@@ -11,6 +11,10 @@ Server knowledge (chat lines, glyph codepoints, item NBT, scoreboard, menus) is 
 - **FOECollab is AGPL.** Use `~/IdeaProjects/FOECollab` as a 1.21.11 API reference only and don't copy its code. The exception is features l wrote themselves: l allowed porting custom HUDs, which is why `%codes%` are FOECollab-compatible. Facts (strings, codepoints, NBT keys) are fine to reuse.
 - `fishonmc-autofish` is a data source only. None of its automation comes over.
 
+## Git
+
+Commit and push straight to `main`. No feature branches or PRs unless l asks for one (l said so on 2026-10-02). Each push to `main` triggers the CI build.
+
 ## Build
 
 `java` is not on PATH on this machine:
