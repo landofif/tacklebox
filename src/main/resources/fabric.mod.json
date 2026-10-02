@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "dofisaddons",
+  "version": "${version}",
+  "name": "Dofi's Addons",
+  "description": "Client-side addons for FishOnMC. Chat triggers: show your own titles and play sounds when a chat message appears. Display only, no automation.",
+  "authors": ["landofif"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["dev.landofif.dofisaddons.DofisAddons"],
+    "modmenu": ["dev.landofif.dofisaddons.ModMenuIntegration"]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.0",
+    "fabric-api": "*",
+    "minecraft": "~1.21.11",
+    "java": ">=21"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}
