@@ -23,7 +23,7 @@ show your own on-screen title and play a sound when a chat message appears.
    - `>` also matches `»`, and fishonmc icon glyphs and extra spaces are ignored
    - paste a real chat line into **test with** to see right away if it fires and what `{n}` becomes
 3. **title**: text, subtitle, colours, size, height, timing and animation (fade, pop, slide, typewriter, shake).
-   - colours: `&a`, `&l` (bold), `&o`, `&#ff8800`
+   - colours: `&a`, `&l` (bold: drawn regular for now, see font), `&o`, `&#ff8800`
    - placeholders: your `{name}` captures, `{player}`, `{count}` (times fired this session), `{message}`
 4. **sound**: click through popular sounds or type any sound id (server pack sounds work too), volume, pitch, repeats.
 5. **▶ preview** any time, then **save**.
@@ -32,7 +32,7 @@ switch triggers on and off with the dot, reorder with the arrows, **share** copi
 
 ## stats
 
-counts what you catch, this session and all-time (per account, since you installed the mod).
+counts what you catch, all-time (per account, kept since you installed the mod, survives relaunches) and for the current session.
 
 - fish, fish per hour, time spent fishing, total value, xp
 - every rarity, size and variant, with percentages
@@ -46,8 +46,8 @@ a catch is counted when fishonmc shows the caught fish title and a new fish with
 
 your own info boxes on screen, built from stats and server info.
 
-- start from a preset: session stats, all-time stats, dry streaks, where and when, wallet, level, bobber timer
-- each line is text with colours and live values, for example `&7fish &f%session.fish%`
+- start from a preset: all-time stats (the default), session stats, dry streaks, where and when, wallet, level, bobber timer
+- each line is text with colours and live values, for example `&7fish &f%alltime.fish%`
 - **+ insert value** lists every value with what it shows right now, so you never have to remember names
 - a line whose value is not available right now hides itself
 - logic and maths work too: `%condition.(<session.fish_raw>>100)%`, `%round.(<expression.(<a>\/<b>)>,1)%`
@@ -85,7 +85,7 @@ everything lives in `config/dofisaddons/`: `triggers.json`, `huds.json`, `settin
 
 ## font
 
-all mod text uses courier prime, a monospaced typewriter style font (sil open font license 1.1).
+all mod text uses courier prime, a monospaced typewriter style font (sil open font license 1.1). it is shipped at several resolutions (`font/mono_1.json` … `mono_8.json`) and drawn at the one matching your gui scale, without the vanilla shadow, so it stays crisp.
 
 ## building
 

@@ -12,8 +12,8 @@ public final class HudPresets {
     public static List<Preset> all() {
         return List.of(
                 new Preset("Blank", "an empty box to fill yourself", blank()),
-                new Preset("Session stats", "fish, rate, time, value, rarities and drops this session", session()),
-                new Preset("All-time stats", "the same, for everything since you installed the mod", allTime()),
+                new Preset("All-time stats", "fish, rate, time, value, rarities and drops since you installed the mod", allTime()),
+                new Preset("Session stats", "the same, for this session only (resets when you relaunch)", session()),
                 new Preset("Dry streaks", "fish since your last mythical, legendary, pet, shard...", dry()),
                 new Preset("Where & when", "location, in-game time, weather and temperature", where()),
                 new Preset("Wallet", "money, credits, level and crew from the sidebar", wallet()),
@@ -35,7 +35,7 @@ public final class HudPresets {
     }
 
     public static CustomHud session() {
-        return make("Session stats", 1, 28,
+        return make("Session stats", 1, 55,
                 "&b&lThis session",
                 "&7Fish &f%session.fish%  &7Per hour &f%session.per_hour%",
                 "&7Fishing &f%session.time%",
@@ -46,9 +46,10 @@ public final class HudPresets {
     }
 
     public static CustomHud allTime() {
-        return make("All-time stats", 1, 55,
+        return make("All-time stats", 1, 28,
                 "&6&lAll-time",
                 "&7Fish &f%alltime.fish%",
+                "&7Per hour &f%alltime.per_hour%",
                 "&7Fishing &f%alltime.time%",
                 "&7Value &f$%alltime.value%  &7Sold &f$%alltime.sold%",
                 "%alltime.rarity_bar%",
