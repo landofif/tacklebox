@@ -7,7 +7,7 @@ Server knowledge (chat lines, glyph codepoints, item NBT, scoreboard, menus) is 
 ## Hard rules
 
 - **Display only.** The mod observes chat, titles, scoreboard, tab, boss bar, item NBT and container screens, and renders things. It never sends chat or commands, clicks, casts, reels or presses keys. Where FOECollab automates (auto `/pay`, `/contest` refreshes, `/find`), show a hint and let the player type the command instead.
-- **Monospace font.** All text the mod draws uses the bundled Courier Prime (`dofisaddons:mono`, see `util/Mono`). Server glyph text (rarity/rank tags, `U+E000`+ icons) stays in its original font so the private-use glyphs render.
+- **Monospace font.** All text the mod draws uses the bundled DM Mono Light, with Medium for bold. It matches l's system24 Discord theme and the desktop font. Go through `util/Mono`: `Mono.text`/`Mono.bold` for screens, and `Mono.prepare` at draw time for anything scaled or drawn over the world. Never add `Formatting.BOLD` to mono text, because vanilla fake bold smears it. Server glyph text (rarity/rank tags, `U+E000`+ icons) stays in its original font so the private-use glyphs render.
 - **FOECollab is AGPL.** Use `~/IdeaProjects/FOECollab` as a 1.21.11 API reference only and don't copy its code. The exception is features l wrote themselves: l allowed porting custom HUDs, which is why `%codes%` are FOECollab-compatible. Facts (strings, codepoints, NBT keys) are fine to reuse.
 - `fishonmc-autofish` is a data source only. None of its automation comes over.
 

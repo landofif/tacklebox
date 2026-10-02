@@ -1,0 +1,16 @@
+{
+  "providers": [
+    {
+      "type": "ttf",
+      "file": "dofisaddons:dm_mono_medium.ttf",
+      "size": 10.0,
+      "oversample": 8.0,
+      "shift": [0.0, 0.5],
+      "skip": []
+    },
+    {
+      "type": "reference",
+      "id": "minecraft:default"
+    }
+  ]
+}

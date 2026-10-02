@@ -11,28 +11,31 @@ import net.minecraft.util.math.MathHelper;
 import java.util.Optional;
 
 /**
- * The mod's typewriter-style monospaced font (Courier Prime). Every piece of text the mod draws goes
- * through here so the whole mod shares one look. Characters the font lacks fall back to Minecraft's
- * default font.
+ * The mod's monospaced font: DM Mono Light, with DM Mono Medium for bold (the same face and weights
+ * as l's system24 Discord theme). Every piece of text the mod draws goes through here so the whole
+ * mod shares one look. Characters the font lacks fall back to Minecraft's default font.
  *
  * <p>Minecraft rasterises a TTF once at a fixed {@code oversample} and draws it with nearest-neighbour
  * sampling, so the glyphs only look clean when one atlas pixel lands on one screen pixel. The font is
- * therefore shipped as {@code mono_1 … mono_8} (oversample 1–8, otherwise identical) and text is pointed
- * at the variant that matches the real pixels per GUI unit it is drawn at.
+ * therefore shipped as {@code mono_1 … mono_8} and {@code mono_bold_1 … mono_bold_8} (oversample 1–8,
+ * otherwise identical) and text is pointed at the variant that matches the real pixels per GUI unit it
+ * is drawn at.
  *
  * <p>Vanilla's shadow and fake bold both offset a copy of the glyph by a whole GUI unit, which smears a
- * thin-stroked font into a blur, so mono text has no shadow (unless asked for, then a soft one) and no
- * fake bold.
+ * thin-stroked font into a blur, so mono text has no shadow (unless asked for, then a soft one), and
+ * bold switches to the real Medium face instead of fake bold.
  */
 public final class Mono {
     private static final int MAX_OVERSAMPLE = 8;
     private static final StyleSpriteSource[] SOURCES = new StyleSpriteSource[MAX_OVERSAMPLE + 1];
+    private static final StyleSpriteSource[] BOLD_SOURCES = new StyleSpriteSource[MAX_OVERSAMPLE + 1];
     /** Shadow for mono text drawn straight over the world, where it needs a little contrast. */
     private static final int SOFT_SHADOW = 0x66000000;
 
     static {
         for (int i = 1; i <= MAX_OVERSAMPLE; i++) {
             SOURCES[i] = new StyleSpriteSource.Font(Identifier.of("dofisaddons", "mono_" + i));
+            BOLD_SOURCES[i] = new StyleSpriteSource.Font(Identifier.of("dofisaddons", "mono_bold_" + i));
         }
     }
 
@@ -41,6 +44,11 @@ public final class Mono {
     /** A plain literal in the mono font, sized for drawing at GUI scale. */
     public static MutableText text(String s) {
         return Text.literal(s).setStyle(style(Style.EMPTY));
+    }
+
+    /** A literal in the Medium (bold) face, for headers in screens. Don't add {@code BOLD} on top. */
+    public static MutableText bold(String s) {
+        return Text.literal(s).setStyle(Style.EMPTY.withFont(BOLD_SOURCES[oversampleFor(1f)]).withoutShadow());
     }
 
     /** Same style, switched to the mono font (keeps colour etc.; drops shadow). */
@@ -55,30 +63,31 @@ public final class Mono {
 
     /** The font variant for text drawn at {@code drawScale} on top of the GUI scale. */
     public static StyleSpriteSource source(float drawScale) {
+        return SOURCES[oversampleFor(drawScale)];
+    }
+
+    private static int oversampleFor(float drawScale) {
         MinecraftClient client = MinecraftClient.getInstance();
         float guiScale = client == null || client.getWindow() == null ? 2 : client.getWindow().getScaleFactor();
-        return SOURCES[MathHelper.clamp(Math.round(guiScale * drawScale), 1, MAX_OVERSAMPLE)];
+        return MathHelper.clamp(Math.round(guiScale * drawScale), 1, MAX_OVERSAMPLE);
     }
 
-    /** {@link #prepare(Text, StyleSpriteSource, boolean)} for text drawn at {@code drawScale} in the GUI. */
+    /** {@link #prepare(Text, int, boolean)} for text drawn at {@code drawScale} in the GUI. */
     public static Text prepare(Text text, float drawScale, boolean shadow) {
-        return prepare(text, source(drawScale), shadow);
-    }
-
-    /** {@link #prepare(Text, StyleSpriteSource, boolean)} with a fixed oversample (text drawn in the world). */
-    public static Text prepare(Text text, int oversample, boolean shadow) {
-        return prepare(text, SOURCES[MathHelper.clamp(oversample, 1, MAX_OVERSAMPLE)], shadow);
+        return prepare(text, oversampleFor(drawScale), shadow);
     }
 
     /**
-     * Re-targets every mono run in {@code text} at {@code source}, without fake bold, and with either no
-     * shadow or a soft one. Runs in other fonts (server glyphs) are left alone.
+     * Re-targets every mono run in {@code text} at the variant for {@code oversample} (the Medium face for
+     * bold runs, instead of fake bold), with either no shadow or a soft one. Runs in other fonts (server
+     * glyphs) are left alone. Use a fixed oversample for text drawn in the world.
      */
-    private static Text prepare(Text text, StyleSpriteSource source, boolean shadow) {
+    public static Text prepare(Text text, int oversample, boolean shadow) {
+        int i = MathHelper.clamp(oversample, 1, MAX_OVERSAMPLE);
         MutableText out = Text.empty();
         text.visit((style, s) -> {
             if (isMono(style)) {
-                style = style.withFont(source).withBold(false);
+                style = style.withFont(style.isBold() ? BOLD_SOURCES[i] : SOURCES[i]).withBold(false);
                 style = shadow ? style.withShadowColor(SOFT_SHADOW) : style.withoutShadow();
             }
             out.append(Text.literal(s).setStyle(style));

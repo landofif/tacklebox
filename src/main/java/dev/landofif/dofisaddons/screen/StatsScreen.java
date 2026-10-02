@@ -210,7 +210,7 @@ public class StatsScreen extends Screen {
             }
             int x = left + c * colW;
             int y = top + colY[c] - off;
-            context.drawTextWithShadow(textRenderer, Mono.text(sec.title()).formatted(Formatting.AQUA), x, y, 0xFFFFFFFF);
+            context.drawTextWithShadow(textRenderer, Mono.bold(sec.title()).formatted(Formatting.AQUA), x, y, 0xFFFFFFFF);
             y += LINE_H + 1;
             for (Text line : sec.lines()) {
                 Text shown = textRenderer.getWidth(line) > colW - 6

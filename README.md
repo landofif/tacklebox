@@ -23,7 +23,7 @@ show your own on-screen title and play a sound when a chat message appears.
    - `>` also matches `»`, and fishonmc icon glyphs and extra spaces are ignored
    - paste a real chat line into **test with** to see right away if it fires and what `{n}` becomes
 3. **title**: text, subtitle, colours, size, height, timing and animation (fade, pop, slide, typewriter, shake).
-   - colours: `&a`, `&l` (bold: drawn regular for now, see font), `&o`, `&#ff8800`
+   - colours: `&a`, `&l` (bold), `&o`, `&#ff8800`
    - placeholders: your `{name}` captures, `{player}`, `{count}` (times fired this session), `{message}`
 4. **sound**: click through popular sounds or type any sound id (server pack sounds work too), volume, pitch, repeats.
 5. **▶ preview** any time, then **save**.
@@ -85,7 +85,7 @@ everything lives in `config/dofisaddons/`: `triggers.json`, `huds.json`, `settin
 
 ## font
 
-all mod text uses courier prime, a monospaced typewriter style font (sil open font license 1.1). it is shipped at several resolutions (`font/mono_1.json` … `mono_8.json`) and drawn at the one matching your gui scale, without the vanilla shadow, so it stays crisp.
+all mod text uses dm mono light, with dm mono medium for bold (sil open font license 1.1, see `assets/dofisaddons/font/ofl-dmmono.txt`). it is shipped at several resolutions (`font/mono_1.json` … `mono_8.json`, `mono_bold_1.json` … `mono_bold_8.json`) and drawn at the one matching your gui scale, without the vanilla shadow, so it stays crisp.
 
 ## building
 

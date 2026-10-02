@@ -2,7 +2,7 @@
   "providers": [
     {
       "type": "ttf",
-      "file": "dofisaddons:courier_prime.ttf",
+      "file": "dofisaddons:dm_mono_light.ttf",
       "size": 10.0,
       "oversample": 5.0,
       "shift": [0.0, 0.5],
