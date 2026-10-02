@@ -102,13 +102,6 @@ public class SettingsScreen extends DofiScreen {
                 toggle("hide vanilla xp bar",
                         "on fishonmc the xp bar shows your fishing level. this hides it and its number so the level hud can take its place. add the level hud from custom huds.",
                         () -> s.hideVanillaXp, v -> s.hideVanillaXp = v, defaults.hideVanillaXp);
-                header("bobber timer");
-                cycle("bobber timer",
-                        "shows how long your line has been in the water. turns yellow, then red, as it gets long, and says bite! when something bites. display only.",
-                        DofiSettings.BobberMode.values(), m -> m.label, () -> s.bobberTimer, v -> s.bobberTimer = v, defaults.bobberTimer);
-                slider("turn red after", "the timer turns red after this many seconds. 0 = always white.",
-                        0, 60, 1, "s", v -> v == 0 ? "never" : String.format(Locale.ROOT, "%.0fs", v),
-                        () -> s.bobberSlowSeconds, v -> s.bobberSlowSeconds = v, defaults.bobberSlowSeconds);
                 header("stats");
                 slider("pause fishing clock after",
                         "the time fishing clock (and fish per hour) stops when you havent caught anything for this long, so afk time doesnt count.",
@@ -135,6 +128,43 @@ public class SettingsScreen extends DofiScreen {
                         () -> s.titleScreen, v -> s.titleScreen = v, defaults.titleScreen);
             }
             case BOBBER -> {
+                header("timer");
+                cycle("bobber timer",
+                        "shows how long your line has been in the water. changes colour as the wait gets long, and says bite! when something bites. display only.",
+                        DofiSettings.BobberMode.values(), m -> m.label, () -> s.bobberTimer, v -> s.bobberTimer = v, defaults.bobberTimer);
+                color("timer colour", "the colour of the timer while the wait is still short.",
+                        () -> s.bobberColor, v -> s.bobberColor = v, defaults.bobberColor);
+                slider("warn after", "the timer switches to the warn colour after this many seconds. 0 = never.",
+                        0, 60, 1, "s", v -> v == 0 ? "never" : String.format(Locale.ROOT, "%.0fs", v),
+                        () -> s.bobberWarnSeconds, v -> s.bobberWarnSeconds = v, defaults.bobberWarnSeconds);
+                color("warn colour", "the colour of the timer once it passes the warn time.",
+                        () -> s.bobberWarnColor, v -> s.bobberWarnColor = v, defaults.bobberWarnColor);
+                slider("slow after", "the timer switches to the slow colour after this many seconds. 0 = never.",
+                        0, 60, 1, "s", v -> v == 0 ? "never" : String.format(Locale.ROOT, "%.0fs", v),
+                        () -> s.bobberSlowSeconds, v -> s.bobberSlowSeconds = v, defaults.bobberSlowSeconds);
+                color("slow colour", "the colour of the timer once it passes the slow time.",
+                        () -> s.bobberSlowColor, v -> s.bobberSlowColor = v, defaults.bobberSlowColor);
+                color("bite colour", "the colour of the timer once something bites.",
+                        () -> s.bobberBiteColor, v -> s.bobberBiteColor = v, defaults.bobberBiteColor);
+                toggle("show bite!", "puts bite! in front of the time when something bites. the colour still changes when this is off.",
+                        () -> s.bobberShowBite, v -> s.bobberShowBite = v, defaults.bobberShowBite);
+                toggle("bold timer", "draws the timer in the medium face instead of the light one.",
+                        () -> s.bobberBold, v -> s.bobberBold = v, defaults.bobberBold);
+                slider("decimals", "how many digits after the point. 0 shows whole seconds.",
+                        0, 2, 1, "", v -> String.format(Locale.ROOT, "%.0f", v),
+                        () -> s.bobberDecimals, v -> s.bobberDecimals = (int) Math.round(v), defaults.bobberDecimals);
+                slider("timer size", "how big the timer is. 1 = normal.", 0.5, 3, 0.05, "x", null,
+                        () -> s.bobberScale, v -> s.bobberScale = v, defaults.bobberScale);
+                slider("height above bobber", "how many blocks above the bobber the timer floats. above bobber mode only.",
+                        0, 3, 0.05, " blocks", null, () -> s.bobberHeight, v -> s.bobberHeight = v, defaults.bobberHeight);
+                slider("background", "how solid the box behind the timer above the bobber is. 0 = no box.",
+                        0, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
+                        () -> s.bobberBacking, v -> s.bobberBacking = (int) Math.round(v), defaults.bobberBacking);
+                toggle("show through walls", "keeps the timer above the bobber visible behind blocks and water.",
+                        () -> s.bobberThroughWalls, v -> s.bobberThroughWalls = v, defaults.bobberThroughWalls);
+                slider("crosshair offset", "how far below the crosshair the timer sits. under crosshair mode only. negative is above.",
+                        -60, 60, 1, "", v -> String.format(Locale.ROOT, "%.0f", v),
+                        () -> s.bobberCrosshairY, v -> s.bobberCrosshairY = (int) Math.round(v), defaults.bobberCrosshairY);
                 header("skin");
                 cycle("bobber skin", "swaps the look of your bobber. only you see it, other players still see the normal one.",
                         DofiSettings.BobberSkin.values(), k -> k.label, () -> s.bobberSkin, v -> s.bobberSkin = v, defaults.bobberSkin);

@@ -29,9 +29,33 @@ public class DofiSettings {
     /** Right click a chat line (with chat open) to copy it. */
     public boolean chatCopy = true;
 
+    // ---- bobber timer ----
     public BobberMode bobberTimer = BobberMode.ABOVE_BOBBER;
-    /** Turn the timer text red after this many seconds (0 = never). */
+    /** Turn the timer text the warn colour after this many seconds (0 = never). */
+    public double bobberWarnSeconds = 13;
+    /** Turn the timer text the slow colour after this many seconds (0 = never). */
     public double bobberSlowSeconds = 20;
+    /** RGB of the timer text: normal, warn, slow, and once something bites. */
+    public int bobberColor = 0xEEEEEE;
+    public int bobberWarnColor = 0xD7B65E;
+    public int bobberSlowColor = 0xDF7A9B;
+    public int bobberBiteColor = 0x3BB693;
+    /** Show "bite!" in front of the time once the server announces a bite. */
+    public boolean bobberShowBite = true;
+    /** Draw the timer in the medium (bold) face. */
+    public boolean bobberBold = false;
+    /** Digits after the point (0 to 2). */
+    public int bobberDecimals = 1;
+    /** Size of the timer text, 1 = normal. */
+    public double bobberScale = 1.0;
+    /** Blocks above the bobber (above bobber mode). */
+    public double bobberHeight = 0.75;
+    /** Opacity of the box behind the timer above the bobber, 0 to 100. */
+    public int bobberBacking = 33;
+    /** Show the timer above the bobber through blocks and water. */
+    public boolean bobberThroughWalls = true;
+    /** Gui units below the crosshair (under crosshair mode). */
+    public int bobberCrosshairY = 12;
 
     // ---- bobber looks (only you see these) ----
     public BobberSkin bobberSkin = BobberSkin.DEFAULT;
@@ -105,5 +129,15 @@ public class DofiSettings {
         swingSlowness = Math.max(0.25, Math.min(4, swingSlowness));
         pauseAfterSeconds = Math.max(10, Math.min(1800, pauseAfterSeconds));
         bobberSlowSeconds = Math.max(0, Math.min(120, bobberSlowSeconds));
+        bobberWarnSeconds = Math.max(0, Math.min(120, bobberWarnSeconds));
+        bobberColor &= 0xFFFFFF;
+        bobberWarnColor &= 0xFFFFFF;
+        bobberSlowColor &= 0xFFFFFF;
+        bobberBiteColor &= 0xFFFFFF;
+        bobberDecimals = Math.max(0, Math.min(2, bobberDecimals));
+        bobberScale = Math.max(0.5, Math.min(3, bobberScale));
+        bobberHeight = Math.max(0, Math.min(3, bobberHeight));
+        bobberBacking = Math.max(0, Math.min(100, bobberBacking));
+        bobberCrosshairY = Math.max(-120, Math.min(120, bobberCrosshairY));
     }
 }

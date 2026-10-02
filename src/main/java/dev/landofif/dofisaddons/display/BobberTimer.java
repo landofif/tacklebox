@@ -10,6 +10,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.projectile.FishingBobberEntity;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
@@ -19,7 +20,8 @@ import java.util.Locale;
 
 /**
  * Shows how long your line has been in the water, floating above your bobber (or under the
- * crosshair). Turns red after a while, and shows "BITE!" when the server announces a bite.
+ * crosshair). Changes colour as the wait gets long, and shows "bite!" when the server announces a bite.
+ * Colours, size, height and the rest are in the bobber tab of the settings.
  * Display only: it never reels or casts.
  */
 public final class BobberTimer {
@@ -64,14 +66,23 @@ public final class BobberTimer {
 
     private static Text label() {
         DofiSettings s = StatsTracker.settings();
-        if (hasBite()) {
-            return Mono.text("bite! " + String.format(Locale.ROOT, "%.1fs", seconds())).formatted(Formatting.RED, Formatting.BOLD);
-        }
         double secs = seconds();
-        Formatting color = s.bobberSlowSeconds > 0 && secs >= s.bobberSlowSeconds ? Formatting.RED
-                : s.bobberSlowSeconds > 0 && secs >= s.bobberSlowSeconds * 0.66 ? Formatting.YELLOW
-                : Formatting.WHITE;
-        return Mono.text(String.format(Locale.ROOT, "%.1fs", secs)).formatted(color);
+        String time = String.format(Locale.ROOT, "%." + s.bobberDecimals + "fs", secs);
+        int color;
+        if (hasBite()) {
+            color = s.bobberBiteColor;
+            if (s.bobberShowBite) {
+                time = "bite! " + time;
+            }
+        } else if (s.bobberSlowSeconds > 0 && secs >= s.bobberSlowSeconds) {
+            color = s.bobberSlowColor;
+        } else if (s.bobberWarnSeconds > 0 && secs >= s.bobberWarnSeconds) {
+            color = s.bobberWarnColor;
+        } else {
+            color = s.bobberColor;
+        }
+        MutableText t = Mono.text(time).withColor(color);
+        return s.bobberBold || hasBite() && s.bobberShowBite ? t.formatted(Formatting.BOLD) : t;
     }
 
     private static boolean active(DofiSettings.BobberMode mode) {
@@ -83,11 +94,15 @@ public final class BobberTimer {
         if (!active(DofiSettings.BobberMode.UNDER_CROSSHAIR)) {
             return;
         }
+        DofiSettings s = StatsTracker.settings();
+        float scale = (float) s.bobberScale;
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
-        Text t = Mono.prepare(label(), 1f, true);
-        int x = ctx.getScaledWindowWidth() / 2 - tr.getWidth(t) / 2;
-        int y = ctx.getScaledWindowHeight() / 2 + 12;
-        ctx.drawTextWithShadow(tr, t, x, y, 0xFFFFFFFF);
+        Text t = Mono.prepare(label(), scale, true);
+        ctx.getMatrices().pushMatrix();
+        ctx.getMatrices().translate(ctx.getScaledWindowWidth() / 2f, ctx.getScaledWindowHeight() / 2f + s.bobberCrosshairY);
+        ctx.getMatrices().scale(scale, scale);
+        ctx.drawTextWithShadow(tr, t, -tr.getWidth(t) / 2, 0, 0xFFFFFFFF);
+        ctx.getMatrices().popMatrix();
     }
 
     /** Above-bobber mode: a small label that always faces you. */
@@ -100,20 +115,24 @@ public final class BobberTimer {
         if (hook == null) {
             return;
         }
+        DofiSettings s = StatsTracker.settings();
+        float scale = (float) s.bobberScale;
         float delta = client.getRenderTickCounter().getTickProgress(true);
         Vec3d pos = hook.getLerpedPos(delta);
         Vec3d camera = context.worldState().cameraRenderState.pos;
         TextRenderer tr = client.textRenderer;
         // Seen up close in the world, so rasterise generously; it has its own backing instead of a shadow.
-        Text text = Mono.prepare(label(), 4, false);
+        Text text = Mono.prepare(label(), Math.round(4 * scale), false);
 
         MatrixStack matrices = new MatrixStack();
-        matrices.translate(pos.x - camera.x, pos.y - camera.y + 0.75, pos.z - camera.z);
+        matrices.translate(pos.x - camera.x, pos.y - camera.y + s.bobberHeight, pos.z - camera.z);
         matrices.multiply(client.gameRenderer.getCamera().getRotation());
-        matrices.scale(0.025f, -0.025f, 0.025f);
+        matrices.scale(0.025f * scale, -0.025f * scale, 0.025f * scale);
         Matrix4f matrix = matrices.peek().getPositionMatrix();
         float x = -tr.getWidth(text) / 2f;
+        int backing = Math.round(s.bobberBacking * 2.55f) << 24;
         tr.draw(text, x, 0, 0xFFFFFFFF, false, matrix, context.consumers(),
-                TextRenderer.TextLayerType.SEE_THROUGH, 0x55000000, 0xF000F0);
+                s.bobberThroughWalls ? TextRenderer.TextLayerType.SEE_THROUGH : TextRenderer.TextLayerType.NORMAL,
+                backing, 0xF000F0);
     }
 }

@@ -75,7 +75,7 @@ on fishonmc the vanilla xp bar shows your fishing level. dofis addons hides it (
 
 ## bobber timer
 
-shows how long your line has been in the water, floating above your bobber or under your crosshair. it turns yellow and then red as the wait gets long, and says bite! when something bites. change it in settings.
+shows how long your line has been in the water, floating above your bobber or under your crosshair. it changes colour as the wait gets long, and says bite! when something bites. in the bobber tab of the settings you can pick all four colours (normal, warn, slow, bite) and when they kick in, the size, how many decimals, bold, the height above the bobber, the box behind it, whether it shows through walls and how far under the crosshair it sits.
 
 ## bobber looks
 
