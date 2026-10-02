@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 /**
  * Draws custom HUDs as panels in the style of l's system24 Discord theme: a dark box with a thin border,
  * the title set into the top edge, roomy padding, and label / value rows with the values lined up on
- * the right. Lines are re-resolved a few times a second, not every frame. A line with a value that
+ * the right. Lines are re-resolved 20 times a second, not every frame. A line with a value that
  * isn't available right now is left out, so a box only shows what makes sense at the moment.
  *
  * <p>Line rules: {@code %tab%} splits a line into a label (left) and a value (right-aligned). If the
@@ -37,7 +37,8 @@ public final class HudRenderer {
     private static final int TITLE_RISE = 5;
     private static final int PANEL_RGB = 0x0E0F12;
     private static final int BORDER_RGB = 0x4E525C;
-    private static final long REFRESH_MS = 200;
+    /** Under 100ms so tenths of a second (the bobber timer) never skip a step. */
+    private static final long REFRESH_MS = 50;
 
     private static final String TAB = "%tab%";
     /** Leading colour/format codes ending in &l, i.e. a bold first line. */
@@ -110,7 +111,7 @@ public final class HudRenderer {
 
     public static void renderAll(DrawContext ctx) {
         long now = System.currentTimeMillis();
-        if (now - cachedAt > REFRESH_MS) {
+        if (now - cachedAt >= REFRESH_MS) {
             CACHE.clear();
             for (CustomHud hud : HudStore.all()) {
                 if (hud.enabled) CACHE.put(hud, resolve(hud));
