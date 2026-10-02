@@ -69,14 +69,19 @@ public final class HudRenderer {
     }
 
     /** Draws one box and returns its on-screen rectangle {x, y, w, h}. */
-    public static int[] draw(DrawContext ctx, CustomHud hud, List<Text> lines, boolean highlight) {
+    public static int[] draw(DrawContext ctx, CustomHud hud, List<Text> rawLines, boolean highlight) {
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
+        float scale = (float) hud.scale;
+        // A box with a background doesn't need a shadow; text floating over the world gets a soft one.
+        boolean shadow = hud.background < 25;
+        List<Text> lines = new ArrayList<>(rawLines.size());
+        for (Text t : rawLines) lines.add(Mono.prepare(t, scale, shadow));
+
         int contentW = 0;
         for (Text t : lines) contentW = Math.max(contentW, tr.getWidth(t));
         int boxW = contentW + PAD * 2;
         int boxH = Math.max(1, lines.size()) * LINE_H + PAD * 2 - 2;
 
-        float scale = (float) hud.scale;
         int sw = ctx.getScaledWindowWidth();
         int sh = ctx.getScaledWindowHeight();
         int w = Math.round(boxW * scale);
@@ -113,7 +118,7 @@ public final class HudRenderer {
                 case CENTER -> PAD + (contentW - tw) / 2;
                 case RIGHT -> PAD + contentW - tw;
             };
-            ctx.drawTextWithShadow(tr, t, tx, ty, 0xFFFFFFFF);
+            ctx.drawTextWithShadow(tr, t, tx, ty, 0xFFFFFFFF); // mono runs carry their own shadow setting
             ty += LINE_H;
         }
         ctx.getMatrices().popMatrix();

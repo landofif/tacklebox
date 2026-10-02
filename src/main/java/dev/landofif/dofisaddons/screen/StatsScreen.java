@@ -21,7 +21,7 @@ import java.util.Map;
 /** Session and all-time numbers in readable sections. */
 public class StatsScreen extends Screen {
     private enum Tab {
-        SESSION("This session"), ALL_TIME("All-time");
+        ALL_TIME("All-time"), SESSION("This session");
 
         final String label;
 
@@ -37,7 +37,7 @@ public class StatsScreen extends Screen {
     private static final int TOP = 48;
 
     private final Screen parent;
-    private Tab tab = Tab.SESSION;
+    private Tab tab = Tab.ALL_TIME;
     private int left;
     private int contentW;
     private double scroll;
@@ -210,7 +210,7 @@ public class StatsScreen extends Screen {
             }
             int x = left + c * colW;
             int y = top + colY[c] - off;
-            context.drawTextWithShadow(textRenderer, Mono.text(sec.title()).formatted(Formatting.AQUA, Formatting.BOLD), x, y, 0xFFFFFFFF);
+            context.drawTextWithShadow(textRenderer, Mono.text(sec.title()).formatted(Formatting.AQUA), x, y, 0xFFFFFFFF);
             y += LINE_H + 1;
             for (Text line : sec.lines()) {
                 Text shown = textRenderer.getWidth(line) > colW - 6

@@ -45,7 +45,7 @@ public final class HudStore {
         HUDS.clear();
         Path path = file();
         if (!Files.isRegularFile(path)) {
-            HUDS.add(HudPresets.session());
+            HUDS.add(HudPresets.allTime());
             HUDS.add(HudPresets.level());
             HUDS.add(HudPresets.bobber());
             save();

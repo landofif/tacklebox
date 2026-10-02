@@ -48,7 +48,7 @@ public class HomeScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         int y = this.height / 2 - 84;
-        context.drawCenteredTextWithShadow(textRenderer, this.title.copy().formatted(Formatting.AQUA, Formatting.BOLD), this.width / 2, y, 0xFFFFFFFF);
+        context.drawCenteredTextWithShadow(textRenderer, this.title.copy().formatted(Formatting.AQUA), this.width / 2, y, 0xFFFFFFFF);
         context.drawCenteredTextWithShadow(textRenderer, Mono.text("fishonmc addons · display only, no automation").formatted(Formatting.GRAY),
                 this.width / 2, y + 12, 0xFFFFFFFF);
     }

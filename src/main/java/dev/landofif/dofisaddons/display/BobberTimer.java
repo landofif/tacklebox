@@ -84,7 +84,7 @@ public final class BobberTimer {
             return;
         }
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
-        Text t = label();
+        Text t = Mono.prepare(label(), 1f, true);
         int x = ctx.getScaledWindowWidth() / 2 - tr.getWidth(t) / 2;
         int y = ctx.getScaledWindowHeight() / 2 + 12;
         ctx.drawTextWithShadow(tr, t, x, y, 0xFFFFFFFF);
@@ -104,7 +104,8 @@ public final class BobberTimer {
         Vec3d pos = hook.getLerpedPos(delta);
         Vec3d camera = context.worldState().cameraRenderState.pos;
         TextRenderer tr = client.textRenderer;
-        Text text = label();
+        // Seen up close in the world, so rasterise generously; it has its own backing instead of a shadow.
+        Text text = Mono.prepare(label(), 4, false);
 
         MatrixStack matrices = new MatrixStack();
         matrices.translate(pos.x - camera.x, pos.y - camera.y + 0.75, pos.z - camera.z);

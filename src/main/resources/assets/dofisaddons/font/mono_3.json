@@ -1,0 +1,16 @@
+{
+  "providers": [
+    {
+      "type": "ttf",
+      "file": "dofisaddons:courier_prime.ttf",
+      "size": 10.0,
+      "oversample": 3.0,
+      "shift": [0.0, 0.5],
+      "skip": []
+    },
+    {
+      "type": "reference",
+      "id": "minecraft:default"
+    }
+  ]
+}
