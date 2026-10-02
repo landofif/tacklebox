@@ -16,3 +16,11 @@ jobs:
         with:
           name: dofisaddons
           path: build/libs/*.jar
+      - name: Build Prism test instance
+        if: github.event_name == 'push'
+        run: python3 .github/scripts/prism_instance.py
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'push'
+        with:
+          name: dofis-addons-prism
+          path: build/dofis-addons-prism.zip
