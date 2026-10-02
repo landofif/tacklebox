@@ -40,7 +40,7 @@ public class HomeScreen extends DofiScreen {
         addDrawableChild(ButtonWidget.builder(entry("stats", StatNames.number(StatsTracker.session().fish) + " fish this session"),
                 b -> client.setScreen(new StatsScreen(this))).dimensions(x, y, w, 20).build());
         y += 24;
-        addDrawableChild(ButtonWidget.builder(entry("settings", "look, bobber, viewmodel"),
+        addDrawableChild(ButtonWidget.builder(entry("settings", "look, bobber, world, viewmodel"),
                 b -> client.setScreen(new SettingsScreen(this))).dimensions(x, y, w, 20).build());
         y += 32;
         addDrawableChild(ButtonWidget.builder(Mono.text("done"), b -> close()).dimensions(x + w / 4, y, w / 2, 20).build());

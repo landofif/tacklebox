@@ -57,6 +57,33 @@ public class DofiSettings {
     /** Gui units below the crosshair (under crosshair mode). */
     public int bobberCrosshairY = 12;
 
+    /** Show a short message in the middle of the screen when your fish bites. */
+    public boolean biteMessage = false;
+    public String biteMessageText = "fish on!";
+    public int biteMessageColor = 0x3BB693;
+
+    // ---- bobber behaviour (only you see these) ----
+    /** Hold the bobber still on the water instead of bobbing (it still dips on a bite). */
+    public boolean stillBobber = true;
+    /** Show your own cast flying smoothly instead of snapping back on a laggy server. */
+    public boolean smoothCast = true;
+    /** Hide other players bobbers and their lines. */
+    public boolean hideOtherBobbers = false;
+
+    // ---- world (only you see these) ----
+    /** Hide the rank / name / power tag the server puts over your own head. */
+    public boolean hideOwnNametag = false;
+    /** Hide every players nametag, the servers and the vanilla one. */
+    public boolean hideAllNametags = false;
+    /** Hide the +66xp reward line in the action bar after a catch. */
+    public boolean hideXpPopups = false;
+    /** Draw leaves flat like vanilla instead of the server packs 3d leaves. */
+    public boolean flatLeaves = false;
+    /** Trim caught fish tooltips: latin name, value, ecosystem, metric units. */
+    public boolean shortFishTooltips = false;
+    /** Trim pet tooltips: maxed stat pairs and empty skin / item / trail slots. */
+    public boolean shortPetTooltips = false;
+
     // ---- bobber looks (only you see these) ----
     public BobberSkin bobberSkin = BobberSkin.DEFAULT;
     /** Also show your skin on other players' bobbers. */
@@ -125,6 +152,8 @@ public class DofiSettings {
         if (chatFilters == null) chatFilters = new java.util.ArrayList<>();
         chatFilters.removeIf(java.util.Objects::isNull);
         lineColor &= 0xFFFFFF;
+        biteMessageColor &= 0xFFFFFF;
+        if (biteMessageText == null) biteMessageText = "";
         vmScale = Math.max(0.1, Math.min(3, vmScale));
         swingSlowness = Math.max(0.25, Math.min(4, swingSlowness));
         pauseAfterSeconds = Math.max(10, Math.min(1800, pauseAfterSeconds));

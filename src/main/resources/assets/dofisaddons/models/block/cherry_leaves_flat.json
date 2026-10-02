@@ -1,0 +1,6 @@
+{
+    "parent": "dofisaddons:block/flat_leaves",
+    "textures": {
+        "all": "minecraft:block/cherry_leaves"
+    }
+}

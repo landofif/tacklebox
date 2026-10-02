@@ -11,6 +11,7 @@ needs: fabric api. mod menu is optional.
 - `/dofi` opens the home screen with everything below
 - `/dofi triggers`, `/dofi huds`, `/dofi chat`, `/dofi stats`, `/dofi move` jump straight to one part
 - right shift opens `/dofi` too
+- `/dofi debug item` prints the held items data, `/dofi debug tooltip` prints the next tooltip you hover
 - with mod menu: mods → dofis addons → configure
 
 ## chat triggers
@@ -76,6 +77,33 @@ on fishonmc the vanilla xp bar shows your fishing level. dofis addons hides it (
 ## bobber timer
 
 shows how long your line has been in the water, floating above your bobber or under your crosshair. it changes colour as the wait gets long, and says bite! when something bites. in the bobber tab of the settings you can pick all four colours (normal, warn, slow, bite) and when they kick in, the size, how many decimals, bold, the height above the bobber, the box behind it, whether it shows through walls and how far under the crosshair it sits.
+
+## bite
+
+the bite is read from your own bobber, so someone fishing next to you can never set it off. it turns the timer to the bite colour, and with **bite message** on it also shows a short message (fish on! by default) in the middle of the screen.
+
+## bobber and world tweaks
+
+these change only what you see. bobber options are under settings → bobber, the rest under settings → world.
+
+- **still bobber** (on by default): the bobber sits still on the water instead of bobbing. it still dips when a fish bites
+- **smooth cast** (on by default): on a laggy connection your own cast flies smoothly instead of jumping back. where it lands stays exact
+- **hide other bobbers**: other players bobbers and their lines disappear
+- **hide my nametag**: hides the rank, name and power tag the server puts over your head
+- **hide all nametags**: hides every players nametag, the servers and the vanilla one
+- **hide xp popups**: hides the +66xp line above the hotbar after a catch
+- **flat leaves**: draws leaves flat like vanilla instead of the fishonmc packs 3d leaves (reloads resources when changed)
+- **short fish tooltips**: leaves out the latin name, value, ecosystem and the kg / cm part of fish tooltips
+- **short pet tooltips**: shows maxed stats once and leaves out empty skin, item and trail slots
+
+## bait and events
+
+two more hud presets:
+
+- **bait**: the bait on the rod you are holding and its uses left (gold when low, red when nearly out). values: `%bait.name_colored%`, `%bait.uses%`, `%bait.left%`, `%bait.total%`, `%bait.rarity%`
+- **events**: rain, storms, rainbow, gold rush, blooming oasis and the moons, each with an estimated time left from its chat message. a line only shows while its event is on. values: `%event.rain%`, `%event.gold_rush%`, `%event.blood_moon%` and so on, plus `%event.any%`
+
+there is also a **variant catch** trigger preset (albino!, melanistic!, trophy! ... on your own catches).
 
 ## bobber looks
 

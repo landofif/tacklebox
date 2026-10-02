@@ -54,10 +54,13 @@ public final class DofisAddons implements ClientModInitializer {
         TriggerStore.load();
         HudStore.load();
         StatsTracker.loadSettings();
+        dev.landofif.dofisaddons.display.FlatLeaves.register();
+        dev.landofif.dofisaddons.display.ShortTooltips.register();
 
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
             if (!overlay) {
                 StatsTracker.onChat(message);
+                dev.landofif.dofisaddons.hud.EventTracker.onChat(message.getString());
             }
             boolean show = TriggerEngine.onGameMessage(message, overlay);
             return show && (overlay || ChatTweaks.allow(message));
@@ -68,7 +71,10 @@ public final class DofisAddons implements ClientModInitializer {
         openKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.dofisaddons.open", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_SHIFT, category));
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> StatsTracker.onJoin());
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> StatsTracker.onLeave());
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            StatsTracker.onLeave();
+            dev.landofif.dofisaddons.hud.EventTracker.clear();
+        });
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> StatsTracker.saveAllTime());
 
         HudElementRegistry.addLast(Identifier.of(MOD_ID, "custom_huds"), (context, tickCounter) -> {
@@ -95,6 +101,7 @@ public final class DofisAddons implements ClientModInitializer {
             ServerInfo.tick(client);
             StatsTracker.tick(client);
             BobberTimer.tick(client);
+            dev.landofif.dofisaddons.display.BiteWatch.tick(client);
             while (openKey.wasPressed()) {
                 if (client.currentScreen == null) {
                     client.setScreen(new HomeScreen(null));
@@ -113,6 +120,9 @@ public final class DofisAddons implements ClientModInitializer {
                     .then(ClientCommandManager.literal("huds").executes(ctx -> open(() -> new HudListScreen(null))))
                     .then(ClientCommandManager.literal("stats").executes(ctx -> open(() -> new StatsScreen(null))))
                     .then(ClientCommandManager.literal("chat").executes(ctx -> open(() -> new ChatFilterScreen(null))))
+                    .then(ClientCommandManager.literal("debug")
+                            .then(ClientCommandManager.literal("item").executes(ctx -> dev.landofif.dofisaddons.display.DebugDump.heldItem()))
+                            .then(ClientCommandManager.literal("tooltip").executes(ctx -> dev.landofif.dofisaddons.display.DebugDump.nextTooltip())))
                     .then(ClientCommandManager.literal("move").executes(ctx -> open(() -> new HudMoveScreen(null)))));
             dispatcher.register(ClientCommandManager.literal("triggers").executes(ctx -> open(() -> new TriggerListScreen(null))));
         });

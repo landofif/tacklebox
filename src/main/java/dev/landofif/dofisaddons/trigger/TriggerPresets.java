@@ -15,6 +15,7 @@ public final class TriggerPresets {
                 new Preset("quest completed", "quests > quest #1-8 has been completed!", TriggerPresets::questComplete),
                 new Preset("pet drop", "pet drop! you pulled ...", TriggerPresets::petDrop),
                 new Preset("rare catch", "rare catch! you pulled ... (shards, bottles, capsules)", TriggerPresets::rareCatch),
+                new Preset("variant catch", "albino! / melanistic! / trophy! ... you caught a ...", TriggerPresets::variant),
                 new Preset("fabled event", "fabled > a fabled event is active at ...", TriggerPresets::fabled),
                 new Preset("storm", "storm > a thunderstorm / supercell has formed!", TriggerPresets::storm),
                 new Preset("moon rising", "full / blue / super / blood moon has risen", TriggerPresets::moon),
@@ -68,6 +69,22 @@ public final class TriggerPresets {
         t.sound.soundId = "minecraft:block.amethyst_block.chime";
         t.sound.plays = 3;
         t.sound.secondsBetween = 0.15;
+        return t;
+    }
+
+    /** Your own variant catches: "MELANISTIC! You caught a Grass Carp" (others read "name caught ..."). */
+    public static Trigger variant() {
+        Trigger t = new Trigger();
+        t.name = "variant catch";
+        t.mode = Trigger.MatchMode.REGEX;
+        t.ignoreCase = false;
+        t.pattern = "^(?<variant>[A-Z]{4,})! You caught a (?<fish>.+)$";
+        t.title.title = "&l{variant.lower}!";
+        t.title.titleColor = "#55ff55";
+        t.title.subtitle = "{fish.lower}";
+        t.title.animation = Trigger.Animation.POP;
+        t.sound.soundId = "minecraft:entity.player.levelup";
+        t.sound.pitch = 1.3;
         return t;
     }
 

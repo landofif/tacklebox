@@ -57,6 +57,13 @@ public final class BobberTimer {
         }
     }
 
+    /** Your own bobber's synced bite flag went up (see BiteWatch). */
+    public static void markBite() {
+        if (castAt != 0 && biteAt < castAt) {
+            biteAt = System.currentTimeMillis();
+        }
+    }
+
     /** FishOnMC sends a "BITE!" title when something bites. */
     public static void onTitle(Text title) {
         if (castAt != 0 && title != null && title.getString().toUpperCase(Locale.ROOT).contains("BITE")) {

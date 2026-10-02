@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -32,7 +33,7 @@ import java.util.function.Supplier;
  */
 public class SettingsScreen extends DofiScreen {
     private enum Tab {
-        GENERAL("general"), LOOK("look"), BOBBER("bobber"), VIEWMODEL("viewmodel");
+        GENERAL("general"), LOOK("look"), BOBBER("bobber"), WORLD("world"), VIEWMODEL("viewmodel");
 
         final String label;
 
@@ -59,7 +60,7 @@ public class SettingsScreen extends DofiScreen {
 
     @Override
     protected void init() {
-        contentW = Math.min(360, width - 20);
+        contentW = Math.min(400, width - 20);
         left = (width - contentW) / 2;
 
         int tabs = Tab.values().length;
@@ -165,6 +166,19 @@ public class SettingsScreen extends DofiScreen {
                 slider("crosshair offset", "how far below the crosshair the timer sits. under crosshair mode only. negative is above.",
                         -60, 60, 1, "", v -> String.format(Locale.ROOT, "%.0f", v),
                         () -> s.bobberCrosshairY, v -> s.bobberCrosshairY = (int) Math.round(v), defaults.bobberCrosshairY);
+                header("bite");
+                toggle("bite message", "shows a short message in the middle of the screen when your own fish bites.",
+                        () -> s.biteMessage, v -> s.biteMessage = v, defaults.biteMessage);
+                text("message text", "what the bite message says.", () -> s.biteMessageText, v -> s.biteMessageText = v, defaults.biteMessageText);
+                color("message colour", "the colour of the bite message.",
+                        () -> s.biteMessageColor, v -> s.biteMessageColor = v, defaults.biteMessageColor);
+                header("bobber");
+                toggle("still bobber", "holds your bobber still on the water instead of bobbing up and down. it still dips when a fish bites.",
+                        () -> s.stillBobber, v -> s.stillBobber = v, defaults.stillBobber);
+                toggle("smooth cast", "on a laggy connection your cast can jump back and fly the path again. this shows your own cast flying smoothly. where it lands stays exact.",
+                        () -> s.smoothCast, v -> s.smoothCast = v, defaults.smoothCast);
+                toggle("hide other bobbers", "hides other players bobbers and their lines, on your screen only.",
+                        () -> s.hideOtherBobbers, v -> s.hideOtherBobbers = v, defaults.hideOtherBobbers);
                 header("skin");
                 cycle("bobber skin", "swaps the look of your bobber. only you see it, other players still see the normal one.",
                         DofiSettings.BobberSkin.values(), k -> k.label, () -> s.bobberSkin, v -> s.bobberSkin = v, defaults.bobberSkin);
@@ -175,6 +189,28 @@ public class SettingsScreen extends DofiScreen {
                         () -> s.customLineColor, v -> s.customLineColor = v, defaults.customLineColor);
                 color("line colour", "the colour of your fishing line. click to pick it.",
                         () -> s.lineColor, v -> s.lineColor = v, defaults.lineColor);
+            }
+            case WORLD -> {
+                header("nametags");
+                toggle("hide my nametag", "hides the rank, name and power tag the server puts over your own head. other players still see it.",
+                        () -> s.hideOwnNametag, v -> s.hideOwnNametag = v, defaults.hideOwnNametag);
+                toggle("hide all nametags", "hides every players nametag on your screen, the servers and the vanilla one.",
+                        () -> s.hideAllNametags, v -> s.hideAllNametags = v, defaults.hideAllNametags);
+                header("clutter");
+                toggle("hide xp popups", "hides the +66xp line above the hotbar after each catch.",
+                        () -> s.hideXpPopups, v -> s.hideXpPopups = v, defaults.hideXpPopups);
+                toggle("flat leaves", "draws leaves flat like vanilla instead of the 3d leaves from the fishonmc pack. reloads resources when you change it.",
+                        () -> s.flatLeaves, v -> {
+                            if (s.flatLeaves != v) {
+                                s.flatLeaves = v;
+                                client.reloadResources();
+                            }
+                        }, defaults.flatLeaves);
+                header("tooltips");
+                toggle("short fish tooltips", "leaves out the latin name, value, ecosystem and the kg / cm part of caught fish tooltips.",
+                        () -> s.shortFishTooltips, v -> s.shortFishTooltips = v, defaults.shortFishTooltips);
+                toggle("short pet tooltips", "shows maxed stats once (+175 instead of +175/+175) and leaves out empty skin, item and trail slots.",
+                        () -> s.shortPetTooltips, v -> s.shortPetTooltips = v, defaults.shortPetTooltips);
             }
             case VIEWMODEL -> {
                 header("held item");
@@ -256,6 +292,15 @@ public class SettingsScreen extends DofiScreen {
             slider.format(format);
         }
         row(slider, desc, () -> set.accept(def));
+    }
+
+    private void text(String name, String desc, Supplier<String> get, Consumer<String> set, String def) {
+        TextFieldWidget field = new TextFieldWidget(textRenderer, 0, 0, controlW(), 20, Mono.text(name));
+        field.setMaxLength(64);
+        field.setText(get.get());
+        field.setPlaceholder(Mono.text(name).formatted(Formatting.DARK_GRAY));
+        field.setChangedListener(set);
+        row(field, desc, () -> set.accept(def));
     }
 
     private void color(String name, String desc, IntSupplier get, IntConsumer set, int def) {

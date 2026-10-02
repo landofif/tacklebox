@@ -1,0 +1,20 @@
+{
+    "__comment": "Self-contained flat leaf block, identical geometry to vanilla minecraft:block/leaves. Parented from block/block (not block/leaves) so a server's 'better leaves' pack that overrides block/leaves cannot re-add its 3D geometry here. tintindex 0 keeps biome tinting working; it is a no-op for untinted leaf types.",
+    "parent": "minecraft:block/block",
+    "textures": {
+        "particle": "#all"
+    },
+    "elements": [
+        {   "from": [ 0, 0, 0 ],
+            "to": [ 16, 16, 16 ],
+            "faces": {
+                "down":  { "uv": [ 0, 0, 16, 16 ], "texture": "#all", "tintindex": 0, "cullface": "down" },
+                "up":    { "uv": [ 0, 0, 16, 16 ], "texture": "#all", "tintindex": 0, "cullface": "up" },
+                "north": { "uv": [ 0, 0, 16, 16 ], "texture": "#all", "tintindex": 0, "cullface": "north" },
+                "south": { "uv": [ 0, 0, 16, 16 ], "texture": "#all", "tintindex": 0, "cullface": "south" },
+                "west":  { "uv": [ 0, 0, 16, 16 ], "texture": "#all", "tintindex": 0, "cullface": "west" },
+                "east":  { "uv": [ 0, 0, 16, 16 ], "texture": "#all", "tintindex": 0, "cullface": "east" }
+            }
+        }
+    ]
+}

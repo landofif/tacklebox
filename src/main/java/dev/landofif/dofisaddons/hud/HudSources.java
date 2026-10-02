@@ -28,6 +28,8 @@ public final class HudSources {
             Map.entry("session", guard(p -> book(StatsTracker.session(), p))),
             Map.entry("alltime", guard(p -> book(StatsTracker.allTime(), p))),
             Map.entry("bobber", guard(HudSources::bobber)),
+            Map.entry("bait", guard(HudSources::bait)),
+            Map.entry("event", guard(HudSources::event)),
             Map.entry("player", guard(HudSources::player)),
             Map.entry("world", guard(HudSources::world)),
             Map.entry("time", guard(HudSources::time)),
@@ -139,6 +141,35 @@ public final class HudSources {
             case "bite" -> ValueResult.bool(BobberTimer.hasBite());
             default -> ValueResult.absent();
         };
+    }
+
+    private static ValueResult bait(String[] p) {
+        BaitInfo.Bait b = BaitInfo.current();
+        if (b == null) {
+            return ValueResult.absent();
+        }
+        return switch (first(p)) {
+            case "name" -> ValueResult.str(b.name());
+            case "name_colored" -> ValueResult.comp(net.minecraft.text.Text.literal(b.name())
+                    .styled(st -> st.withColor(net.minecraft.text.TextColor.fromRgb(BaitInfo.rarityColor(b.rarity())))));
+            case "left" -> ValueResult.str(String.valueOf(b.left()));
+            case "total" -> b.total() > 0 ? ValueResult.str(String.valueOf(b.total())) : ValueResult.absent();
+            case "uses" -> ValueResult.comp(BaitInfo.usesColored(b));
+            case "rarity" -> b.rarity().isEmpty() ? ValueResult.absent() : ValueResult.str(b.rarity());
+            default -> ValueResult.absent();
+        };
+    }
+
+    private static ValueResult event(String[] p) {
+        String id = first(p);
+        if (id.equals("any")) {
+            return ValueResult.bool(EventTracker.any());
+        }
+        int left = EventTracker.secondsLeft(id);
+        if (left < 0) {
+            return ValueResult.absent();
+        }
+        return p.length > 1 && p[1].equals("seconds") ? ValueResult.str(String.valueOf(left)) : ValueResult.str(EventTracker.clock(left));
     }
 
     private static ValueResult player(String[] p) {
@@ -411,6 +442,17 @@ public final class HudSources {
         c.add(new Entry(you, "%time.clock%", "real time (24h)"));
         c.add(new Entry(you, "%time.clock12%", "real time (12h)"));
         c.add(new Entry(you, "%time.date%", "todays date"));
+
+        String gear = "bait & events";
+        c.add(new Entry(gear, "%bait.name_colored%", "the bait on the rod you hold, in its rarity colour"));
+        c.add(new Entry(gear, "%bait.uses%", "uses left / total, gold when low, red when nearly out"));
+        c.add(new Entry(gear, "%bait.left%", "uses left"));
+        c.add(new Entry(gear, "%bait.total%", "total uses"));
+        c.add(new Entry(gear, "%bait.rarity%", "bait rarity"));
+        for (EventTracker.Event e : EventTracker.Event.values()) {
+            c.add(new Entry(gear, "%event." + e.id + "%", "estimated time left of " + e.id.replace('_', ' ') + " (from its chat message)"));
+        }
+        c.add(new Entry(gear, "%event.any%", "true while any event is on"));
 
         String fn = "logic & maths";
         c.add(new Entry(fn, "%condition.(<session.fish_raw>>100)%", "show the line only if true"));

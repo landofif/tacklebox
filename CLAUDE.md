@@ -27,6 +27,11 @@ Server knowledge (chat lines, glyph codepoints, item NBT, scoreboard, menus) is 
   - `ChatHudMixin` moves the chat by wrapping the one `Backend.updatePose` call in `ChatHud.render(Backend,…)`. Drawing, hover and the `ChatScreen` click handler all go through it.
   - `chat/ChatCopy` finds the line under the mouse by running that same layout pass with its own `Backend` (via `ChatHudAccessor`).
   - The `/dofi` key is registered in `DofisAddons` (right shift, category `dofisaddons:main`, names in `lang/en_us.json`).
+- Ported from l's older fishutils mod (MIT, l's own code), all only changing what the player sees:
+  - Bobber: still bobber (`FishingBobberEntityMixin`, which also exposes `caughtFish` through `duck/BobberCatchAccess`), smooth cast (`EntityInterpolationMixin` + `display/SmoothCast`), and `display/BiteWatch`, which turns the rising edge of your own bobber's `caughtFish` into the bite (bobber timer and optional bite message).
+  - World: `EntityRenderManagerMixin` hides other bobbers, nametag holograms and xp holograms (`display/Holograms` folds small caps and fancy digits). `PlayerNameLabelMixin` hides vanilla labels. `InGameHudOverlayMixin` hides the +xp action bar. `display/FlatLeaves` swaps leaf models with a `ModelLoadingPlugin` (models in `assets/dofisaddons/models/block`). `display/ShortTooltips` trims fish and pet tooltips.
+  - Hud values: `hud/BaitInfo` (rod `activeBait` custom_data) and `hud/EventTracker` (event chat lines, estimated lengths).
+  - Left out on purpose: the particle-based fish trail and bite countdown. l didnt want them.
 - HUDs (`hud/HudRenderer`) use the same look: a panel with the bold first line as the border title, and `%tab%` for label/value rows.
 
 ## Git

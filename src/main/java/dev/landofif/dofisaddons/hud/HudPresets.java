@@ -18,7 +18,9 @@ public final class HudPresets {
                 new Preset("where & when", "location, in-game time, weather and temperature", where()),
                 new Preset("wallet", "money, credits, level and crew from the sidebar", wallet()),
                 new Preset("level", "your fishing level and progress bar, replaces the vanilla xp bar", level()),
-                new Preset("bobber timer", "how long your line has been out (also see settings)", bobber()));
+                new Preset("bobber timer", "how long your line has been out (also see settings)", bobber()),
+                new Preset("bait", "the bait on your rod and its uses left, while you hold the rod", bait()),
+                new Preset("events", "weather and world events with an estimated time left", events()));
     }
 
     private static CustomHud make(String name, double x, double y, String... lines) {
@@ -98,6 +100,31 @@ public final class HudPresets {
                 "&7lvl &l%player.level_colored% %player.level_bar.16% &7%player.xp_progress%%");
         h.align = CustomHud.Align.CENTER;
         h.background = 0;
+        return h;
+    }
+
+    public static CustomHud bait() {
+        return make("bait", 1, 55,
+                "&b&lbait",
+                "%bait.name_colored%",
+                "&7uses%tab%%bait.uses%");
+    }
+
+    /** Each line hides itself while its event is off, so only what is on shows. */
+    public static CustomHud events() {
+        CustomHud h = make("events", 99, 16,
+                "&b&levents",
+                "&#55ffffrain%tab%&f%event.rain%",
+                "&7thunderstorm%tab%&f%event.thunderstorm%",
+                "&5supercell%tab%&f%event.supercell%",
+                "&arainbow%tab%&f%event.rainbow%",
+                "&6gold rush%tab%&f%event.gold_rush%",
+                "&ablooming oasis%tab%&f%event.blooming_oasis%",
+                "&ffull moon%tab%&f%event.full_moon%",
+                "&bblue moon%tab%&f%event.blue_moon%",
+                "&esuper moon%tab%&f%event.super_moon%",
+                "&cblood moon%tab%&f%event.blood_moon%");
+        h.align = CustomHud.Align.RIGHT;
         return h;
     }
 
