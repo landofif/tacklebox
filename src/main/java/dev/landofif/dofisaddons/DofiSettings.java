@@ -5,6 +5,9 @@ public class DofiSettings {
     /** Stop the "time fishing" clock after this many seconds without a catch. */
     public int pauseAfterSeconds = 120;
 
+    /** Hide the vanilla XP bar and level number on FishOnMC (the level HUD replaces them). */
+    public boolean hideVanillaXp = true;
+
     public BobberMode bobberTimer = BobberMode.ABOVE_BOBBER;
     /** Turn the timer text red after this many seconds (0 = never). */
     public double bobberSlowSeconds = 20;

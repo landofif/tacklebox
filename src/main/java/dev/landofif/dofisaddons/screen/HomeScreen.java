@@ -34,7 +34,7 @@ public class HomeScreen extends Screen {
         addDrawableChild(ButtonWidget.builder(entry("Stats", StatNames.number(StatsTracker.session().fish) + " fish this session"),
                 b -> client.setScreen(new StatsScreen(this))).dimensions(x, y, w, 20).build());
         y += 24;
-        addDrawableChild(ButtonWidget.builder(entry("Settings", "bobber timer, clock"),
+        addDrawableChild(ButtonWidget.builder(entry("Settings", "level, bobber timer, clock"),
                 b -> client.setScreen(SettingsScreen.create(this))).dimensions(x, y, w, 20).build());
         y += 32;
         addDrawableChild(ButtonWidget.builder(Mono.text("Done"), b -> close()).dimensions(x + w / 4, y, w / 2, 20).build());

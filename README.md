@@ -46,13 +46,17 @@ a catch is counted when fishonmc shows the caught fish title and a new fish with
 
 your own info boxes on screen, built from stats and server info.
 
-- start from a preset: session stats, all-time stats, dry streaks, where and when, wallet, bobber timer
+- start from a preset: session stats, all-time stats, dry streaks, where and when, wallet, level, bobber timer
 - each line is text with colours and live values, for example `&7fish &f%session.fish%`
 - **+ insert value** lists every value with what it shows right now, so you never have to remember names
 - a line whose value is not available right now hides itself
 - logic and maths work too: `%condition.(<session.fish_raw>>100)%`, `%round.(<expression.(<a>\/<b>)>,1)%`
 - **move huds** lets you drag every box into place and scroll to resize
 - share codes from foecollab and fishonmc extras import as well
+
+## level
+
+on fishonmc the vanilla xp bar shows your fishing level. dofis addons hides it (and its number) and shows a level hud instead: your level in its level colour, a progress bar and the percent to the next level. it is a normal custom hud, so you can move it, resize it or rebuild it with `%player.level_colored%`, `%player.level_bar%` and `%player.xp_progress%`. turn the vanilla bar back on in settings.
 
 ## bobber timer
 

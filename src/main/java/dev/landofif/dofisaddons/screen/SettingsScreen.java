@@ -5,6 +5,7 @@ import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.OptionGroup;
 import dev.isxander.yacl3.api.YetAnotherConfigLib;
+import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
 import dev.isxander.yacl3.api.controller.DoubleSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
@@ -52,10 +53,22 @@ public final class SettingsScreen {
                         .formatValue(v -> Mono.text(v + "s")))
                 .build();
 
+        Option<Boolean> hideXp = Option.<Boolean>createBuilder()
+                .name(Mono.text("Hide vanilla XP bar"))
+                .description(OptionDescription.of(Mono.text(
+                        "on fishonmc the xp bar shows your fishing level. this hides it and its number so the level hud can take its place. add the level hud from custom huds.")))
+                .binding(defaults.hideVanillaXp, () -> s.hideVanillaXp, v -> s.hideVanillaXp = v)
+                .controller(opt -> BooleanControllerBuilder.create(opt).coloured(true))
+                .build();
+
         return YetAnotherConfigLib.createBuilder()
                 .title(Mono.text("Dofi's Addons · Settings"))
                 .category(ConfigCategory.createBuilder()
                         .name(Mono.text("General"))
+                        .group(OptionGroup.createBuilder()
+                                .name(Mono.text("Level"))
+                                .option(hideXp)
+                                .build())
                         .group(OptionGroup.createBuilder()
                                 .name(Mono.text("Bobber timer"))
                                 .option(bobberMode)

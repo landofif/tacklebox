@@ -17,6 +17,7 @@ public final class HudPresets {
                 new Preset("Dry streaks", "fish since your last mythical, legendary, pet, shard...", dry()),
                 new Preset("Where & when", "location, in-game time, weather and temperature", where()),
                 new Preset("Wallet", "money, credits, level and crew from the sidebar", wallet()),
+                new Preset("Level", "your fishing level and progress bar, replaces the vanilla xp bar", level()),
                 new Preset("Bobber timer", "how long your line has been out (also see settings)", bobber()));
     }
 
@@ -84,6 +85,14 @@ public final class HudPresets {
                 "&7Level &f%player.level% &8(%player.xp_progress%%)",
                 "&7Crew &f%scoreboard.crew_name% &8lvl %scoreboard.crew_level%");
         h.align = CustomHud.Align.RIGHT;
+        return h;
+    }
+
+    public static CustomHud level() {
+        CustomHud h = make("Level", 50, 86,
+                "&7lvl &l%player.level_colored% %player.level_bar.16% &7%player.xp_progress%%");
+        h.align = CustomHud.Align.CENTER;
+        h.background = 0;
         return h;
     }
 

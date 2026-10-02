@@ -151,6 +151,9 @@ public final class HudSources {
             case "health" -> ValueResult.str(String.valueOf((int) player.getHealth()));
             case "level", "xp_level" -> ValueResult.str(String.valueOf(player.experienceLevel));
             case "xp_progress" -> ValueResult.str(String.format(Locale.ROOT, "%.1f", player.experienceProgress * 100f));
+            case "level_colored" -> ValueResult.comp(LevelInfo.coloredLevel());
+            case "level_bar" -> ValueResult.comp(LevelInfo.bar(p.length > 1 ? Math.max(4, Math.min(60, Integer.parseInt(p[1]))) : 20));
+            case "next_level" -> ValueResult.str(String.valueOf(player.experienceLevel + 1));
             case "x" -> ValueResult.str(String.valueOf(player.getBlockX()));
             case "y" -> ValueResult.str(String.valueOf(player.getBlockY()));
             case "z" -> ValueResult.str(String.valueOf(player.getBlockZ()));
@@ -397,6 +400,9 @@ public final class HudSources {
         String you = "You & time";
         c.add(new Entry(you, "%bobber.time%", "seconds your line has been out"));
         c.add(new Entry(you, "%player.level%", "fishing level"));
+        c.add(new Entry(you, "%player.level_colored%", "fishing level in its level colour"));
+        c.add(new Entry(you, "%player.level_bar%", "progress bar to the next level (add .30 for 30 blocks)"));
+        c.add(new Entry(you, "%player.next_level%", "next level"));
         c.add(new Entry(you, "%player.xp_progress%", "% to next level"));
         c.add(new Entry(you, "%player.x%", "x"));
         c.add(new Entry(you, "%player.y%", "y"));
