@@ -62,6 +62,23 @@ on fishonmc the vanilla xp bar shows your fishing level. dofis addons hides it (
 
 shows how long your line has been in the water, floating above your bobber or under your crosshair. it turns yellow and then red as the wait gets long, and says bite! when something bites. change it in settings.
 
+## bobber looks
+
+- **bobber skin**: swap your bobber for one of 10 skins (ocean, gold, emerald, midnight, candy, duck, ember, pearl, star, rainbow). only you see it.
+- **skin every bobber**: use your skin for everyone elses bobbers too, on your screen only.
+- **line colour**: pick any colour for your own fishing line. other lines stay normal.
+
+## viewmodel
+
+changes how your held item looks in first person. only you see it.
+
+- size, left / right, up / down, forward / back, tilt, turn and roll
+- no switch dip stops the item from dipping when you switch slots
+- swing style: normal, smooth, snappy or no swing
+- swing length makes the swing animation slower or faster. it only changes how it looks, not how fast you can do anything.
+
+all of this is in settings under bobber and viewmodel.
+
 ## files
 
 everything lives in `config/dofisaddons/`: `triggers.json`, `huds.json`, `settings.json` and `stats/<your uuid>.json`.

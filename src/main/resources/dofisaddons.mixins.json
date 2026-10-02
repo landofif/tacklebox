@@ -5,7 +5,11 @@
   "client": [
     "BossBarHudAccessor",
     "ExperienceBarMixin",
-    "InGameHudMixin"
+    "FishingBobberRendererMixin",
+    "FishingBobberStateMixin",
+    "HeldItemRendererMixin",
+    "InGameHudMixin",
+    "LivingEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
