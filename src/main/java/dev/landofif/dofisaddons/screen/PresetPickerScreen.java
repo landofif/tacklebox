@@ -42,7 +42,7 @@ public class PresetPickerScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(textRenderer, this.title, this.width / 2, 10, 0xFFFFFFFF);
         context.drawCenteredTextWithShadow(textRenderer,
-                Mono.text("Pick a starting point. You can change everything after.").formatted(Formatting.GRAY),
+                Mono.text("pick a starting point. you can change everything after.").formatted(Formatting.GRAY),
                 this.width / 2, 22, 0xFFFFFFFF);
     }
 

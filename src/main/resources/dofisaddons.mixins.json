@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "dev.landofif.dofisaddons.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "BossBarHudAccessor",
+    "InGameHudMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

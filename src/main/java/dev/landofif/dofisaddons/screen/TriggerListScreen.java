@@ -46,18 +46,18 @@ public class TriggerListScreen extends Screen {
         int startX = (this.width - (bw * 4 + 12)) / 2;
         addDrawableChild(ButtonWidget.builder(Mono.text("+ New trigger"), b -> client.setScreen(new PresetPickerScreen(this)))
                 .dimensions(startX, buttonY, bw, 20)
-                .tooltip(Tooltip.of(Mono.text("Start blank or from a ready-made FishOnMC preset")))
+                .tooltip(Tooltip.of(Mono.text("start blank or from a ready-made fishonmc preset")))
                 .build());
         addDrawableChild(ButtonWidget.builder(Mono.text("Import"), b -> onImport())
                 .dimensions(startX + (bw + 4), buttonY, bw, 20)
-                .tooltip(Tooltip.of(Mono.text("Add a trigger from a share code on your clipboard")))
+                .tooltip(Tooltip.of(Mono.text("add a trigger from a share code on your clipboard")))
                 .build());
         addDrawableChild(ButtonWidget.builder(Mono.text("Reload file"), b -> {
                     TriggerStore.load();
                     rebuild();
-                    setStatus("Reloaded triggers.json", Formatting.GREEN);
+                    setStatus("reloaded triggers.json", Formatting.GREEN);
                 }).dimensions(startX + (bw + 4) * 2, buttonY, bw, 20)
-                .tooltip(Tooltip.of(Mono.text("Re-read config/dofisaddons/triggers.json (after editing it by hand)")))
+                .tooltip(Tooltip.of(Mono.text("re-read config/dofisaddons/triggers.json (after editing it by hand)")))
                 .build());
         addDrawableChild(ButtonWidget.builder(Mono.text("Done"), b -> close())
                 .dimensions(startX + (bw + 4) * 3, buttonY, bw, 20).build());
@@ -82,34 +82,34 @@ public class TriggerListScreen extends Screen {
                         b.setMessage(toggleLabel(t));
                         rebuild();
                     }).dimensions(0, 0, 20, 20)
-                    .tooltip(Tooltip.of(Mono.text(t.enabled ? "On: click to switch off" : "Off: click to switch on")))
+                    .tooltip(Tooltip.of(Mono.text(t.enabled ? "on: click to switch off" : "off: click to switch on")))
                     .build();
 
             ButtonWidget main = ButtonWidget.builder(mainLabel(t, mainWidth), b -> client.setScreen(new TriggerEditScreen(this, t.copyKeepId(), false)))
                     .dimensions(0, 0, mainWidth, 20)
-                    .tooltip(Tooltip.of(Mono.text("Click to edit\nWhen chat says: " + t.pattern
+                    .tooltip(Tooltip.of(Mono.text("click to edit\nwhen chat says: " + t.pattern
                             + "\nFired this session: " + TriggerEngine.count(t))))
                     .build();
 
             ButtonWidget up = ButtonWidget.builder(Mono.text("▲"), b -> {
                 TriggerStore.move(index, -1);
                 rebuild();
-            }).dimensions(0, 0, 12, 20).tooltip(Tooltip.of(Mono.text("Move up"))).build();
+            }).dimensions(0, 0, 12, 20).tooltip(Tooltip.of(Mono.text("move up"))).build();
             up.active = index > 0;
 
             ButtonWidget down = ButtonWidget.builder(Mono.text("▼"), b -> {
                 TriggerStore.move(index, 1);
                 rebuild();
-            }).dimensions(0, 0, 12, 20).tooltip(Tooltip.of(Mono.text("Move down"))).build();
+            }).dimensions(0, 0, 12, 20).tooltip(Tooltip.of(Mono.text("move down"))).build();
             down.active = index < triggers.size() - 1;
 
             ButtonWidget share = ButtonWidget.builder(Mono.text("Share"), b -> {
                 client.keyboard.setClipboard(TriggerStore.exportCode(t));
-                setStatus("Copied \"" + t.name + "\" share code to clipboard", Formatting.GREEN);
-            }).dimensions(0, 0, 40, 20).tooltip(Tooltip.of(Mono.text("Copy a code others can Import"))).build();
+                setStatus("copied \"" + t.name + "\" share code to clipboard", Formatting.GREEN);
+            }).dimensions(0, 0, 40, 20).tooltip(Tooltip.of(Mono.text("copy a code others can import"))).build();
 
             ButtonWidget delete = ButtonWidget.builder(Mono.text("✕").formatted(Formatting.RED), b -> confirmDelete(t))
-                    .dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Mono.text("Delete"))).build();
+                    .dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Mono.text("delete"))).build();
 
             List<ClickableWidget> row = new ArrayList<>(List.of(toggle, main, up, down, share, delete));
             list.addRow(new RowListWidget.Row(row));
@@ -134,18 +134,18 @@ public class TriggerListScreen extends Screen {
                 TriggerStore.remove(t);
             }
             client.setScreen(this);
-        }, Mono.text("Delete \"" + t.name + "\"?"), Mono.text("This can't be undone. Tip: use Share first to keep a copy.")));
+        }, Mono.text("delete \"" + t.name + "\"?"), Mono.text("this cant be undone. tip: use share first to keep a copy.")));
     }
 
     private void onImport() {
         Trigger imported = TriggerStore.importCode(client.keyboard.getClipboard());
         if (imported == null) {
-            setStatus("No share code on the clipboard (it starts with dofi-trigger:)", Formatting.RED);
+            setStatus("no share code on the clipboard (it starts with dofi-trigger:)", Formatting.RED);
             return;
         }
         TriggerStore.put(imported);
         rebuild();
-        setStatus("Imported \"" + imported.name + "\"", Formatting.GREEN);
+        setStatus("imported \"" + imported.name + "\"", Formatting.GREEN);
     }
 
     void setStatus(String message, Formatting color) {
@@ -158,12 +158,12 @@ public class TriggerListScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(textRenderer, this.title, this.width / 2, 10, 0xFFFFFFFF);
         context.drawCenteredTextWithShadow(textRenderer,
-                Mono.text("Show your own titles and sounds when a chat message appears").formatted(Formatting.GRAY),
+                Mono.text("show your own titles and sounds when a chat message appears").formatted(Formatting.GRAY),
                 this.width / 2, 23, 0xFFFFFFFF);
 
         if (TriggerStore.all().isEmpty()) {
             context.drawCenteredTextWithShadow(textRenderer,
-                    Mono.text("No triggers yet. Click \"+ New trigger\" to make one.").formatted(Formatting.GRAY),
+                    Mono.text("no triggers yet. click \"+ new trigger\" to make one.").formatted(Formatting.GRAY),
                     this.width / 2, this.height / 2 - 10, 0xFFFFFFFF);
         }
         if (!status.isEmpty() && System.currentTimeMillis() < statusUntil) {

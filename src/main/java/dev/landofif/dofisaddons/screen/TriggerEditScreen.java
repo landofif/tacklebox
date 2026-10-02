@@ -116,10 +116,10 @@ public class TriggerEditScreen extends Screen {
         int bw = (width - 8) / 3;
         addDrawableChild(ButtonWidget.builder(Mono.text("Cancel"), b -> close())
                 .dimensions(left, by, bw, 20)
-                .tooltip(Tooltip.of(Mono.text("Leave without saving"))).build());
+                .tooltip(Tooltip.of(Mono.text("leave without saving"))).build());
         addDrawableChild(ButtonWidget.builder(Mono.text("▶ Preview"), b -> preview())
                 .dimensions(left + bw + 4, by, bw, 20)
-                .tooltip(Tooltip.of(Mono.text("Show the title and play the sound now, using the test message"))).build());
+                .tooltip(Tooltip.of(Mono.text("show the title and play the sound now, using the test message"))).build());
         addDrawableChild(ButtonWidget.builder(Mono.text("Save").formatted(Formatting.GREEN), b -> save())
                 .dimensions(left + (bw + 4) * 2, by, bw, 20).build());
     }
@@ -128,7 +128,7 @@ public class TriggerEditScreen extends Screen {
 
     private void initWhen() {
         int y = FIRST_ROW;
-        textField(y, draft.name, 64, s -> draft.name = s, "e.g. Quest completed");
+        textField(y, draft.name, 64, s -> draft.name = s, "e.g. quest completed");
         y += ROW;
 
         addDrawableChild(ButtonWidget.builder(modeLabel(), b -> {
@@ -139,39 +139,39 @@ public class TriggerEditScreen extends Screen {
                 .tooltip(Tooltip.of(Mono.text(modeHelp()))).build());
         y += ROW;
 
-        textField(y, draft.pattern, 512, s -> draft.pattern = s, "e.g. QUESTS > Quest #{n} has been completed!");
+        textField(y, draft.pattern, 512, s -> draft.pattern = s, "e.g. quests > quest #{n} has been completed!");
         y += ROW + 14; // room for the hint line
 
         int thirdW = (width - 8) / 3;
         addDrawableChild(toggle(left, y, thirdW, "Ignore caps", () -> draft.ignoreCase, v -> draft.ignoreCase = v,
-                "On: \"quest\" also matches \"QUEST\""));
+                "on: \"quest\" also matches \"quest\""));
         addDrawableChild(toggle(left + thirdW + 4, y, thirdW, "Hide chat line", () -> draft.hideMessage, v -> draft.hideMessage = v,
-                "On: the original message is removed from chat"));
+                "on: the original message is removed from chat"));
         addDrawableChild(toggle(left + (thirdW + 4) * 2, y, thirdW, "FishOnMC only", () -> draft.fishOnMcOnly, v -> draft.fishOnMcOnly = v,
-                "On: only works while you're on FishOnMC"));
+                "on: only works while youre on fishonmc"));
         y += ROW;
 
         addDrawableChild(new ValueSlider(left, y, width, 20, "Wait before firing again", 0, 30, 0.5, "s",
                 draft.cooldownSeconds, v -> draft.cooldownSeconds = v));
         y += ROW;
 
-        TextFieldWidget test = textField(y, testLine, 512, s -> testLine = s, "Paste a chat message to test");
-        test.setTooltip(Tooltip.of(Mono.text("Type or paste a real chat message. The line below says if it would fire.")));
+        TextFieldWidget test = textField(y, testLine, 512, s -> testLine = s, "paste a chat message to test");
+        test.setTooltip(Tooltip.of(Mono.text("type or paste a real chat message. the line below says if it would fire.")));
     }
 
     private void initTitle() {
         Trigger.TitleSettings t = draft.title;
         int y = FIRST_ROW;
         int half = (width - 4) / 2;
-        addDrawableChild(toggle(left, y, half, "Show title", () -> t.enabled, v -> t.enabled = v, "Turn the on-screen title on or off"));
+        addDrawableChild(toggle(left, y, half, "Show title", () -> t.enabled, v -> t.enabled = v, "turn the on-screen title on or off"));
         addDrawableChild(ButtonWidget.builder(animationLabel(), b -> {
                     t.animation = Trigger.Animation.values()[(t.animation.ordinal() + 1) % Trigger.Animation.values().length];
                     b.setMessage(animationLabel());
                 }).dimensions(left + half + 4, y, half, 20)
-                .tooltip(Tooltip.of(Mono.text("How the title appears: Fade, Pop, Slide, Typewriter or Shake"))).build());
+                .tooltip(Tooltip.of(Mono.text("how the title appears: fade, pop, slide, typewriter or shake"))).build());
         y += ROW;
 
-        textField(y, t.title, 256, s -> t.title = s, "e.g. &a&lQUEST {n} COMPLETE");
+        textField(y, t.title, 256, s -> t.title = s, "e.g. &a&lquest {n} complete");
         y += ROW;
         textField(y, t.subtitle, 256, s -> t.subtitle = s, "optional second line");
         y += ROW;
@@ -180,12 +180,12 @@ public class TriggerEditScreen extends Screen {
         TextFieldWidget tc = new TextFieldWidget(textRenderer, fieldX, y, colorW, 20, Text.empty());
         tc.setText(t.titleColor);
         tc.setChangedListener(s -> t.titleColor = s);
-        tc.setTooltip(Tooltip.of(Mono.text("Title colour: #FF8800, &a or a name like gold")));
+        tc.setTooltip(Tooltip.of(Mono.text("title colour: #ff8800, &a or a name like gold")));
         addDrawableChild(tc);
         TextFieldWidget sc = new TextFieldWidget(textRenderer, fieldX + colorW + 30, y, colorW, 20, Text.empty());
         sc.setText(t.subtitleColor);
         sc.setChangedListener(s -> t.subtitleColor = s);
-        sc.setTooltip(Tooltip.of(Mono.text("Subtitle colour: #FF8800, &a or a name like gray")));
+        sc.setTooltip(Tooltip.of(Mono.text("subtitle colour: #ff8800, &a or a name like gray")));
         addDrawableChild(sc);
         y += ROW;
 
@@ -199,14 +199,14 @@ public class TriggerEditScreen extends Screen {
         addDrawableChild(new ValueSlider(left + (third + 4) * 2, y, third, 20, "Out", 0, 3, 0.1, "s", t.fadeOutSeconds, v -> t.fadeOutSeconds = v));
         y += ROW;
 
-        addDrawableChild(toggle(left, y, half, "Text shadow", () -> t.shadow, v -> t.shadow = v, "Dark shadow behind the letters"));
+        addDrawableChild(toggle(left, y, half, "Text shadow", () -> t.shadow, v -> t.shadow = v, "dark shadow behind the letters"));
     }
 
     private void initSound() {
         Trigger.SoundSettings s = draft.sound;
         int y = FIRST_ROW;
         int half = (width - 4) / 2;
-        addDrawableChild(toggle(left, y, half, "Play sound", () -> s.enabled, v -> s.enabled = v, "Turn the sound on or off"));
+        addDrawableChild(toggle(left, y, half, "Play sound", () -> s.enabled, v -> s.enabled = v, "turn the sound on or off"));
         addDrawableChild(ButtonWidget.builder(Mono.text("▶ Play sound"), b -> SoundQueue.play(s))
                 .dimensions(left + half + 4, y, half, 20).build());
         y += ROW;
@@ -220,7 +220,7 @@ public class TriggerEditScreen extends Screen {
                     b.setMessage(soundLabel());
                     SoundQueue.play(s);
                 }).dimensions(fieldX, y, fieldW, 20)
-                .tooltip(Tooltip.of(Mono.text("Click to go through popular sounds (plays each one)"))).build();
+                .tooltip(Tooltip.of(Mono.text("click to go through popular sounds (plays each one)"))).build();
         addDrawableChild(pick);
         y += ROW;
 
@@ -228,7 +228,7 @@ public class TriggerEditScreen extends Screen {
             s.soundId = v;
             pick.setMessage(soundLabel());
         }, "e.g. minecraft:block.note_block.pling");
-        idField[0].setTooltip(Tooltip.of(Mono.text("Any sound id, including sounds from the FishOnMC server pack")));
+        idField[0].setTooltip(Tooltip.of(Mono.text("any sound id, including sounds from the fishonmc server pack")));
         y += ROW;
 
         addDrawableChild(new ValueSlider(left, y, half, 20, "Volume", 0, 1, 0.05, "", s.volume, v -> s.volume = v));
@@ -272,7 +272,7 @@ public class TriggerEditScreen extends Screen {
         }
         TriggerStore.put(draft);
         client.setScreen(parent);
-        parent.setStatus((isNew ? "Created \"" : "Saved \"") + draft.name + "\"", Formatting.GREEN);
+        parent.setStatus((isNew ? "created \"" : "saved \"") + draft.name + "\"", Formatting.GREEN);
     }
 
     @Override
@@ -329,7 +329,7 @@ public class TriggerEditScreen extends Screen {
         if (testMatcher.error() != null) {
             result = Mono.text("⚠ " + testMatcher.error()).formatted(Formatting.YELLOW);
         } else if (testResult == null) {
-            result = Mono.text("✘ This message would NOT fire the trigger").formatted(Formatting.RED);
+            result = Mono.text("✘ this message would not fire the trigger").formatted(Formatting.RED);
         } else {
             StringBuilder sb = new StringBuilder("✔ Fires!");
             for (Map.Entry<String, String> e : testResult.values().entrySet()) {
@@ -353,7 +353,7 @@ public class TriggerEditScreen extends Screen {
         swatch(context, fieldX + colorW + 4, y, RichText.parseColor(draft.title.titleColor, 0xFFFFFF));
         swatch(context, fieldX + colorW * 2 + 34, y, RichText.parseColor(draft.title.subtitleColor, 0xBBBBBB));
         y += ROW * 4;
-        hint(context, "Use {n}-style values from step 1, {player}, {count}. Colours: &a &l &o &#FF8800", y + 2);
+        hint(context, "use {n}-style values from step 1, {player}, {count}. colours: &a &l &o &#ff8800", y + 2);
     }
 
     private void renderSound(DrawContext context) {
@@ -362,7 +362,7 @@ public class TriggerEditScreen extends Screen {
         y += ROW;
         label(context, "Sound ID", y);
         y += ROW * 3;
-        hint(context, "Tip: press Play sound to hear it. Volume is on the Master slider.", y + 2);
+        hint(context, "tip: press play sound to hear it. volume is on the master slider.", y + 2);
     }
 
     private void label(DrawContext context, String text, int y) {
@@ -415,16 +415,16 @@ public class TriggerEditScreen extends Screen {
 
     private String modeHelp() {
         return switch (draft.mode) {
-            case SIMPLE -> "Fires when the message contains your text. * = anything, {name} = remember that part";
-            case EXACT -> "Fires only when the whole message is exactly your text ({name} and * still work)";
-            case REGEX -> "Java regular expression. Named groups (?<name>...) become {name}";
+            case SIMPLE -> "fires when the message contains your text. * = anything, {name} = remember that part";
+            case EXACT -> "fires only when the whole message is exactly your text ({name} and * still work)";
+            case REGEX -> "java regular expression. named groups (?<name>...) become {name}";
         };
     }
 
     private String patternHint() {
         return switch (draft.mode) {
             case SIMPLE, EXACT -> "* matches anything · {n} grabs a part to show in the title · > also matches »";
-            case REGEX -> "Example: QUESTS > Quest #(?<n>\\d+) has been completed!";
+            case REGEX -> "example: quests > quest #(?<n>\\d+) has been completed!";
         };
     }
 

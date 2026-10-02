@@ -11,14 +11,14 @@ public final class TriggerPresets {
 
     public static List<Preset> all() {
         return List.of(
-                new Preset("Blank trigger", "Start from scratch", TriggerPresets::blank),
-                new Preset("Quest completed", "QUESTS > Quest #1-8 has been completed!", TriggerPresets::questComplete),
-                new Preset("Pet drop", "PET DROP! You pulled ...", TriggerPresets::petDrop),
-                new Preset("Rare catch", "RARE CATCH! You pulled ... (shards, bottles, capsules)", TriggerPresets::rareCatch),
-                new Preset("Fabled event", "FABLED > A Fabled Event is active at ...", TriggerPresets::fabled),
-                new Preset("Storm", "STORM > A thunderstorm / supercell has formed!", TriggerPresets::storm),
-                new Preset("Moon rising", "FULL / BLUE / SUPER / BLOOD MOON has risen", TriggerPresets::moon),
-                new Preset("Fish sold", "SELL > You just earned $... from selling your fish!", TriggerPresets::sold)
+                new Preset("Blank trigger", "start from scratch", TriggerPresets::blank),
+                new Preset("Quest completed", "quests > quest #1-8 has been completed!", TriggerPresets::questComplete),
+                new Preset("Pet drop", "pet drop! you pulled ...", TriggerPresets::petDrop),
+                new Preset("Rare catch", "rare catch! you pulled ... (shards, bottles, capsules)", TriggerPresets::rareCatch),
+                new Preset("Fabled event", "fabled > a fabled event is active at ...", TriggerPresets::fabled),
+                new Preset("Storm", "storm > a thunderstorm / supercell has formed!", TriggerPresets::storm),
+                new Preset("Moon rising", "full / blue / super / blood moon has risen", TriggerPresets::moon),
+                new Preset("Fish sold", "sell > you just earned $... from selling your fish!", TriggerPresets::sold)
         );
     }
 
