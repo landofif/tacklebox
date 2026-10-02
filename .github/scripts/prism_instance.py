@@ -12,7 +12,7 @@ MC = "1.21.11"
 LOADER = "0.19.5"
 NAME = "Dofis Addons Test"
 # The mod's own dependencies, then performance mods. Required dependencies are added automatically.
-MODS = ["fabric-api", "yacl", "modmenu",
+MODS = ["fabric-api", "modmenu",
         "sodium", "lithium", "ferrite-core", "entityculling", "immediatelyfast", "modernfix", "dynamic-fps"]
 
 API = "https://api.modrinth.com/v2"

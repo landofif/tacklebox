@@ -176,17 +176,22 @@ public class TriggerEditScreen extends Screen {
         textField(y, t.subtitle, 256, s -> t.subtitle = s, "optional second line");
         y += ROW;
 
-        int colorW = (fieldW - 30) / 2;
+        // [title colour][swatch] [subtitle colour][swatch]; a swatch opens the colour picker.
+        int colorW = (fieldW - 56) / 2;
         TextFieldWidget tc = new TextFieldWidget(textRenderer, fieldX, y, colorW, 20, Text.empty());
         tc.setText(t.titleColor);
         tc.setChangedListener(s -> t.titleColor = s);
         tc.setTooltip(Tooltip.of(Mono.text("title colour: #ff8800, &a or a name like gold")));
         addDrawableChild(tc);
-        TextFieldWidget sc = new TextFieldWidget(textRenderer, fieldX + colorW + 30, y, colorW, 20, Text.empty());
+        addDrawableChild(colorSwatch(fieldX + colorW + 3, y, "Title colour",
+                () -> RichText.parseColor(t.titleColor, 0xFFFFFF), c -> t.titleColor = hex(c)));
+        TextFieldWidget sc = new TextFieldWidget(textRenderer, fieldX + colorW + 28, y, colorW, 20, Text.empty());
         sc.setText(t.subtitleColor);
         sc.setChangedListener(s -> t.subtitleColor = s);
         sc.setTooltip(Tooltip.of(Mono.text("subtitle colour: #ff8800, &a or a name like gray")));
         addDrawableChild(sc);
+        addDrawableChild(colorSwatch(fieldX + colorW * 2 + 31, y, "Subtitle colour",
+                () -> RichText.parseColor(t.subtitleColor, 0xBBBBBB), c -> t.subtitleColor = hex(c)));
         y += ROW;
 
         addDrawableChild(new ValueSlider(left, y, half, 20, "Size", 0.5, 8, 0.1, "x", t.scale, v -> t.scale = v));
@@ -349,9 +354,6 @@ public class TriggerEditScreen extends Screen {
         label(context, "Subtitle", y);
         y += ROW;
         label(context, "Colours", y);
-        int colorW = (fieldW - 30) / 2;
-        swatch(context, fieldX + colorW + 4, y, RichText.parseColor(draft.title.titleColor, 0xFFFFFF));
-        swatch(context, fieldX + colorW * 2 + 34, y, RichText.parseColor(draft.title.subtitleColor, 0xBBBBBB));
         y += ROW * 4;
         hint(context, "use {n}-style values from step 1, {player}, {count}. colours: &a &l &o &#ff8800", y + 2);
     }
@@ -373,9 +375,16 @@ public class TriggerEditScreen extends Screen {
         context.drawTextWithShadow(textRenderer, Mono.text(textRenderer.trimToWidth(text, width)).formatted(Formatting.DARK_GRAY), left, y, 0xFFFFFFFF);
     }
 
-    private void swatch(DrawContext context, int x, int y, int rgb) {
-        context.fill(x, y + 2, x + 22, y + 18, 0xFF000000);
-        context.fill(x + 1, y + 3, x + 21, y + 17, 0xFF000000 | rgb);
+    private SwatchButton colorSwatch(int x, int y, String name, java.util.function.IntSupplier get,
+                                     java.util.function.IntConsumer set) {
+        SwatchButton b = new SwatchButton(x, y, 22, 20, get,
+                () -> client.setScreen(new ColorPickerScreen(this, name, get.getAsInt(), set)));
+        b.setTooltip(Tooltip.of(Mono.text("click to pick the " + name.toLowerCase(java.util.Locale.ROOT))));
+        return b;
+    }
+
+    private static String hex(int rgb) {
+        return String.format(java.util.Locale.ROOT, "#%06x", rgb & 0xFFFFFF);
     }
 
     // ------------------------------------------------------------------ helpers

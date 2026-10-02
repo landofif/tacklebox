@@ -401,7 +401,7 @@ public final class HudSources {
         c.add(new Entry(you, "%bobber.time%", "seconds your line has been out"));
         c.add(new Entry(you, "%player.level%", "fishing level"));
         c.add(new Entry(you, "%player.level_colored%", "fishing level in its level colour"));
-        c.add(new Entry(you, "%player.level_bar%", "progress bar to the next level (add .30 for 30 blocks)"));
+        c.add(new Entry(you, "%player.level_bar%", "progress bar to the next level (add .30 for 30 characters long)"));
         c.add(new Entry(you, "%player.next_level%", "next level"));
         c.add(new Entry(you, "%player.xp_progress%", "% to next level"));
         c.add(new Entry(you, "%player.x%", "x"));

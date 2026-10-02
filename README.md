@@ -4,7 +4,7 @@ client side fabric mod for **fishonmc** (minecraft 1.21.11).
 
 display only: the mod reacts to what the server sends. it never sends chat, clicks, casts, reels or presses keys for you.
 
-needs: fabric api and [yacl](https://modrinth.com/mod/yacl). mod menu is optional.
+needs: fabric api. mod menu is optional.
 
 ## getting around
 

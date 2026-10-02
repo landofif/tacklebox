@@ -6,7 +6,10 @@ import dev.landofif.dofisaddons.util.Mono;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
+import net.minecraft.text.StyleSpriteSource;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 /**
  * FishOnMC uses the vanilla XP bar for your fishing level: the number is your level and the bar is
@@ -43,16 +46,21 @@ public final class LevelInfo {
         return Mono.text(String.valueOf(level)).withColor(color(level));
     }
 
-    /** A bar of blocks: the filled part in the level colour, the rest dark. */
-    public static Text bar(int segments) {
+    /** The bar font: U+E100 is a solid 2px column, U+E101 a -1px space that closes the glyph gap. */
+    private static final StyleSpriteSource BAR_FONT = new StyleSpriteSource.Font(Identifier.of("dofisaddons", "bar"));
+    private static final int UNITS_PER_BLOCK = 3; // 3 columns x 2px = 6px, one character cell
+
+    /** One continuous progress bar, {@code blocks} character cells long, filled to the XP progress. */
+    public static Text bar(int blocks) {
         ClientPlayerEntity p = MinecraftClient.getInstance().player;
         if (p == null) {
             return Text.empty();
         }
-        int filled = Math.round(Math.max(0, Math.min(1, p.experienceProgress)) * segments);
-        MutableText t = Text.empty();
-        t.append(Text.literal("█".repeat(filled)).withColor(color(p.experienceLevel)));
-        t.append(Text.literal("█".repeat(segments - filled)).withColor(0x333333));
+        int units = blocks * UNITS_PER_BLOCK;
+        int filled = Math.round(Math.max(0, Math.min(1, p.experienceProgress)) * units);
+        MutableText t = Text.empty().setStyle(Style.EMPTY.withFont(BAR_FONT).withBold(false).withoutShadow());
+        t.append(Text.literal("\ue100\ue101".repeat(filled)).withColor(color(p.experienceLevel)));
+        t.append(Text.literal("\ue100\ue101".repeat(units - filled)).withColor(0x333333));
         return t;
     }
 }

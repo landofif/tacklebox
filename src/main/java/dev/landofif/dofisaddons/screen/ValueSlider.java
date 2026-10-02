@@ -5,6 +5,7 @@ import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.text.Text;
 
 import java.util.function.DoubleConsumer;
+import java.util.function.DoubleFunction;
 
 /** A slider over [min, max] that snaps to {@code step} and shows "Label: value". */
 public class ValueSlider extends SliderWidget {
@@ -14,6 +15,7 @@ public class ValueSlider extends SliderWidget {
     private final double step;
     private final String unit;
     private final DoubleConsumer onChange;
+    private DoubleFunction<String> format;
 
     public ValueSlider(int x, int y, int width, int height, String label, double min, double max, double step,
                        String unit, double initial, DoubleConsumer onChange) {
@@ -27,6 +29,13 @@ public class ValueSlider extends SliderWidget {
         updateMessage();
     }
 
+    /** Shows the value as {@code format(value)} instead of number + unit (e.g. "never" for 0). */
+    public ValueSlider format(DoubleFunction<String> format) {
+        this.format = format;
+        updateMessage();
+        return this;
+    }
+
     public double getValue() {
         double raw = min + this.value * (max - min);
         return clamp(Math.round(raw / step) * step, min, max);
@@ -35,6 +44,10 @@ public class ValueSlider extends SliderWidget {
     @Override
     protected void updateMessage() {
         double v = getValue();
+        if (format != null) {
+            setMessage(Mono.text(label + ": " + format.apply(v)));
+            return;
+        }
         String shown = step >= 1 ? String.valueOf((long) v) : String.format(java.util.Locale.ROOT, step >= 0.1 ? "%.1f" : "%.2f", v);
         setMessage(Mono.text(label + ": " + shown + unit));
     }
