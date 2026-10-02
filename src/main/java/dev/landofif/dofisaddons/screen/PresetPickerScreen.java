@@ -16,7 +16,7 @@ public class PresetPickerScreen extends DofiScreen {
     private final TriggerListScreen parent;
 
     public PresetPickerScreen(TriggerListScreen parent) {
-        super(Mono.text("New trigger"));
+        super(Mono.text("new trigger"));
         this.parent = parent;
     }
 
@@ -34,7 +34,7 @@ public class PresetPickerScreen extends DofiScreen {
                     .build();
             list.addRow(new RowListWidget.Row(List.of(b)));
         }
-        addDrawableChild(ButtonWidget.builder(Mono.text("Back"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Mono.text("back"), b -> close())
                 .dimensions(this.width / 2 - 50, this.height - 28, 100, 20).build());
     }
 

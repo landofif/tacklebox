@@ -33,7 +33,7 @@ import java.util.function.Consumer;
  */
 public class TriggerEditScreen extends DofiScreen {
     private enum Tab {
-        WHEN("1. When"), TITLE("2. Title"), SOUND("3. Sound");
+        WHEN("1. when"), TITLE("2. title"), SOUND("3. sound");
         final String label;
         Tab(String label) { this.label = label; }
     }
@@ -41,19 +41,19 @@ public class TriggerEditScreen extends DofiScreen {
     private record SoundChoice(String label, String id) {}
 
     private static final List<SoundChoice> SOUNDS = List.of(
-            new SoundChoice("Challenge complete", "minecraft:ui.toast.challenge_complete"),
-            new SoundChoice("Level up", "minecraft:entity.player.levelup"),
-            new SoundChoice("XP pickup", "minecraft:entity.experience_orb.pickup"),
-            new SoundChoice("Bell", "minecraft:block.bell.use"),
-            new SoundChoice("Pling", "minecraft:block.note_block.pling"),
-            new SoundChoice("Chime", "minecraft:block.note_block.chime"),
-            new SoundChoice("Amethyst", "minecraft:block.amethyst_block.chime"),
-            new SoundChoice("Beacon", "minecraft:block.beacon.activate"),
-            new SoundChoice("Totem", "minecraft:item.totem.use"),
-            new SoundChoice("Firework", "minecraft:entity.firework_rocket.twinkle"),
-            new SoundChoice("Thunder", "minecraft:entity.lightning_bolt.thunder"),
-            new SoundChoice("Anvil", "minecraft:block.anvil.land"),
-            new SoundChoice("Villager yes", "minecraft:entity.villager.yes")
+            new SoundChoice("challenge complete", "minecraft:ui.toast.challenge_complete"),
+            new SoundChoice("level up", "minecraft:entity.player.levelup"),
+            new SoundChoice("xp pickup", "minecraft:entity.experience_orb.pickup"),
+            new SoundChoice("bell", "minecraft:block.bell.use"),
+            new SoundChoice("pling", "minecraft:block.note_block.pling"),
+            new SoundChoice("chime", "minecraft:block.note_block.chime"),
+            new SoundChoice("amethyst", "minecraft:block.amethyst_block.chime"),
+            new SoundChoice("beacon", "minecraft:block.beacon.activate"),
+            new SoundChoice("totem", "minecraft:item.totem.use"),
+            new SoundChoice("firework", "minecraft:entity.firework_rocket.twinkle"),
+            new SoundChoice("thunder", "minecraft:entity.lightning_bolt.thunder"),
+            new SoundChoice("anvil", "minecraft:block.anvil.land"),
+            new SoundChoice("villager yes", "minecraft:entity.villager.yes")
     );
 
     private static final int ROW = 22;
@@ -81,7 +81,7 @@ public class TriggerEditScreen extends DofiScreen {
     private Matcher.Result testResult;
 
     public TriggerEditScreen(TriggerListScreen parent, Trigger draft, boolean isNew) {
-        super(Mono.text(isNew ? "New trigger" : "Edit trigger"));
+        super(Mono.text(isNew ? "new trigger" : "edit trigger"));
         this.parent = parent;
         this.draft = draft;
         this.isNew = isNew;
@@ -115,13 +115,13 @@ public class TriggerEditScreen extends DofiScreen {
         // Bottom bar
         int by = this.height - 26;
         int bw = (width - 8) / 3;
-        addDrawableChild(ButtonWidget.builder(Mono.text("Cancel"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Mono.text("cancel"), b -> close())
                 .dimensions(left, by, bw, 20)
                 .tooltip(Tooltip.of(Mono.text("leave without saving"))).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("▶ Preview"), b -> preview())
+        addDrawableChild(ButtonWidget.builder(Mono.text("▶ preview"), b -> preview())
                 .dimensions(left + bw + 4, by, bw, 20)
                 .tooltip(Tooltip.of(Mono.text("show the title and play the sound now, using the test message"))).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("Save").formatted(Formatting.GREEN), b -> save())
+        addDrawableChild(ButtonWidget.builder(Mono.text("save").formatted(Formatting.GREEN), b -> save())
                 .dimensions(left + (bw + 4) * 2, by, bw, 20).build());
     }
 
@@ -144,15 +144,15 @@ public class TriggerEditScreen extends DofiScreen {
         y += ROW + 14; // room for the hint line
 
         int thirdW = (width - 8) / 3;
-        addDrawableChild(toggle(left, y, thirdW, "Ignore caps", () -> draft.ignoreCase, v -> draft.ignoreCase = v,
+        addDrawableChild(toggle(left, y, thirdW, "ignore caps", () -> draft.ignoreCase, v -> draft.ignoreCase = v,
                 "on: \"quest\" also matches \"quest\""));
-        addDrawableChild(toggle(left + thirdW + 4, y, thirdW, "Hide chat line", () -> draft.hideMessage, v -> draft.hideMessage = v,
+        addDrawableChild(toggle(left + thirdW + 4, y, thirdW, "hide chat line", () -> draft.hideMessage, v -> draft.hideMessage = v,
                 "on: the original message is removed from chat"));
-        addDrawableChild(toggle(left + (thirdW + 4) * 2, y, thirdW, "FishOnMC only", () -> draft.fishOnMcOnly, v -> draft.fishOnMcOnly = v,
+        addDrawableChild(toggle(left + (thirdW + 4) * 2, y, thirdW, "fishonmc only", () -> draft.fishOnMcOnly, v -> draft.fishOnMcOnly = v,
                 "on: only works while youre on fishonmc"));
         y += ROW;
 
-        addDrawableChild(new ValueSlider(left, y, width, 20, "Wait before firing again", 0, 30, 0.5, "s",
+        addDrawableChild(new ValueSlider(left, y, width, 20, "wait before firing again", 0, 30, 0.5, "s",
                 draft.cooldownSeconds, v -> draft.cooldownSeconds = v));
         y += ROW;
 
@@ -164,7 +164,7 @@ public class TriggerEditScreen extends DofiScreen {
         Trigger.TitleSettings t = draft.title;
         int y = FIRST_ROW;
         int half = (width - 4) / 2;
-        addDrawableChild(toggle(left, y, half, "Show title", () -> t.enabled, v -> t.enabled = v, "turn the on-screen title on or off"));
+        addDrawableChild(toggle(left, y, half, "show title", () -> t.enabled, v -> t.enabled = v, "turn the on-screen title on or off"));
         addDrawableChild(ButtonWidget.builder(animationLabel(), b -> {
                     t.animation = Trigger.Animation.values()[(t.animation.ordinal() + 1) % Trigger.Animation.values().length];
                     b.setMessage(animationLabel());
@@ -184,36 +184,36 @@ public class TriggerEditScreen extends DofiScreen {
         tc.setChangedListener(s -> t.titleColor = s);
         tc.setTooltip(Tooltip.of(Mono.text("title colour: #ff8800, &a or a name like gold")));
         addDrawableChild(tc);
-        addDrawableChild(colorSwatch(fieldX + colorW + 3, y, "Title colour",
+        addDrawableChild(colorSwatch(fieldX + colorW + 3, y, "title colour",
                 () -> RichText.parseColor(t.titleColor, 0xFFFFFF), c -> t.titleColor = hex(c)));
         TextFieldWidget sc = new TextFieldWidget(textRenderer, fieldX + colorW + 28, y, colorW, 20, Text.empty());
         sc.setText(t.subtitleColor);
         sc.setChangedListener(s -> t.subtitleColor = s);
         sc.setTooltip(Tooltip.of(Mono.text("subtitle colour: #ff8800, &a or a name like gray")));
         addDrawableChild(sc);
-        addDrawableChild(colorSwatch(fieldX + colorW * 2 + 31, y, "Subtitle colour",
+        addDrawableChild(colorSwatch(fieldX + colorW * 2 + 31, y, "subtitle colour",
                 () -> RichText.parseColor(t.subtitleColor, 0xBBBBBB), c -> t.subtitleColor = hex(c)));
         y += ROW;
 
-        addDrawableChild(new ValueSlider(left, y, half, 20, "Size", 0.5, 8, 0.1, "x", t.scale, v -> t.scale = v));
-        addDrawableChild(new ValueSlider(left + half + 4, y, half, 20, "Height", 0, 100, 1, "%", t.heightPercent, v -> t.heightPercent = v));
+        addDrawableChild(new ValueSlider(left, y, half, 20, "size", 0.5, 8, 0.1, "x", t.scale, v -> t.scale = v));
+        addDrawableChild(new ValueSlider(left + half + 4, y, half, 20, "height", 0, 100, 1, "%", t.heightPercent, v -> t.heightPercent = v));
         y += ROW;
 
         int third = (width - 8) / 3;
-        addDrawableChild(new ValueSlider(left, y, third, 20, "In", 0, 3, 0.1, "s", t.fadeInSeconds, v -> t.fadeInSeconds = v));
-        addDrawableChild(new ValueSlider(left + third + 4, y, third, 20, "Stay", 0, 15, 0.1, "s", t.staySeconds, v -> t.staySeconds = v));
-        addDrawableChild(new ValueSlider(left + (third + 4) * 2, y, third, 20, "Out", 0, 3, 0.1, "s", t.fadeOutSeconds, v -> t.fadeOutSeconds = v));
+        addDrawableChild(new ValueSlider(left, y, third, 20, "in", 0, 3, 0.1, "s", t.fadeInSeconds, v -> t.fadeInSeconds = v));
+        addDrawableChild(new ValueSlider(left + third + 4, y, third, 20, "stay", 0, 15, 0.1, "s", t.staySeconds, v -> t.staySeconds = v));
+        addDrawableChild(new ValueSlider(left + (third + 4) * 2, y, third, 20, "out", 0, 3, 0.1, "s", t.fadeOutSeconds, v -> t.fadeOutSeconds = v));
         y += ROW;
 
-        addDrawableChild(toggle(left, y, half, "Text shadow", () -> t.shadow, v -> t.shadow = v, "dark shadow behind the letters"));
+        addDrawableChild(toggle(left, y, half, "text shadow", () -> t.shadow, v -> t.shadow = v, "dark shadow behind the letters"));
     }
 
     private void initSound() {
         Trigger.SoundSettings s = draft.sound;
         int y = FIRST_ROW;
         int half = (width - 4) / 2;
-        addDrawableChild(toggle(left, y, half, "Play sound", () -> s.enabled, v -> s.enabled = v, "turn the sound on or off"));
-        addDrawableChild(ButtonWidget.builder(Mono.text("▶ Play sound"), b -> SoundQueue.play(s))
+        addDrawableChild(toggle(left, y, half, "play sound", () -> s.enabled, v -> s.enabled = v, "turn the sound on or off"));
+        addDrawableChild(ButtonWidget.builder(Mono.text("▶ play sound"), b -> SoundQueue.play(s))
                 .dimensions(left + half + 4, y, half, 20).build());
         y += ROW;
 
@@ -237,12 +237,12 @@ public class TriggerEditScreen extends DofiScreen {
         idField[0].setTooltip(Tooltip.of(Mono.text("any sound id, including sounds from the fishonmc server pack")));
         y += ROW;
 
-        addDrawableChild(new ValueSlider(left, y, half, 20, "Volume", 0, 1, 0.05, "", s.volume, v -> s.volume = v));
-        addDrawableChild(new ValueSlider(left + half + 4, y, half, 20, "Pitch", 0.5, 2, 0.05, "", s.pitch, v -> s.pitch = v));
+        addDrawableChild(new ValueSlider(left, y, half, 20, "volume", 0, 1, 0.05, "", s.volume, v -> s.volume = v));
+        addDrawableChild(new ValueSlider(left + half + 4, y, half, 20, "pitch", 0.5, 2, 0.05, "", s.pitch, v -> s.pitch = v));
         y += ROW;
 
-        addDrawableChild(new ValueSlider(left, y, half, 20, "Times", 1, 10, 1, "x", s.plays, v -> s.plays = (int) v));
-        addDrawableChild(new ValueSlider(left + half + 4, y, half, 20, "Gap", 0.05, 2, 0.05, "s", s.secondsBetween, v -> s.secondsBetween = v));
+        addDrawableChild(new ValueSlider(left, y, half, 20, "times", 1, 10, 1, "x", s.plays, v -> s.plays = (int) v));
+        addDrawableChild(new ValueSlider(left + half + 4, y, half, 20, "gap", 0.05, 2, 0.05, "s", s.secondsBetween, v -> s.secondsBetween = v));
     }
 
     // ------------------------------------------------------------------ actions
@@ -312,16 +312,16 @@ public class TriggerEditScreen extends DofiScreen {
 
     private void renderWhen(DrawContext context) {
         int y = FIRST_ROW;
-        label(context, "Name", y);
+        label(context, "name", y);
         y += ROW;
-        label(context, "Match type", y);
+        label(context, "match type", y);
         y += ROW;
-        label(context, "Chat says", y);
+        label(context, "chat says", y);
         hint(context, patternHint(), y + 23);
         y += ROW + 14;
         y += ROW; // toggles
         y += ROW; // cooldown
-        label(context, "Test with", y);
+        label(context, "test with", y);
 
         // live result
         String key = draft.mode + "|" + draft.ignoreCase + "|" + draft.pattern + "|" + testLine;
@@ -336,7 +336,7 @@ public class TriggerEditScreen extends DofiScreen {
         } else if (testResult == null) {
             result = Mono.text("✘ this message would not fire the trigger").formatted(Formatting.RED);
         } else {
-            StringBuilder sb = new StringBuilder("✔ Fires!");
+            StringBuilder sb = new StringBuilder("✔ fires!");
             for (Map.Entry<String, String> e : testResult.values().entrySet()) {
                 if (!e.getKey().equals("message") && !e.getKey().chars().allMatch(Character::isDigit)) {
                     sb.append("  {").append(e.getKey()).append("} = ").append(e.getValue());
@@ -349,20 +349,20 @@ public class TriggerEditScreen extends DofiScreen {
 
     private void renderTitle(DrawContext context) {
         int y = FIRST_ROW + ROW;
-        label(context, "Title", y);
+        label(context, "title", y);
         y += ROW;
-        label(context, "Subtitle", y);
+        label(context, "subtitle", y);
         y += ROW;
-        label(context, "Colours", y);
+        label(context, "colours", y);
         y += ROW * 4;
         hint(context, "use {n}-style values from step 1, {player}, {count}. colours: &a &l &o &#ff8800", y + 2);
     }
 
     private void renderSound(DrawContext context) {
         int y = FIRST_ROW + ROW;
-        label(context, "Sound", y);
+        label(context, "sound", y);
         y += ROW;
-        label(context, "Sound ID", y);
+        label(context, "sound id", y);
         y += ROW * 3;
         hint(context, "tip: press play sound to hear it. volume is on the master slider.", y + 2);
     }
@@ -411,14 +411,14 @@ public class TriggerEditScreen extends DofiScreen {
     }
 
     private static Text toggleText(String name, boolean on) {
-        return Mono.text(name + ": ").append(Mono.text(on ? "ON" : "OFF").formatted(on ? Formatting.GREEN : Formatting.RED));
+        return Mono.text(name + ": ").append(Mono.text(on ? "on" : "off").formatted(on ? Formatting.GREEN : Formatting.RED));
     }
 
     private Text modeLabel() {
         return Mono.text(switch (draft.mode) {
-            case SIMPLE -> "Contains (simple)";
-            case EXACT -> "Whole message";
-            case REGEX -> "Regex (advanced)";
+            case SIMPLE -> "contains (simple)";
+            case EXACT -> "whole message";
+            case REGEX -> "regex (advanced)";
         });
     }
 
@@ -439,12 +439,12 @@ public class TriggerEditScreen extends DofiScreen {
 
     private Text animationLabel() {
         String name = draft.title.animation.name();
-        return Mono.text("Animation: " + name.charAt(0) + name.substring(1).toLowerCase());
+        return Mono.text("animation: " + name.toLowerCase(java.util.Locale.ROOT));
     }
 
     private Text soundLabel() {
         int i = soundIndex(draft.sound.soundId);
-        return Mono.text("♪ " + (i >= 0 ? SOUNDS.get(i).label : "Custom sound") + "  (click for next)");
+        return Mono.text("♪ " + (i >= 0 ? SOUNDS.get(i).label : "custom sound") + "  (click for next)");
     }
 
     private static int soundIndex(String id) {

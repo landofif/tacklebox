@@ -80,8 +80,8 @@ public class ColorPickerScreen extends DofiScreen {
 
         y += 20;
         int bw = (PICKER_W - 4) / 2;
-        addDrawableChild(ButtonWidget.builder(Mono.text("Cancel"), b -> close()).dimensions(left, y, bw, 20).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("Done").formatted(Formatting.GREEN), b -> {
+        addDrawableChild(ButtonWidget.builder(Mono.text("cancel"), b -> close()).dimensions(left, y, bw, 20).build());
+        addDrawableChild(ButtonWidget.builder(Mono.text("done").formatted(Formatting.GREEN), b -> {
             onDone.accept(rgb);
             close();
         }).dimensions(left + bw + 4, y, bw, 20).build());
@@ -89,7 +89,7 @@ public class ColorPickerScreen extends DofiScreen {
 
     private void syncHex() {
         syncing = true;
-        hex.setText(String.format(Locale.ROOT, "#%06X", rgb));
+        hex.setText(String.format(Locale.ROOT, "#%06x", rgb));
         syncing = false;
     }
 

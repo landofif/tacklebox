@@ -31,7 +31,7 @@ public final class Matcher {
 
     public static Matcher of(Trigger trigger) {
         if (trigger.pattern == null || trigger.pattern.isBlank()) {
-            return new Matcher(null, "Type the chat text to look for");
+            return new Matcher(null, "type the chat text to look for");
         }
         int flags = trigger.ignoreCase ? Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE : 0;
         try {
@@ -42,7 +42,7 @@ public final class Matcher {
             };
             return new Matcher(Pattern.compile(regex, flags), null);
         } catch (PatternSyntaxException e) {
-            return new Matcher(null, "Pattern error: " + e.getDescription());
+            return new Matcher(null, "pattern error: " + e.getDescription());
         }
     }
 

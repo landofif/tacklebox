@@ -8,7 +8,7 @@ import java.util.UUID;
  */
 public class Trigger {
     public String id = UUID.randomUUID().toString();
-    public String name = "New trigger";
+    public String name = "new trigger";
     public boolean enabled = true;
 
     // ---- When ----
@@ -43,10 +43,10 @@ public class Trigger {
 
     public static class TitleSettings {
         public boolean enabled = true;
-        public String title = "&lSomething happened!";
+        public String title = "&lsomething happened!";
         public String subtitle = "";
-        public String titleColor = "#FFFFFF";
-        public String subtitleColor = "#BBBBBB";
+        public String titleColor = "#ffffff";
+        public String subtitleColor = "#bbbbbb";
         /** Title size multiplier; the subtitle is drawn at half of it. */
         public double scale = 3.0;
         /** Vertical position of the title, % of screen height (0 = top, 100 = bottom). */
@@ -90,8 +90,8 @@ public class Trigger {
         if (sound == null) sound = new SoundSettings();
         if (title.title == null) title.title = "";
         if (title.subtitle == null) title.subtitle = "";
-        if (title.titleColor == null) title.titleColor = "#FFFFFF";
-        if (title.subtitleColor == null) title.subtitleColor = "#BBBBBB";
+        if (title.titleColor == null) title.titleColor = "#ffffff";
+        if (title.subtitleColor == null) title.subtitleColor = "#bbbbbb";
         if (title.animation == null) title.animation = Animation.POP;
         if (sound.soundId == null) sound.soundId = "";
         cooldownSeconds = clamp(cooldownSeconds, 0, 3600);

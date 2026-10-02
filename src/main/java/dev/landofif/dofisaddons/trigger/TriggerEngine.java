@@ -93,6 +93,11 @@ public final class TriggerEngine {
                 int close = template.indexOf('}', i);
                 if (close > i) {
                     String key = template.substring(i + 1, close);
+                    // {name.lower}: the captured text in lowercase (server lines are often in caps)
+                    boolean lower = key.toLowerCase(java.util.Locale.ROOT).endsWith(".lower");
+                    if (lower) {
+                        key = key.substring(0, key.length() - ".lower".length());
+                    }
                     String value = values.get(key);
                     if (value == null) {
                         // case-insensitive fallback, so {N} works for {n}
@@ -104,7 +109,7 @@ public final class TriggerEngine {
                         }
                     }
                     if (value != null) {
-                        out.append(value);
+                        out.append(lower ? value.toLowerCase(java.util.Locale.ROOT) : value);
                         i = close + 1;
                         continue;
                     }

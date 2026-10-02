@@ -27,7 +27,7 @@ public class VariablePickerScreen extends DofiScreen {
     private String query = "";
 
     public VariablePickerScreen(Screen parent, Consumer<String> onPick) {
-        super(Mono.text("Insert a value"));
+        super(Mono.text("insert a value"));
         this.parent = parent;
         this.onPick = onPick;
     }
@@ -48,7 +48,7 @@ public class VariablePickerScreen extends DofiScreen {
 
         list = new RowListWidget(this.client, x, 46, w, this.height - 80, 22);
         addDrawableChild(list);
-        addDrawableChild(ButtonWidget.builder(Mono.text("Back"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Mono.text("back"), b -> close())
                 .dimensions(this.width / 2 - 50, this.height - 28, 100, 20).build());
         rebuild();
     }

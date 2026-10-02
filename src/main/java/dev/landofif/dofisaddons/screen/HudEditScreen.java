@@ -41,7 +41,7 @@ public class HudEditScreen extends DofiScreen {
     private long statusUntil;
 
     public HudEditScreen(HudListScreen parent, CustomHud draft, int index) {
-        super(Mono.text(index < 0 ? "New HUD" : "Edit HUD"));
+        super(Mono.text(index < 0 ? "new hud" : "edit hud"));
         this.parent = parent;
         this.draft = draft;
         this.index = index;
@@ -80,48 +80,48 @@ public class HudEditScreen extends DofiScreen {
                 .tooltip(Tooltip.of(Mono.text("which way the lines line up"))).build());
         y += 24;
 
-        addDrawableChild(new ValueSlider(left, y, half, 20, "Size", 0.5, 3, 0.1, "x", draft.scale, v -> draft.scale = v));
-        addDrawableChild(new ValueSlider(left + half + 4, y, half, 20, "Backdrop", 0, 100, 5, "%", draft.background, v -> draft.background = (int) v));
+        addDrawableChild(new ValueSlider(left, y, half, 20, "size", 0.5, 3, 0.1, "x", draft.scale, v -> draft.scale = v));
+        addDrawableChild(new ValueSlider(left + half + 4, y, half, 20, "backdrop", 0, 100, 5, "%", draft.background, v -> draft.background = (int) v));
         y += 24 + 12;
 
         int boxBottom = this.height - 56;
         linesBox = EditBoxWidget.builder()
                 .x(left).y(y)
                 .placeholder(Mono.text("one line per row. try: &7fish &f%session.fish%").formatted(Formatting.DARK_GRAY))
-                .build(textRenderer, editW, Math.max(40, boxBottom - y), Mono.text("Lines"));
+                .build(textRenderer, editW, Math.max(40, boxBottom - y), Mono.text("lines"));
         linesBox.setMaxLength(8192);
         linesBox.setText(String.join("\n", draft.lines));
         addDrawableChild(linesBox);
 
         int by = this.height - 50;
-        addDrawableChild(ButtonWidget.builder(Mono.text("+ Insert value…"), b -> {
+        addDrawableChild(ButtonWidget.builder(Mono.text("+ insert value…"), b -> {
                     commitLines();
                     client.setScreen(new VariablePickerScreen(this, this::insert));
                 }).dimensions(left, by, half, 20)
                 .tooltip(Tooltip.of(Mono.text("pick a stat or server value to add to your lines"))).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("Move on screen…"), b -> {
+        addDrawableChild(ButtonWidget.builder(Mono.text("move on screen…"), b -> {
                     commitLines();
                     client.setScreen(new HudMoveScreen(this, List.of(draft)));
                 }).dimensions(left + half + 4, by, half, 20)
                 .tooltip(Tooltip.of(Mono.text("drag this box where you want it"))).build());
 
         int bottom = this.height - 26;
-        addDrawableChild(ButtonWidget.builder(Mono.text("Cancel"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Mono.text("cancel"), b -> close())
                 .dimensions(left, bottom, half, 20)
                 .tooltip(Tooltip.of(Mono.text("leave without saving"))).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("Save").formatted(Formatting.GREEN), b -> save())
+        addDrawableChild(ButtonWidget.builder(Mono.text("save").formatted(Formatting.GREEN), b -> save())
                 .dimensions(left + half + 4, bottom, half, 20).build());
     }
 
     private Text shownText() {
-        return Mono.text("Shown: ").append(Mono.text(draft.enabled ? "ON" : "OFF").formatted(draft.enabled ? Formatting.GREEN : Formatting.RED));
+        return Mono.text("shown: ").append(Mono.text(draft.enabled ? "on" : "off").formatted(draft.enabled ? Formatting.GREEN : Formatting.RED));
     }
 
     private Text alignText() {
-        return Mono.text("Align: " + switch (draft.align) {
-            case LEFT -> "Left";
-            case CENTER -> "Center";
-            case RIGHT -> "Right";
+        return Mono.text("align: " + switch (draft.align) {
+            case LEFT -> "left";
+            case CENTER -> "center";
+            case RIGHT -> "right";
         });
     }
 
@@ -151,7 +151,7 @@ public class HudEditScreen extends DofiScreen {
     private void save() {
         commitLines();
         if (draft.name == null || draft.name.isBlank()) {
-            draft.name = "HUD " + (HudStore.all().size() + 1);
+            draft.name = "hud " + (HudStore.all().size() + 1);
         }
         draft.sanitize();
         if (index >= 0 && index < HudStore.all().size()) {
@@ -167,8 +167,8 @@ public class HudEditScreen extends DofiScreen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawTextWithShadow(textRenderer, Mono.text("Name").formatted(Formatting.GRAY), left, 30, 0xFFFFFFFF);
-        context.drawTextWithShadow(textRenderer, Mono.text("Lines").formatted(Formatting.GRAY), left, 24 * 4 - 10, 0xFFFFFFFF);
+        context.drawTextWithShadow(textRenderer, Mono.text("name").formatted(Formatting.GRAY), left, 30, 0xFFFFFFFF);
+        context.drawTextWithShadow(textRenderer, Mono.text("lines").formatted(Formatting.GRAY), left, 24 * 4 - 10, 0xFFFFFFFF);
 
         // Live preview with real values (refreshed a few times a second).
         long now = System.currentTimeMillis();
@@ -181,7 +181,7 @@ public class HudEditScreen extends DofiScreen {
         boolean wide = previewX != left;
         if (wide) {
             int py = 24;
-            context.drawTextWithShadow(textRenderer, Mono.text("Preview").formatted(Formatting.GRAY), previewX, py - 10 + 6, 0xFFFFFFFF);
+            context.drawTextWithShadow(textRenderer, Mono.text("preview").formatted(Formatting.GRAY), previewX, py - 10 + 6, 0xFFFFFFFF);
             CustomHud tmp = draft.copy();
             tmp.align = CustomHud.Align.LEFT;
             tmp.x = previewX * 100.0 / this.width;

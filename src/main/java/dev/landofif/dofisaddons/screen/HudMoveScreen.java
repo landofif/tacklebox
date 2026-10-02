@@ -32,7 +32,7 @@ public class HudMoveScreen extends DofiScreen {
     }
 
     public HudMoveScreen(Screen parent, List<CustomHud> only) {
-        super(Mono.text("Move HUDs"));
+        super(Mono.text("move huds"));
         this.parent = parent;
         this.only = only;
     }
@@ -50,7 +50,7 @@ public class HudMoveScreen extends DofiScreen {
 
     @Override
     protected void init() {
-        addDrawableChild(ButtonWidget.builder(Mono.text("Done").formatted(Formatting.GREEN), b -> close())
+        addDrawableChild(ButtonWidget.builder(Mono.text("done").formatted(Formatting.GREEN), b -> close())
                 .dimensions(this.width / 2 - 50, this.height - 28, 100, 20).build());
     }
 

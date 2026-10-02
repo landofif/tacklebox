@@ -29,7 +29,7 @@ public class TriggerListScreen extends DofiScreen {
     private long statusUntil;
 
     public TriggerListScreen(Screen parent) {
-        super(Mono.text("Dofi's Addons · Chat Triggers"));
+        super(Mono.text("dofis addons · chat triggers"));
         this.parent = parent;
     }
 
@@ -45,22 +45,22 @@ public class TriggerListScreen extends DofiScreen {
         int buttonY = this.height - 28;
         int bw = Math.min(100, (listWidth - 12) / 4);
         int startX = (this.width - (bw * 4 + 12)) / 2;
-        addDrawableChild(ButtonWidget.builder(Mono.text("+ New trigger"), b -> client.setScreen(new PresetPickerScreen(this)))
+        addDrawableChild(ButtonWidget.builder(Mono.text("+ new trigger"), b -> client.setScreen(new PresetPickerScreen(this)))
                 .dimensions(startX, buttonY, bw, 20)
                 .tooltip(Tooltip.of(Mono.text("start blank or from a ready-made fishonmc preset")))
                 .build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("Import"), b -> onImport())
+        addDrawableChild(ButtonWidget.builder(Mono.text("import"), b -> onImport())
                 .dimensions(startX + (bw + 4), buttonY, bw, 20)
                 .tooltip(Tooltip.of(Mono.text("add a trigger from a share code on your clipboard")))
                 .build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("Reload file"), b -> {
+        addDrawableChild(ButtonWidget.builder(Mono.text("reload file"), b -> {
                     TriggerStore.load();
                     rebuild();
                     setStatus("reloaded triggers.json", Formatting.GREEN);
                 }).dimensions(startX + (bw + 4) * 2, buttonY, bw, 20)
                 .tooltip(Tooltip.of(Mono.text("re-read config/dofisaddons/triggers.json (after editing it by hand)")))
                 .build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("Done"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Mono.text("done"), b -> close())
                 .dimensions(startX + (bw + 4) * 3, buttonY, bw, 20).build());
 
         rebuild();
@@ -89,7 +89,7 @@ public class TriggerListScreen extends DofiScreen {
             ButtonWidget main = ButtonWidget.builder(mainLabel(t, mainWidth), b -> client.setScreen(new TriggerEditScreen(this, t.copyKeepId(), false)))
                     .dimensions(0, 0, mainWidth, 20)
                     .tooltip(Tooltip.of(Mono.text("click to edit\nwhen chat says: " + t.pattern
-                            + "\nFired this session: " + TriggerEngine.count(t))))
+                            + "\nfired this session: " + TriggerEngine.count(t))))
                     .build();
 
             ButtonWidget up = ButtonWidget.builder(Mono.text("▲"), b -> {
@@ -104,7 +104,7 @@ public class TriggerListScreen extends DofiScreen {
             }).dimensions(0, 0, 12, 20).tooltip(Tooltip.of(Mono.text("move down"))).build();
             down.active = index < triggers.size() - 1;
 
-            ButtonWidget share = ButtonWidget.builder(Mono.text("Share"), b -> {
+            ButtonWidget share = ButtonWidget.builder(Mono.text("share"), b -> {
                 client.keyboard.setClipboard(TriggerStore.exportCode(t));
                 setStatus("copied \"" + t.name + "\" share code to clipboard", Formatting.GREEN);
             }).dimensions(0, 0, 40, 20).tooltip(Tooltip.of(Mono.text("copy a code others can import"))).build();

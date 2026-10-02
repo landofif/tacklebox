@@ -119,7 +119,7 @@ public final class HudSources {
             long n = b.count(b.rarity, k.id());
             if (n == 0 && k.id().equals("special")) continue;
             if (!sb.isEmpty()) sb.append(' ');
-            sb.append(String.format("&#%06X", k.color())).append(k.name().charAt(0)).append(StatNames.compact(n));
+            sb.append(String.format("&#%06x", k.color())).append(k.name().charAt(0)).append(StatNames.compact(n));
         }
         return sb.toString().replace('&', '§');
     }
@@ -189,7 +189,7 @@ public final class HudSources {
             case "minute" -> ValueResult.str(String.format("%02d", now.getMinute()));
             case "second" -> ValueResult.str(String.format("%02d", now.getSecond()));
             case "clock" -> ValueResult.str(String.format("%02d:%02d", hour, now.getMinute()));
-            case "clock12" -> ValueResult.str(String.format("%d:%02d %s", ((hour + 11) % 12) + 1, now.getMinute(), hour < 12 ? "AM" : "PM"));
+            case "clock12" -> ValueResult.str(String.format("%d:%02d %s", ((hour + 11) % 12) + 1, now.getMinute(), hour < 12 ? "am" : "pm"));
             case "date" -> ValueResult.str(String.format("%04d-%02d-%02d", now.getYear(), now.getMonthValue(), now.getDayOfMonth()));
             default -> ValueResult.absent();
         };
@@ -197,7 +197,7 @@ public final class HudSources {
 
     private static ValueResult bossBar(String[] p) {
         return switch (first(p)) {
-            case "time" -> ValueResult.of(ServerInfo.time.isEmpty() ? "" : ServerInfo.time + " " + ServerInfo.ampm);
+            case "time" -> ValueResult.of(ServerInfo.time.isEmpty() ? "" : ServerInfo.time + " " + ServerInfo.ampm.toLowerCase(java.util.Locale.ROOT));
             case "weather" -> ValueResult.of(ServerInfo.weather);
             case "temperature" -> ValueResult.of(ServerInfo.temperature);
             case "location" -> ValueResult.of(ServerInfo.locationName);
@@ -330,10 +330,10 @@ public final class HudSources {
 
     private static String direction(float yaw) {
         return switch (Math.floorMod(Math.round(yaw / 90f), 4)) {
-            case 0 -> "S";
-            case 1 -> "W";
-            case 2 -> "N";
-            default -> "E";
+            case 0 -> "s";
+            case 1 -> "w";
+            case 2 -> "n";
+            default -> "e";
         };
     }
 
@@ -366,7 +366,7 @@ public final class HudSources {
                 c.add(new Entry(cat, "%" + scope + ".variant." + k.id() + "%", k.name() + " fish"));
             }
         }
-        String dry = "Fish since last (dry streak)";
+        String dry = "fish since last (dry streak)";
         for (StatNames.Kind k : StatNames.RARITIES) {
             c.add(new Entry(dry, "%alltime.since.rarity." + k.id() + "%", "since last " + k.name()));
         }
@@ -381,7 +381,7 @@ public final class HudSources {
         c.add(new Entry(dry, "%alltime.since.lightning%", "since last lightning in a bottle"));
         c.add(new Entry(dry, "%alltime.since.capsule%", "since last infusion capsule"));
 
-        String server = "FishOnMC";
+        String server = "fishonmc";
         c.add(new Entry(server, "%boss_bar.location%", "where you are"));
         c.add(new Entry(server, "%boss_bar.time%", "in-game time"));
         c.add(new Entry(server, "%boss_bar.weather%", "weather / event"));
@@ -397,7 +397,7 @@ public final class HudSources {
         c.add(new Entry(server, "%scoreboard.location_max%", "location max level"));
         c.add(new Entry(server, "%tab.count%", "players online"));
 
-        String you = "You & time";
+        String you = "you & time";
         c.add(new Entry(you, "%bobber.time%", "seconds your line has been out"));
         c.add(new Entry(you, "%player.level%", "fishing level"));
         c.add(new Entry(you, "%player.level_colored%", "fishing level in its level colour"));
@@ -412,7 +412,7 @@ public final class HudSources {
         c.add(new Entry(you, "%time.clock12%", "real time (12h)"));
         c.add(new Entry(you, "%time.date%", "todays date"));
 
-        String fn = "Logic & maths";
+        String fn = "logic & maths";
         c.add(new Entry(fn, "%condition.(<session.fish_raw>>100)%", "show the line only if true"));
         c.add(new Entry(fn, "%round.(<expression.(<session.value_raw>\\/<session.fish_raw>)>,1)%", "maths: average value per fish"));
         c.add(new Entry(fn, "%not.(<bobber.bite>)%", "show the line only if false"));

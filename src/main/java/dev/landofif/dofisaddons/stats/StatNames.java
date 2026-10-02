@@ -8,28 +8,28 @@ public final class StatNames {
     public record Kind(String id, String name, int color) {}
 
     public static final List<Kind> RARITIES = List.of(
-            new Kind("common", "Common", 0xFFFFFF),
-            new Kind("rare", "Rare", 0x2B85C4),
-            new Kind("epic", "Epic", 0x1CD832),
-            new Kind("legendary", "Legendary", 0xD98103),
-            new Kind("mythical", "Mythical", 0xC93832),
-            new Kind("special", "Special", 0xDD7ACF));
+            new Kind("common", "common", 0xFFFFFF),
+            new Kind("rare", "rare", 0x2B85C4),
+            new Kind("epic", "epic", 0x1CD832),
+            new Kind("legendary", "legendary", 0xD98103),
+            new Kind("mythical", "mythical", 0xC93832),
+            new Kind("special", "special", 0xDD7ACF));
 
     public static final List<Kind> SIZES = List.of(
-            new Kind("baby", "Baby", 0x468CE7),
-            new Kind("juvenile", "Juvenile", 0x22EA08),
-            new Kind("adult", "Adult", 0x1C7DA0),
-            new Kind("large", "Large", 0xFF9000),
-            new Kind("gigantic", "Gigantic", 0xAF3333));
+            new Kind("baby", "baby", 0x468CE7),
+            new Kind("juvenile", "juvenile", 0x22EA08),
+            new Kind("adult", "adult", 0x1C7DA0),
+            new Kind("large", "large", 0xFF9000),
+            new Kind("gigantic", "gigantic", 0xAF3333));
 
     public static final List<Kind> VARIANTS = List.of(
-            new Kind("albino", "Albino", 0xC6C3A1),
-            new Kind("melanistic", "Melanistic", 0x777777),
-            new Kind("trophy", "Trophy", 0xD8C13C),
-            new Kind("fabled", "Fabled", 0xCE2326),
-            new Kind("alternate", "Alternate", 0x9D7CFF),
-            new Kind("spooky", "Spooky", 0xFF8C1A),
-            new Kind("frozen", "Frozen", 0x9FE3FF));
+            new Kind("albino", "albino", 0xC6C3A1),
+            new Kind("melanistic", "melanistic", 0x777777),
+            new Kind("trophy", "trophy", 0xD8C13C),
+            new Kind("fabled", "fabled", 0xCE2326),
+            new Kind("alternate", "alternate", 0x9D7CFF),
+            new Kind("spooky", "spooky", 0xFF8C1A),
+            new Kind("frozen", "frozen", 0x9FE3FF));
 
     private StatNames() {}
 
@@ -42,7 +42,7 @@ public final class StatNames {
         for (String part : id.replace('-', '_').split("_")) {
             if (part.isEmpty()) continue;
             if (!sb.isEmpty()) sb.append(' ');
-            sb.append(Character.toUpperCase(part.charAt(0))).append(part.substring(1));
+            sb.append(part.toLowerCase(java.util.Locale.ROOT));
         }
         return sb.toString();
     }
@@ -55,9 +55,9 @@ public final class StatNames {
     /** 38480 -> "38.5K". */
     public static String compact(double v) {
         double a = Math.abs(v);
-        if (a >= 1e9) return String.format(Locale.ROOT, "%.2fB", v / 1e9);
-        if (a >= 1e6) return String.format(Locale.ROOT, "%.2fM", v / 1e6);
-        if (a >= 1e4) return String.format(Locale.ROOT, "%.1fK", v / 1e3);
+        if (a >= 1e9) return String.format(Locale.ROOT, "%.2fb", v / 1e9);
+        if (a >= 1e6) return String.format(Locale.ROOT, "%.2fm", v / 1e6);
+        if (a >= 1e4) return String.format(Locale.ROOT, "%.1fk", v / 1e3);
         return String.format(Locale.ROOT, "%,.0f", v);
     }
 

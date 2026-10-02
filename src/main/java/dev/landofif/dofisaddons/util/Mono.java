@@ -41,14 +41,23 @@ public final class Mono {
 
     private Mono() {}
 
-    /** A plain literal in the mono font, sized for drawing at GUI scale. */
+    /**
+     * l's house style for everything the mod writes: no capital letters, no apostrophes. Applied here so
+     * it also holds for values that come from the server or the player (wallet "38.48K", chat captures,
+     * typed HUD lines). Formatting codes are case-insensitive, so lowercasing "§A" is harmless.
+     */
+    public static String house(String s) {
+        return s.toLowerCase(java.util.Locale.ROOT).replace("'", "").replace("\u2019", "");
+    }
+
+    /** A plain literal in the mono font, sized for drawing at GUI scale (lowercase, see {@link #house}). */
     public static MutableText text(String s) {
-        return Text.literal(s).setStyle(style(Style.EMPTY));
+        return Text.literal(house(s)).setStyle(style(Style.EMPTY));
     }
 
     /** A literal in the Medium (bold) face, for headers in screens. Don't add {@code BOLD} on top. */
     public static MutableText bold(String s) {
-        return Text.literal(s).setStyle(Style.EMPTY.withFont(BOLD_SOURCES[oversampleFor(1f)]).withoutShadow());
+        return Text.literal(house(s)).setStyle(Style.EMPTY.withFont(BOLD_SOURCES[oversampleFor(1f)]).withoutShadow());
     }
 
     /** Same style, switched to the mono font (keeps colour etc.; drops shadow). */
@@ -90,7 +99,7 @@ public final class Mono {
                 style = style.withFont(style.isBold() ? BOLD_SOURCES[i] : SOURCES[i]).withBold(false);
                 style = shadow ? style.withShadowColor(SOFT_SHADOW) : style.withoutShadow();
             }
-            out.append(Text.literal(s).setStyle(style));
+            out.append(Text.literal(isMono(style) ? house(s) : s).setStyle(style));
             return Optional.empty();
         }, Style.EMPTY);
         return out;

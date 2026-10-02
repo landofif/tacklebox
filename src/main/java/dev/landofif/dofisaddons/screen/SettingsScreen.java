@@ -32,7 +32,7 @@ import java.util.function.Supplier;
  */
 public class SettingsScreen extends DofiScreen {
     private enum Tab {
-        GENERAL("General"), BOBBER("Bobber"), VIEWMODEL("Viewmodel");
+        GENERAL("general"), BOBBER("bobber"), VIEWMODEL("viewmodel");
 
         final String label;
 
@@ -53,7 +53,7 @@ public class SettingsScreen extends DofiScreen {
     private int contentW;
 
     public SettingsScreen(Screen parent) {
-        super(Mono.text("Dofi's Addons · Settings"));
+        super(Mono.text("dofis addons · settings"));
         this.parent = parent;
     }
 
@@ -78,7 +78,7 @@ public class SettingsScreen extends DofiScreen {
         addDrawableChild(list);
         fillRows();
 
-        addDrawableChild(ButtonWidget.builder(Mono.text("Done"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Mono.text("done"), b -> close())
                 .dimensions(width / 2 - 75, height - 26, 150, 20).build());
     }
 
@@ -97,60 +97,60 @@ public class SettingsScreen extends DofiScreen {
     private void fillRows() {
         switch (tab) {
             case GENERAL -> {
-                header("Level");
-                toggle("Hide vanilla XP bar",
+                header("level");
+                toggle("hide vanilla xp bar",
                         "on fishonmc the xp bar shows your fishing level. this hides it and its number so the level hud can take its place. add the level hud from custom huds.",
                         () -> s.hideVanillaXp, v -> s.hideVanillaXp = v, defaults.hideVanillaXp);
-                header("Bobber timer");
-                cycle("Bobber timer",
+                header("bobber timer");
+                cycle("bobber timer",
                         "shows how long your line has been in the water. turns yellow, then red, as it gets long, and says bite! when something bites. display only.",
                         DofiSettings.BobberMode.values(), m -> m.label, () -> s.bobberTimer, v -> s.bobberTimer = v, defaults.bobberTimer);
-                slider("Turn red after", "the timer turns red after this many seconds. 0 = always white.",
+                slider("turn red after", "the timer turns red after this many seconds. 0 = always white.",
                         0, 60, 1, "s", v -> v == 0 ? "never" : String.format(Locale.ROOT, "%.0fs", v),
                         () -> s.bobberSlowSeconds, v -> s.bobberSlowSeconds = v, defaults.bobberSlowSeconds);
-                header("Stats");
-                slider("Pause fishing clock after",
+                header("stats");
+                slider("pause fishing clock after",
                         "the time fishing clock (and fish per hour) stops when you havent caught anything for this long, so afk time doesnt count.",
                         10, 600, 10, "s", null,
                         () -> s.pauseAfterSeconds, v -> s.pauseAfterSeconds = (int) v, defaults.pauseAfterSeconds);
             }
             case BOBBER -> {
-                header("Skin");
-                cycle("Bobber skin", "swaps the look of your bobber. only you see it, other players still see the normal one.",
+                header("skin");
+                cycle("bobber skin", "swaps the look of your bobber. only you see it, other players still see the normal one.",
                         DofiSettings.BobberSkin.values(), k -> k.label, () -> s.bobberSkin, v -> s.bobberSkin = v, defaults.bobberSkin);
-                toggle("Skin every bobber", "also uses your skin for other players bobbers, on your screen only.",
+                toggle("skin every bobber", "also uses your skin for other players bobbers, on your screen only.",
                         () -> s.skinEveryone, v -> s.skinEveryone = v, defaults.skinEveryone);
-                header("Line");
-                toggle("Custom line colour", "colours your own fishing line. other lines stay normal.",
+                header("line");
+                toggle("custom line colour", "colours your own fishing line. other lines stay normal.",
                         () -> s.customLineColor, v -> s.customLineColor = v, defaults.customLineColor);
-                color("Line colour", "the colour of your fishing line. click to pick it.",
+                color("line colour", "the colour of your fishing line. click to pick it.",
                         () -> s.lineColor, v -> s.lineColor = v, defaults.lineColor);
             }
             case VIEWMODEL -> {
-                header("Held item");
-                toggle("Custom viewmodel", "changes how big your held item is and where it sits on screen. turn off to go back to normal.",
+                header("held item");
+                toggle("custom viewmodel", "changes how big your held item is and where it sits on screen. turn off to go back to normal.",
                         () -> s.viewmodel, v -> s.viewmodel = v, defaults.viewmodel);
-                slider("Size", "how big the held item is. 1 = normal.", 0.1, 3, 0.05, "x", null,
+                slider("size", "how big the held item is. 1 = normal.", 0.1, 3, 0.05, "x", null,
                         () -> s.vmScale, v -> s.vmScale = v, defaults.vmScale);
-                slider("Left / right", "moves the item sideways. mirrored for your off hand.", -1, 1, 0.05, "", null,
+                slider("left / right", "moves the item sideways. mirrored for your off hand.", -1, 1, 0.05, "", null,
                         () -> s.vmX, v -> s.vmX = v, defaults.vmX);
-                slider("Up / down", "moves the item up or down.", -1, 1, 0.05, "", null,
+                slider("up / down", "moves the item up or down.", -1, 1, 0.05, "", null,
                         () -> s.vmY, v -> s.vmY = v, defaults.vmY);
-                slider("Forward / back", "moves the item closer or further away. negative is further.", -1, 1, 0.05, "", null,
+                slider("forward / back", "moves the item closer or further away. negative is further.", -1, 1, 0.05, "", null,
                         () -> s.vmZ, v -> s.vmZ = v, defaults.vmZ);
-                slider("Tilt", "tilts the item forward or back, in degrees.", -180, 180, 1, "°", null,
+                slider("tilt", "tilts the item forward or back, in degrees.", -180, 180, 1, "°", null,
                         () -> s.vmRotX, v -> s.vmRotX = v, defaults.vmRotX);
-                slider("Turn", "turns the item left or right, in degrees.", -180, 180, 1, "°", null,
+                slider("turn", "turns the item left or right, in degrees.", -180, 180, 1, "°", null,
                         () -> s.vmRotY, v -> s.vmRotY = v, defaults.vmRotY);
-                slider("Roll", "rolls the item sideways, in degrees.", -180, 180, 1, "°", null,
+                slider("roll", "rolls the item sideways, in degrees.", -180, 180, 1, "°", null,
                         () -> s.vmRotZ, v -> s.vmRotZ = v, defaults.vmRotZ);
-                toggle("No switch dip", "stops the item from dipping down when you switch slots or use it.",
+                toggle("no switch dip", "stops the item from dipping down when you switch slots or use it.",
                         () -> s.vmNoEquipDip, v -> s.vmNoEquipDip = v, defaults.vmNoEquipDip);
-                header("Swing");
-                cycle("Swing style",
+                header("swing");
+                cycle("swing style",
                         "how your hand swings. smooth eases in and out, snappy moves fast at the start, no swing keeps the item still. only you see it.",
                         DofiSettings.SwingStyle.values(), w -> w.label, () -> s.swingStyle, v -> s.swingStyle = v, defaults.swingStyle);
-                slider("Swing length", "how long one swing takes. 1 = normal, 2 = twice as slow, 0.5 = twice as fast. only changes how it looks.",
+                slider("swing length", "how long one swing takes. 1 = normal, 2 = twice as slow, 0.5 = twice as fast. only changes how it looks.",
                         0.25, 4, 0.05, "x", null, () -> s.swingSlowness, v -> s.swingSlowness = v, defaults.swingSlowness);
             }
         }
@@ -187,7 +187,7 @@ public class SettingsScreen extends DofiScreen {
     }
 
     private static Text onOff(String name, boolean on) {
-        return Mono.text(name + ": ").append(Mono.text(on ? "ON" : "OFF").formatted(on ? Formatting.GREEN : Formatting.RED));
+        return Mono.text(name + ": ").append(Mono.text(on ? "on" : "off").formatted(on ? Formatting.GREEN : Formatting.RED));
     }
 
     private <E extends Enum<E>> void cycle(String name, String desc, E[] values, Function<E, String> label,
@@ -210,7 +210,7 @@ public class SettingsScreen extends DofiScreen {
 
     private void color(String name, String desc, IntSupplier get, IntConsumer set, int def) {
         Runnable open = () -> client.setScreen(new ColorPickerScreen(this, name, get.getAsInt(), set));
-        ButtonWidget b = ButtonWidget.builder(Mono.text(name + ": " + String.format(Locale.ROOT, "#%06X", get.getAsInt())),
+        ButtonWidget b = ButtonWidget.builder(Mono.text(name + ": " + String.format(Locale.ROOT, "#%06x", get.getAsInt())),
                 btn -> open.run()).dimensions(0, 0, controlW() - 22, 20).build();
         SwatchButton swatch = new SwatchButton(0, 0, 20, 20, get, open);
         swatch.setTooltip(Tooltip.of(Mono.text("click to pick a colour")));

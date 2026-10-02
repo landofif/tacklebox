@@ -119,7 +119,7 @@ public final class ServerInfo {
             for (Map.Entry<String, String> e : LOCATIONS.entrySet()) {
                 if (s.contains(e.getValue())) {
                     locationId = e.getKey();
-                    locationName = e.getValue();
+                    locationName = e.getValue().toLowerCase(java.util.Locale.ROOT); // matched as sent, shown lowercase
                     break;
                 }
             }
@@ -128,13 +128,13 @@ public final class ServerInfo {
     }
 
     private static String weatherOf(String s) {
-        if (s.contains("⚡")) return "Thunderstorm";
-        if (s.contains("☂")) return "Rain";
-        if (s.contains("♣")) return "Blooming Oasis";
-        if (s.contains("⭐")) return "Fabled";
-        if (s.contains("⚠")) return "Gold Rush";
-        if (s.contains("○")) return "Moon";
-        if (s.contains("☀")) return "Clear";
+        if (s.contains("⚡")) return "thunderstorm";
+        if (s.contains("☂")) return "rain";
+        if (s.contains("♣")) return "blooming oasis";
+        if (s.contains("⭐")) return "fabled";
+        if (s.contains("⚠")) return "gold rush";
+        if (s.contains("○")) return "moon";
+        if (s.contains("☀")) return "clear";
         return "";
     }
 

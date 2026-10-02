@@ -36,9 +36,9 @@ public class DofiSettings {
     public double swingSlowness = 1.0;
 
     public enum BobberSkin {
-        DEFAULT("Default", null), OCEAN("Ocean", "ocean"), GOLD("Gold", "gold"), EMERALD("Emerald", "emerald"),
-        MIDNIGHT("Midnight", "midnight"), CANDY("Candy", "candy"), DUCK("Duck", "duck"), EMBER("Ember", "ember"),
-        PEARL("Pearl", "pearl"), STAR("Star", "star"), RAINBOW("Rainbow", "rainbow");
+        DEFAULT("default", null), OCEAN("ocean", "ocean"), GOLD("gold", "gold"), EMERALD("emerald", "emerald"),
+        MIDNIGHT("midnight", "midnight"), CANDY("candy", "candy"), DUCK("duck", "duck"), EMBER("ember", "ember"),
+        PEARL("pearl", "pearl"), STAR("star", "star"), RAINBOW("rainbow", "rainbow");
 
         public final String label;
         public final String texture;
@@ -50,7 +50,7 @@ public class DofiSettings {
     }
 
     public enum SwingStyle {
-        NORMAL("Normal"), SMOOTH("Smooth"), SNAPPY("Snappy"), NONE("No swing");
+        NORMAL("normal"), SMOOTH("smooth"), SNAPPY("snappy"), NONE("no swing");
 
         public final String label;
 
@@ -60,7 +60,7 @@ public class DofiSettings {
     }
 
     public enum BobberMode {
-        ABOVE_BOBBER("Above bobber"), UNDER_CROSSHAIR("Under crosshair"), OFF("Off");
+        ABOVE_BOBBER("above bobber"), UNDER_CROSSHAIR("under crosshair"), OFF("off");
 
         public final String label;
 

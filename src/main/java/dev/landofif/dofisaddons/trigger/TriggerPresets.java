@@ -11,33 +11,33 @@ public final class TriggerPresets {
 
     public static List<Preset> all() {
         return List.of(
-                new Preset("Blank trigger", "start from scratch", TriggerPresets::blank),
-                new Preset("Quest completed", "quests > quest #1-8 has been completed!", TriggerPresets::questComplete),
-                new Preset("Pet drop", "pet drop! you pulled ...", TriggerPresets::petDrop),
-                new Preset("Rare catch", "rare catch! you pulled ... (shards, bottles, capsules)", TriggerPresets::rareCatch),
-                new Preset("Fabled event", "fabled > a fabled event is active at ...", TriggerPresets::fabled),
-                new Preset("Storm", "storm > a thunderstorm / supercell has formed!", TriggerPresets::storm),
-                new Preset("Moon rising", "full / blue / super / blood moon has risen", TriggerPresets::moon),
-                new Preset("Fish sold", "sell > you just earned $... from selling your fish!", TriggerPresets::sold)
+                new Preset("blank trigger", "start from scratch", TriggerPresets::blank),
+                new Preset("quest completed", "quests > quest #1-8 has been completed!", TriggerPresets::questComplete),
+                new Preset("pet drop", "pet drop! you pulled ...", TriggerPresets::petDrop),
+                new Preset("rare catch", "rare catch! you pulled ... (shards, bottles, capsules)", TriggerPresets::rareCatch),
+                new Preset("fabled event", "fabled > a fabled event is active at ...", TriggerPresets::fabled),
+                new Preset("storm", "storm > a thunderstorm / supercell has formed!", TriggerPresets::storm),
+                new Preset("moon rising", "full / blue / super / blood moon has risen", TriggerPresets::moon),
+                new Preset("fish sold", "sell > you just earned $... from selling your fish!", TriggerPresets::sold)
         );
     }
 
     public static Trigger blank() {
         Trigger t = new Trigger();
-        t.name = "My trigger";
+        t.name = "my trigger";
         t.pattern = "";
-        t.title.title = "&lHello!";
+        t.title.title = "&lhello!";
         t.title.subtitle = "";
         return t;
     }
 
     public static Trigger questComplete() {
         Trigger t = new Trigger();
-        t.name = "Quest completed";
-        t.pattern = "QUESTS > Quest #{n} has been completed!";
-        t.title.title = "&a&lQUEST {n} COMPLETE";
-        t.title.subtitle = "Type /quests to claim it";
-        t.title.titleColor = "#55FF55";
+        t.name = "quest completed";
+        t.pattern = "quests > quest #{n} has been completed!";
+        t.title.title = "&a&lquest {n} complete";
+        t.title.subtitle = "type /quests to claim it";
+        t.title.titleColor = "#55ff55";
         t.title.animation = Trigger.Animation.POP;
         t.sound.soundId = "minecraft:ui.toast.challenge_complete";
         return t;
@@ -45,10 +45,10 @@ public final class TriggerPresets {
 
     public static Trigger petDrop() {
         Trigger t = new Trigger();
-        t.name = "Pet drop";
-        t.pattern = "PET DROP! You pulled {pet}";
-        t.title.title = "&#FD95F6&lPET DROP!";
-        t.title.subtitle = "{pet}";
+        t.name = "pet drop";
+        t.pattern = "pet drop! you pulled {pet}";
+        t.title.title = "&#fd95f6&lpet drop!";
+        t.title.subtitle = "{pet.lower}";
         t.title.animation = Trigger.Animation.SHAKE;
         t.sound.soundId = "minecraft:entity.player.levelup";
         t.sound.plays = 2;
@@ -58,10 +58,10 @@ public final class TriggerPresets {
 
     public static Trigger rareCatch() {
         Trigger t = new Trigger();
-        t.name = "Rare catch";
-        t.pattern = "RARE CATCH! You pulled {item}";
-        t.title.title = "&6&lRARE CATCH!";
-        t.title.subtitle = "{item}";
+        t.name = "rare catch";
+        t.pattern = "rare catch! you pulled {item}";
+        t.title.title = "&6&lrare catch!";
+        t.title.subtitle = "{item.lower}";
         t.title.animation = Trigger.Animation.POP;
         t.sound.soundId = "minecraft:block.amethyst_block.chime";
         t.sound.plays = 3;
@@ -71,10 +71,10 @@ public final class TriggerPresets {
 
     public static Trigger fabled() {
         Trigger t = new Trigger();
-        t.name = "Fabled event";
-        t.pattern = "FABLED > A Fabled Event is active at {place}";
-        t.title.title = "&#F7453E&lFABLED EVENT";
-        t.title.subtitle = "at {place}";
+        t.name = "fabled event";
+        t.pattern = "fabled > a fabled event is active at {place}";
+        t.title.title = "&#f7453e&lfabled event";
+        t.title.subtitle = "at {place.lower}";
         t.title.animation = Trigger.Animation.TYPEWRITER;
         t.title.staySeconds = 4;
         t.sound.soundId = "minecraft:block.bell.use";
@@ -83,10 +83,10 @@ public final class TriggerPresets {
 
     public static Trigger storm() {
         Trigger t = new Trigger();
-        t.name = "Storm";
-        t.pattern = "STORM > A {kind} has formed!";
-        t.title.title = "&e&l⚡ {kind}";
-        t.title.subtitle = "Bite speed is up";
+        t.name = "storm";
+        t.pattern = "storm > a {kind} has formed!";
+        t.title.title = "&e&l⚡ {kind.lower}";
+        t.title.subtitle = "bite speed is up";
         t.title.animation = Trigger.Animation.SHAKE;
         t.sound.soundId = "minecraft:entity.lightning_bolt.thunder";
         t.sound.volume = 0.6;
@@ -95,10 +95,10 @@ public final class TriggerPresets {
 
     public static Trigger moon() {
         Trigger t = new Trigger();
-        t.name = "Moon rising";
+        t.name = "moon rising";
         t.mode = Trigger.MatchMode.REGEX;
-        t.pattern = "(?<moon>FULL|BLUE|SUPER|BLOOD) MOON > A .* has risen";
-        t.title.title = "&#60C2E9&l{moon} MOON";
+        t.pattern = "(?<moon>full|blue|super|blood) moon > a .* has risen";
+        t.title.title = "&#60c2e9&l{moon.lower} moon";
         t.title.subtitle = "has risen";
         t.title.animation = Trigger.Animation.SLIDE;
         t.sound.soundId = "minecraft:block.beacon.activate";
@@ -107,8 +107,8 @@ public final class TriggerPresets {
 
     public static Trigger sold() {
         Trigger t = new Trigger();
-        t.name = "Fish sold";
-        t.pattern = "SELL > You just earned {amount} from selling your fish!";
+        t.name = "fish sold";
+        t.pattern = "sell > you just earned {amount} from selling your fish!";
         t.title.title = "&a&l+{amount}";
         t.title.subtitle = "fish sold";
         t.title.scale = 2.5;

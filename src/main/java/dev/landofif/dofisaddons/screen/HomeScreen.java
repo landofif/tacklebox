@@ -18,7 +18,7 @@ public class HomeScreen extends DofiScreen {
     private final Screen parent;
 
     public HomeScreen(Screen parent) {
-        super(Mono.text("Dofi's Addons"));
+        super(Mono.text("dofis addons"));
         this.parent = parent;
     }
 
@@ -27,19 +27,19 @@ public class HomeScreen extends DofiScreen {
         int w = 220;
         int x = (this.width - w) / 2;
         int y = this.height / 2 - 52;
-        addDrawableChild(ButtonWidget.builder(entry("Chat triggers", TriggerStore.all().size() + " set up"),
+        addDrawableChild(ButtonWidget.builder(entry("chat triggers", TriggerStore.all().size() + " set up"),
                 b -> client.setScreen(new TriggerListScreen(this))).dimensions(x, y, w, 20).build());
         y += 24;
-        addDrawableChild(ButtonWidget.builder(entry("Custom HUDs", HudStore.all().stream().filter(h -> h.enabled).count() + " shown"),
+        addDrawableChild(ButtonWidget.builder(entry("custom huds", HudStore.all().stream().filter(h -> h.enabled).count() + " shown"),
                 b -> client.setScreen(new HudListScreen(this))).dimensions(x, y, w, 20).build());
         y += 24;
-        addDrawableChild(ButtonWidget.builder(entry("Stats", StatNames.number(StatsTracker.session().fish) + " fish this session"),
+        addDrawableChild(ButtonWidget.builder(entry("stats", StatNames.number(StatsTracker.session().fish) + " fish this session"),
                 b -> client.setScreen(new StatsScreen(this))).dimensions(x, y, w, 20).build());
         y += 24;
-        addDrawableChild(ButtonWidget.builder(entry("Settings", "level, bobber timer, clock"),
+        addDrawableChild(ButtonWidget.builder(entry("settings", "level, bobber timer, clock"),
                 b -> client.setScreen(new SettingsScreen(this))).dimensions(x, y, w, 20).build());
         y += 32;
-        addDrawableChild(ButtonWidget.builder(Mono.text("Done"), b -> close()).dimensions(x + w / 4, y, w / 2, 20).build());
+        addDrawableChild(ButtonWidget.builder(Mono.text("done"), b -> close()).dimensions(x + w / 4, y, w / 2, 20).build());
     }
 
     private static Text entry(String name, String detail) {

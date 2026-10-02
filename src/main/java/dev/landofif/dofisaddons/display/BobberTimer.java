@@ -65,7 +65,7 @@ public final class BobberTimer {
     private static Text label() {
         DofiSettings s = StatsTracker.settings();
         if (hasBite()) {
-            return Mono.text("BITE! " + String.format(Locale.ROOT, "%.1fs", seconds())).formatted(Formatting.RED, Formatting.BOLD);
+            return Mono.text("bite! " + String.format(Locale.ROOT, "%.1fs", seconds())).formatted(Formatting.RED, Formatting.BOLD);
         }
         double secs = seconds();
         Formatting color = s.bobberSlowSeconds > 0 && secs >= s.bobberSlowSeconds ? Formatting.RED

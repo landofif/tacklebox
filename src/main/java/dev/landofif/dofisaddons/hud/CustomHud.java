@@ -5,9 +5,9 @@ import java.util.List;
 
 /** One custom HUD box: its lines of "& colours + %values%", where it sits and how it looks. */
 public class CustomHud {
-    public String name = "New HUD";
+    public String name = "new hud";
     public boolean enabled = true;
-    public List<String> lines = new ArrayList<>(List.of("&b&lMy HUD", "&7Fish &f%session.fish%"));
+    public List<String> lines = new ArrayList<>(List.of("&b&lmy hud", "&7fish &f%session.fish%"));
     /** Anchor point, % of the screen (0..100). */
     public double x = 2;
     public double y = 30;

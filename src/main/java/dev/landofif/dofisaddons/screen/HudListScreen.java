@@ -25,7 +25,7 @@ public class HudListScreen extends DofiScreen {
     private long statusUntil;
 
     public HudListScreen(Screen parent) {
-        super(Mono.text("Dofi's Addons · Custom HUDs"));
+        super(Mono.text("dofis addons · custom huds"));
         this.parent = parent;
     }
 
@@ -41,16 +41,16 @@ public class HudListScreen extends DofiScreen {
         int y = this.height - 28;
         int bw = Math.min(100, (listWidth - 12) / 4);
         int startX = (this.width - (bw * 4 + 12)) / 2;
-        addDrawableChild(ButtonWidget.builder(Mono.text("+ New HUD"), b -> client.setScreen(new HudPresetScreen(this)))
+        addDrawableChild(ButtonWidget.builder(Mono.text("+ new hud"), b -> client.setScreen(new HudPresetScreen(this)))
                 .dimensions(startX, y, bw, 20)
                 .tooltip(Tooltip.of(Mono.text("start blank or from a ready-made hud"))).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("Import"), b -> onImport())
+        addDrawableChild(ButtonWidget.builder(Mono.text("import"), b -> onImport())
                 .dimensions(startX + (bw + 4), y, bw, 20)
                 .tooltip(Tooltip.of(Mono.text("add a hud from a code on your clipboard (dofi or foecollab codes)"))).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("Move HUDs"), b -> client.setScreen(new HudMoveScreen(this)))
+        addDrawableChild(ButtonWidget.builder(Mono.text("move huds"), b -> client.setScreen(new HudMoveScreen(this)))
                 .dimensions(startX + (bw + 4) * 2, y, bw, 20)
                 .tooltip(Tooltip.of(Mono.text("drag every hud into place, scroll to resize"))).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("Done"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Mono.text("done"), b -> close())
                 .dimensions(startX + (bw + 4) * 3, y, bw, 20).build());
         rebuild();
     }
@@ -84,7 +84,7 @@ public class HudListScreen extends DofiScreen {
                 rebuild();
             }).dimensions(0, 0, 12, 20).build();
             down.active = index < huds.size() - 1;
-            ButtonWidget share = ButtonWidget.builder(Mono.text("Share"), b -> {
+            ButtonWidget share = ButtonWidget.builder(Mono.text("share"), b -> {
                 client.keyboard.setClipboard(HudStore.exportCode(h));
                 setStatus("copied \"" + name + "\" share code to clipboard", Formatting.GREEN);
             }).dimensions(0, 0, 40, 20).tooltip(Tooltip.of(Mono.text("copy a code others can import"))).build();
@@ -150,7 +150,7 @@ public class HudListScreen extends DofiScreen {
         private final HudListScreen parent;
 
         HudPresetScreen(HudListScreen parent) {
-            super(Mono.text("New HUD · pick a starting point"));
+            super(Mono.text("new hud · pick a starting point"));
             this.parent = parent;
         }
 
@@ -169,7 +169,7 @@ public class HudListScreen extends DofiScreen {
                         .tooltip(Tooltip.of(Mono.text(p.description()))).build();
                 list.addRow(new RowListWidget.Row(new ArrayList<ClickableWidget>(List.of(b))));
             }
-            addDrawableChild(ButtonWidget.builder(Mono.text("Back"), b -> close())
+            addDrawableChild(ButtonWidget.builder(Mono.text("back"), b -> close())
                     .dimensions(this.width / 2 - 50, this.height - 28, 100, 20).build());
         }
 
