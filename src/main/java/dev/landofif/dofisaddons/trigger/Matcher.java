@@ -30,15 +30,19 @@ public final class Matcher {
     }
 
     public static Matcher of(Trigger trigger) {
-        if (trigger.pattern == null || trigger.pattern.isBlank()) {
+        return of(trigger.pattern, trigger.mode, trigger.ignoreCase);
+    }
+
+    public static Matcher of(String pattern, Trigger.MatchMode mode, boolean ignoreCase) {
+        if (pattern == null || pattern.isBlank()) {
             return new Matcher(null, "type the chat text to look for");
         }
-        int flags = trigger.ignoreCase ? Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE : 0;
+        int flags = ignoreCase ? Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE : 0;
         try {
-            String regex = switch (trigger.mode) {
-                case SIMPLE -> simpleToRegex(normalize(trigger.pattern), false);
-                case EXACT -> "^" + simpleToRegex(normalize(trigger.pattern), true) + "$";
-                case REGEX -> trigger.pattern;
+            String regex = switch (mode == null ? Trigger.MatchMode.SIMPLE : mode) {
+                case SIMPLE -> simpleToRegex(normalize(pattern), false);
+                case EXACT -> "^" + simpleToRegex(normalize(pattern), true) + "$";
+                case REGEX -> pattern;
             };
             return new Matcher(Pattern.compile(regex, flags), null);
         } catch (PatternSyntaxException e) {

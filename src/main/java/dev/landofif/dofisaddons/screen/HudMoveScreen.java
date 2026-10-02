@@ -1,12 +1,17 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.DofiSettings;
+import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.ui.DofiScreen;
+import dev.landofif.dofisaddons.ui.S24;
 import dev.landofif.dofisaddons.hud.CustomHud;
 import dev.landofif.dofisaddons.hud.HudRenderer;
 import dev.landofif.dofisaddons.hud.HudStore;
 import dev.landofif.dofisaddons.util.Mono;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.hud.ChatHud;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
@@ -17,7 +22,10 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Drag HUD boxes into place and scroll on one to resize it. Shows the game behind them. */
+/**
+ * Drag HUD boxes into place and scroll on one to resize it. When moving every HUD, the chat box can be
+ * dragged too (right click it to put it back). Shows the game behind them.
+ */
 public class HudMoveScreen extends DofiScreen {
     private final Screen parent;
     /** null = every HUD in the store (saved on Done); otherwise just these drafts. */
@@ -26,6 +34,7 @@ public class HudMoveScreen extends DofiScreen {
     private CustomHud dragging;
     private double grabX;
     private double grabY;
+    private boolean draggingChat;
 
     public HudMoveScreen(Screen parent) {
         this(parent, null);
@@ -67,6 +76,9 @@ public class HudMoveScreen extends DofiScreen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         boxes.clear();
+        if (only == null) {
+            renderChatBox(context, mouseX, mouseY); // under the hud boxes, which also win clicks
+        }
         for (CustomHud hud : targets()) {
             if (hud == dragging) {
                 moveTo(hud, mouseX - grabX, mouseY - grabY);
@@ -79,8 +91,41 @@ public class HudMoveScreen extends DofiScreen {
         }
         context.fill(0, 4, this.width, 30, 0x90000000);
         context.drawCenteredTextWithShadow(textRenderer, Mono.text("drag a box to move it").formatted(Formatting.WHITE), this.width / 2, 8, 0xFFFFFFFF);
-        context.drawCenteredTextWithShadow(textRenderer, Mono.text("scroll on a box to resize · esc when done").formatted(Formatting.GRAY), this.width / 2, 19, 0xFFFFFFFF);
+        context.drawCenteredTextWithShadow(textRenderer, Mono.text(only == null
+                ? "scroll on a box to resize · right click chat to reset it · esc when done"
+                : "scroll on a box to resize · esc when done").formatted(Formatting.GRAY), this.width / 2, 19, 0xFFFFFFFF);
         super.render(context, mouseX, mouseY, delta);
+    }
+
+    /** Where the chat box is now: x, y, width, height in gui units (mirrors ChatHud's own layout). */
+    private int[] chatBox() {
+        GameOptions o = client.options;
+        DofiSettings s = StatsTracker.settings();
+        double scale = o.getChatScale().getValue();
+        int lineH = (int) (9 * (o.getChatLineSpacing().getValue() + 1.0));
+        int lines = Math.max(1, ChatHud.getHeight(o.getChatHeightUnfocused().getValue()) / lineH);
+        int w = (int) Math.ceil((Math.ceil(ChatHud.getWidth(o.getChatWidth().getValue()) / scale) + 12) * scale);
+        int h = (int) Math.ceil(lines * lineH * scale);
+        int bottom = (int) (Math.floor((this.height - 40) / scale) * scale);
+        return new int[]{s.chatX, bottom - h + s.chatY, w, h};
+    }
+
+    private void renderChatBox(DrawContext ctx, int mouseX, int mouseY) {
+        if (draggingChat) {
+            int[] at = chatBox();
+            DofiSettings s = StatsTracker.settings();
+            int nx = (int) Math.round(mouseX - grabX);
+            int ny = (int) Math.round(mouseY - grabY);
+            s.chatX = Math.max(0, Math.min(this.width - at[2], nx));
+            s.chatY += Math.max(0, Math.min(this.height - at[3], ny)) - at[1];
+        }
+        int[] b = chatBox();
+        boolean hot = draggingChat || over(b, mouseX, mouseY);
+        ctx.fill(b[0], b[1], b[0] + b[2], b[1] + b[3], S24.alpha(0x50, S24.BG_4));
+        S24.outline(ctx, b[0], b[1], b[2], b[3], hot ? S24.ACCENT : S24.TEXT_5);
+        Text label = Mono.text("chat");
+        ctx.fill(b[0] + 6, b[1], b[0] + 12 + textRenderer.getWidth(label), b[1] + 1, S24.alpha(0x50, S24.BG_4));
+        ctx.drawText(textRenderer, label, b[0] + 9, b[1] - 4, hot ? S24.ACCENT : S24.TEXT_3, false);
     }
 
     /** Places the box's top-left corner at (left, top), storing it as the HUD's anchor in %. */
@@ -113,6 +158,18 @@ public class HudMoveScreen extends DofiScreen {
             return true;
         }
         CustomHud h = hit(click.x(), click.y());
+        if (h == null && only == null && over(chatBox(), click.x(), click.y())) {
+            if (click.button() == 1) {
+                StatsTracker.settings().chatX = 0;
+                StatsTracker.settings().chatY = 0;
+            } else {
+                int[] b = chatBox();
+                draggingChat = true;
+                grabX = click.x() - b[0];
+                grabY = click.y() - b[1];
+            }
+            return true;
+        }
         if (h != null) {
             int[] b = boxes.get(h);
             dragging = h;
@@ -126,6 +183,7 @@ public class HudMoveScreen extends DofiScreen {
     @Override
     public boolean mouseReleased(Click click) {
         dragging = null;
+        draggingChat = false;
         return super.mouseReleased(click);
     }
 
@@ -143,6 +201,7 @@ public class HudMoveScreen extends DofiScreen {
     public void close() {
         if (only == null) {
             HudStore.save();
+            StatsTracker.saveSettings();
         }
         client.setScreen(parent);
     }

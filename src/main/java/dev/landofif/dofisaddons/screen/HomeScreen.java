@@ -26,12 +26,16 @@ public class HomeScreen extends DofiScreen {
     protected void init() {
         int w = 220;
         int x = (this.width - w) / 2;
-        int y = this.height / 2 - 52;
+        int y = this.height / 2 - 64;
         addDrawableChild(ButtonWidget.builder(entry("chat triggers", TriggerStore.all().size() + " set up"),
                 b -> client.setScreen(new TriggerListScreen(this))).dimensions(x, y, w, 20).build());
         y += 24;
         addDrawableChild(ButtonWidget.builder(entry("custom huds", HudStore.all().stream().filter(h -> h.enabled).count() + " shown"),
                 b -> client.setScreen(new HudListScreen(this))).dimensions(x, y, w, 20).build());
+        y += 24;
+        long rules = StatsTracker.settings().chatFilters.stream().filter(f -> f.enabled).count();
+        addDrawableChild(ButtonWidget.builder(entry("chat", rules + (rules == 1 ? " hide rule" : " hide rules") + ", move, copy"),
+                b -> client.setScreen(new ChatFilterScreen(this))).dimensions(x, y, w, 20).build());
         y += 24;
         addDrawableChild(ButtonWidget.builder(entry("stats", StatNames.number(StatsTracker.session().fish) + " fish this session"),
                 b -> client.setScreen(new StatsScreen(this))).dimensions(x, y, w, 20).build());
@@ -49,7 +53,7 @@ public class HomeScreen extends DofiScreen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        int y = this.height / 2 - 84;
+        int y = this.height / 2 - 96;
         context.drawCenteredTextWithShadow(textRenderer, Mono.bold(this.title.getString()).withColor(S24.ACCENT & 0xFFFFFF), this.width / 2, y, 0xFFFFFFFF);
         context.drawCenteredTextWithShadow(textRenderer, Mono.text("fishonmc addons · display only, no automation").formatted(Formatting.GRAY),
                 this.width / 2, y + 12, 0xFFFFFFFF);

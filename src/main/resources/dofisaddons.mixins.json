@@ -4,6 +4,9 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "BossBarHudAccessor",
+    "ChatHudAccessor",
+    "ChatHudMixin",
+    "ChatScreenMixin",
     "CheckboxWidgetMixin",
     "EntryListWidgetMixin",
     "ExperienceBarMixin",

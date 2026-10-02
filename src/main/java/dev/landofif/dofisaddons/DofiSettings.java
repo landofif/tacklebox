@@ -20,6 +20,15 @@ public class DofiSettings {
     /** Replace the minecraft title screen with the mod's own, with a join fishonmc button. */
     public boolean titleScreen = true;
 
+    // ---- chat ----
+    /** Lines matching one of these never show in chat. */
+    public java.util.List<dev.landofif.dofisaddons.chat.ChatFilter> chatFilters = new java.util.ArrayList<>();
+    /** Where the chat box sits, as an offset from the vanilla spot in gui units (right and down are positive). */
+    public int chatX = 0;
+    public int chatY = 0;
+    /** Right click a chat line (with chat open) to copy it. */
+    public boolean chatCopy = true;
+
     public BobberMode bobberTimer = BobberMode.ABOVE_BOBBER;
     /** Turn the timer text red after this many seconds (0 = never). */
     public double bobberSlowSeconds = 20;
@@ -89,6 +98,8 @@ public class DofiSettings {
         if (bobberTimer == null) bobberTimer = BobberMode.ABOVE_BOBBER;
         if (bobberSkin == null) bobberSkin = BobberSkin.DEFAULT;
         if (swingStyle == null) swingStyle = SwingStyle.NORMAL;
+        if (chatFilters == null) chatFilters = new java.util.ArrayList<>();
+        chatFilters.removeIf(java.util.Objects::isNull);
         lineColor &= 0xFFFFFF;
         vmScale = Math.max(0.1, Math.min(3, vmScale));
         swingSlowness = Math.max(0.25, Math.min(4, swingSlowness));

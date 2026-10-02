@@ -21,6 +21,11 @@ Server knowledge (chat lines, glyph codepoints, item NBT, scoreboard, menus) is 
   - `InGameHudMixin.flatHotbar` draws the hotbar.
   - "Mono font everywhere": `TextRendererMixin` (widths) and `TextRendererDrawerMixin` (drawing) send every minecraft-default-font run through `Mono.everywhere`. It leaves alone the colours the fishonmc pack text shader keys on (effects and no-shadow), since the TTF goes through `rendertype_text_intensity`, where those effects don't exist.
   - `MinecraftClientMixin` swaps `TitleScreen` for `screen/DofiTitleScreen`. Its join button connects to the fishonmc server-list entry, or a hidden one so the resource pack answer sticks. Joining only happens on the player's click.
+- Chat (`chat/`, `screen/ChatFilterScreen`, settings `chatFilters`/`chatX`/`chatY`/`chatCopy`):
+  - Hide rules run in `ALLOW_GAME` and `ALLOW_CHAT`, reusing `trigger/Matcher`.
+  - `ChatHudMixin` moves the chat by wrapping the one `Backend.updatePose` call in `ChatHud.render(Backend,…)`. Drawing, hover and the `ChatScreen` click handler all go through it.
+  - `chat/ChatCopy` finds the line under the mouse by running that same layout pass with its own `Backend` (via `ChatHudAccessor`).
+  - The `/dofi` key is registered in `DofisAddons` (right shift, category `dofisaddons:main`, names in `lang/en_us.json`).
 - HUDs (`hud/HudRenderer`) use the same look: a panel with the bold first line as the border title, and `%tab%` for label/value rows.
 
 ## Git

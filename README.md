@@ -9,7 +9,8 @@ needs: fabric api. mod menu is optional.
 ## getting around
 
 - `/dofi` opens the home screen with everything below
-- `/dofi triggers`, `/dofi huds`, `/dofi stats`, `/dofi move` jump straight to one part
+- `/dofi triggers`, `/dofi huds`, `/dofi chat`, `/dofi stats`, `/dofi move` jump straight to one part
+- right shift opens `/dofi` too
 - with mod menu: mods → dofis addons → configure
 
 ## chat triggers
@@ -29,6 +30,18 @@ show your own on-screen title and play a sound when a chat message appears.
 5. **▶ preview** any time, then **save**.
 
 switch triggers on and off with the dot, reorder with the arrows, **share** copies a code others can **import**, and a cooldown stops repeated lines from spamming.
+
+## chat
+
+`/dofi chat`, or chat on the home screen.
+
+- **hide rules**: lines that match never show up in chat. type part of the line (`*` matches anything), the whole line, or a regex, and pick fishonmc only or every server. paste a line into **test with** to check which rule hides it
+- **move chat**: drag the chat box anywhere in the move screen. right click it there to put it back
+- **copy**: with chat open, right click a message to copy it. shift + right click a message to make a hide rule for it
+
+## hotkey
+
+right shift opens `/dofi` from anywhere in game. change it in options → controls → dofis addons.
 
 ## stats
 
