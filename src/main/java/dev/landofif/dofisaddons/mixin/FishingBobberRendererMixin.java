@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.mixin;
 
+import dev.landofif.dofisaddons.duck.BobberStateAccess;
 import dev.landofif.dofisaddons.display.BobberLooks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;

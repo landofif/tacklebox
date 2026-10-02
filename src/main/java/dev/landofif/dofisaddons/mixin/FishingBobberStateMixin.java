@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.mixin;
 
+import dev.landofif.dofisaddons.duck.BobberStateAccess;
 import net.minecraft.client.render.entity.state.FishingBobberEntityState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
