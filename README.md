@@ -118,6 +118,7 @@ changes how your held item looks in first person. only you see it.
 - size, left / right, up / down, forward / back, tilt, turn and roll
 - no switch dip stops the item from dipping when you switch slots
 - swing style: normal, smooth, snappy or no swing (no swing keeps the item in place and only turns it around its own centre)
+- swing turn sets how far no swing turns the item, from the full vanilla turn down to none
 - swing length makes the swing animation slower or faster. it only changes how it looks, not how fast you can do anything.
 
 all of this is in settings under bobber and viewmodel.

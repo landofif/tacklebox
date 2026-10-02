@@ -244,6 +244,8 @@ public class SettingsScreen extends DofiScreen {
                         DofiSettings.SwingStyle.values(), w -> w.label, () -> s.swingStyle, v -> s.swingStyle = v, defaults.swingStyle);
                 slider("swing length", "how long one swing takes. 1 = normal, 2 = twice as slow, 0.5 = twice as fast. only changes how it looks.",
                         0.25, 4, 0.05, "x", null, () -> s.swingSlowness, v -> s.swingSlowness = v, defaults.swingSlowness);
+                slider("swing turn", "with no swing, how far the item turns. 100% is the full vanilla turn, 0% keeps it still.",
+                        0, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v), () -> s.swingTurn, v -> s.swingTurn = v, defaults.swingTurn);
             }
         }
     }

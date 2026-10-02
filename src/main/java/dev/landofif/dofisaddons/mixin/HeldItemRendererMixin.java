@@ -111,7 +111,7 @@ public class HeldItemRendererMixin {
             ItemDisplayContext context = arm == Arm.RIGHT ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
             Vector3f pivot = view.transformPosition(dofisaddons$centre(player, item, context), new Vector3f());
             matrices.translate(pivot.x, pivot.y, pivot.z);
-            dofisaddons$swingTurn(matrices, side, spin);
+            dofisaddons$swingTurn(matrices, side, spin, (float) s.swingTurn / 100f);
             matrices.translate(-pivot.x, -pivot.y, -pivot.z);
         }
         if (s.viewmodel) {
@@ -119,11 +119,11 @@ public class HeldItemRendererMixin {
         }
     }
 
-    /** The rotation part of vanilla's swing (HeldItemRenderer.applySwingOffset), without the movement. */
+    /** The rotation part of vanilla's swing (HeldItemRenderer.applySwingOffset), without the movement, scaled by amount. */
     @Unique
-    private static void dofisaddons$swingTurn(MatrixStack matrices, float side, float progress) {
-        float f = MathHelper.sin(progress * progress * (float) Math.PI);
-        float g = MathHelper.sin(MathHelper.sqrt(progress) * (float) Math.PI);
+    private static void dofisaddons$swingTurn(MatrixStack matrices, float side, float progress, float amount) {
+        float f = MathHelper.sin(progress * progress * (float) Math.PI) * amount;
+        float g = MathHelper.sin(MathHelper.sqrt(progress) * (float) Math.PI) * amount;
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(side * (45.0F + f * -20.0F)));
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(side * g * -20.0F));
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(g * -80.0F));

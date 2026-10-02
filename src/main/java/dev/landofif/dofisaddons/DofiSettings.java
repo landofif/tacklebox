@@ -108,6 +108,8 @@ public class DofiSettings {
     public SwingStyle swingStyle = SwingStyle.NORMAL;
     /** 1 = normal, 2 = twice as slow, 0.5 = twice as fast. Only the animation changes. */
     public double swingSlowness = 1.0;
+    /** "No swing": how far the item turns, in percent of vanilla's turn. */
+    public double swingTurn = 100;
 
     public enum BobberSkin {
         DEFAULT("default", null), OCEAN("ocean", "ocean"), GOLD("gold", "gold"), EMERALD("emerald", "emerald"),
@@ -159,6 +161,7 @@ public class DofiSettings {
         if (biteMessageText == null) biteMessageText = "";
         vmScale = Math.max(0.1, Math.min(3, vmScale));
         swingSlowness = Math.max(0.25, Math.min(4, swingSlowness));
+        swingTurn = Math.max(0, Math.min(100, swingTurn));
         pauseAfterSeconds = Math.max(10, Math.min(1800, pauseAfterSeconds));
         bobberSlowSeconds = Math.max(0, Math.min(120, bobberSlowSeconds));
         bobberWarnSeconds = Math.max(0, Math.min(120, bobberWarnSeconds));
