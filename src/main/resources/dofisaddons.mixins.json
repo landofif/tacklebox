@@ -4,16 +4,28 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "BossBarHudAccessor",
+    "CheckboxWidgetMixin",
+    "EntryListWidgetMixin",
     "ExperienceBarMixin",
     "FishingBobberRendererMixin",
     "FishingBobberStateMixin",
+    "HandledScreenMixin",
     "HeldItemRendererMixin",
     "InGameHudMixin",
     "LivingEntityMixin",
+    "MinecraftClientMixin",
     "PressableWidgetMixin",
+    "ScreenMixin",
     "ScrollableTextFieldWidgetMixin",
+    "ScrollableWidgetMixin",
+    "SeparatorMixin",
     "SliderWidgetMixin",
-    "TextFieldWidgetMixin"
+    "TabButtonWidgetMixin",
+    "TextFieldWidgetMixin",
+    "TextRendererDrawerMixin",
+    "TextRendererMixin",
+    "ToastMixin",
+    "TooltipBackgroundRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

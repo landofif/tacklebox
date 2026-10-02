@@ -10,14 +10,14 @@ import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-/** Single-line text fields in the mod's screens: a flat box, accent border while focused. */
+/** Single-line text fields: a flat box, accent border while focused. */
 @Mixin(TextFieldWidget.class)
 abstract class TextFieldWidgetMixin {
     @WrapOperation(method = "renderWidget", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIII)V"))
     private void dofisaddons$flatField(DrawContext ctx, RenderPipeline pipeline, Identifier texture, int x, int y, int w, int h,
                                        Operation<Void> original) {
-        if (S24.active()) {
+        if (S24.everywhere()) {
             TextFieldWidget self = (TextFieldWidget) (Object) this;
             ctx.fill(x, y, x + w, y + h, S24.BG_4);
             S24.outline(ctx, x, y, w, h, self.isFocused() ? S24.ACCENT : self.isHovered() ? S24.TEXT_5 : S24.BORDER);

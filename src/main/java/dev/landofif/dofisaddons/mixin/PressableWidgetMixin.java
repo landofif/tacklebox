@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Buttons in the mod's screens: a flat system24 box instead of the stone texture. */
+/** Buttons: a flat system24 box instead of the stone texture (the mods screens, or everywhere if set). */
 @Mixin(PressableWidget.class)
 abstract class PressableWidgetMixin extends ClickableWidget {
     private PressableWidgetMixin(int x, int y, int width, int height, Text message) {
@@ -19,8 +19,8 @@ abstract class PressableWidgetMixin extends ClickableWidget {
 
     @Inject(method = "drawButton", at = @At("HEAD"), cancellable = true)
     private void dofisaddons$flatButton(DrawContext ctx, CallbackInfo ci) {
-        if (S24.active()) {
-            S24.box(ctx, getX(), getY(), getWidth(), getHeight(), isSelected(), this.active);
+        if (S24.everywhere()) {
+            S24.button(ctx, getX(), getY(), getWidth(), getHeight(), isSelected(), this.active);
             ci.cancel();
         }
     }

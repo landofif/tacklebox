@@ -1,5 +1,7 @@
 package dev.landofif.dofisaddons.ui;
 
+import dev.landofif.dofisaddons.DofiSettings;
+import dev.landofif.dofisaddons.stats.StatsTracker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -39,6 +41,29 @@ public final class S24 {
         return MinecraftClient.getInstance().currentScreen instanceof DofiScreen;
     }
 
+    /** True when vanilla widgets, lists, backgrounds and tooltips should be drawn in this style right now. */
+    public static boolean everywhere() {
+        DofiSettings s = StatsTracker.settings();
+        return active() || (s != null && s.s24Everywhere);
+    }
+
+    /** True when chests, the inventory and server menus get the flat panel look. */
+    public static boolean menus() {
+        DofiSettings s = StatsTracker.settings();
+        return s != null && s.s24Menus;
+    }
+
+    /** True when the hotbar gets flat boxes. */
+    public static boolean hotbar() {
+        DofiSettings s = StatsTracker.settings();
+        return s != null && s.s24Hotbar;
+    }
+
+    /** {@code rgb} at the given alpha (0-255). */
+    public static int alpha(int alpha, int rgb) {
+        return (alpha << 24) | (rgb & 0xFFFFFF);
+    }
+
     public static void outline(DrawContext ctx, int x, int y, int w, int h, int color) {
         ctx.fill(x, y, x + w, y + 1, color);
         ctx.fill(x, y + h - 1, x + w, y + h, color);
@@ -54,6 +79,30 @@ public final class S24 {
             TextRenderer tr = MinecraftClient.getInstance().textRenderer;
             int lw = tr.getWidth(label);
             ctx.fill(x + 6, y, x + 12 + lw, y + 1, BG_4); // gap in the border
+            ctx.drawText(tr, label, x + 9, y - 4, TEXT_4, false);
+        }
+    }
+
+    /**
+     * A vanilla button anywhere in the game. In the mod's own screens an inactive button is the selected
+     * tab (accent underline); everywhere else it is a disabled button, so it is just dimmed.
+     */
+    public static void button(DrawContext ctx, int x, int y, int w, int h, boolean hot, boolean active) {
+        if (active || active()) {
+            box(ctx, x, y, w, h, hot, active);
+        } else {
+            ctx.fill(x, y, x + w, y + h, BG_3);
+            outline(ctx, x, y, w, h, BORDER);
+        }
+    }
+
+    /** A horizontal border line with a label set into it, like a panel title (splits one panel in two). */
+    public static void divider(DrawContext ctx, int x, int y, int w, Text label) {
+        ctx.fill(x, y, x + w, y + 1, BORDER);
+        if (label != null && !label.getString().isEmpty()) {
+            TextRenderer tr = MinecraftClient.getInstance().textRenderer;
+            int lw = tr.getWidth(label);
+            ctx.fill(x + 6, y, x + 12 + lw, y + 1, BG_4);
             ctx.drawText(tr, label, x + 9, y - 4, TEXT_4, false);
         }
     }

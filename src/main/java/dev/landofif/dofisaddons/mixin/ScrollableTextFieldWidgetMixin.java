@@ -8,12 +8,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Multi-line text boxes (the HUD lines editor) in the mod's screens: a flat box like the fields. */
+/** Multi-line text boxes (the HUD lines editor): a flat box like the fields. */
 @Mixin(ScrollableTextFieldWidget.class)
 abstract class ScrollableTextFieldWidgetMixin {
     @Inject(method = "drawBox", at = @At("HEAD"), cancellable = true)
     private void dofisaddons$flatBox(DrawContext ctx, CallbackInfo ci) {
-        if (S24.active()) {
+        if (S24.everywhere()) {
             ScrollableTextFieldWidget self = (ScrollableTextFieldWidget) (Object) this;
             int x = self.getX();
             int y = self.getY();

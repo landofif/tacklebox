@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Sliders in the mod's screens: a flat box, the filled part shaded, an accent line for the handle. */
+/** Sliders: a flat box, the filled part shaded, an accent line for the handle. */
 @Mixin(SliderWidget.class)
 abstract class SliderWidgetMixin {
     @Shadow
@@ -18,7 +18,7 @@ abstract class SliderWidgetMixin {
 
     @Inject(method = "renderWidget", at = @At("HEAD"), cancellable = true)
     private void dofisaddons$flatSlider(DrawContext ctx, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (!S24.active()) {
+        if (!S24.everywhere()) {
             return;
         }
         SliderWidget self = (SliderWidget) (Object) this;

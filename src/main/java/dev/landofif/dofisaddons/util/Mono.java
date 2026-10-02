@@ -81,6 +81,54 @@ public final class Mono {
         return MathHelper.clamp(Math.round(guiScale * drawScale), 1, MAX_OVERSAMPLE);
     }
 
+    /**
+     * Used by the text renderer for every run of text in the game when "mono font everywhere" is on: a run
+     * in the minecraft default font is pointed at the mono variant for the GUI scale, bold becomes the
+     * Medium face, and a requested shadow becomes the soft one. Runs in other fonts (server glyph fonts,
+     * the mods own mono text) are left alone, and so are the colours the fishonmc pack shaders key on:
+     * its text effects and its no-shadow colour (#4e5c24), which only work in the
+     * minecraft font. Characters dm mono lacks (pack glyphs, small caps) fall back to the default font.
+     */
+    public static Style everywhere(Style style, boolean shadow) {
+        dev.landofif.dofisaddons.DofiSettings settings = dev.landofif.dofisaddons.stats.StatsTracker.settings();
+        if (settings == null || !settings.monoEverywhere || !StyleSpriteSource.DEFAULT.equals(style.getFont())) {
+            return style;
+        }
+        net.minecraft.text.TextColor color = style.getColor();
+        if (color != null && isPackShaderColor(color.getRgb())) {
+            return style;
+        }
+        int i = oversampleFor(1f);
+        // Called once per character; consecutive characters share one Style object, so remember the last.
+        Converted last = lastConverted;
+        if (last != null && last.in == style && last.shadow == shadow && last.oversample == i) {
+            return last.out;
+        }
+        Style out = style.withFont(style.isBold() ? BOLD_SOURCES[i] : SOURCES[i]).withBold(false);
+        if (shadow && style.getShadowColor() == null) {
+            out = out.withShadowColor(SOFT_SHADOW);
+        }
+        lastConverted = new Converted(style, shadow, i, out);
+        return out;
+    }
+
+    /**
+     * Colours the fishonmc pack's text shader treats specially (assets/minecraft/shaders/include/
+     * text_effects_config.glsl matches colour / 4): effects at (240, 240, 0..64), (255, 255, 248) and
+     * (94, 171, 136), plus the no-shadow colour #4e5c24.
+     */
+    private static boolean isPackShaderColor(int rgb) {
+        int r = (rgb >> 16 & 0xFF) >> 2;
+        int g = (rgb >> 8 & 0xFF) >> 2;
+        int b = (rgb & 0xFF) >> 2;
+        return (r == 60 && g == 60 && b <= 16) || (r == 63 && g == 63 && b == 62) || (r == 23 && g == 42 && b == 34)
+                || rgb == 0x4E5C24;
+    }
+
+    private record Converted(Style in, boolean shadow, int oversample, Style out) {}
+
+    private static volatile Converted lastConverted;
+
     /** {@link #prepare(Text, int, boolean)} for text drawn at {@code drawScale} in the GUI. */
     public static Text prepare(Text text, float drawScale, boolean shadow) {
         return prepare(text, oversampleFor(drawScale), shadow);

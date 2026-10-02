@@ -8,6 +8,18 @@ public class DofiSettings {
     /** Hide the vanilla XP bar and level number on FishOnMC (the level HUD replaces them). */
     public boolean hideVanillaXp = true;
 
+    // ---- look (system24 for the whole game, see ui/S24) ----
+    /** Buttons, sliders, fields, lists, screen backgrounds and tooltips in every screen, not just the mod's. */
+    public boolean s24Everywhere = true;
+    /** Flat hotbar boxes instead of the stone hotbar. */
+    public boolean s24Hotbar = true;
+    /** Chests, the inventory and fishonmc menus as panels with flat slots (drops the server's menu art). */
+    public boolean s24Menus = true;
+    /** Draw every text in the game with DM Mono instead of the minecraft font. */
+    public boolean monoEverywhere = true;
+    /** Replace the minecraft title screen with the mod's own, with a join fishonmc button. */
+    public boolean titleScreen = true;
+
     public BobberMode bobberTimer = BobberMode.ABOVE_BOBBER;
     /** Turn the timer text red after this many seconds (0 = never). */
     public double bobberSlowSeconds = 20;

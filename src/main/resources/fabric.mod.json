@@ -3,7 +3,7 @@
   "id": "dofisaddons",
   "version": "${version}",
   "name": "dofis addons",
-  "description": "fishonmc addons: chat triggers with your own titles and sounds, session and all-time fishing stats, custom huds and a bobber timer. display only, no automation.",
+  "description": "fishonmc addons: chat triggers with your own titles and sounds, session and all-time fishing stats, custom huds, a bobber timer and a system24 look for the whole game. display only, no automation.",
   "authors": [
     "landofif"
   ],

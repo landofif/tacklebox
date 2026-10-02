@@ -41,6 +41,11 @@ The server pushes a resource pack; most UI is bitmap-font glyphs in the Unicode 
 - Vanilla caches pushed packs at `<game>/downloads/<uuid>/<sha1>` with journal `downloads/log.json`; FOECollab mirrors them into `resourcepacks/foecollab_*.zip` (`handler/ServerPackHandler.java`). Easiest way to get the full pack for analysis.
 - Small-caps Unicode (e.g. `ᴄᴀᴛᴄʜᴇꜱ`, `ʟᴜᴄᴋ`) is used heavily in scoreboard, lore and menus. Note mixed `ꜱ`/`s` variants: match the exact string from the code.
 
+- Pack `731da466fdc8be483990b59b11e0ca5c6533dc06` ("© FishOnMC Shader Pack - Handcrafted By Zebra", formats 75–85) has shaders only, with no fonts or textures. It overrides `rendertype_text.{vsh,fsh}`, `rendertype_text_intensity.vsh`, `rendertype_text_see_through.*`, `position_tex.*`, `entity.*`, `stars.*` and the armor cutout vsh.
+  - Text effects (`include/text_effects_config.glsl`) are keyed on vertex colour / 4: `(240,240,0..64)` in steps of 4 (shake, wave, outline, gradient, rainbow, shimmer, …), `(255,255,248)` and `(94,171,136)`. They only run in `rendertype_text`, so text drawn in a TTF font (which goes through `rendertype_text_intensity`) loses them.
+  - NoShadow (GUI only): text colour `#4E5C24` is drawn in the lightmap colour, and its shadow `#131709` is discarded.
+  - The menu and glyph art (fonts, textures) must be in a different pack the server sends.
+
 ### Tag glyphs (`FOMC/Constant.java`)
 
 | Glyph | Meaning | Colour |

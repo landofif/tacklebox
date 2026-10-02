@@ -32,7 +32,7 @@ import java.util.function.Supplier;
  */
 public class SettingsScreen extends DofiScreen {
     private enum Tab {
-        GENERAL("general"), BOBBER("bobber"), VIEWMODEL("viewmodel");
+        GENERAL("general"), LOOK("look"), BOBBER("bobber"), VIEWMODEL("viewmodel");
 
         final String label;
 
@@ -62,7 +62,8 @@ public class SettingsScreen extends DofiScreen {
         contentW = Math.min(360, width - 20);
         left = (width - contentW) / 2;
 
-        int tabW = (contentW - 8) / 3;
+        int tabs = Tab.values().length;
+        int tabW = (contentW - 4 * (tabs - 1)) / tabs;
         int i = 0;
         for (Tab t : Tab.values()) {
             ButtonWidget b = ButtonWidget.builder(Mono.text(t.label), btn -> {
@@ -113,6 +114,25 @@ public class SettingsScreen extends DofiScreen {
                         "the time fishing clock (and fish per hour) stops when you havent caught anything for this long, so afk time doesnt count.",
                         10, 600, 10, "s", null,
                         () -> s.pauseAfterSeconds, v -> s.pauseAfterSeconds = (int) v, defaults.pauseAfterSeconds);
+            }
+            case LOOK -> {
+                header("system24");
+                toggle("restyle all screens",
+                        "draws buttons, sliders, text fields, lists, screen backgrounds and tooltips in every screen in the system24 style, not just in the mods own screens.",
+                        () -> s.s24Everywhere, v -> s.s24Everywhere = v, defaults.s24Everywhere);
+                toggle("restyle menus",
+                        "draws chests, your inventory and fishonmc menus as flat panels with flat slots. this hides the menu art from the fishonmc resource pack.",
+                        () -> s.s24Menus, v -> s.s24Menus = v, defaults.s24Menus);
+                toggle("restyle hotbar", "flat boxes for the hotbar, with an accent border on the selected slot.",
+                        () -> s.s24Hotbar, v -> s.s24Hotbar = v, defaults.s24Hotbar);
+                header("font");
+                toggle("mono font everywhere",
+                        "draws all text in the game, chat and menus included, with dm mono like the rest of the mod. icons from the fishonmc pack keep their own font.",
+                        () -> s.monoEverywhere, v -> s.monoEverywhere = v, defaults.monoEverywhere);
+                header("title screen");
+                toggle("dofis title screen",
+                        "replaces the minecraft title screen with a system24 one that has a button to join fishonmc straight away.",
+                        () -> s.titleScreen, v -> s.titleScreen = v, defaults.titleScreen);
             }
             case BOBBER -> {
                 header("skin");
