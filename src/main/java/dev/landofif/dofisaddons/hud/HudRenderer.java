@@ -35,8 +35,6 @@ public final class HudRenderer {
     private static final int TITLE_X = 6;
     private static final int TITLE_GAP = 3;
     private static final int TITLE_RISE = 5;
-    private static final int PANEL_RGB = 0x0E0F12;
-    private static final int BORDER_RGB = 0x4E525C;
     /** Under 100ms so tenths of a second (the bobber timer) never skip a step. */
     private static final long REFRESH_MS = 50;
 
@@ -173,8 +171,8 @@ public final class HudRenderer {
 
         if (panel) {
             int alpha = Math.round(hud.background / 100f * 255);
-            ctx.fill(0, 0, boxW, boxH, alpha << 24 | PANEL_RGB);
-            int border = Math.min(255, Math.round(alpha * 1.4f)) << 24 | BORDER_RGB;
+            ctx.fill(0, 0, boxW, boxH, alpha << 24 | (dev.landofif.dofisaddons.ui.S24.HUD_PANEL & 0xFFFFFF));
+            int border = Math.min(255, Math.round(alpha * 1.4f)) << 24 | (dev.landofif.dofisaddons.ui.S24.HUD_BORDER & 0xFFFFFF);
             if (title == null) {
                 ctx.fill(0, 0, boxW, 1, border);
             } else { // leave a gap in the top edge for the title

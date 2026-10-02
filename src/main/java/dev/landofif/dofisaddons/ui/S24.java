@@ -10,31 +10,64 @@ import net.minecraft.text.Text;
 /**
  * The mod's look, taken from l's system24 Discord theme (~/.config/equibop/themes/system24.theme.css):
  * flat neutral greys, thin borders that turn accent purple on hover, panels with their label set into
- * the top border, square corners. Colours are the theme's oklch values converted to sRGB.
+ * the top border, square corners. Colours are the theme's oklch values converted to sRGB, and switch
+ * with the chosen flavor (see {@link Flavor}).
  */
 public final class S24 {
     // text-1 .. text-5
-    public static final int TEXT_1 = 0xFFEEEEEE;
-    public static final int TEXT_2 = 0xFFCECECE;
-    public static final int TEXT_3 = 0xFFAEAEAE;
-    public static final int TEXT_4 = 0xFF808080;
-    public static final int TEXT_5 = 0xFF484848;
+    public static int TEXT_1 = 0xFFEEEEEE;
+    public static int TEXT_2 = 0xFFCECECE;
+    public static int TEXT_3 = 0xFFAEAEAE;
+    public static int TEXT_4 = 0xFF808080;
+    public static int TEXT_5 = 0xFF484848;
     // bg-1 (pressed) .. bg-4 (main background)
-    public static final int BG_1 = 0xFF303030;
-    public static final int BG_2 = 0xFF262626;
-    public static final int BG_3 = 0xFF1D1D1D;
-    public static final int BG_4 = 0xFF141414;
+    public static int BG_1 = 0xFF303030;
+    public static int BG_2 = 0xFF262626;
+    public static int BG_3 = 0xFF1D1D1D;
+    public static int BG_4 = 0xFF141414;
     /** --border (54% grey at 20%) as it lands on bg-4. */
-    public static final int BORDER = 0xFF2A2A2A;
+    public static int BORDER = 0xFF2A2A2A;
     /** accent-2 (purple-2): hovered borders and small accent elements. */
-    public static final int ACCENT = 0xFFB589D6;
+    public static int ACCENT = 0xFFB589D6;
     /** accent-4 (purple-4). */
-    public static final int ACCENT_DIM = 0xFF966AB5;
+    public static int ACCENT_DIM = 0xFF966AB5;
+
+    /** Custom hud box fill and border (rgb; each hud sets its own alpha). */
+    public static int HUD_PANEL = 0x0E0F12;
+    public static int HUD_BORDER = 0x4E525C;
+    /** The flavor the colours above come from (settings → look). */
+    private static Flavor flavor = Flavor.SYSTEM24;
 
     /** How far a panel's label rises above its top border. */
     public static final int LABEL_RISE = 5;
 
     private S24() {}
+
+    /** Switches every colour above to a system24 flavor. Takes effect on the next frame. */
+    public static void apply(Flavor f) {
+        if (f == null) {
+            f = Flavor.SYSTEM24;
+        }
+        flavor = f;
+        TEXT_1 = f.text1;
+        TEXT_2 = f.text2;
+        TEXT_3 = f.text3;
+        TEXT_4 = f.text4;
+        TEXT_5 = f.text5;
+        BG_1 = f.bg1;
+        BG_2 = f.bg2;
+        BG_3 = f.bg3;
+        BG_4 = f.bg4;
+        BORDER = f.border;
+        ACCENT = f.accent;
+        ACCENT_DIM = f.accentDim;
+        HUD_PANEL = f.hudPanel;
+        HUD_BORDER = f.hudBorder;
+    }
+
+    public static Flavor flavor() {
+        return flavor;
+    }
 
     /** True while one of the mod's own screens is open (the widget mixins only restyle those). */
     public static boolean active() {

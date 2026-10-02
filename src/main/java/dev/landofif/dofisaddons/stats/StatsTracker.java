@@ -300,6 +300,7 @@ public final class StatsTracker {
     public static void loadSettings() {
         settings = read(dir().resolve("settings.json"), DofiSettings.class, new DofiSettings());
         settings.sanitize();
+        dev.landofif.dofisaddons.ui.S24.apply(settings.flavor);
     }
 
     public static void saveSettings() {

@@ -130,6 +130,7 @@ everything lives in `config/dofisaddons/`: `triggers.json`, `huds.json`, `settin
 
 screens and huds are styled after the system24 discord theme: flat dark panels, thin borders that light up purple on hover, labels set into the panel border. by default the whole game gets the same look (settings → look turns each part off):
 
+- **flavor**: the colour set, from the flavors of the system24 discord theme: system24, catppuccin mocha, catppuccin macchiato, nord, tokyo night, rose pine, rose pine moon, everforest and vencord. it changes the mod, the restyled screens and the huds right away
 - **restyle all screens**: buttons, sliders, text fields, checkboxes, tabs, lists, scrollbars, screen backgrounds and tooltips in every screen, vanilla and other mods included
 - **restyle menus**: chests, your inventory and fishonmc menus become flat panels with the menu name in the border and flat slots. the art from the fishonmc pack is left out
 - **restyle hotbar**: flat hotbar boxes with an accent border on the selected slot

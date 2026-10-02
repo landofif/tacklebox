@@ -9,6 +9,8 @@ public class DofiSettings {
     public boolean hideVanillaXp = true;
 
     // ---- look (system24 for the whole game, see ui/S24) ----
+    /** Which system24 flavor the colours come from. */
+    public dev.landofif.dofisaddons.ui.Flavor flavor = dev.landofif.dofisaddons.ui.Flavor.SYSTEM24;
     /** Buttons, sliders, fields, lists, screen backgrounds and tooltips in every screen, not just the mod's. */
     public boolean s24Everywhere = true;
     /** Flat hotbar boxes instead of the stone hotbar. */
@@ -146,6 +148,7 @@ public class DofiSettings {
     }
 
     public void sanitize() {
+        if (flavor == null) flavor = dev.landofif.dofisaddons.ui.Flavor.SYSTEM24;
         if (bobberTimer == null) bobberTimer = BobberMode.ABOVE_BOBBER;
         if (bobberSkin == null) bobberSkin = BobberSkin.DEFAULT;
         if (swingStyle == null) swingStyle = SwingStyle.NORMAL;
