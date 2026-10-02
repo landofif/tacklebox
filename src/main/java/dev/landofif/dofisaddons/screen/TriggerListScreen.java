@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.trigger.Trigger;
 import dev.landofif.dofisaddons.trigger.TriggerEngine;
 import dev.landofif.dofisaddons.trigger.TriggerStore;
@@ -21,7 +22,7 @@ import java.util.List;
  * Home screen: every trigger in a list. Click a trigger to edit it, the dot to switch it on/off,
  * arrows to reorder, "Share" to copy a code, and the bin to delete it.
  */
-public class TriggerListScreen extends Screen {
+public class TriggerListScreen extends DofiScreen {
     private final Screen parent;
     private RowListWidget list;
     private String status = "";
@@ -156,7 +157,6 @@ public class TriggerListScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(textRenderer, this.title, this.width / 2, 10, 0xFFFFFFFF);
         context.drawCenteredTextWithShadow(textRenderer,
                 Mono.text("show your own titles and sounds when a chat message appears").formatted(Formatting.GRAY),
                 this.width / 2, 23, 0xFFFFFFFF);

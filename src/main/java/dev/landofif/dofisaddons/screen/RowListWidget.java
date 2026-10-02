@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.S24;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
@@ -27,6 +28,28 @@ public class RowListWidget extends ElementListWidget<RowListWidget.Row> {
     @Override
     protected int getScrollbarX() {
         return this.getX() + this.width - 6;
+    }
+
+    // system24 look: no textured strip or separators, just a slim scrollbar (see ui/S24).
+    @Override
+    protected void drawMenuListBackground(DrawContext context) {
+    }
+
+    @Override
+    protected void drawHeaderAndFooterSeparators(DrawContext context) {
+    }
+
+    @Override
+    protected void drawScrollbar(DrawContext context, int mouseX, int mouseY) {
+        int max = getMaxScrollY();
+        if (max <= 0) {
+            return;
+        }
+        int x = getScrollbarX() + 2;
+        int thumb = Math.max(16, height * height / (height + max));
+        int top = getY() + (int) ((height - thumb) * (getScrollY() / max));
+        context.fill(x, getY(), x + 2, getBottom(), S24.BORDER);
+        context.fill(x, top, x + 2, top + thumb, S24.ACCENT_DIM);
     }
 
     public void addRow(Row row) {

@@ -1,5 +1,7 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.S24;
+import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.stats.StatBook;
 import dev.landofif.dofisaddons.stats.StatNames;
 import dev.landofif.dofisaddons.stats.StatsTracker;
@@ -19,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Session and all-time numbers in readable sections. */
-public class StatsScreen extends Screen {
+public class StatsScreen extends DofiScreen {
     private enum Tab {
         ALL_TIME("All-time"), SESSION("This session");
 
@@ -183,7 +185,6 @@ public class StatsScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(textRenderer, this.title, this.width / 2, 8, 0xFFFFFFFF);
 
         boolean allTime = tab == Tab.ALL_TIME;
         StatBook book = allTime ? StatsTracker.allTime() : StatsTracker.session();
@@ -210,7 +211,7 @@ public class StatsScreen extends Screen {
             }
             int x = left + c * colW;
             int y = top + colY[c] - off;
-            context.drawTextWithShadow(textRenderer, Mono.bold(sec.title()).formatted(Formatting.AQUA), x, y, 0xFFFFFFFF);
+            context.drawTextWithShadow(textRenderer, Mono.bold(sec.title()).withColor(S24.ACCENT & 0xFFFFFF), x, y, 0xFFFFFFFF);
             y += LINE_H + 1;
             for (Text line : sec.lines()) {
                 Text shown = textRenderer.getWidth(line) > colW - 6

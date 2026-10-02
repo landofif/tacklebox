@@ -11,6 +11,12 @@ Server knowledge (chat lines, glyph codepoints, item NBT, scoreboard, menus) is 
 - **FOECollab is AGPL.** Use `~/IdeaProjects/FOECollab` as a 1.21.11 API reference only and don't copy its code. The exception is features l wrote themselves: l allowed porting custom HUDs, which is why `%codes%` are FOECollab-compatible. Facts (strings, codepoints, NBT keys) are fine to reuse.
 - `fishonmc-autofish` is a data source only. None of its automation comes over.
 
+## UI
+
+- **Everything looks like l's system24 Discord theme.** Colours come from `ui/S24`, converted from the theme's oklch values: greys plus accent purple `#B589D6`, flat boxes, 1px borders that turn accent on hover, and panel labels set into the top border.
+- Screens extend `ui/DofiScreen`, which frames the whole screen as one labelled panel. Don't draw the title yourself. The widget mixins (`PressableWidgetMixin`, `SliderWidgetMixin`, `TextFieldWidgetMixin`, `ScrollableTextFieldWidgetMixin`) restyle vanilla widgets **only while a `DofiScreen` is open**, so the mod's screens can keep using vanilla `ButtonWidget`/`TextFieldWidget`. Override `framed()` to false for screens that must show the game (the HUD move screen).
+- HUDs (`hud/HudRenderer`) use the same look: a panel with the bold first line as the border title, and `%tab%` for label/value rows.
+
 ## Git
 
 Commit and push straight to `main`. No feature branches or PRs unless l asks for one (l said so on 2026-10-02). Each push to `main` triggers the CI build.

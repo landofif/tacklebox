@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.hud.CustomHud;
 import dev.landofif.dofisaddons.hud.HudRenderer;
 import dev.landofif.dofisaddons.hud.HudStore;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Drag HUD boxes into place and scroll on one to resize it. Shows the game behind them. */
-public class HudMoveScreen extends Screen {
+public class HudMoveScreen extends DofiScreen {
     private final Screen parent;
     /** null = every HUD in the store (saved on Done); otherwise just these drafts. */
     private final List<CustomHud> only;
@@ -54,6 +55,11 @@ public class HudMoveScreen extends Screen {
     }
 
     @Override
+    protected boolean framed() {
+        return false;
+    }
+
+    @Override
     public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
         // No blur or dim: you see the HUDs exactly as in game.
     }
@@ -65,9 +71,9 @@ public class HudMoveScreen extends Screen {
             if (hud == dragging) {
                 moveTo(hud, mouseX - grabX, mouseY - grabY);
             }
-            List<Text> lines = HudRenderer.resolve(hud);
+            HudRenderer.Resolved lines = HudRenderer.resolve(hud);
             if (lines.isEmpty()) {
-                lines = List.of(Mono.text(hud.name + " (nothing to show now)").formatted(Formatting.GRAY));
+                lines = HudRenderer.Resolved.of(Mono.text(hud.name + " (nothing to show now)").formatted(Formatting.GRAY));
             }
             boxes.put(hud, HudRenderer.draw(context, hud, lines, true));
         }

@@ -1,5 +1,7 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.S24;
+import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.util.Mono;
@@ -28,7 +30,7 @@ import java.util.function.Supplier;
  * General settings in three tabs. Every change applies right away (so viewmodel tweaks preview live) and
  * is saved when the screen closes. Each row has a ↺ button that puts that one setting back to default.
  */
-public class SettingsScreen extends Screen {
+public class SettingsScreen extends DofiScreen {
     private enum Tab {
         GENERAL("General"), BOBBER("Bobber"), VIEWMODEL("Viewmodel");
 
@@ -157,7 +159,7 @@ public class SettingsScreen extends Screen {
     // ------------------------------------------------------------------ row builders
 
     private void header(String name) {
-        list.addRow(new RowListWidget.Row(List.of(new Label(rowW(), Mono.bold(name).formatted(Formatting.AQUA)))));
+        list.addRow(new RowListWidget.Row(List.of(new Label(rowW(), Mono.bold(name).withColor(S24.ACCENT & 0xFFFFFF)))));
     }
 
     private void row(ClickableWidget control, String desc, Runnable reset) {
@@ -225,7 +227,6 @@ public class SettingsScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(textRenderer, this.title, this.width / 2, 8, 0xFFFFFFFF);
     }
 
     @Override

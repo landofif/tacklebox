@@ -31,41 +31,45 @@ public final class HudPresets {
     }
 
     public static CustomHud blank() {
-        return make("New HUD", 2, 30, "&b&lMy HUD", "&7Edit these lines!");
+        return make("New HUD", 2, 30, "&b&lMy HUD", "&7Label%tab%&fvalue", "&7Edit these lines!");
     }
 
     public static CustomHud session() {
         return make("Session stats", 1, 55,
                 "&b&lThis session",
-                "&7Fish &f%session.fish%  &7Per hour &f%session.per_hour%",
-                "&7Fishing &f%session.time%",
-                "&7Value &f$%session.value%",
+                "&7Fish%tab%&f%session.fish%",
+                "&7Per hour%tab%&f%session.per_hour%",
+                "&7Fishing%tab%&f%session.time%",
+                "&7Value%tab%&f$%session.value%",
                 "%session.rarity_bar%",
-                "&7Pets &f%session.pets%  &7Shards &f%session.shards%",
-                "&7Since Mythical &f%alltime.since.rarity.mythical%");
+                "&7Pets%tab%&f%session.pets%",
+                "&7Shards%tab%&f%session.shards%",
+                "&7Since mythical%tab%&f%alltime.since.rarity.mythical%");
     }
 
     public static CustomHud allTime() {
         return make("All-time stats", 1, 28,
                 "&6&lAll-time",
-                "&7Fish &f%alltime.fish%",
-                "&7Per hour &f%alltime.per_hour%",
-                "&7Fishing &f%alltime.time%",
-                "&7Value &f$%alltime.value%  &7Sold &f$%alltime.sold%",
+                "&7Fish%tab%&f%alltime.fish%",
+                "&7Per hour%tab%&f%alltime.per_hour%",
+                "&7Fishing%tab%&f%alltime.time%",
+                "&7Value%tab%&f$%alltime.value%",
+                "&7Sold%tab%&f$%alltime.sold%",
                 "%alltime.rarity_bar%",
-                "&7Pets &f%alltime.pets%  &7Shards &f%alltime.shards%",
-                "&7Heaviest &f%alltime.heaviest%");
+                "&7Pets%tab%&f%alltime.pets%",
+                "&7Shards%tab%&f%alltime.shards%",
+                "&7Heaviest%tab%&f%alltime.heaviest%");
     }
 
     public static CustomHud dry() {
         CustomHud h = make("Dry streaks", 99, 30,
                 "&c&lFish since last",
-                "&#C93832Mythical &f%alltime.since.rarity.mythical%",
-                "&#D98103Legendary &f%alltime.since.rarity.legendary%",
-                "&#CE2326Fabled &f%alltime.since.variant.fabled%",
-                "&#AF3333Gigantic &f%alltime.since.size.gigantic%",
-                "&7Pet &f%alltime.since.pet%",
-                "&7Shard &f%alltime.since.shard%");
+                "&#C93832Mythical%tab%&f%alltime.since.rarity.mythical%",
+                "&#D98103Legendary%tab%&f%alltime.since.rarity.legendary%",
+                "&#CE2326Fabled%tab%&f%alltime.since.variant.fabled%",
+                "&#AF3333Gigantic%tab%&f%alltime.since.size.gigantic%",
+                "&7Pet%tab%&f%alltime.since.pet%",
+                "&7Shard%tab%&f%alltime.since.shard%");
         h.align = CustomHud.Align.RIGHT;
         return h;
     }
@@ -81,10 +85,10 @@ public final class HudPresets {
     public static CustomHud wallet() {
         CustomHud h = make("Wallet", 99, 70,
                 "&e&lWallet",
-                "&7Money &f$%scoreboard.wallet%",
-                "&7Credits &f%scoreboard.credits%",
-                "&7Level &f%player.level% &8(%player.xp_progress%%)",
-                "&7Crew &f%scoreboard.crew_name% &8lvl %scoreboard.crew_level%");
+                "&7Money%tab%&f$%scoreboard.wallet%",
+                "&7Credits%tab%&f%scoreboard.credits%",
+                "&7Level%tab%&f%player.level% &8(%player.xp_progress%%)",
+                "&7Crew%tab%&f%scoreboard.crew_name% &8lvl %scoreboard.crew_level%");
         h.align = CustomHud.Align.RIGHT;
         return h;
     }

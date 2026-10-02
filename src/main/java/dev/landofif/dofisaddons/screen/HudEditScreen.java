@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.hud.CustomHud;
 import dev.landofif.dofisaddons.hud.HudRenderer;
 import dev.landofif.dofisaddons.hud.HudStore;
@@ -21,7 +22,7 @@ import java.util.List;
  * Edit one HUD: name, look, and its lines. The right side shows a live preview with real values,
  * so you see exactly what you'll get. Cancel throws the changes away.
  */
-public class HudEditScreen extends Screen {
+public class HudEditScreen extends DofiScreen {
     private static final int LABEL_W = 60;
 
     private final HudListScreen parent;
@@ -34,7 +35,7 @@ public class HudEditScreen extends Screen {
     private int previewX;
     private int previewW;
 
-    private List<Text> preview = List.of();
+    private HudRenderer.Resolved preview = HudRenderer.Resolved.EMPTY;
     private long previewAt;
     private String status = "";
     private long statusUntil;
@@ -166,7 +167,6 @@ public class HudEditScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(textRenderer, this.title, this.width / 2, 8, 0xFFFFFFFF);
         context.drawTextWithShadow(textRenderer, Mono.text("Name").formatted(Formatting.GRAY), left, 30, 0xFFFFFFFF);
         context.drawTextWithShadow(textRenderer, Mono.text("Lines").formatted(Formatting.GRAY), left, 24 * 4 - 10, 0xFFFFFFFF);
 
@@ -192,12 +192,14 @@ public class HudEditScreen extends Screen {
             } else {
                 HudRenderer.draw(context, tmp, preview, false);
             }
-            int hy = this.height - 120;
+            int hy = this.height - 140;
             for (String help : List.of(
                     "how lines work:",
                     "&a &b &c ... colour, &l bold",
                     "&#ff8800 any hex colour",
                     "%session.fish% a live value",
+                    "label%tab%value: value on the right",
+                    "bold 1st line = title in border",
                     "a line whose value isnt",
                     "available right now hides.",
                     "use + insert value to browse.")) {

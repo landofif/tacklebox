@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.display.SoundQueue;
 import dev.landofif.dofisaddons.display.TitleOverlay;
 import dev.landofif.dofisaddons.trigger.Matcher;
@@ -30,7 +31,7 @@ import java.util.function.Consumer;
  * </ol>
  * Changes go into a draft; nothing is saved until "Save". "Preview" fires the draft right here.
  */
-public class TriggerEditScreen extends Screen {
+public class TriggerEditScreen extends DofiScreen {
     private enum Tab {
         WHEN("1. When"), TITLE("2. Title"), SOUND("3. Sound");
         final String label;
@@ -291,7 +292,6 @@ public class TriggerEditScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(textRenderer, this.title, super.width / 2, 8, 0xFFFFFFFF);
 
         switch (tab) {
             case WHEN -> renderWhen(context);

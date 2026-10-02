@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.trigger.TriggerPresets;
 import dev.landofif.dofisaddons.util.Mono;
 import net.minecraft.client.gui.DrawContext;
@@ -11,7 +12,7 @@ import net.minecraft.util.Formatting;
 import java.util.List;
 
 /** "What should the new trigger start from?" Blank, or one of the FishOnMC presets. */
-public class PresetPickerScreen extends Screen {
+public class PresetPickerScreen extends DofiScreen {
     private final TriggerListScreen parent;
 
     public PresetPickerScreen(TriggerListScreen parent) {
@@ -40,7 +41,6 @@ public class PresetPickerScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(textRenderer, this.title, this.width / 2, 10, 0xFFFFFFFF);
         context.drawCenteredTextWithShadow(textRenderer,
                 Mono.text("pick a starting point. you can change everything after.").formatted(Formatting.GRAY),
                 this.width / 2, 22, 0xFFFFFFFF);

@@ -1,5 +1,7 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.S24;
+import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.hud.HudEngine;
 import dev.landofif.dofisaddons.hud.HudSources;
 import dev.landofif.dofisaddons.util.Mono;
@@ -18,7 +20,7 @@ import java.util.Locale;
 import java.util.function.Consumer;
 
 /** Browse every value a HUD line can show, with what it is right now. Click one to add it. */
-public class VariablePickerScreen extends Screen {
+public class VariablePickerScreen extends DofiScreen {
     private final Screen parent;
     private final Consumer<String> onPick;
     private RowListWidget list;
@@ -63,7 +65,7 @@ public class VariablePickerScreen extends Screen {
             }
             if (!e.category().equals(lastCategory)) {
                 lastCategory = e.category();
-                ButtonWidget header = ButtonWidget.builder(Mono.text("— " + e.category() + " —").formatted(Formatting.AQUA), b -> {})
+                ButtonWidget header = ButtonWidget.builder(Mono.text("— " + e.category() + " —").withColor(S24.ACCENT & 0xFFFFFF), b -> {})
                         .dimensions(0, 0, rowW, 20).build();
                 header.active = false;
                 list.addRow(new RowListWidget.Row(new ArrayList<ClickableWidget>(List.of(header))));
@@ -85,7 +87,6 @@ public class VariablePickerScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(textRenderer, this.title, this.width / 2, 8, 0xFFFFFFFF);
     }
 
     @Override

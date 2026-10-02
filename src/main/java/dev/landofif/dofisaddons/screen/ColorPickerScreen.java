@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.util.Mono;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -15,7 +16,7 @@ import java.util.function.IntConsumer;
  * Pick a colour by dragging (see {@link ColorPickerWidget}), typing a hex code, or clicking one of the
  * chat colours. Done hands the colour back; Esc or Cancel leaves it unchanged.
  */
-public class ColorPickerScreen extends Screen {
+public class ColorPickerScreen extends DofiScreen {
     private static final int PICKER_W = 200;
     private static final int PICKER_H = 120;
     /** The 16 chat colours, in &0..&f order, so a click gives exactly the colour a code would. */
@@ -95,7 +96,6 @@ public class ColorPickerScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(textRenderer, this.title, this.width / 2, picker.getY() - 18, 0xFFFFFFFF);
         // Before / after, next to the hex field.
         int x = hex.getX() + hex.getWidth() + 8;
         int y = hex.getY();

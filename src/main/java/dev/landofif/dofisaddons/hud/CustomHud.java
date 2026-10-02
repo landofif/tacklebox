@@ -15,7 +15,7 @@ public class CustomHud {
     /** 1.0 = normal size. */
     public double scale = 1.0;
     /** Background darkness, 0..100. */
-    public int background = 45;
+    public int background = 85;
 
     public enum Align {
         LEFT, CENTER, RIGHT;

@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.hud.CustomHud;
 import dev.landofif.dofisaddons.hud.HudPresets;
 import dev.landofif.dofisaddons.hud.HudStore;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Every custom HUD in a list: switch on/off, edit, reorder, share, delete, and move them all. */
-public class HudListScreen extends Screen {
+public class HudListScreen extends DofiScreen {
     private final Screen parent;
     private RowListWidget list;
     private String status = "";
@@ -127,7 +128,6 @@ public class HudListScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(textRenderer, this.title, this.width / 2, 10, 0xFFFFFFFF);
         context.drawCenteredTextWithShadow(textRenderer,
                 Mono.text("your own info boxes on screen, built from stats and server info").formatted(Formatting.GRAY),
                 this.width / 2, 23, 0xFFFFFFFF);
@@ -146,7 +146,7 @@ public class HudListScreen extends Screen {
     }
 
     /** Pick a starting point for a new HUD. */
-    static class HudPresetScreen extends Screen {
+    static class HudPresetScreen extends DofiScreen {
         private final HudListScreen parent;
 
         HudPresetScreen(HudListScreen parent) {
@@ -176,7 +176,6 @@ public class HudListScreen extends Screen {
         @Override
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
             super.render(context, mouseX, mouseY, delta);
-            context.drawCenteredTextWithShadow(textRenderer, this.title, this.width / 2, 12, 0xFFFFFFFF);
         }
 
         @Override

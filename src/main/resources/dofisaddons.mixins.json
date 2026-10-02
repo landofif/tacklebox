@@ -9,7 +9,11 @@
     "FishingBobberStateMixin",
     "HeldItemRendererMixin",
     "InGameHudMixin",
-    "LivingEntityMixin"
+    "LivingEntityMixin",
+    "PressableWidgetMixin",
+    "ScrollableTextFieldWidgetMixin",
+    "SliderWidgetMixin",
+    "TextFieldWidgetMixin"
   ],
   "injectors": {
     "defaultRequire": 1

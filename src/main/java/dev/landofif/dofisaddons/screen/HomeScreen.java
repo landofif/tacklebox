@@ -1,5 +1,7 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.S24;
+import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.hud.HudStore;
 import dev.landofif.dofisaddons.stats.StatNames;
 import dev.landofif.dofisaddons.stats.StatsTracker;
@@ -12,7 +14,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 /** /dofi: one place to reach every part of the mod. */
-public class HomeScreen extends Screen {
+public class HomeScreen extends DofiScreen {
     private final Screen parent;
 
     public HomeScreen(Screen parent) {
@@ -48,7 +50,7 @@ public class HomeScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         int y = this.height / 2 - 84;
-        context.drawCenteredTextWithShadow(textRenderer, Mono.bold(this.title.getString()).formatted(Formatting.AQUA), this.width / 2, y, 0xFFFFFFFF);
+        context.drawCenteredTextWithShadow(textRenderer, Mono.bold(this.title.getString()).withColor(S24.ACCENT & 0xFFFFFF), this.width / 2, y, 0xFFFFFFFF);
         context.drawCenteredTextWithShadow(textRenderer, Mono.text("fishonmc addons · display only, no automation").formatted(Formatting.GRAY),
                 this.width / 2, y + 12, 0xFFFFFFFF);
     }

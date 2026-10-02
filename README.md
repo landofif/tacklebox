@@ -47,7 +47,9 @@ a catch is counted when fishonmc shows the caught fish title and a new fish with
 your own info boxes on screen, built from stats and server info.
 
 - start from a preset: all-time stats (the default), session stats, dry streaks, where and when, wallet, level, bobber timer
-- each line is text with colours and live values, for example `&7fish &f%alltime.fish%`
+- each line is text with colours and live values, for example `&7fish%tab%&f%alltime.fish%`
+- `%tab%` splits a line into a label on the left and a value lined up on the right
+- huds are drawn as panels in the style of the system24 discord theme. a bold first line with no values (like `&6&lall-time`) becomes the title in the top border. set the background to 0 for no panel at all
 - **+ insert value** lists every value with what it shows right now, so you never have to remember names
 - a line whose value is not available right now hides itself
 - logic and maths work too: `%condition.(<session.fish_raw>>100)%`, `%round.(<expression.(<a>\/<b>)>,1)%`
@@ -82,6 +84,10 @@ all of this is in settings under bobber and viewmodel.
 ## files
 
 everything lives in `config/dofisaddons/`: `triggers.json`, `huds.json`, `settings.json` and `stats/<your uuid>.json`.
+
+## look
+
+screens and huds are styled after the system24 discord theme: flat dark panels, thin borders that light up purple on hover, labels set into the panel border.
 
 ## font
 
