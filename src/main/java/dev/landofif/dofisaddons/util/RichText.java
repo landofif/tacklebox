@@ -126,6 +126,58 @@ public final class RichText {
         return sb.toString();
     }
 
+    /** A colour code lifted off the start of a line: the colour, and the line without it. */
+    public record Lead(int rgb, String rest) {}
+
+    /**
+     * Takes the colour code off the start of {@code input} ({@code &a&lhi} gives green and {@code &lhi}),
+     * so the colour can live in a colour box instead. A code at the start always beats the colour box,
+     * which made picking a colour look broken. Returns null when there is no leading colour, or when a
+     * later {@code &r} would fall back to the box colour and so change meaning.
+     */
+    public static Lead liftLeadColor(String input) {
+        if (input == null) {
+            return null;
+        }
+        Integer color = null;
+        StringBuilder formats = new StringBuilder();
+        int i = 0;
+        while (i + 1 < input.length() && input.charAt(i) == '&') {
+            char code = Character.toLowerCase(input.charAt(i + 1));
+            if (code == '#' && i + 8 <= input.length() && isHex(input.substring(i + 2, i + 8))) {
+                color = Integer.parseInt(input.substring(i + 2, i + 8), 16);
+                formats.setLength(0); // a colour code resets bold and the rest
+                i += 8;
+                continue;
+            }
+            Formatting f = Formatting.byCode(code);
+            if (f == null || f == Formatting.RESET) {
+                break;
+            }
+            if (f.isColor()) {
+                color = f.getColorValue();
+                formats.setLength(0);
+            } else {
+                formats.append('&').append(code);
+            }
+            i += 2;
+        }
+        if (color == null) {
+            return null;
+        }
+        String rest = formats + input.substring(i);
+        for (int j = 0; j + 1 < rest.length(); j++) {
+            if (rest.charAt(j) == '&') {
+                char code = Character.toLowerCase(rest.charAt(j + 1));
+                if (code == 'r') {
+                    return null;
+                }
+                j++; // skip the code char (also covers "&&")
+            }
+        }
+        return new Lead(color, rest);
+    }
+
     /**
      * Parses a colour typed by the user: {@code #FF8800}, {@code FF8800}, {@code &a} or a colour
      * name like {@code gold}. Returns {@code fallback} when it can't be read.

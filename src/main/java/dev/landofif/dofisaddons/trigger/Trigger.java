@@ -1,5 +1,7 @@
 package dev.landofif.dofisaddons.trigger;
 
+import dev.landofif.dofisaddons.util.RichText;
+
 import java.util.UUID;
 
 /**
@@ -93,6 +95,22 @@ public class Trigger {
         if (title.titleColor == null) title.titleColor = "#ffffff";
         if (title.subtitleColor == null) title.subtitleColor = "#bbbbbb";
         if (title.animation == null) title.animation = Animation.POP;
+        // A colour code at the start of the text always won over the colour box, which hid colours picked
+        // in the box. Move the code into the box, or drop it if a colour was already picked there.
+        RichText.Lead lead = RichText.liftLeadColor(title.title);
+        if (lead != null) {
+            title.title = lead.rest();
+            if (RichText.parseColor(title.titleColor, 0xFFFFFF) == 0xFFFFFF) {
+                title.titleColor = String.format(java.util.Locale.ROOT, "#%06x", lead.rgb());
+            }
+        }
+        lead = RichText.liftLeadColor(title.subtitle);
+        if (lead != null) {
+            title.subtitle = lead.rest();
+            if (RichText.parseColor(title.subtitleColor, 0xBBBBBB) == 0xBBBBBB) {
+                title.subtitleColor = String.format(java.util.Locale.ROOT, "#%06x", lead.rgb());
+            }
+        }
         if (sound.soundId == null) sound.soundId = "";
         cooldownSeconds = clamp(cooldownSeconds, 0, 3600);
         title.scale = clamp(title.scale, 0.5, 8);

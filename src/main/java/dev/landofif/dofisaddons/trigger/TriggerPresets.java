@@ -35,7 +35,7 @@ public final class TriggerPresets {
         Trigger t = new Trigger();
         t.name = "quest completed";
         t.pattern = "quests > quest #{n} has been completed!";
-        t.title.title = "&a&lquest {n} complete";
+        t.title.title = "&lquest {n} complete";
         t.title.subtitle = "type /quests to claim it";
         t.title.titleColor = "#55ff55";
         t.title.animation = Trigger.Animation.POP;
@@ -47,7 +47,8 @@ public final class TriggerPresets {
         Trigger t = new Trigger();
         t.name = "pet drop";
         t.pattern = "pet drop! you pulled {pet}";
-        t.title.title = "&#fd95f6&lpet drop!";
+        t.title.title = "&lpet drop!";
+        t.title.titleColor = "#fd95f6";
         t.title.subtitle = "{pet.lower}";
         t.title.animation = Trigger.Animation.SHAKE;
         t.sound.soundId = "minecraft:entity.player.levelup";
@@ -60,7 +61,8 @@ public final class TriggerPresets {
         Trigger t = new Trigger();
         t.name = "rare catch";
         t.pattern = "rare catch! you pulled {item}";
-        t.title.title = "&6&lrare catch!";
+        t.title.title = "&lrare catch!";
+        t.title.titleColor = "#ffaa00";
         t.title.subtitle = "{item.lower}";
         t.title.animation = Trigger.Animation.POP;
         t.sound.soundId = "minecraft:block.amethyst_block.chime";
@@ -73,7 +75,8 @@ public final class TriggerPresets {
         Trigger t = new Trigger();
         t.name = "fabled event";
         t.pattern = "fabled > a fabled event is active at {place}";
-        t.title.title = "&#f7453e&lfabled event";
+        t.title.title = "&lfabled event";
+        t.title.titleColor = "#f7453e";
         t.title.subtitle = "at {place.lower}";
         t.title.animation = Trigger.Animation.TYPEWRITER;
         t.title.staySeconds = 4;
@@ -85,7 +88,8 @@ public final class TriggerPresets {
         Trigger t = new Trigger();
         t.name = "storm";
         t.pattern = "storm > a {kind} has formed!";
-        t.title.title = "&e&l⚡ {kind.lower}";
+        t.title.title = "&l⚡ {kind.lower}";
+        t.title.titleColor = "#ffff55";
         t.title.subtitle = "bite speed is up";
         t.title.animation = Trigger.Animation.SHAKE;
         t.sound.soundId = "minecraft:entity.lightning_bolt.thunder";
@@ -98,7 +102,8 @@ public final class TriggerPresets {
         t.name = "moon rising";
         t.mode = Trigger.MatchMode.REGEX;
         t.pattern = "(?<moon>full|blue|super|blood) moon > a .* has risen";
-        t.title.title = "&#60c2e9&l{moon.lower} moon";
+        t.title.title = "&l{moon.lower} moon";
+        t.title.titleColor = "#60c2e9";
         t.title.subtitle = "has risen";
         t.title.animation = Trigger.Animation.SLIDE;
         t.sound.soundId = "minecraft:block.beacon.activate";
@@ -109,7 +114,8 @@ public final class TriggerPresets {
         Trigger t = new Trigger();
         t.name = "fish sold";
         t.pattern = "sell > you just earned {amount} from selling your fish!";
-        t.title.title = "&a&l+{amount}";
+        t.title.title = "&l+{amount}";
+        t.title.titleColor = "#55ff55";
         t.title.subtitle = "fish sold";
         t.title.scale = 2.5;
         t.title.staySeconds = 1.5;

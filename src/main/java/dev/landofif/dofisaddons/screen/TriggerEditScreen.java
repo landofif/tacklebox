@@ -172,27 +172,44 @@ public class TriggerEditScreen extends DofiScreen {
                 .tooltip(Tooltip.of(Mono.text("how the title appears: fade, pop, slide, typewriter or shake"))).build());
         y += ROW;
 
-        textField(y, t.title, 256, s -> t.title = s, "e.g. &a&lquest {n} complete");
+        TextFieldWidget titleField = textField(y, t.title, 256, s -> t.title = s, "e.g. &lquest {n} complete");
         y += ROW;
-        textField(y, t.subtitle, 256, s -> t.subtitle = s, "optional second line");
+        TextFieldWidget subtitleField = textField(y, t.subtitle, 256, s -> t.subtitle = s, "optional second line");
         y += ROW;
 
-        // [title colour][swatch] [subtitle colour][swatch]; a swatch opens the colour picker.
+        // [title colour][swatch] [subtitle colour][swatch]; a swatch opens the colour picker. Picking a colour
+        // drops a colour code at the start of that line, since the code would win and hide the pick.
         int colorW = (fieldW - 56) / 2;
         TextFieldWidget tc = new TextFieldWidget(textRenderer, fieldX, y, colorW, 20, Text.empty());
         tc.setText(t.titleColor);
-        tc.setChangedListener(s -> t.titleColor = s);
+        tc.setChangedListener(s -> {
+            t.titleColor = s;
+            if (RichText.parseColor(s, -1) != -1) {
+                dropLeadColor(titleField);
+            }
+        });
         tc.setTooltip(Tooltip.of(Mono.text("title colour: #ff8800, &a or a name like gold")));
         addDrawableChild(tc);
         addDrawableChild(colorSwatch(fieldX + colorW + 3, y, "title colour",
-                () -> RichText.parseColor(t.titleColor, 0xFFFFFF), c -> t.titleColor = hex(c)));
+                () -> RichText.parseColor(t.titleColor, 0xFFFFFF), c -> {
+                    t.titleColor = hex(c);
+                    dropLeadColor(titleField);
+                }));
         TextFieldWidget sc = new TextFieldWidget(textRenderer, fieldX + colorW + 28, y, colorW, 20, Text.empty());
         sc.setText(t.subtitleColor);
-        sc.setChangedListener(s -> t.subtitleColor = s);
+        sc.setChangedListener(s -> {
+            t.subtitleColor = s;
+            if (RichText.parseColor(s, -1) != -1) {
+                dropLeadColor(subtitleField);
+            }
+        });
         sc.setTooltip(Tooltip.of(Mono.text("subtitle colour: #ff8800, &a or a name like gray")));
         addDrawableChild(sc);
         addDrawableChild(colorSwatch(fieldX + colorW * 2 + 31, y, "subtitle colour",
-                () -> RichText.parseColor(t.subtitleColor, 0xBBBBBB), c -> t.subtitleColor = hex(c)));
+                () -> RichText.parseColor(t.subtitleColor, 0xBBBBBB), c -> {
+                    t.subtitleColor = hex(c);
+                    dropLeadColor(subtitleField);
+                }));
         y += ROW;
 
         addDrawableChild(new ValueSlider(left, y, half, 20, "size", 0.5, 8, 0.1, "x", t.scale, v -> t.scale = v));
@@ -382,6 +399,14 @@ public class TriggerEditScreen extends DofiScreen {
                 () -> client.setScreen(new ColorPickerScreen(this, name, get.getAsInt(), set)));
         b.setTooltip(Tooltip.of(Mono.text("click to pick the " + name.toLowerCase(java.util.Locale.ROOT))));
         return b;
+    }
+
+    /** Removes a colour code from the start of the line in {@code field} (its listener updates the draft). */
+    private static void dropLeadColor(TextFieldWidget field) {
+        RichText.Lead lead = RichText.liftLeadColor(field.getText());
+        if (lead != null) {
+            field.setText(lead.rest());
+        }
     }
 
     private static String hex(int rgb) {
