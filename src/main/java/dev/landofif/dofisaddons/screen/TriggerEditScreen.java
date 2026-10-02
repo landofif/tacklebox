@@ -250,6 +250,7 @@ public class TriggerEditScreen extends DofiScreen {
     private void switchTab(Tab next) {
         this.tab = next;
         clearAndInit();
+        replayIntro();
     }
 
     private void preview() {

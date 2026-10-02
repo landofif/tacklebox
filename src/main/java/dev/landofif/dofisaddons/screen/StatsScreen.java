@@ -62,6 +62,7 @@ public class StatsScreen extends DofiScreen {
                 tab = t;
                 scroll = 0;
                 clearAndInit();
+                replayIntro();
             }).dimensions(left + i * (tabW + 4), 22, tabW, 18).build();
             b.active = t != tab;
             addDrawableChild(b);
