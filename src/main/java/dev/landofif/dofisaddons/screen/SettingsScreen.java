@@ -168,7 +168,7 @@ public class SettingsScreen extends DofiScreen {
                         () -> s.vmNoEquipDip, v -> s.vmNoEquipDip = v, defaults.vmNoEquipDip);
                 header("swing");
                 cycle("swing style",
-                        "how your hand swings. smooth eases in and out, snappy moves fast at the start, no swing keeps the item still. only you see it.",
+                        "how your hand swings. smooth eases in and out, snappy moves fast at the start, no swing only turns the item around its own centre without moving it. only you see it.",
                         DofiSettings.SwingStyle.values(), w -> w.label, () -> s.swingStyle, v -> s.swingStyle = v, defaults.swingStyle);
                 slider("swing length", "how long one swing takes. 1 = normal, 2 = twice as slow, 0.5 = twice as fast. only changes how it looks.",
                         0.25, 4, 0.05, "x", null, () -> s.swingSlowness, v -> s.swingSlowness = v, defaults.swingSlowness);
