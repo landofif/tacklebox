@@ -54,6 +54,7 @@ public final class DofisAddons implements ClientModInitializer {
         TriggerStore.load();
         HudStore.load();
         StatsTracker.loadSettings();
+        HudStore.retireAllTimeDefault();
         dev.landofif.dofisaddons.display.FlatLeaves.register();
         dev.landofif.dofisaddons.display.ShortTooltips.register();
         dev.landofif.dofisaddons.compat.FoeLook.register();

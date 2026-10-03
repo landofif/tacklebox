@@ -2,6 +2,9 @@ package dev.landofif.dofisaddons;
 
 /** Small global settings. Saved to {@code config/dofisaddons/settings.json}. */
 public class DofiSettings {
+    /** Set once the old default all-time hud was removed (see HudStore.retireAllTimeDefault). */
+    public boolean allTimeHudRetired = false;
+
     /** Stop the "time fishing" clock after this many seconds without a catch. */
     public int pauseAfterSeconds = 120;
 

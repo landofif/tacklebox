@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.DofisAddons;
 import dev.landofif.dofisaddons.stats.StatsTracker;
 
@@ -45,7 +46,7 @@ public final class HudStore {
         HUDS.clear();
         Path path = file();
         if (!Files.isRegularFile(path)) {
-            HUDS.add(HudPresets.allTime());
+            // no all-time box: foecollab's fish tracker shows the same
             HUDS.add(HudPresets.level());
             HUDS.add(HudPresets.bobber());
             save();
@@ -65,6 +66,23 @@ public final class HudStore {
                 }
             }
         }
+    }
+
+    /**
+     * Once: drops the all-time box older installs started with, now that foecollab's fish tracker shows
+     * the same. Only if it is still exactly the default; an edited one stays.
+     */
+    public static void retireAllTimeDefault() {
+        DofiSettings s = StatsTracker.settings();
+        if (s == null || s.allTimeHudRetired) {
+            return;
+        }
+        List<String> stock = HudPresets.allTime().lines;
+        if (HUDS.removeIf(h -> "all-time stats".equals(h.name) && stock.equals(h.lines))) {
+            save();
+        }
+        s.allTimeHudRetired = true;
+        StatsTracker.saveSettings();
     }
 
     public static void save() {
