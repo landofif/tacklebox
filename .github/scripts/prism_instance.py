@@ -12,7 +12,7 @@ MC = "1.21.11"
 LOADER = "0.19.5"
 NAME = "Dofis Addons Test"
 # The mod's own dependencies, then performance mods. Required dependencies are added automatically.
-MODS = ["fabric-api", "modmenu",
+MODS = ["fabric-api", "modmenu", "cloth-config",
         "sodium", "lithium", "ferrite-core", "entityculling", "immediatelyfast", "modernfix", "dynamic-fps"]
 
 API = "https://api.modrinth.com/v2"
@@ -51,6 +51,21 @@ while queue:
         out.write(get(f["url"]))
     added.append(f"{p} {v['version_number']}")
     queue += [d["project_id"] for d in v["dependencies"] if d["dependency_type"] == "required" and d.get("project_id")]
+
+# foecollab (required) is not on modrinth: take the jar from its latest github release
+try:
+    req = {"User-Agent": HEADERS["User-Agent"], "Accept": "application/vnd.github+json"}
+    if os.environ.get("GITHUB_TOKEN"):
+        req["Authorization"] = "Bearer " + os.environ["GITHUB_TOKEN"]
+    with urllib.request.urlopen(urllib.request.Request(
+            "https://api.github.com/repos/Kimberlyow/FOECollab/releases/latest", headers=req)) as r:
+        release = json.loads(r.read())
+    asset = next(a for a in release["assets"] if a["name"].endswith(".jar") and "sources" not in a["name"])
+    with open(f"{mods_dir}/{asset['name']}", "wb") as out:
+        out.write(get(asset["browser_download_url"]))
+    added.append(f"foecollab {release['tag_name']}")
+except Exception as e:  # the instance still builds; add foecollab by hand then
+    missing.append(f"foecollab ({e})")
 
 for jar in glob.glob("build/libs/*.jar"):
     if not jar.endswith(("-sources.jar", "-dev.jar")):

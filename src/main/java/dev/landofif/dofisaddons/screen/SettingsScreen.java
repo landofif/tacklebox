@@ -1,5 +1,7 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.compat.FoeConfig;
+import dev.landofif.dofisaddons.compat.FoeScreens;
 import dev.landofif.dofisaddons.ui.S24;
 import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.DofiSettings;
@@ -33,7 +35,7 @@ import java.util.function.Supplier;
  */
 public class SettingsScreen extends DofiScreen {
     private enum Tab {
-        GENERAL("general"), LOOK("look"), BOBBER("bobber"), WORLD("world"), VIEWMODEL("viewmodel");
+        GENERAL("general"), LOOK("look"), BOBBER("bobber"), WORLD("world"), VIEWMODEL("viewmodel"), FOECOLLAB("foecollab");
 
         final String label;
 
@@ -49,6 +51,8 @@ public class SettingsScreen extends DofiScreen {
     private final DofiSettings s = StatsTracker.settings();
     private final DofiSettings defaults = new DofiSettings();
     private Tab tab = Tab.GENERAL;
+    private TextFieldWidget search;
+    private String query = "";
     private RowListWidget list;
     private int left;
     private int contentW;
@@ -58,15 +62,26 @@ public class SettingsScreen extends DofiScreen {
         this.parent = parent;
     }
 
+    /** Opened on the foecollab tab: stands in for foecollab's own cloth config screen. */
+    public static SettingsScreen foecollab(Screen parent) {
+        SettingsScreen screen = new SettingsScreen(parent);
+        screen.tab = Tab.FOECOLLAB;
+        return screen;
+    }
+
     @Override
     protected void init() {
         contentW = Math.min(400, width - 20);
         left = (width - contentW) / 2;
 
-        int tabs = Tab.values().length;
+        List<Tab> shown = new ArrayList<>(List.of(Tab.values()));
+        if (!FoeConfig.available()) {
+            shown.remove(Tab.FOECOLLAB);
+        }
+        int tabs = shown.size();
         int tabW = (contentW - 4 * (tabs - 1)) / tabs;
         int i = 0;
-        for (Tab t : Tab.values()) {
+        for (Tab t : shown) {
             ButtonWidget b = ButtonWidget.builder(Mono.text(t.label), btn -> {
                 tab = t;
                 clearAndInit();
@@ -76,8 +91,31 @@ public class SettingsScreen extends DofiScreen {
             i++;
         }
 
-        list = new RowListWidget(client, left, 46, contentW, height - 46 - 34, ROW_H);
+        int listTop = tab == Tab.FOECOLLAB ? 70 : 46;
+        list = new RowListWidget(client, left, listTop, contentW, height - listTop - 34, ROW_H);
         addDrawableChild(list);
+        if (tab == Tab.FOECOLLAB) {
+            // a search box above the list, lined up with its rows: foecollab has a few hundred options
+            int x = list.getRowLeft();
+            int w = list.getRowWidth();
+            int bw = 92;
+            search = new TextFieldWidget(textRenderer, x, 46, w - 2 * (bw + 4), 18, Mono.text("search"));
+            search.setMaxLength(64);
+            search.setText(query);
+            search.setPlaceholder(Mono.text("search foecollab settings").formatted(Formatting.DARK_GRAY));
+            search.setChangedListener(v -> {
+                query = v;
+                refresh();
+                list.setScrollY(0);
+            });
+            addDrawableChild(search);
+            addDrawableChild(ButtonWidget.builder(Mono.text("foecollab menu"), b -> open(FoeScreens.main(this)))
+                    .dimensions(x + w - 2 * bw - 4, 46, bw, 18)
+                    .tooltip(Tooltip.of(Mono.text("foecollabs own menu: custom huds, custom buttons, pet calculator and more"))).build());
+            addDrawableChild(ButtonWidget.builder(Mono.text("move huds"), b -> open(FoeScreens.move(this)))
+                    .dimensions(x + w - bw, 46, bw, 18)
+                    .tooltip(Tooltip.of(Mono.text("drag foecollabs huds into place"))).build());
+        }
         fillRows();
 
         addDrawableChild(ButtonWidget.builder(Mono.text("done"), b -> close())
@@ -125,14 +163,17 @@ public class SettingsScreen extends DofiScreen {
                         () -> s.s24Menus, v -> s.s24Menus = v, defaults.s24Menus);
                 toggle("restyle hotbar", "flat boxes for the hotbar, with an accent border on the selected slot.",
                         () -> s.s24Hotbar, v -> s.s24Hotbar = v, defaults.s24Hotbar);
+                toggle("restyle foecollab huds",
+                        "draws foecollabs hud boxes as system24 panels in your flavor. pick any clean theme in foecollab to get the titles set into the top border.",
+                        () -> s.foeHuds, v -> s.foeHuds = v, defaults.foeHuds);
                 header("font");
                 toggle("mono font everywhere",
                         "draws all text in the game, chat and menus included, with dm mono like the rest of the mod. icons from the fishonmc pack keep their own font.",
                         () -> s.monoEverywhere, v -> s.monoEverywhere = v, defaults.monoEverywhere);
                 header("title screen");
-                toggle("dofis title screen",
-                        "replaces the minecraft title screen with a system24 one that has a button to join fishonmc straight away.",
-                        () -> s.titleScreen, v -> s.titleScreen = v, defaults.titleScreen);
+                cycle("title screen",
+                        "which title screen shows when the game starts: the system24 one from dofis addons with a join fishonmc button, foecollabs, or the minecraft one.",
+                        titleChoices(), c -> c.label, () -> s.titleChoice, v -> s.titleChoice = v, DofiSettings.TitleChoice.DOFIS);
             }
             case BOBBER -> {
                 header("timer");
@@ -247,6 +288,106 @@ public class SettingsScreen extends DofiScreen {
                 slider("swing turn", "with no swing, how far the item turns. 100% is the full vanilla turn, 0% keeps it still.",
                         0, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v), () -> s.swingTurn, v -> s.swingTurn = v, defaults.swingTurn);
             }
+            case FOECOLLAB -> foeRows();
+        }
+    }
+
+    private DofiSettings.TitleChoice[] titleChoices() {
+        if (FoeConfig.available()) {
+            return DofiSettings.TitleChoice.values();
+        }
+        return new DofiSettings.TitleChoice[]{DofiSettings.TitleChoice.DOFIS, DofiSettings.TitleChoice.MINECRAFT};
+    }
+
+    private void open(Screen screen) {
+        if (screen != null) {
+            StatsTracker.saveSettings();
+            FoeConfig.save();
+            client.setScreen(screen);
+        }
+    }
+
+    // ------------------------------------------------------------------ foecollab
+
+    /** foecollab's own settings as rows (compat/FoeConfig), filtered by the search box. */
+    private void foeRows() {
+        String q = query.trim().toLowerCase(Locale.ROOT);
+        List<FoeConfig.Header> path = new ArrayList<>(); // the open categories and sections, by depth
+        int emitted = 0; // how many of them already have a row
+        int shown = 0;
+        for (FoeConfig.Node node : FoeConfig.nodes()) {
+            if (node instanceof FoeConfig.Header h) {
+                while (path.size() > h.depth()) path.removeLast();
+                path.add(h);
+                emitted = Math.min(emitted, path.size() - 1);
+                continue;
+            }
+            FoeConfig.Option o = (FoeConfig.Option) node;
+            if (!q.isEmpty() && !foeMatches(o, path, q)) {
+                continue;
+            }
+            for (; emitted < path.size(); emitted++) {
+                FoeConfig.Header h = path.get(emitted);
+                if (h.depth() == 0) {
+                    header(h.label());
+                } else {
+                    subheader(h.label());
+                }
+            }
+            foeOption(o);
+            shown++;
+        }
+        if (shown == 0) {
+            subheader(q.isEmpty() ? "foecollab has no settings to show" : "nothing matches " + q);
+        }
+    }
+
+    private static boolean foeMatches(FoeConfig.Option o, List<FoeConfig.Header> path, String q) {
+        if (o.label().contains(q) || (o.tooltip() != null && o.tooltip().contains(q))) {
+            return true;
+        }
+        for (FoeConfig.Header h : path) {
+            if (h.label().contains(q)) return true;
+        }
+        return false;
+    }
+
+    private void foeOption(FoeConfig.Option o) {
+        if (o.prefix() != null && !o.prefix().isEmpty()) {
+            subheader(o.prefix());
+        }
+        String name = o.label();
+        String desc = o.tooltip() == null ? "" : o.tooltip();
+        switch (o.kind()) {
+            case BOOL -> toggle(name, desc, () -> (Boolean) o.get(), o::set, (Boolean) o.def());
+            case SLIDER -> slider(name, desc, o.min(), o.max(), 1, "", v -> String.valueOf((int) Math.round(v)),
+                    () -> ((Number) o.get()).doubleValue(), v -> o.set((int) Math.round(v)), ((Number) o.def()).doubleValue());
+            case COLOR -> color(name, desc, () -> (Integer) o.get() & 0xFFFFFF,
+                    v -> o.set(((Integer) o.get() & 0xFF000000) | (v & 0xFFFFFF)), (Integer) o.def() & 0xFFFFFF);
+            case INT -> text(name, desc, () -> String.valueOf(o.get()), v -> {
+                try {
+                    o.set(Integer.parseInt(v.trim()));
+                } catch (NumberFormatException ignored) {
+                    // keep the old value until the field holds a number
+                }
+            }, String.valueOf(o.def()));
+            case LONG -> text(name, desc, () -> String.valueOf(o.get()), v -> {
+                try {
+                    o.set(Long.parseLong(v.trim()));
+                } catch (NumberFormatException ignored) {
+                    // keep the old value until the field holds a number
+                }
+            }, String.valueOf(o.def()));
+            case STRING -> text(name, desc, () -> String.valueOf(o.get()), o::set, String.valueOf(o.def()));
+            case ENUM -> {
+                Enum<?>[] values = o.constants();
+                ButtonWidget b = ButtonWidget.builder(Mono.text(name + ": " + FoeConfig.enumLabel(o.get())), btn -> {
+                    Enum<?> now = (Enum<?>) o.get();
+                    o.set(values[((now == null ? -1 : now.ordinal()) + 1) % values.length]);
+                    btn.setMessage(Mono.text(name + ": " + FoeConfig.enumLabel(o.get())));
+                }).dimensions(0, 0, controlW(), 20).build();
+                row(b, desc.isEmpty() ? "click to change" : desc + " (click to change)", () -> o.set(o.def()));
+            }
         }
     }
 
@@ -256,8 +397,15 @@ public class SettingsScreen extends DofiScreen {
         list.addRow(new RowListWidget.Row(List.of(new Label(rowW(), Mono.bold(name).withColor(S24.ACCENT & 0xFFFFFF)))));
     }
 
+    /** A smaller grey header for a section inside a category. */
+    private void subheader(String name) {
+        list.addRow(new RowListWidget.Row(List.of(new Label(rowW(), Mono.text(name).withColor(S24.TEXT_3 & 0xFFFFFF)))));
+    }
+
     private void row(ClickableWidget control, String desc, Runnable reset) {
-        control.setTooltip(Tooltip.of(Mono.text(desc)));
+        if (!desc.isEmpty()) {
+            control.setTooltip(Tooltip.of(Mono.text(desc)));
+        }
         ButtonWidget r = ButtonWidget.builder(Mono.text("↺"), b -> {
             reset.run();
             refresh();
@@ -317,7 +465,9 @@ public class SettingsScreen extends DofiScreen {
                 btn -> open.run()).dimensions(0, 0, controlW() - 22, 20).build();
         SwatchButton swatch = new SwatchButton(0, 0, 20, 20, get, open);
         swatch.setTooltip(Tooltip.of(Mono.text("click to pick a colour")));
-        b.setTooltip(Tooltip.of(Mono.text(desc)));
+        if (!desc.isEmpty()) {
+            b.setTooltip(Tooltip.of(Mono.text(desc)));
+        }
         ButtonWidget r = ButtonWidget.builder(Mono.text("↺"), btn -> {
             set.accept(def);
             refresh();
@@ -335,6 +485,9 @@ public class SettingsScreen extends DofiScreen {
     @Override
     public void close() {
         StatsTracker.saveSettings();
+        if (FoeConfig.available()) {
+            FoeConfig.save();
+        }
         client.setScreen(parent);
     }
 

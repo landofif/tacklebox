@@ -135,6 +135,14 @@ Hook via Fabric `ClientReceiveMessageEvents.ALLOW_GAME` (observe/suppress) and `
 - Moon set: contains `» The ` … ` has set.`
 - Fabled: `FABLED » A Fabled Event is active at <Location>` or `Visit the <Location> to ...`; ends with `Caught by <player>`.
 
+**Player chat, dms, crew chat** (from l's logs, 2026-09)
+- Player chat is a server line: `<glyphs>! [<level>] <rank glyph> <tag glyph> <name> » <message>`; after `Matcher.normalize` it reads `! [113] Jukoneko > is crc easy...`.
+- Direct messages: `✉ From <name> » <message>` (incoming, seen in logs); outgoing is presumably `✉ To <name> » <message>`.
+- Crew chat: `[Crew Chat] <name> » <message>` (l's memory, not in the logs yet). Toggled with `/crew chat`: `CREWS » Crew Chat has been enabled/disabled`.
+- Others' catches broadcast: `WR! <name> caught a record <fish> <lb> (+<lb>) <in> (+<in>)`, `TROPHY! <name> caught a <glyph> <fish>`. Yours: `RARE CATCH! You pulled a 1x Subtropical Shard`.
+- More prefixes seen: `REACTIONS`, `BOOSTER`, `VOTE`, `TIP` (`You tipped <name>! + 500xp | $500`), `LOCATION` (`Lake Biwa gained 4.17K xp`), `TP`, `PURCHASE!`, `CHUMMER` (`<name> activated a <glyph> Chummer. (+75 Bite Speed)`), `CONTESTS` (`0.2lb → 0.43lb (+0.24lb)`), `NOTIFICATION`, `TRAILS`, `HATS`, `ROD PARTS`, `ARTISAN`, `MANUFACTURER`, `PAY`, `TRADE`, `TPA`, `AUCTION HOUSE`, `<LOCATION> MINI EVENT` (message starts with a newline), and FOECollab's own `FOE » You went <n> fish dry before catching a ...`.
+- Gameplay logs to grep for more: `/home/luna/.local/share/PrismLauncher/instances/fishonmc-dev/minecraft/logs/` (l offered them, 2026-10-03).
+
 **Other**
 - `SELL » You just earned $38.48K from selling your fish!` (money earned per sell; good stat)
 - `TACKLE SHOP » ... Tackle items restocked!`

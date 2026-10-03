@@ -182,7 +182,10 @@ public class DofiTitleScreen extends DofiScreen {
         // status in the joins top border, like a panel label
         Text status = status();
         int sw = textRenderer.getWidth(status);
-        ctx.drawText(textRenderer, Mono.text(ADDRESS).withColor(S24.TEXT_4 & 0xFFFFFF), join.getX(), join.getY() - 12, 0xFFFFFFFF, false);
+        Text address = Mono.text(ADDRESS).withColor(S24.TEXT_4 & 0xFFFFFF);
+        if (textRenderer.getWidth(address) + 8 + sw <= join.getWidth()) { // a long status gets the whole line
+            ctx.drawText(textRenderer, address, join.getX(), join.getY() - 12, 0xFFFFFFFF, false);
+        }
         ctx.drawText(textRenderer, status, join.getRight() - sw, join.getY() - 12, 0xFFFFFFFF, false);
         if (join.active && !join.isSelected()) {
             S24.outline(ctx, join.getX(), join.getY(), join.getWidth(), join.getHeight(), S24.ACCENT_DIM);

@@ -4,7 +4,7 @@ client side fabric mod for **fishonmc** (minecraft 1.21.11).
 
 display only: the mod reacts to what the server sends. it never sends chat, clicks, casts, reels or presses keys for you.
 
-needs: fabric api. mod menu is optional.
+needs: fabric api and [foecollab](https://github.com/Kimberlyow/FOECollab) (with its own requirements, cloth config and mod menu). dofis addons is made to run next to foecollab: it leaves the trackers to foecollab, draws foecollabs huds and screens in the system24 look, and puts foecollabs settings in its own settings screen.
 
 ## getting around
 
@@ -39,6 +39,7 @@ switch triggers on and off with the dot, reorder with the arrows, **share** copi
 - **hide rules**: lines that match never show up in chat. type part of the line (`*` matches anything), the whole line, or a regex, and pick fishonmc only or every server. paste a line into **test with** to check which rule hides it
 - **move chat**: drag the chat box anywhere in the move screen. right click it there to put it back
 - **copy**: with chat open, right click a message to copy it. shift + right click a message to make a hide rule for it
+- **chat boxes**: separate chat panels, each with its own place on screen. two come set up: **dms** (`✉ from …` and `✉ to …` lines) and **crew** (`[crew chat] …` lines). their lines leave the main chat (or stay there too with **also in chat**). each box has rules like the hide rules, a name in its top border, and can fade out a while after its last line. with chat open you can scroll a box, hover and click its text like normal chat, and right click a line to copy it. move them in the move screen: drag a box, scroll on it for more or fewer lines, shift + scroll for its width. **+ box** makes a new one for anything else
 
 ## hotkey
 
@@ -136,7 +137,12 @@ screens and huds are styled after the system24 discord theme: flat dark panels, 
 - **restyle menus**: chests, your inventory and fishonmc menus become flat panels with the menu name in the border and flat slots. the art from the fishonmc pack is left out
 - **restyle hotbar**: flat hotbar boxes with an accent border on the selected slot
 - **mono font everywhere**: all text in the game in dm mono. fishonmc pack icons and animated text effects keep the server font
-- **dofis title screen**: a system24 title screen with a **join fishonmc** button that shows how many players are on and your ping
+- **restyle foecollab huds**: foecollabs hud boxes become system24 panels in your flavor. pick any clean theme in foecollab (settings → foecollab → change theme) and the titles sit in the top border like the dofis huds. foecollabs own screens get system24 buttons with restyle all screens
+- **title screen**: dofis addons (a system24 title screen with a **join fishonmc** button that shows how many players are on and your ping), foecollab, or minecraft
+
+## foecollab
+
+settings → foecollab has every foecollab option as a row in the same screen, grouped like foecollabs own config, with a search box on top. opening foecollabs config from its menu or from mod menu lands here too. **foecollab menu** opens foecollabs own screens (custom huds, custom buttons, pet calculator), and **move huds** its hud mover.
 
 ## font
 

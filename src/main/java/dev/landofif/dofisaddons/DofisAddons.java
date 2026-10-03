@@ -56,6 +56,7 @@ public final class DofisAddons implements ClientModInitializer {
         StatsTracker.loadSettings();
         dev.landofif.dofisaddons.display.FlatLeaves.register();
         dev.landofif.dofisaddons.display.ShortTooltips.register();
+        dev.landofif.dofisaddons.compat.FoeLook.register();
 
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
             if (!overlay) {
@@ -86,6 +87,12 @@ public final class DofisAddons implements ClientModInitializer {
             HudRenderer.renderAll(context);
             BobberTimer.renderHud(context);
         });
+        HudElementRegistry.attachElementAfter(net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements.CHAT,
+                Identifier.of(MOD_ID, "chat_boxes"), (context, tickCounter) -> {
+                    if (!(MinecraftClient.getInstance().currentScreen instanceof HudMoveScreen)) { // it draws the boxes itself
+                        dev.landofif.dofisaddons.chat.ChatBoxes.render(context, tickCounter);
+                    }
+                });
         HudElementRegistry.addLast(Identifier.of(MOD_ID, "trigger_titles"), (context, tickCounter) -> {
             MinecraftClient client = MinecraftClient.getInstance();
             // The editor draws its own live preview on top of its UI.

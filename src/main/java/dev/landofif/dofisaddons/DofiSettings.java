@@ -19,8 +19,12 @@ public class DofiSettings {
     public boolean s24Menus = true;
     /** Draw every text in the game with DM Mono instead of the minecraft font. */
     public boolean monoEverywhere = true;
-    /** Replace the minecraft title screen with the mod's own, with a join fishonmc button. */
+    /** Which title screen to show. null until sanitize, so old files fall back to {@link #titleScreen}. */
+    public TitleChoice titleChoice = null;
+    /** Old on/off switch for the mod's title screen, only read to fill in {@link #titleChoice}. */
     public boolean titleScreen = true;
+    /** Draw foecollabs hud boxes as system24 panels (see compat/FoeLook). */
+    public boolean foeHuds = true;
 
     // ---- chat ----
     /** Lines matching one of these never show in chat. */
@@ -30,6 +34,8 @@ public class DofiSettings {
     public int chatY = 0;
     /** Right click a chat line (with chat open) to copy it. */
     public boolean chatCopy = true;
+    /** Separate chat boxes (dms, crew chat). null until sanitize fills in the defaults. */
+    public java.util.List<dev.landofif.dofisaddons.chat.ChatBox> chatBoxes = null;
 
     // ---- bobber timer ----
     public BobberMode bobberTimer = BobberMode.ABOVE_BOBBER;
@@ -125,6 +131,16 @@ public class DofiSettings {
         }
     }
 
+    public enum TitleChoice {
+        DOFIS("dofis addons"), FOECOLLAB("foecollab"), MINECRAFT("minecraft");
+
+        public final String label;
+
+        TitleChoice(String label) {
+            this.label = label;
+        }
+    }
+
     public enum SwingStyle {
         NORMAL("normal"), SMOOTH("smooth"), SNAPPY("snappy"), NONE("no swing");
 
@@ -151,11 +167,22 @@ public class DofiSettings {
 
     public void sanitize() {
         if (flavor == null) flavor = dev.landofif.dofisaddons.ui.Flavor.SYSTEM24;
+        if (titleChoice == null) titleChoice = titleScreen ? TitleChoice.DOFIS : TitleChoice.MINECRAFT;
         if (bobberTimer == null) bobberTimer = BobberMode.ABOVE_BOBBER;
         if (bobberSkin == null) bobberSkin = BobberSkin.DEFAULT;
         if (swingStyle == null) swingStyle = SwingStyle.NORMAL;
         if (chatFilters == null) chatFilters = new java.util.ArrayList<>();
         chatFilters.removeIf(java.util.Objects::isNull);
+        if (chatBoxes == null) chatBoxes = dev.landofif.dofisaddons.chat.ChatBoxes.defaults();
+        chatBoxes.removeIf(java.util.Objects::isNull);
+        for (dev.landofif.dofisaddons.chat.ChatBox b : chatBoxes) {
+            if (b.name == null) b.name = "";
+            if (b.rules == null) b.rules = new java.util.ArrayList<>();
+            b.rules.removeIf(java.util.Objects::isNull);
+            b.width = Math.max(80, Math.min(600, b.width));
+            b.lines = Math.max(1, Math.min(30, b.lines));
+            b.fadeSeconds = Math.max(0, Math.min(600, b.fadeSeconds));
+        }
         lineColor &= 0xFFFFFF;
         biteMessageColor &= 0xFFFFFF;
         if (biteMessageText == null) biteMessageText = "";

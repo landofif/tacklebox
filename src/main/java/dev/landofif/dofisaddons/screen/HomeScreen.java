@@ -34,13 +34,14 @@ public class HomeScreen extends DofiScreen {
                 b -> client.setScreen(new HudListScreen(this))).dimensions(x, y, w, 20).build());
         y += 24;
         long rules = StatsTracker.settings().chatFilters.stream().filter(f -> f.enabled).count();
-        addDrawableChild(ButtonWidget.builder(entry("chat", rules + (rules == 1 ? " hide rule" : " hide rules") + ", move, copy"),
+        long boxes = StatsTracker.settings().chatBoxes.stream().filter(b -> b.enabled).count();
+        addDrawableChild(ButtonWidget.builder(entry("chat", rules + (rules == 1 ? " hide rule, " : " hide rules, ") + boxes + (boxes == 1 ? " box" : " boxes")),
                 b -> client.setScreen(new ChatFilterScreen(this))).dimensions(x, y, w, 20).build());
         y += 24;
         addDrawableChild(ButtonWidget.builder(entry("stats", StatNames.number(StatsTracker.session().fish) + " fish this session"),
                 b -> client.setScreen(new StatsScreen(this))).dimensions(x, y, w, 20).build());
         y += 24;
-        addDrawableChild(ButtonWidget.builder(entry("settings", "look, bobber, world, viewmodel"),
+        addDrawableChild(ButtonWidget.builder(entry("settings", "look, world, foecollab"),
                 b -> client.setScreen(new SettingsScreen(this))).dimensions(x, y, w, 20).build());
         y += 32;
         addDrawableChild(ButtonWidget.builder(Mono.text("done"), b -> close()).dimensions(x + w / 4, y, w / 2, 20).build());

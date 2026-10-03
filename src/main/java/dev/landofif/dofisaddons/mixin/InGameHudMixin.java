@@ -9,13 +9,11 @@ import dev.landofif.dofisaddons.stats.StatsTracker;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.gui.hud.bar.Bar;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
@@ -36,11 +34,12 @@ public class InGameHudMixin {
     }
 
     /** In 1.21.11 the level number is drawn by Bar.drawExperienceLevel inside renderMainHud. */
-    @Redirect(method = "renderMainHud", at = @At(value = "INVOKE",
+    // a wrap, not a redirect: foecollab redirects the same call, and two redirects on one call crash
+    @WrapOperation(method = "renderMainHud", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/gui/hud/bar/Bar;drawExperienceLevel(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/font/TextRenderer;I)V"))
-    private void dofisaddons$levelNumber(DrawContext context, TextRenderer textRenderer, int level) {
+    private void dofisaddons$levelNumber(DrawContext context, TextRenderer textRenderer, int level, Operation<Void> original) {
         if (!LevelInfo.hideVanilla()) {
-            Bar.drawExperienceLevel(context, textRenderer, level);
+            original.call(context, textRenderer, level);
         }
     }
 

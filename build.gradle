@@ -13,6 +13,7 @@ base {
 repositories {
     mavenCentral()
     maven { name = 'TerraformersMC'; url = 'https://maven.terraformersmc.com/releases/' }
+    maven { name = 'Shedaniel'; url = 'https://maven.shedaniel.me/' }
 }
 
 dependencies {
@@ -24,6 +25,14 @@ dependencies {
     // Optional: adds a "Configure" button in Mods -> Dofi's Addons. Never required at runtime.
     modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
     modLocalRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
+
+    // FOECollab is required at runtime (fabric.mod.json) but never compiled against: the mod only wraps its
+    // hud element by id (compat/FoeLook). It is not on a maven, so runClient picks up a jar you drop in
+    // run/foecollab/ (build it from github.com/Kimberlyow/FOECollab), plus its own requirement, cloth config.
+    modLocalRuntime fileTree(dir: 'run/foecollab', include: '*.jar')
+    modLocalRuntime("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
+        exclude group: 'net.fabricmc.fabric-api'
+    }
 }
 
 processResources {

@@ -2,6 +2,7 @@ package dev.landofif.dofisaddons.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import dev.landofif.dofisaddons.compat.FoeLook;
 import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.ui.S24;
 import net.minecraft.client.MinecraftClient;
@@ -63,7 +64,12 @@ abstract class ScreenMixin {
             target = "Lnet/minecraft/client/gui/screen/Screen;render(Lnet/minecraft/client/gui/DrawContext;IIF)V"))
     private void dofisaddons$intro(Screen self, DrawContext ctx, int mouseX, int mouseY, float delta, Operation<Void> original) {
         if (!(self instanceof DofiScreen dofi)) {
-            original.call(self, ctx, mouseX, mouseY, delta);
+            boolean foe = FoeLook.beginScreen(self); // foecollab's screens get system24 buttons while they draw
+            try {
+                original.call(self, ctx, mouseX, mouseY, delta);
+            } finally {
+                if (foe) FoeLook.endScreen();
+            }
             return;
         }
         float offset = dofi.introOffset();

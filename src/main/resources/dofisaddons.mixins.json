@@ -6,6 +6,7 @@
     "BossBarHudAccessor",
     "ChatHudAccessor",
     "ChatHudMixin",
+    "DrawContextMixin",
     "ChatScreenMixin",
     "CheckboxWidgetMixin",
     "EntityInterpolationMixin",
