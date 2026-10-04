@@ -109,16 +109,6 @@ public final class S24 {
         return Math.min(Math.min(w, h) / 2, 6);
     }
 
-    /** How far row {@code i} of a rounded box is pulled in from each side (0 outside the corners). */
-    private static int inset(int i, int h, int r) {
-        int d = Math.min(i, h - 1 - i);
-        if (d >= r) {
-            return 0;
-        }
-        double dy = r - d - 0.5;
-        return (int) Math.round(r - Math.sqrt(r * r - dy * dy));
-    }
-
     /** A filled box, rounded in the caelestia style. */
     public static void fill(DrawContext ctx, int x, int y, int w, int h, int color) {
         int r = round() ? radius(w, h) : 0;
@@ -126,12 +116,7 @@ public final class S24 {
             ctx.fill(x, y, x + w, y + h, color);
             return;
         }
-        for (int i = 0; i < r; i++) {
-            int in = inset(i, h, r);
-            ctx.fill(x + in, y + i, x + w - in, y + i + 1, color);
-            ctx.fill(x + in, y + h - 1 - i, x + w - in, y + h - i, color);
-        }
-        ctx.fill(x, y + r, x + w, y + h - r, color);
+        Round.draw(ctx, x, y, w, h, r, 0, color);
     }
 
     /**
@@ -147,19 +132,8 @@ public final class S24 {
 
     public static void outline(DrawContext ctx, int x, int y, int w, int h, int color) {
         int r = round() ? radius(w, h) : 0;
-        if (r > 0 && h > 2) {
-            // each row: from the outer edge in to the edge of the same shape shrunk by one pixel
-            int ir = Math.max(0, r - 1);
-            for (int i = 0; i < h; i++) {
-                int out = inset(i, h, r);
-                if (i == 0 || i == h - 1) {
-                    ctx.fill(x + out, y + i, x + w - out, y + i + 1, color);
-                    continue;
-                }
-                int in = Math.max(out + 1, 1 + inset(i - 1, h - 2, ir));
-                ctx.fill(x + out, y + i, x + in, y + i + 1, color);
-                ctx.fill(x + w - in, y + i, x + w - out, y + i + 1, color);
-            }
+        if (r > 0) {
+            Round.draw(ctx, x, y, w, h, r, 1, color);
             return;
         }
         ctx.fill(x, y, x + w, y + 1, color);

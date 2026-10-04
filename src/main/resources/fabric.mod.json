@@ -20,6 +20,7 @@
   "mixins": [
     "dofisaddons.mixins.json"
   ],
+  "accessWidener": "dofisaddons.accesswidener",
   "depends": {
     "fabricloader": ">=0.19.0",
     "fabric-api": "*",

@@ -35,6 +35,10 @@ dependencies {
     }
 }
 
+loom {
+    accessWidenerPath = file('src/main/resources/dofisaddons.accesswidener')
+}
+
 processResources {
     inputs.property 'version', project.version
     filesMatching('fabric.mod.json') {
