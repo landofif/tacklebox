@@ -22,8 +22,7 @@ abstract class TooltipBackgroundRendererMixin {
             int by = y - 4;
             int bw = width + 8;
             int bh = height + 8;
-            ctx.fill(bx, by, bx + bw, by + bh, S24.alpha(0xF0, S24.BG_4));
-            S24.outline(ctx, bx, by, bw, bh, S24.BORDER);
+            S24.rect(ctx, bx, by, bw, bh, S24.alpha(0xF0, S24.BG_4), S24.BORDER);
             ci.cancel();
         }
     }

@@ -19,8 +19,7 @@ abstract class TextFieldWidgetMixin {
                                        Operation<Void> original) {
         if (S24.everywhere()) {
             TextFieldWidget self = (TextFieldWidget) (Object) this;
-            ctx.fill(x, y, x + w, y + h, S24.BG_4);
-            S24.outline(ctx, x, y, w, h, self.isFocused() ? S24.ACCENT : self.isHovered() ? S24.TEXT_5 : S24.BORDER);
+            S24.rect(ctx, x, y, w, h, S24.BG_4, self.isFocused() ? S24.ACCENT : self.isHovered() ? S24.TEXT_5 : S24.BORDER);
         } else {
             original.call(ctx, pipeline, texture, x, y, w, h);
         }

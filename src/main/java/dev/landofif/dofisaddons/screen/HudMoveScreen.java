@@ -136,8 +136,7 @@ public class HudMoveScreen extends DofiScreen {
         }
         int[] b = chatBox();
         boolean hot = draggingChat || over(b, mouseX, mouseY);
-        ctx.fill(b[0], b[1], b[0] + b[2], b[1] + b[3], S24.alpha(0x50, S24.BG_4));
-        S24.outline(ctx, b[0], b[1], b[2], b[3], hot ? S24.ACCENT : S24.TEXT_5);
+        S24.rect(ctx, b[0], b[1], b[2], b[3], S24.alpha(0x50, S24.BG_4), hot ? S24.ACCENT : S24.TEXT_5);
         Text label = Mono.text("chat");
         ctx.fill(b[0] + 6, b[1], b[0] + 12 + textRenderer.getWidth(label), b[1] + 1, S24.alpha(0x50, S24.BG_4));
         ctx.drawText(textRenderer, label, b[0] + 9, b[1] - 4, hot ? S24.ACCENT : S24.TEXT_3, false);

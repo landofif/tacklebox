@@ -35,8 +35,7 @@ abstract class EntryListWidgetMixin {
             target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V", ordinal = 0))
     private void dofisaddons$flatSelection(DrawContext ctx, int x1, int y1, int x2, int y2, int color, Operation<Void> original) {
         if (S24.everywhere()) {
-            ctx.fill(x1, y1, x2, y2, S24.BG_2);
-            S24.outline(ctx, x1, y1, x2 - x1, y2 - y1, color == -1 ? S24.ACCENT : S24.TEXT_5);
+            S24.rect(ctx, x1, y1, x2 - x1, y2 - y1, S24.BG_2, color == -1 ? S24.ACCENT : S24.TEXT_5);
         } else {
             original.call(ctx, x1, y1, x2, y2, color);
         }

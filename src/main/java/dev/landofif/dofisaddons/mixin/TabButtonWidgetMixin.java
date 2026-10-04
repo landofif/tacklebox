@@ -26,8 +26,7 @@ abstract class TabButtonWidgetMixin {
         }
         TabButtonWidget self = (TabButtonWidget) (Object) this;
         boolean hot = self.isSelected();
-        ctx.fill(x, y, x + w, y + h, hot ? S24.BG_1 : S24.BG_2);
-        S24.outline(ctx, x, y, w, h, hot ? S24.ACCENT : S24.BORDER);
+        S24.rect(ctx, x, y, w, h, hot ? S24.BG_1 : S24.BG_2, hot ? S24.ACCENT : S24.BORDER);
     }
 
     /** The current tab's background texture patch and white underline are replaced by an accent line. */

@@ -77,8 +77,7 @@ abstract class PressableWidgetMixin extends ClickableWidget {
             return;
         }
         float hv = dofisaddons$hover;
-        ctx.fill(x, y, x + w, y + h, Anim.mix(S24.BG_2, S24.BG_1, hv));
-        S24.outline(ctx, x, y, w, h, Anim.mix(S24.BORDER, S24.ACCENT, hv));
+        S24.rect(ctx, x, y, w, h, Anim.mix(S24.BG_2, S24.BG_1, hv), Anim.mix(S24.BORDER, S24.ACCENT, hv));
 
         // press: an accent band spreading out from the click, fading as it goes
         float p = Anim.progress(dofisaddons$pressedAt, PRESS_MS);
@@ -88,7 +87,7 @@ abstract class PressableWidgetMixin extends ClickableWidget {
             int left = (int) Math.max(x + 1, x + dofisaddons$pressX - reach);
             int right = (int) Math.min(x + w - 1, x + dofisaddons$pressX + reach);
             int alpha = (int) ((1f - p) * (1f - p) * 0x70);
-            ctx.fill(left, y + 1, right, y + h - 1, S24.alpha(alpha, S24.ACCENT));
+            S24.fill(ctx, left, y + 1, right - left, h - 2, S24.alpha(alpha, S24.ACCENT));
             S24.outline(ctx, x, y, w, h, Anim.mix(Anim.mix(S24.BORDER, S24.ACCENT, hv), S24.ACCENT, 1f - p));
         }
 
@@ -98,6 +97,10 @@ abstract class PressableWidgetMixin extends ClickableWidget {
                 dofisaddons$underlineAt = now;
             }
             float u = Anim.easeOut(Anim.progress(dofisaddons$underlineAt, UNDERLINE_MS));
+            if (S24.round()) { // caelestia: the pill fills with accent instead
+                S24.fill(ctx, x, y, w, h, S24.alpha((int) (0x60 * u), S24.ACCENT));
+                return;
+            }
             int half = (int) ((w - 2) / 2f * u);
             int mid = x + w / 2;
             ctx.fill(mid - half, y + h - 2, mid + half, y + h - 1, S24.ACCENT);

@@ -103,8 +103,7 @@ abstract class ChatScreenMixin extends Screen {
         int w = textRenderer.getWidth(label) + 8;
         int x = dofisaddons$flashX + 8;
         int y = dofisaddons$flashY - 14;
-        ctx.fill(x, y, x + w, y + 13, S24.BG_4);
-        S24.outline(ctx, x, y, w, 13, S24.ACCENT);
+        S24.rect(ctx, x, y, w, 13, S24.BG_4, S24.ACCENT);
         ctx.drawText(textRenderer, label, x + 4, y + 3, S24.TEXT_1, false);
     }
 }

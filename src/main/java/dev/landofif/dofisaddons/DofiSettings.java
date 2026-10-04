@@ -14,6 +14,8 @@ public class DofiSettings {
     // ---- look (system24 for the whole game, see ui/S24) ----
     /** Which system24 flavor the colours come from. */
     public dev.landofif.dofisaddons.ui.Flavor flavor = dev.landofif.dofisaddons.ui.Flavor.SYSTEM24;
+    /** Square system24 panels, or caelestia shell's rounded borderless ones. */
+    public Style style = Style.SYSTEM24;
     /** Buttons, sliders, fields, lists, screen backgrounds and tooltips in every screen, not just the mod's. */
     public boolean s24Everywhere = true;
     /** Flat hotbar boxes instead of the stone hotbar. */
@@ -134,6 +136,16 @@ public class DofiSettings {
         }
     }
 
+    public enum Style {
+        SYSTEM24("system24"), CAELESTIA("caelestia");
+
+        public final String label;
+
+        Style(String label) {
+            this.label = label;
+        }
+    }
+
     public enum TitleChoice {
         DOFIS("dofis addons"), FOECOLLAB("foecollab"), MINECRAFT("minecraft");
 
@@ -170,6 +182,7 @@ public class DofiSettings {
 
     public void sanitize() {
         if (flavor == null) flavor = dev.landofif.dofisaddons.ui.Flavor.SYSTEM24;
+        if (style == null) style = Style.SYSTEM24;
         if (titleChoice == null) titleChoice = titleScreen ? TitleChoice.DOFIS : TitleChoice.MINECRAFT;
         if (bobberTimer == null) bobberTimer = BobberMode.ABOVE_BOBBER;
         if (bobberSkin == null) bobberSkin = BobberSkin.DEFAULT;

@@ -51,18 +51,15 @@ public class InGameHudMixin {
         if (!S24.hotbar()) {
             original.call(ctx, pipeline, texture, x, y, w, h);
         } else if (HOTBAR.equals(texture)) {
-            ctx.fill(x, y, x + w, y + h, S24.alpha(0xC8, S24.BG_4));
-            S24.outline(ctx, x, y, w, h, S24.BORDER);
+            S24.rect(ctx, x, y, w, h, S24.alpha(0xC8, S24.BG_4), S24.BORDER);
             for (int i = 1; i < 9; i++) {
                 ctx.fill(x + 1 + i * 20, y + 1, x + 2 + i * 20, y + h - 1, S24.BORDER);
             }
         } else if (HOTBAR_SELECTION.equals(texture)) {
-            ctx.fill(x + 2, y + 2, x + 22, y + 22, S24.alpha(0x30, S24.ACCENT));
-            S24.outline(ctx, x + 2, y + 2, 20, 20, S24.ACCENT);
+            S24.rect(ctx, x + 2, y + 2, 20, 20, S24.alpha(0x30, S24.ACCENT), S24.ACCENT);
         } else if (OFFHAND_LEFT.equals(texture) || OFFHAND_RIGHT.equals(texture)) {
             int bx = OFFHAND_LEFT.equals(texture) ? x : x + 7;
-            ctx.fill(bx, y + 1, bx + 22, y + 23, S24.alpha(0xC8, S24.BG_4));
-            S24.outline(ctx, bx, y + 1, 22, 22, S24.BORDER);
+            S24.rect(ctx, bx, y + 1, 22, 22, S24.alpha(0xC8, S24.BG_4), S24.BORDER);
         } else {
             original.call(ctx, pipeline, texture, x, y, w, h);
         }

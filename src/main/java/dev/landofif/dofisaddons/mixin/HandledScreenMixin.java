@@ -89,8 +89,7 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
         }
         if (inventory && client != null && client.player != null) {
             // the player preview box and the crafting arrow were part of the texture
-            ctx.fill(x + 26, y + 8, x + 75, y + 78, S24.BG_3);
-            S24.outline(ctx, x + 26, y + 8, 49, 70, S24.BORDER);
+            S24.rect(ctx, x + 26, y + 8, 49, 70, S24.BG_3, S24.BORDER);
             InventoryScreen.drawEntity(ctx, x + 26, y + 8, x + 75, y + 78, 30, 0.0625F, mouseX, mouseY, client.player);
             ctx.drawCenteredTextWithShadow(textRenderer, Mono.text("→"), x + 143, y + 32, S24.TEXT_4);
         }
@@ -112,7 +111,7 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
         }
         for (Slot slot : handler.slots) {
             if (slot.isEnabled()) {
-                ctx.fill(slot.x - 1, slot.y - 1, slot.x + 16, slot.y + 16, S24.BG_2);
+                S24.fill(ctx, slot.x - 1, slot.y - 1, 17, 17, S24.BG_2);
             }
         }
     }
@@ -133,7 +132,7 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
         if (focusedSlot != null && focusedSlot.canBeHighlighted()) {
             int sx = focusedSlot.x;
             int sy = focusedSlot.y;
-            ctx.fill(sx - 1, sy - 1, sx + 16, sy + 16, S24.alpha(0x30, S24.ACCENT));
+            S24.fill(ctx, sx - 1, sy - 1, 17, 17, S24.alpha(0x30, S24.ACCENT));
             S24.outline(ctx, sx - 2, sy - 2, 19, 19, S24.ACCENT);
         }
     }

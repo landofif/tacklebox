@@ -149,12 +149,17 @@ public class SettingsScreen extends DofiScreen {
             }
             case LOOK -> {
                 header("system24");
-                cycle("flavor", "the colour set from the system24 discord theme: system24, catppuccin, nord, tokyo night, rose pine, everforest or vencord. changes the mod, the restyled screens and the huds.",
+                cycle("flavor", "the colour set: system24, caelestia, catppuccin, nord, tokyo night, rose pine, everforest or vencord. changes the mod, the restyled screens and the huds.",
                         dev.landofif.dofisaddons.ui.Flavor.values(), f -> f.label, () -> s.flavor, v -> {
                             s.flavor = v;
                             S24.apply(v);
                             refresh(); // headers and swatches pick up the new colours
                         }, defaults.flavor);
+                cycle("style", "system24: square panels with thin borders and labels in the top edge. caelestia: rounded borderless boxes like caelestia shell, best with the caelestia flavor.",
+                        DofiSettings.Style.values(), v -> v.label, () -> s.style, v -> {
+                            s.style = v;
+                            refresh();
+                        }, defaults.style);
                 toggle("restyle all screens",
                         "draws buttons, sliders, text fields, lists, screen backgrounds and tooltips in every screen in the system24 style, not just in the mods own screens.",
                         () -> s.s24Everywhere, v -> s.s24Everywhere = v, defaults.s24Everywhere);

@@ -27,8 +27,7 @@ abstract class CheckboxWidgetMixin {
         }
         CheckboxWidget self = (CheckboxWidget) (Object) this;
         boolean hot = self.isFocused() || self.isHovered();
-        ctx.fill(x, y, x + w, y + h, hot ? S24.BG_1 : S24.BG_2);
-        S24.outline(ctx, x, y, w, h, hot ? S24.ACCENT : S24.BORDER);
+        S24.rect(ctx, x, y, w, h, hot ? S24.BG_1 : S24.BG_2, hot ? S24.ACCENT : S24.BORDER);
         if (checked) {
             int inset = Math.max(3, w / 4);
             ctx.fill(x + inset, y + inset, x + w - inset, y + h - inset, S24.ACCENT);

@@ -27,8 +27,7 @@ abstract class ToastMixin {
     private void dofisaddons$flatToast(DrawContext ctx, RenderPipeline pipeline, Identifier texture, int x, int y, int w, int h,
                                        Operation<Void> original) {
         if (S24.everywhere() && texture.getPath().startsWith("toast/")) {
-            ctx.fill(x, y, x + w, y + h, S24.alpha(0xF0, S24.BG_4));
-            S24.outline(ctx, x, y, w, h, S24.BORDER);
+            S24.rect(ctx, x, y, w, h, S24.alpha(0xF0, S24.BG_4), S24.BORDER);
             ctx.fill(x, y, x + 2, y + h, S24.ACCENT);
         } else {
             original.call(ctx, pipeline, texture, x, y, w, h);

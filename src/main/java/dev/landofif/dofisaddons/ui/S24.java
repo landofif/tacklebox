@@ -11,7 +11,8 @@ import net.minecraft.text.Text;
  * The mod's look, taken from l's system24 Discord theme (~/.config/equibop/themes/system24.theme.css):
  * flat neutral greys, thin borders that turn accent purple on hover, panels with their label set into
  * the top border, square corners. Colours are the theme's oklch values converted to sRGB, and switch
- * with the chosen flavor (see {@link Flavor}).
+ * with the chosen flavor (see {@link Flavor}). The caelestia style ({@link #round()}, after caelestia-dots/shell)
+ * keeps the colours but draws rounded, borderless tonal boxes and pill controls instead.
  */
 public final class S24 {
     // text-1 .. text-5
@@ -97,7 +98,70 @@ public final class S24 {
         return (alpha << 24) | (rgb & 0xFFFFFF);
     }
 
+    /** True when the caelestia shell style is on: rounded, borderless tonal surfaces instead of square panels. */
+    public static boolean round() {
+        DofiSettings s = StatsTracker.settings();
+        return s != null && s.style == DofiSettings.Style.CAELESTIA;
+    }
+
+    /** Corner radius for a box this size in the caelestia style. */
+    private static int radius(int w, int h) {
+        return Math.min(Math.min(w, h) / 2, 6);
+    }
+
+    /** How far row {@code i} of a rounded box is pulled in from each side (0 outside the corners). */
+    private static int inset(int i, int h, int r) {
+        int d = Math.min(i, h - 1 - i);
+        if (d >= r) {
+            return 0;
+        }
+        double dy = r - d - 0.5;
+        return (int) Math.round(r - Math.sqrt(r * r - dy * dy));
+    }
+
+    /** A filled box, rounded in the caelestia style. */
+    public static void fill(DrawContext ctx, int x, int y, int w, int h, int color) {
+        int r = round() ? radius(w, h) : 0;
+        if (r == 0) {
+            ctx.fill(x, y, x + w, y + h, color);
+            return;
+        }
+        for (int i = 0; i < r; i++) {
+            int in = inset(i, h, r);
+            ctx.fill(x + in, y + i, x + w - in, y + i + 1, color);
+            ctx.fill(x + in, y + h - 1 - i, x + w - in, y + h - i, color);
+        }
+        ctx.fill(x, y + r, x + w, y + h - r, color);
+    }
+
+    /**
+     * A filled box with a border. In the caelestia style it is rounded and the resting {@link #BORDER} is
+     * left out, so only hover, focus and accent rings show.
+     */
+    public static void rect(DrawContext ctx, int x, int y, int w, int h, int fill, int border) {
+        fill(ctx, x, y, w, h, fill);
+        if (!round() || border != BORDER) {
+            outline(ctx, x, y, w, h, border);
+        }
+    }
+
     public static void outline(DrawContext ctx, int x, int y, int w, int h, int color) {
+        int r = round() ? radius(w, h) : 0;
+        if (r > 0 && h > 2) {
+            // each row: from the outer edge in to the edge of the same shape shrunk by one pixel
+            int ir = Math.max(0, r - 1);
+            for (int i = 0; i < h; i++) {
+                int out = inset(i, h, r);
+                if (i == 0 || i == h - 1) {
+                    ctx.fill(x + out, y + i, x + w - out, y + i + 1, color);
+                    continue;
+                }
+                int in = Math.max(out + 1, 1 + inset(i - 1, h - 2, ir));
+                ctx.fill(x + out, y + i, x + in, y + i + 1, color);
+                ctx.fill(x + w - in, y + i, x + w - out, y + i + 1, color);
+            }
+            return;
+        }
         ctx.fill(x, y, x + w, y + 1, color);
         ctx.fill(x, y + h - 1, x + w, y + h, color);
         ctx.fill(x, y + 1, x + 1, y + h - 1, color);
@@ -106,11 +170,15 @@ public final class S24 {
 
     /** A panel: bg-4 fill, thin border, and (if given) a muted label set into the top border. */
     public static void panel(DrawContext ctx, int x, int y, int w, int h, Text label) {
-        ctx.fill(x, y, x + w, y + h, BG_4);
-        outline(ctx, x, y, w, h, BORDER);
+        rect(ctx, x, y, w, h, BG_4, BORDER);
         if (label != null && !label.getString().isEmpty()) {
             TextRenderer tr = MinecraftClient.getInstance().textRenderer;
             int lw = tr.getWidth(label);
+            if (round()) { // caelestia: the label is an accent pill sitting on the top edge
+                fill(ctx, x + 6, y - 6, lw + 10, 12, BG_2);
+                ctx.drawText(tr, label, x + 11, y - 4, ACCENT, false);
+                return;
+            }
             ctx.fill(x + 6, y, x + 12 + lw, y + 1, BG_4); // gap in the border
             ctx.drawText(tr, label, x + 9, y - 4, TEXT_4, false);
         }
@@ -124,14 +192,13 @@ public final class S24 {
         if (active || active()) {
             box(ctx, x, y, w, h, hot, active);
         } else {
-            ctx.fill(x, y, x + w, y + h, BG_3);
-            outline(ctx, x, y, w, h, BORDER);
+            rect(ctx, x, y, w, h, BG_3, BORDER);
         }
     }
 
     /** A horizontal border line with a label set into it, like a panel title (splits one panel in two). */
     public static void divider(DrawContext ctx, int x, int y, int w, Text label) {
-        ctx.fill(x, y, x + w, y + 1, BORDER);
+        ctx.fill(x, y, x + w, y + 1, round() ? BG_2 : BORDER);
         if (label != null && !label.getString().isEmpty()) {
             TextRenderer tr = MinecraftClient.getInstance().textRenderer;
             int lw = tr.getWidth(label);
@@ -145,8 +212,11 @@ public final class S24 {
      * Inactive buttons in the mod are the selected tab, so they get an accent underline instead.
      */
     public static void box(DrawContext ctx, int x, int y, int w, int h, boolean hot, boolean active) {
-        ctx.fill(x, y, x + w, y + h, hot && active ? BG_1 : BG_2);
-        outline(ctx, x, y, w, h, hot && active ? ACCENT : BORDER);
+        if (!active && round()) { // caelestia: the selected tab is a filled accent pill
+            rect(ctx, x, y, w, h, Anim.mix(BG_2, ACCENT, 0.35f), BORDER);
+            return;
+        }
+        rect(ctx, x, y, w, h, hot && active ? BG_1 : BG_2, hot && active ? ACCENT : BORDER);
         if (!active) {
             ctx.fill(x + 1, y + h - 2, x + w - 1, y + h - 1, ACCENT);
         }
