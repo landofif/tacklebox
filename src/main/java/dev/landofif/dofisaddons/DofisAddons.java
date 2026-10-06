@@ -112,6 +112,7 @@ public final class DofisAddons implements ClientModInitializer {
             ServerInfo.tick(client);
             StatsTracker.tick(client);
             BobberTimer.tick(client);
+            dev.landofif.dofisaddons.input.KeyCommands.tick(client);
             dev.landofif.dofisaddons.display.BiteWatch.tick(client);
             while (openKey.wasPressed()) {
                 if (client.currentScreen == null) {

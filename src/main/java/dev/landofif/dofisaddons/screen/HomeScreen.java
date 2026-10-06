@@ -26,7 +26,7 @@ public class HomeScreen extends DofiScreen {
     protected void init() {
         int w = 220;
         int x = (this.width - w) / 2;
-        int y = this.height / 2 - 64;
+        int y = this.height / 2 - 76;
         addDrawableChild(ButtonWidget.builder(entry("chat triggers", TriggerStore.all().size() + " set up"),
                 b -> client.setScreen(new TriggerListScreen(this))).dimensions(x, y, w, 20).build());
         y += 24;
@@ -40,6 +40,9 @@ public class HomeScreen extends DofiScreen {
         long boxes = StatsTracker.settings().chatBoxes.stream().filter(b -> b.enabled).count();
         addDrawableChild(ButtonWidget.builder(entry("chat", rules + (rules == 1 ? " hide rule, " : " hide rules, ") + boxes + (boxes == 1 ? " box" : " boxes")),
                 b -> client.setScreen(new ChatFilterScreen(this))).dimensions(x, y, w, 20).build());
+        y += 24;
+        addDrawableChild(ButtonWidget.builder(entry("key commands", StatsTracker.settings().keyCommands.size() + " set up"),
+                b -> client.setScreen(new KeyCommandScreen(this))).dimensions(x, y, w, 20).build());
         y += 24;
         addDrawableChild(ButtonWidget.builder(entry("stats", StatNames.number(StatsTracker.session().fish) + " fish this session"),
                 b -> client.setScreen(new StatsScreen(this))).dimensions(x, y, w, 20).build());

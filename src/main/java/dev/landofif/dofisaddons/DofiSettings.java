@@ -46,6 +46,8 @@ public class DofiSettings {
     public boolean chatCopy = true;
     /** Separate chat boxes (dms, crew chat). null until sanitize fills in the defaults. */
     public java.util.List<dev.landofif.dofisaddons.chat.ChatBox> chatBoxes = null;
+    /** Keys that run a command when pressed in game, see input/KeyCommands. */
+    public java.util.List<dev.landofif.dofisaddons.input.KeyCommands.Entry> keyCommands = new java.util.ArrayList<>();
 
     // ---- bobber timer ----
     public BobberMode bobberTimer = BobberMode.ABOVE_BOBBER;
@@ -205,6 +207,11 @@ public class DofiSettings {
         if (swingStyle == null) swingStyle = SwingStyle.NORMAL;
         if (chatFilters == null) chatFilters = new java.util.ArrayList<>();
         chatFilters.removeIf(java.util.Objects::isNull);
+        if (keyCommands == null) keyCommands = new java.util.ArrayList<>();
+        keyCommands.removeIf(java.util.Objects::isNull);
+        for (var k : keyCommands) {
+            if (k.command == null) k.command = "";
+        }
         if (chatBoxes == null) chatBoxes = dev.landofif.dofisaddons.chat.ChatBoxes.defaults();
         chatBoxes.removeIf(java.util.Objects::isNull);
         for (dev.landofif.dofisaddons.chat.ChatBox b : chatBoxes) {
