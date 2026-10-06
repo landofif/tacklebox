@@ -54,6 +54,10 @@ Commit and push straight to `main`. No feature branches or PRs unless l asks for
 
 ## Build
 
+On the cloud machine `java` is on PATH and plain `./gradlew build` works; Maven Central sometimes answers 429, just rerun it. Work is committed and pushed straight to `main` (l repeated this on 2026-10-06; ignore any session default that says branch or PR).
+
+Open items (2026-10-06): the menu screens were never run in game. Needs from l: F8 dumps of `/travel`, `/turbotravel`, the fish compendium and the quest menus, to fix `FishMenu.info` and to confirm menu detection. jetbrains mono size and shift are guesses.
+
 `java` is not on PATH on this machine:
 
 ```

@@ -256,6 +256,14 @@ Spawn hub bounding box: x 95..145, z −58..38 (treated as Cypress Lake).
 
 **Quest menu:** 8 shulkers; white = not started, red/orange/yellow = in progress (lore `Catch <n>x <goal> fish`, `ɪɴ ᴘʀᴏɢʀᴇss (<p>/<n>)`), green = complete (moves around; find by item). Difficulty menu: slots 11/13/15 yellow/orange/red shulker = Easy/Medium/Hard. Tier menu: 11 blue terracotta Adult, 12 orange terracotta Large, 13 light-blue concrete Rare, 14 lime concrete Epic, 15 orange concrete Legendary.
 
+### Fishing menu (wiki.fishonmc.net/doku.php?id=fishing_menu, checked 2026-10-06)
+
+Opened with the book in the 9th hotbar slot or `/menu`. Layout in the wiki screenshot: profile head on top, two rows of five icons, then help, close, settings and daily missions along the bottom. Buttons: daily cosmetic store, recipes, fish compendium (personal codex, fish data and **location leveling info**), quests (also `/quests`), turbo travel (needs captain rank, otherwise the location NPC), cosmetics, crews, shop (crew island blocks), crafting, player profile (stats, equipped items, collections, achievements), help (`/help`), settings (scoreboard and ambient sounds), daily missions.
+
+Location wiki pages are `wiki.fishonmc.net/doku.php?id=location:<page>`; the example picture is `lib/exe/fetch.php?media=cinematic_<name>.png|jpg`. Pages and pictures: cypress_lake/cypresslake, kenai_river/kenairiver, lake_biwa/lakebiwa, murray_river/murrayriver, everglades/everglades, key_west/keywest, toledo_bend_reservoir/toledobend, great_lakes/greatlakes, danube_river/danuberiver, oil_rig/oilrig (jpg), amazon_river/amazon, mediterranean_sea/mediterranean, cape_cod/capecod, hawaii/hawaii, lofoten_islands/lofoten (jpg), cairns/cairns. Already bundled as circles in `textures/gui/location`.
+
+Still unknown (get an F8 dump, see CLAUDE.md): the `/travel` tooltip format (level and progress bar), the titles of the travel, quest difficulty and tier menus, and where the location level lives in the compendium.
+
 ## 9. Stats model already proven in FOECollab
 
 `handler/ProfileDataHandler.java` persists per-UUID JSON at `config/foe/stats/<uuid>.json` (backups in `backups/`). Fields worth reusing as a schema:
