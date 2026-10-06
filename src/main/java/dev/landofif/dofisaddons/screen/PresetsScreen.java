@@ -38,14 +38,23 @@ public class PresetsScreen extends DofiScreen {
     private static final int TOP = 20;
     private static final int BAR = 30;
 
-    /** One preset: its equip button and the items on its row. */
-    private record Card(Slot equip, String label, List<Slot> pieces) {}
+    /** One preset: its equip button (null for a page seen earlier) and copies of the items on its row. */
+    private record Card(Slot equip, int preset, String filter, List<ItemStack> pieces) {
+        String label() {
+            return "preset " + preset;
+        }
+    }
+
+    /** Every preset seen this session, so the page you are not on can be drawn greyed out. */
+    private static final Map<String, Card> SEEN = new java.util.LinkedHashMap<>();
 
     private final GenericContainerScreen original;
     private final ScreenHandler handler;
     private final Map<Integer, OtherClientPlayerEntity> models = new HashMap<>();
     private final List<Card> cards = new ArrayList<>();
-    private int cardX, cardY, cardW, cardH, gap;
+    private final List<Card> others = new ArrayList<>();
+    private int cardX, cardY, cardW, cardH, gap, otherY, otherH;
+    private String otherNav = "next";
 
     public PresetsScreen(GenericContainerScreen original) {
         super(Text.literal("presets"));
@@ -97,20 +106,32 @@ public class PresetsScreen extends DofiScreen {
 
     private void collect() {
         cards.clear();
+        others.clear();
         for (Slot slot : handler.slots) {
             if (slot.inventory instanceof net.minecraft.entity.player.PlayerInventory || !data(slot.getStack(), "type").equals("equip")) {
                 continue;
             }
-            List<Slot> pieces = new ArrayList<>();
+            List<ItemStack> pieces = new ArrayList<>();
             for (int i = slot.id + 1; i % 9 != 0 && i < handler.slots.size(); i++) {
-                ItemStack s = handler.slots.get(i).getStack();
-                if (!s.isEmpty() && !s.isOf(Items.BREAD)) {
-                    pieces.add(handler.slots.get(i));
+                ItemStack st = handler.slots.get(i).getStack();
+                if (!st.isEmpty() && !st.isOf(Items.BREAD)) {
+                    pieces.add(st.copy());
                 }
             }
             var cd = slot.getStack().get(DataComponentTypes.CUSTOM_DATA);
-            cards.add(new Card(slot, "preset " + (cd == null ? "" : cd.copyNbt().getInt("preset", 0)), pieces));
+            int n = cd == null ? 0 : cd.copyNbt().getInt("preset", 0);
+            Card c = new Card(slot, n, data(slot.getStack(), "filter"), pieces);
+            cards.add(c);
+            SEEN.put(c.filter + n, c);
         }
+        if (cards.isEmpty()) {
+            return;
+        }
+        String filter = cards.get(0).filter;
+        int first = cards.stream().mapToInt(Card::preset).min().getAsInt();
+        SEEN.values().stream().filter(c -> c.filter.equals(filter) && cards.stream().noneMatch(k -> k.preset == c.preset))
+                .sorted(java.util.Comparator.comparingInt(Card::preset)).forEach(others::add);
+        otherNav = !others.isEmpty() && others.get(0).preset < first ? "prev" : "next";
     }
 
     private static EquipmentSlot armorSlot(ItemStack stack) {
@@ -121,10 +142,6 @@ public class PresetsScreen extends DofiScreen {
         String path = Registries.ITEM.getId(stack.getItem()).getPath();
         return path.endsWith("_helmet") ? EquipmentSlot.HEAD : path.endsWith("_chestplate") ? EquipmentSlot.CHEST
                 : path.endsWith("_leggings") ? EquipmentSlot.LEGS : path.endsWith("_boots") ? EquipmentSlot.FEET : null;
-    }
-
-    private OtherClientPlayerEntity model(Card card) {
-        return models.computeIfAbsent(card.equip.id, id -> new OtherClientPlayerEntity(client.world, client.player.getGameProfile()));
     }
 
     private int cardAt(double mx, double my) {
@@ -140,6 +157,10 @@ public class PresetsScreen extends DofiScreen {
     @Override
     public boolean mouseClicked(Click click, boolean doubled) {
         if (super.mouseClicked(click, doubled)) {
+            return true;
+        }
+        if (!others.isEmpty() && click.y() >= otherY && click.y() < otherY + otherH) {
+            nav(otherNav);
             return true;
         }
         int i = cardAt(click.x(), click.y());
@@ -160,54 +181,79 @@ public class PresetsScreen extends DofiScreen {
         }
         gap = 8;
         int n = cards.size();
-        cardW = Math.min(170, (width - 2 * PAD - (n - 1) * gap) / n);
-        cardH = height - TOP - BAR - 6;
+        cardW = Math.min(150, (width - 2 * PAD - (n - 1) * gap) / n);
+        int avail = height - TOP - BAR - 6;
+        cardH = others.isEmpty() ? avail : avail * 62 / 100;
+        otherH = avail - cardH - gap;
         cardX = (width - (n * cardW + (n - 1) * gap)) / 2;
         cardY = TOP;
+        otherY = cardY + cardH + gap;
         int hover = cardAt(mouseX, mouseY);
         ItemStack tip = ItemStack.EMPTY;
         for (int i = 0; i < n; i++) {
-            Card c = cards.get(i);
+            ItemStack t = drawCard(ctx, cards.get(i), cardX + i * (cardW + gap), cardY, cardW, cardH, i == hover, mouseX, mouseY);
+            tip = t.isEmpty() ? tip : t;
+        }
+        for (int i = 0; i < Math.min(others.size(), n); i++) { // the other page, greyed out, click to go there
             int x = cardX + i * (cardW + gap);
-            S24.rect(ctx, x, cardY, cardW, cardH, i == hover ? S24.BG_1 : S24.BG_2, i == hover ? S24.ACCENT : S24.BORDER);
-            Text label = Mono.text(c.label);
-            ctx.drawText(textRenderer, label, x + (cardW - textRenderer.getWidth(label)) / 2, cardY + 6, i == hover ? S24.ACCENT : S24.TEXT_2, false);
-
-            boolean armor = c.pieces.stream().anyMatch(s -> armorSlot(s.getStack()) != null);
-            int iconSize = armor ? 16 : Math.max(16, Math.min(48, (cardW - 12) / Math.max(1, c.pieces.size())));
-            int rowW = c.pieces.size() * iconSize + (c.pieces.size() - 1) * 4;
-            int iy = cardY + cardH - iconSize - 8;
-            if (armor) {
-                OtherClientPlayerEntity m = model(c);
-                for (EquipmentSlot s : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
-                    m.equipStack(s, ItemStack.EMPTY);
-                }
-                c.pieces.forEach(p -> {
-                    EquipmentSlot s = armorSlot(p.getStack());
-                    if (s != null) {
-                        m.equipStack(s, p.getStack());
-                    }
-                });
-                int top = cardY + 20, bottom = iy - 6;
-                int boxH = bottom - top, boxW = Math.min(cardW - 8, boxH * 7 / 10);
-                int mx0 = x + (cardW - boxW) / 2;
-                InventoryScreen.drawEntity(ctx, mx0, top, mx0 + boxW, bottom, (int) (boxH * 0.43), 0.0625f, mouseX, mouseY, m);
-            }
-            int ix = x + (cardW - rowW) / 2;
-            for (Slot p : c.pieces) {
-                ctx.getMatrices().pushMatrix();
-                ctx.getMatrices().translate(ix, iy);
-                ctx.getMatrices().scale(iconSize / 16f, iconSize / 16f);
-                ctx.drawItem(p.getStack(), 0, 0);
-                ctx.getMatrices().popMatrix();
-                if (mouseX >= ix && mouseX < ix + iconSize && mouseY >= iy && mouseY < iy + iconSize) {
-                    tip = p.getStack();
-                }
-                ix += iconSize + 4;
-            }
+            drawCard(ctx, others.get(i), x, otherY, cardW, otherH, false, -1, -1);
+            ctx.fill(x, otherY, x + cardW, otherY + otherH, (S24.BG_2 & 0xFFFFFF) | 0xA0000000);
         }
         if (!tip.isEmpty()) {
             ctx.drawItemTooltip(textRenderer, tip, mouseX, mouseY);
         }
+    }
+
+    /** A copy of the piece that renders on a player even where the server gives the armor no model of its own. */
+    private static ItemStack wearable(ItemStack stack, EquipmentSlot slot) {
+        ItemStack out = stack.copy();
+        var eq = out.get(DataComponentTypes.EQUIPPABLE);
+        if (eq == null || eq.assetId().isEmpty()) {
+            out.set(DataComponentTypes.EQUIPPABLE, net.minecraft.component.type.EquippableComponent.builder(slot)
+                    .model(net.minecraft.item.equipment.EquipmentAssetKeys.LEATHER).build());
+        }
+        return out;
+    }
+
+    /** Draws one card and returns the item under the mouse, if any. */
+    private ItemStack drawCard(DrawContext ctx, Card c, int x, int y, int w, int h, boolean hover, int mouseX, int mouseY) {
+        S24.rect(ctx, x, y, w, h, hover ? S24.BG_1 : S24.BG_2, hover ? S24.ACCENT : S24.BORDER);
+        Text label = Mono.text(c.label());
+        ctx.drawText(textRenderer, label, x + (w - textRenderer.getWidth(label)) / 2, y + 6, hover ? S24.ACCENT : S24.TEXT_2, false);
+
+        boolean armor = c.pieces.stream().anyMatch(s -> armorSlot(s) != null);
+        int iconSize = armor ? 16 : Math.max(16, Math.min(40, (w - 12) / Math.max(1, c.pieces.size())));
+        int rowW = c.pieces.size() * iconSize + (c.pieces.size() - 1) * 4;
+        int iy = y + h - iconSize - 8;
+        if (armor) {
+            OtherClientPlayerEntity m = models.computeIfAbsent(c.preset, id -> new OtherClientPlayerEntity(client.world, client.player.getGameProfile()));
+            for (EquipmentSlot s : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+                m.equipStack(s, ItemStack.EMPTY);
+            }
+            for (ItemStack p : c.pieces) {
+                EquipmentSlot s = armorSlot(p);
+                if (s != null) {
+                    m.equipStack(s, wearable(p, s));
+                }
+            }
+            int top = y + 20, bottom = iy - 6;
+            int boxH = bottom - top, boxW = Math.min(w - 8, boxH * 7 / 10);
+            int mx0 = x + (w - boxW) / 2;
+            InventoryScreen.drawEntity(ctx, mx0, top, mx0 + boxW, bottom, (int) (boxH * 0.34), 0.0625f, mouseX, mouseY, m);
+        }
+        ItemStack tip = ItemStack.EMPTY;
+        int ix = x + (w - rowW) / 2;
+        for (ItemStack p : c.pieces) {
+            ctx.getMatrices().pushMatrix();
+            ctx.getMatrices().translate(ix, iy);
+            ctx.getMatrices().scale(iconSize / 16f, iconSize / 16f);
+            ctx.drawItem(p, 0, 0);
+            ctx.getMatrices().popMatrix();
+            if (mouseX >= ix && mouseX < ix + iconSize && mouseY >= iy && mouseY < iy + iconSize) {
+                tip = p;
+            }
+            ix += iconSize + 4;
+        }
+        return tip;
     }
 }
