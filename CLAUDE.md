@@ -115,3 +115,5 @@ When not to be lazy:
 - Do not cut validation, error handling, security, accessibility, data-loss protection, or real edge cases.
 - Do not skip understanding. A small diff you do not understand is just laziness dressed up as efficiency.
 - Non-trivial logic leaves one runnable check behind. Trivial one-liners need no test.
+
+- **Foecollab's look, bent to ours by string mixins** (all `require = 0`, intermediary names, no compile dependency): `BoxRendererMixin` cancels its box textures (inventory panels vanish, its buttons become `Foe.button`; under `flatMenus`), `MovableBoxWidgetMixin` turns the hud mover's blue boxes into thin outlines (orange hovered), `ItemMarkerHandlerMixin` + `compat/FoeRarity` draw the optional rarity circle behind items (`rarityCircles`, default off). Untested in game.

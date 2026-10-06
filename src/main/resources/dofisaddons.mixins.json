@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "BossBarHudAccessor",
+    "BoxRendererMixin",
     "ChatHudAccessor",
     "ChatHudMixin",
     "ChatScreenMixin",
@@ -15,8 +16,10 @@
     "HandledScreenMixin",
     "HeldItemRendererMixin",
     "InGameHudOverlayMixin",
+    "ItemMarkerHandlerMixin",
     "LivingEntityMixin",
     "MinecraftClientMixin",
+    "MovableBoxWidgetMixin",
     "MoveHudScreenMixin",
     "PlayerNameLabelMixin",
     "PressableWidgetMixin"

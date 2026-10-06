@@ -63,6 +63,8 @@ public class DofiSettings {
     public boolean flatMenus = true;
     /** Every button as a flat see-through fill (lighter while hovered) instead of the bevelled texture. */
     public boolean flatButtons = true;
+    /** A see-through circle in the rarity colour behind items in slots (foecollabs rarity, drawn by its item markers). */
+    public boolean rarityCircles = false;
 
     // ---- fishonmc menu (see menu/FishMenu) ----
     /** Show the main menu and /travel as the mods own screens instead of the chest gui. */

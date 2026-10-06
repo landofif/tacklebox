@@ -229,6 +229,8 @@ public class SettingsScreen extends DofiScreen {
                 () -> s.flatMenus, v -> s.flatMenus = v);
         toggle("flat buttons", "every button as a flat see-through fill instead of the bevelled texture, in the game menus too.",
                 () -> s.flatButtons, v -> s.flatButtons = v);
+        toggle("rarity circles", "a see-through circle in the rarity colour behind items in your inventory. foecollabs corner mark has its own setting.",
+                () -> s.rarityCircles, v -> s.rarityCircles = v);
         toggle("fishonmc menu", "the main menu and /travel as a screen with big icons you can rearrange. off gives the chest back.",
                 () -> s.fishMenu, v -> s.fishMenu = v);
         slider("menu size", "how much of the screen the fishonmc menu fills.", 40, 100, 1, "%", PCT,
