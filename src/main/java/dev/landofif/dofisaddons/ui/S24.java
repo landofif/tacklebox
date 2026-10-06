@@ -75,22 +75,32 @@ public final class S24 {
         return MinecraftClient.getInstance().currentScreen instanceof DofiScreen;
     }
 
+    private static void sprite(DrawContext ctx, String id, int x, int y, int w, int h) {
+        ctx.drawGuiTexture(net.minecraft.client.gl.RenderPipelines.GUI_TEXTURED, net.minecraft.util.Identifier.ofVanilla(id), x, y, w, h);
+    }
+
+    /** True when the plain minecraft style is picked: vanilla widgets, backgrounds, menus and hotbar everywhere. */
+    public static boolean vanilla() {
+        DofiSettings s = StatsTracker.settings();
+        return s != null && s.style == DofiSettings.Style.MINECRAFT;
+    }
+
     /** True when vanilla widgets, lists, backgrounds and tooltips should be drawn in this style right now. */
     public static boolean everywhere() {
         DofiSettings s = StatsTracker.settings();
-        return active() || (s != null && s.s24Everywhere);
+        return !vanilla() && (active() || (s != null && s.s24Everywhere));
     }
 
     /** True when chests, the inventory and server menus get the flat panel look. */
     public static boolean menus() {
         DofiSettings s = StatsTracker.settings();
-        return s != null && s.s24Menus;
+        return s != null && s.s24Menus && !vanilla();
     }
 
     /** True when the hotbar gets flat boxes. */
     public static boolean hotbar() {
         DofiSettings s = StatsTracker.settings();
-        return s != null && s.s24Hotbar;
+        return s != null && s.s24Hotbar && !vanilla();
     }
 
     /** {@code rgb} at the given alpha (0-255). */
@@ -124,6 +134,10 @@ public final class S24 {
      * left out, so only hover, focus and accent rings show.
      */
     public static void rect(DrawContext ctx, int x, int y, int w, int h, int fill, int border) {
+        if (vanilla()) { // minecraft style: the vanilla sprites, so resource packs can retexture them
+            sprite(ctx, border == ACCENT ? "widget/button_highlighted" : "widget/button", x, y, w, h);
+            return;
+        }
         fill(ctx, x, y, w, h, fill);
         if (!round() || border != BORDER) {
             outline(ctx, x, y, w, h, border);
@@ -186,6 +200,10 @@ public final class S24 {
      * Inactive buttons in the mod are the selected tab, so they get an accent underline instead.
      */
     public static void box(DrawContext ctx, int x, int y, int w, int h, boolean hot, boolean active) {
+        if (vanilla()) {
+            sprite(ctx, hot && active ? "widget/button_highlighted" : active ? "widget/button" : "widget/button_disabled", x, y, w, h);
+            return;
+        }
         if (!active && round()) { // caelestia: the selected tab is a filled accent pill
             rect(ctx, x, y, w, h, Anim.mix(BG_2, ACCENT, 0.35f), BORDER);
             return;

@@ -155,7 +155,7 @@ public class SettingsScreen extends DofiScreen {
                             S24.apply(v);
                             refresh(); // headers and swatches pick up the new colours
                         }, defaults.flavor);
-                cycle("style", "system24: square panels with thin borders and labels in the top edge. caelestia: rounded borderless boxes like caelestia shell, best with the caelestia flavor.",
+                cycle("style", "system24: square panels with thin borders and labels in the top edge. caelestia: rounded borderless boxes like caelestia shell, best with the caelestia flavor. minecraft: no restyling at all, vanilla buttons, backgrounds, menus and hotbar, so a resource pack can retexture them.",
                         DofiSettings.Style.values(), v -> v.label, () -> s.style, v -> {
                             s.style = v;
                             refresh();
@@ -166,6 +166,9 @@ public class SettingsScreen extends DofiScreen {
                 toggle("restyle menus",
                         "draws chests, your inventory and fishonmc menus as flat panels with flat slots. this hides the menu art from the fishonmc resource pack.",
                         () -> s.s24Menus, v -> s.s24Menus = v, defaults.s24Menus);
+                toggle("fishonmc menu",
+                        "shows the main menu (book in the 9th slot, /menu) and /travel as a screen of dofis addons with big icons you can rearrange. turn it off to get the chest back.",
+                        () -> s.fishMenu, v -> s.fishMenu = v, defaults.fishMenu);
                 toggle("restyle hotbar", "flat boxes for the hotbar, with an accent border on the selected slot.",
                         () -> s.s24Hotbar, v -> s.s24Hotbar = v, defaults.s24Hotbar);
                 toggle("restyle foecollab huds",

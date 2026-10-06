@@ -3,7 +3,10 @@ package dev.landofif.dofisaddons.mixin;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.compat.FoeConfig;
 import dev.landofif.dofisaddons.compat.FoeScreens;
+import dev.landofif.dofisaddons.menu.FishMenu;
+import dev.landofif.dofisaddons.screen.FishMenuScreen;
 import dev.landofif.dofisaddons.screen.SettingsScreen;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import dev.landofif.dofisaddons.screen.DofiTitleScreen;
 import dev.landofif.dofisaddons.stats.StatsTracker;
 import net.minecraft.client.MinecraftClient;
@@ -35,6 +38,11 @@ abstract class MinecraftClientMixin {
             // one settings screen for both mods: foecollab's options live in settings → foecollab
             ci.cancel();
             setScreen(SettingsScreen.foecollab(currentScreen));
+            return;
+        }
+        if (FishMenu.wants(screen)) {
+            ci.cancel();
+            setScreen(new FishMenuScreen((GenericContainerScreen) screen));
             return;
         }
         DofiSettings settings = StatsTracker.settings();

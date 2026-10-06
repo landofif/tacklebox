@@ -31,6 +31,12 @@ public class DofiSettings {
     /** Draw foecollabs hud boxes as system24 panels (see compat/FoeLook). */
     public boolean foeHuds = true;
 
+    // ---- fishonmc menu (see menu/FishMenu) ----
+    /** Show the main menu and /travel as the mods own screens instead of the chest gui. */
+    public boolean fishMenu = true;
+    /** Where you put each menu button: "main:name" or "travel:id" to {column, row}. */
+    public java.util.Map<String, int[]> menuCells = new java.util.HashMap<>();
+
     // ---- chat ----
     /** Lines matching one of these never show in chat. */
     public java.util.List<dev.landofif.dofisaddons.chat.ChatFilter> chatFilters = new java.util.ArrayList<>();
@@ -137,7 +143,7 @@ public class DofiSettings {
     }
 
     public enum Style {
-        SYSTEM24("system24"), CAELESTIA("caelestia");
+        SYSTEM24("system24"), CAELESTIA("caelestia"), MINECRAFT("minecraft");
 
         public final String label;
 

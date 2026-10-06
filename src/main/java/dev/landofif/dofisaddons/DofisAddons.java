@@ -51,6 +51,7 @@ public final class DofisAddons implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        dev.landofif.dofisaddons.menu.FishMenu.register();
         TriggerStore.load();
         HudStore.load();
         StatsTracker.loadSettings();

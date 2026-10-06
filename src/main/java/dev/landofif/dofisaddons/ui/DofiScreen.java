@@ -38,7 +38,7 @@ public abstract class DofiScreen extends Screen {
 
     /** How far the contents should be shifted down right now (0 when settled). */
     public float introOffset() {
-        return framed() ? (1f - introEase()) * INTRO_RISE : 0f;
+        return framed() && !S24.vanilla() ? (1f - introEase()) * INTRO_RISE : 0f;
     }
 
     private float introEase() {
@@ -51,7 +51,7 @@ public abstract class DofiScreen extends Screen {
      * the inside of the frame and lifting it away. Tooltips are drawn after this, so they never fade.
      */
     public void drawIntroCover(DrawContext ctx) {
-        if (!framed()) {
+        if (!framed() || S24.vanilla()) {
             return;
         }
         float e = introEase();
@@ -72,6 +72,10 @@ public abstract class DofiScreen extends Screen {
     @Override
     public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
         if (!framed()) {
+            return;
+        }
+        if (S24.vanilla()) {
+            super.renderBackground(ctx, mouseX, mouseY, delta); // minecraft style: the normal dirt and blur
             return;
         }
         int w = ctx.getScaledWindowWidth();
