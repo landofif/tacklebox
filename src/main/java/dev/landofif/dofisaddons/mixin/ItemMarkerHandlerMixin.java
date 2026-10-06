@@ -5,7 +5,6 @@ import dev.landofif.dofisaddons.compat.FoeRarity;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,9 +30,6 @@ abstract class ItemMarkerHandlerMixin {
     private void dofisaddons$circle(DrawContext ctx, ItemStack stack, int x, int y, CallbackInfo ci) {
         if (!DofiSettings.get().rarityCircles || dofisaddons$skip) {
             return;
-        }
-        if (Registries.ITEM.getId(stack.getItem()).getPath().endsWith("glass_pane")) {
-            return; // the filler of a menu
         }
         int rgb = FoeRarity.color(stack);
         if (rgb < 0) {
