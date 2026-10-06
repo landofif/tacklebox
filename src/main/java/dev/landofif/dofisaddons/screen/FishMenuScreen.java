@@ -317,6 +317,9 @@ public class FishMenuScreen extends DofiScreen {
         int panelW = travel ? Math.min(200, vw() / 3) : 0;
         int areaW = right - left - panelW - (travel ? 10 : 0);
         boolean oneRow = !travel && !tiles.isEmpty() && tiles.size() <= 4; // a few buttons go in a single line
+        if (oneRow) {
+            tiles.sort(java.util.Comparator.comparing(t -> !t.name.equalsIgnoreCase("return"))); // return first, the rest as before
+        }
         arrange(oneRow ? tiles.size() : 4, !travel && !oneRow);
         fit(left, top, areaW, areaH, travel ? 84 : 66, travel ? 96 : 76, travel ? 1.4f : 2f);
 
