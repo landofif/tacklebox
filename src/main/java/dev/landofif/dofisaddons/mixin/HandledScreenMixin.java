@@ -110,7 +110,10 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
             return;
         }
         for (Slot slot : handler.slots) {
-            if (slot.isEnabled()) {
+            // empty and blank-named (filler) menu slots stay clear, so the panel is solid there
+            boolean dead = !(slot.inventory instanceof PlayerInventory)
+                    && (slot.getStack().isEmpty() || slot.getStack().getName().getString().isBlank());
+            if (slot.isEnabled() && !dead) {
                 S24.fill(ctx, slot.x - 1, slot.y - 1, 17, 17, S24.BG_2);
             }
         }
