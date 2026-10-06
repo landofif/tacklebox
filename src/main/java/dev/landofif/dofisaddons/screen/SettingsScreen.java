@@ -175,8 +175,13 @@ public class SettingsScreen extends DofiScreen {
                         "draws foecollabs hud boxes as system24 panels in your flavor. pick any clean theme in foecollab to get the titles set into the top border.",
                         () -> s.foeHuds, v -> s.foeHuds = v, defaults.foeHuds);
                 header("font");
+                cycle("font", "the font of the mods own text: dm mono, jetbrains mono, or minecraft (the normal game font). also used by mono font everywhere.",
+                        DofiSettings.Font.values(), v -> v.label, () -> s.font, v -> {
+                            s.font = v;
+                            refresh();
+                        }, defaults.font);
                 toggle("mono font everywhere",
-                        "draws all text in the game, chat and menus included, with dm mono like the rest of the mod. icons from the fishonmc pack keep their own font.",
+                        "draws all text in the game, chat and menus included, with the font above (not when it is minecraft). icons from the fishonmc pack keep their own font.",
                         () -> s.monoEverywhere, v -> s.monoEverywhere = v, defaults.monoEverywhere);
                 header("title screen");
                 cycle("title screen",

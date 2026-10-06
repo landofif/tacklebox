@@ -22,6 +22,8 @@ public class DofiSettings {
     public boolean s24Hotbar = true;
     /** Chests, the inventory and fishonmc menus as panels with flat slots (drops the server's menu art). */
     public boolean s24Menus = true;
+    /** The font of the mods own text (and of the whole game with the option below). Order matches util/Mono. */
+    public Font font = Font.DM_MONO;
     /** Draw every text in the game with DM Mono instead of the minecraft font. */
     public boolean monoEverywhere = true;
     /** Which title screen to show. null until sanitize, so old files fall back to {@link #titleScreen}. */
@@ -142,6 +144,16 @@ public class DofiSettings {
         }
     }
 
+    public enum Font {
+        DM_MONO("dm mono"), JETBRAINS_MONO("jetbrains mono"), MINECRAFT("minecraft");
+
+        public final String label;
+
+        Font(String label) {
+            this.label = label;
+        }
+    }
+
     public enum Style {
         SYSTEM24("system24"), CAELESTIA("caelestia"), MINECRAFT("minecraft");
 
@@ -189,6 +201,7 @@ public class DofiSettings {
     public void sanitize() {
         if (flavor == null) flavor = dev.landofif.dofisaddons.ui.Flavor.SYSTEM24;
         if (style == null) style = Style.SYSTEM24;
+        if (font == null) font = Font.DM_MONO;
         if (titleChoice == null) titleChoice = titleScreen ? TitleChoice.DOFIS : TitleChoice.MINECRAFT;
         if (bobberTimer == null) bobberTimer = BobberMode.ABOVE_BOBBER;
         if (bobberSkin == null) bobberSkin = BobberSkin.DEFAULT;
