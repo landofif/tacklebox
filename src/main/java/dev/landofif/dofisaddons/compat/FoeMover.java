@@ -52,9 +52,10 @@ public final class FoeMover {
         }, (x, y, r) -> {
             s.hotbarX = Math.max(-sw() / 2 + r[2] / 2, Math.min(sw() / 2 - r[2] / 2, x - (sw() / 2 - r[2] / 2)));
             s.hotbarY = Math.max(-sh() + r[3], Math.min(0, y - (sh() - r[3])));
-        }, null, () -> {
+        }, (step, shift) -> s.hotbarScale = Math.max(50, Math.min(200, s.hotbarScale + step * 5)), () -> {
             s.hotbarX = 0;
             s.hotbarY = 0;
+            s.hotbarScale = 100;
         }));
         add.add(new Box(ctx -> new int[]{sw() / 2 - 65 + s.hotbarX + s.equipX, sh() - 48 + s.hotbarY + s.equipY, 131, 20}, (x, y, r) -> {
             s.equipX = x - (sw() / 2 - 65 + s.hotbarX); // foecollabs default place: the row above the hotbar
