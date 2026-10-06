@@ -35,6 +35,9 @@ public class DofiSettings {
     public boolean fishMenu = true;
     /** The /presets wardrobe screen, and for both custom guis: size in percent of the screen and accent colour. */
     public boolean presetsMenu = true;
+    /** Preset rows seen on /presets, kept between sessions so the other page can be drawn: "armor:6" to its pieces as "item|color|floats|strings|model". */
+    public java.util.Map<String, java.util.List<String>> presetCache = new java.util.LinkedHashMap<>();
+    public boolean presetsOtherBg = false;
     public int menuSize = 100;
     public int presetsSize = 100;
     public int menuColor = DEFAULT_GUI_COLOR;
@@ -242,6 +245,7 @@ public class DofiSettings {
         bobberSlowSeconds = Math.max(0, Math.min(120, bobberSlowSeconds));
         bobberWarnSeconds = Math.max(0, Math.min(120, bobberWarnSeconds));
         bobberColor &= 0xFFFFFF;
+        if (presetCache == null) presetCache = new java.util.LinkedHashMap<>();
         menuSize = Math.max(40, Math.min(100, menuSize));
         presetsSize = Math.max(40, Math.min(100, presetsSize));
         menuColor &= 0xFFFFFF;

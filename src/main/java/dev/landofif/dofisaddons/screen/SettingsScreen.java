@@ -198,6 +198,8 @@ public class SettingsScreen extends DofiScreen {
                         () -> s.menuSize, v -> s.menuSize = (int) Math.round(v), defaults.menuSize);
                 color("menu colour", "the highlight colour of the fishonmc menu. the default follows the flavor.",
                         () -> s.menuColor, v -> s.menuColor = v, defaults.menuColor);
+                toggle("presets other page background", "draws the card boxes behind the dimmed presets of the other page. off by default, so only the models show.",
+                        () -> s.presetsOtherBg, v -> s.presetsOtherBg = v, defaults.presetsOtherBg);
                 slider("presets size", "how much of the screen the presets screen takes.", 40, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
                         () -> s.presetsSize, v -> s.presetsSize = (int) Math.round(v), defaults.presetsSize);
                 color("presets colour", "the highlight colour of the presets screen. the default follows the flavor.",

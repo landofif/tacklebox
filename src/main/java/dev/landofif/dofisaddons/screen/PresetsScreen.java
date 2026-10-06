@@ -47,8 +47,32 @@ public class PresetsScreen extends DofiScreen {
         }
     }
 
-    /** Every preset seen this session, so the page you are not on can be drawn greyed out. */
-    private static final Map<String, Card> SEEN = new java.util.LinkedHashMap<>();
+    /** A piece reduced to what is needed to draw it: item, dye colour, custom model data and item model. */
+    private static String pack(ItemStack st) {
+        var dye = st.get(DataComponentTypes.DYED_COLOR);
+        var cmd = st.get(DataComponentTypes.CUSTOM_MODEL_DATA);
+        var model = st.get(DataComponentTypes.ITEM_MODEL);
+        return Registries.ITEM.getId(st.getItem()) + "|" + (dye == null ? "" : dye.rgb()) + "|"
+                + (cmd == null ? "" : cmd.floats().stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","))) + "|"
+                + (cmd == null ? "" : String.join(",", cmd.strings())) + "|" + (model == null ? "" : model);
+    }
+
+    private static ItemStack unpack(String text) {
+        String[] f = (text + " ").split("\\|", -1);
+        ItemStack st = new ItemStack(Registries.ITEM.get(net.minecraft.util.Identifier.of(f[0])));
+        if (!f[1].isEmpty()) {
+            st.set(DataComponentTypes.DYED_COLOR, new net.minecraft.component.type.DyedColorComponent(Integer.parseInt(f[1])));
+        }
+        if (!f[2].isEmpty() || !f[3].isEmpty()) {
+            st.set(DataComponentTypes.CUSTOM_MODEL_DATA, new net.minecraft.component.type.CustomModelDataComponent(
+                    java.util.Arrays.stream(f[2].split(",")).filter(x -> !x.isEmpty()).map(Float::valueOf).toList(), List.of(),
+                    java.util.Arrays.stream(f[3].split(",")).filter(x -> !x.isEmpty()).toList(), List.of()));
+        }
+        if (!f[4].isBlank()) {
+            st.set(DataComponentTypes.ITEM_MODEL, net.minecraft.util.Identifier.of(f[4].strip()));
+        }
+        return st;
+    }
 
     private final GenericContainerScreen original;
     private final ScreenHandler handler;
@@ -125,15 +149,32 @@ public class PresetsScreen extends DofiScreen {
             int n = cd == null ? 0 : cd.copyNbt().getInt("preset", 0);
             Card c = new Card(slot, n, data(slot.getStack(), "filter"), pieces);
             cards.add(c);
-            SEEN.put(c.filter + n, c);
         }
         if (cards.isEmpty()) {
             return;
         }
+        var cache = StatsTracker.settings().presetCache;
+        boolean dirty = false;
+        for (Card c : cards) { // remember what the page showed, so the other page can be drawn without opening it
+            List<String> now = c.pieces.stream().map(PresetsScreen::pack).toList();
+            if (!now.equals(cache.get(c.filter + ":" + c.preset))) {
+                cache.put(c.filter + ":" + c.preset, new ArrayList<>(now));
+                dirty = true;
+            }
+        }
+        if (dirty) {
+            StatsTracker.saveSettings();
+        }
         String filter = cards.get(0).filter;
         int first = cards.stream().mapToInt(Card::preset).min().getAsInt();
-        SEEN.values().stream().filter(c -> c.filter.equals(filter) && cards.stream().noneMatch(k -> k.preset == c.preset))
-                .sorted(java.util.Comparator.comparingInt(Card::preset)).forEach(others::add);
+        cache.forEach((key, packed) -> {
+            int colon = key.indexOf(':');
+            int n = Integer.parseInt(key.substring(colon + 1));
+            if (key.substring(0, colon).equals(filter) && cards.stream().noneMatch(k -> k.preset == n)) {
+                others.add(new Card(null, n, filter, packed.stream().map(PresetsScreen::unpack).toList()));
+            }
+        });
+        others.sort(java.util.Comparator.comparingInt(Card::preset));
         otherNav = !others.isEmpty() && others.get(0).preset < first ? "prev" : "next";
     }
 
@@ -194,13 +235,13 @@ public class PresetsScreen extends DofiScreen {
         int hover = cardAt(mouseX, mouseY);
         ItemStack tip = ItemStack.EMPTY;
         for (int i = 0; i < n; i++) {
-            ItemStack t = drawCard(ctx, cards.get(i), cardX + i * (cardW + gap), cardY, cardW, cardH, i == hover, mouseX, mouseY);
+            ItemStack t = drawCard(ctx, cards.get(i), cardX + i * (cardW + gap), cardY, cardW, cardH, i == hover, mouseX, mouseY, true);
             tip = t.isEmpty() ? tip : t;
         }
         for (int i = 0; i < Math.min(others.size(), n); i++) { // the other page, greyed out, click to go there
             int x = cardX + i * (cardW + gap);
-            drawCard(ctx, others.get(i), x, otherY, cardW, otherH, false, -1, -1);
-            ctx.fill(x, otherY, x + cardW, otherY + otherH, (S24.BG_2 & 0xFFFFFF) | 0xA0000000);
+            drawCard(ctx, others.get(i), x, otherY, cardW, otherH, false, -1, -1, StatsTracker.settings().presetsOtherBg);
+            ctx.fill(x, otherY, x + cardW, otherY + otherH, 0x80000000);
         }
         if (!tip.isEmpty()) {
             ctx.drawItemTooltip(textRenderer, tip, mouseX, mouseY);
@@ -216,8 +257,10 @@ public class PresetsScreen extends DofiScreen {
     }
 
     /** Draws one card and returns the item under the mouse, if any. */
-    private ItemStack drawCard(DrawContext ctx, Card c, int x, int y, int w, int h, boolean hover, int mouseX, int mouseY) {
-        S24.rect(ctx, x, y, w, h, hover ? S24.BG_1 : S24.BG_2, hover ? accent() : S24.BORDER);
+    private ItemStack drawCard(DrawContext ctx, Card c, int x, int y, int w, int h, boolean hover, int mouseX, int mouseY, boolean bg) {
+        if (bg) {
+            S24.rect(ctx, x, y, w, h, hover ? S24.BG_1 : S24.BG_2, hover ? accent() : S24.BORDER);
+        }
         Text label = Mono.text(c.label());
         ctx.drawText(textRenderer, label, x + (w - textRenderer.getWidth(label)) / 2, y + 6, hover ? accent() : S24.TEXT_2, false);
 
@@ -227,6 +270,8 @@ public class PresetsScreen extends DofiScreen {
         int iy = y + h - iconSize - 8;
         if (armor) {
             OtherClientPlayerEntity m = models.computeIfAbsent(c.preset, id -> new OtherClientPlayerEntity(client.world, client.player.getGameProfile()));
+            m.getDataTracker().set(net.minecraft.entity.PlayerLikeEntity.PLAYER_MODE_CUSTOMIZATION_ID,
+                    client.player.getDataTracker().get(net.minecraft.entity.PlayerLikeEntity.PLAYER_MODE_CUSTOMIZATION_ID)); // second skin layer
             for (EquipmentSlot s : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
                 m.equipStack(s, ItemStack.EMPTY);
             }
