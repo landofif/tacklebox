@@ -79,10 +79,10 @@ public final class TriggerPresets {
         Trigger t = new Trigger();
         t.name = "climate shard";
         t.mode = Trigger.MatchMode.REGEX;
-        t.pattern = "You (?:pulled|caught) an? (?:\\d+x )?(?<climate>[a-z -]+?) Shard";
+        t.pattern = "You (?:pulled|caught) an? (?<n>\\d+)x (?<climate>[a-z -]+?) Shard";
         t.title.title = "&l{climate.lower} shard!";
         t.title.titleColor = "#ffaa00";
-        t.title.subtitle = "rare catch";
+        t.title.subtitle = "{n}x";
         t.title.animation = Trigger.Animation.POP;
         t.sound.soundId = "minecraft:block.amethyst_block.chime";
         t.sound.plays = 3;
