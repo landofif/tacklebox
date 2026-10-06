@@ -27,15 +27,19 @@ import java.util.Optional;
  */
 public final class Mono {
     private static final int MAX_OVERSAMPLE = 8;
-    private static final StyleSpriteSource[] SOURCES = new StyleSpriteSource[MAX_OVERSAMPLE + 1];
-    private static final StyleSpriteSource[] BOLD_SOURCES = new StyleSpriteSource[MAX_OVERSAMPLE + 1];
+    /** Font definition name prefixes, in the order of {@link dev.landofif.dofisaddons.DofiSettings.Font}; minecraft has none. */
+    private static final String[] PREFIX = {"mono", "jb"};
+    private static final StyleSpriteSource[][] SOURCES = new StyleSpriteSource[PREFIX.length][MAX_OVERSAMPLE + 1];
+    private static final StyleSpriteSource[][] BOLD_SOURCES = new StyleSpriteSource[PREFIX.length][MAX_OVERSAMPLE + 1];
     /** Shadow for mono text drawn straight over the world, where it needs a little contrast. */
     private static final int SOFT_SHADOW = 0x66000000;
 
     static {
-        for (int i = 1; i <= MAX_OVERSAMPLE; i++) {
-            SOURCES[i] = new StyleSpriteSource.Font(Identifier.of("dofisaddons", "mono_" + i));
-            BOLD_SOURCES[i] = new StyleSpriteSource.Font(Identifier.of("dofisaddons", "mono_bold_" + i));
+        for (int f = 0; f < PREFIX.length; f++) {
+            for (int i = 1; i <= MAX_OVERSAMPLE; i++) {
+                SOURCES[f][i] = new StyleSpriteSource.Font(Identifier.of("dofisaddons", PREFIX[f] + "_" + i));
+                BOLD_SOURCES[f][i] = new StyleSpriteSource.Font(Identifier.of("dofisaddons", PREFIX[f] + "_bold_" + i));
+            }
         }
     }
 
@@ -57,22 +61,36 @@ public final class Mono {
 
     /** A literal in the Medium (bold) face, for headers in screens. Don't add {@code BOLD} on top. */
     public static MutableText bold(String s) {
-        return Text.literal(house(s)).setStyle(Style.EMPTY.withFont(BOLD_SOURCES[oversampleFor(1f)]).withoutShadow());
+        if (!custom()) { // the minecraft font: its own bold
+            return Text.literal(house(s)).setStyle(Style.EMPTY.withBold(true));
+        }
+        return Text.literal(house(s)).setStyle(Style.EMPTY.withFont(BOLD_SOURCES[font()][oversampleFor(1f)]).withoutShadow());
     }
 
-    /** Same style, switched to the mono font (keeps colour etc.; drops shadow). */
+    /** Same style, switched to the mods font (keeps colour etc.; drops shadow, except in the minecraft font). */
     public static Style style(Style style) {
-        return style.withFont(source(1f)).withoutShadow();
+        return custom() ? style.withFont(source(1f)).withoutShadow() : style.withFont(StyleSpriteSource.DEFAULT);
     }
 
     public static boolean isMono(Style style) {
         return style.getFont() instanceof StyleSpriteSource.Font f
-                && f.id().getNamespace().equals("dofisaddons") && f.id().getPath().startsWith("mono");
+                && f.id().getNamespace().equals("dofisaddons") && (f.id().getPath().startsWith("mono") || f.id().getPath().startsWith("jb"));
     }
 
     /** The font variant for text drawn at {@code drawScale} on top of the GUI scale. */
     public static StyleSpriteSource source(float drawScale) {
-        return SOURCES[oversampleFor(drawScale)];
+        return custom() ? SOURCES[font()][oversampleFor(drawScale)] : StyleSpriteSource.DEFAULT;
+    }
+
+    /** Index into {@link #PREFIX} of the chosen font (the first one while settings are not loaded). */
+    private static int font() {
+        dev.landofif.dofisaddons.DofiSettings settings = dev.landofif.dofisaddons.stats.StatsTracker.settings();
+        return settings == null || settings.font == null ? 0 : Math.min(settings.font.ordinal(), PREFIX.length);
+    }
+
+    /** False when the minecraft font is chosen: the mod then draws its text like vanilla does. */
+    private static boolean custom() {
+        return font() < PREFIX.length;
     }
 
     private static int oversampleFor(float drawScale) {
@@ -91,7 +109,7 @@ public final class Mono {
      */
     public static Style everywhere(Style style, boolean shadow) {
         dev.landofif.dofisaddons.DofiSettings settings = dev.landofif.dofisaddons.stats.StatsTracker.settings();
-        if (settings == null || !settings.monoEverywhere || !StyleSpriteSource.DEFAULT.equals(style.getFont())) {
+        if (settings == null || !settings.monoEverywhere || !custom() || !StyleSpriteSource.DEFAULT.equals(style.getFont())) {
             return style;
         }
         net.minecraft.text.TextColor color = style.getColor();
@@ -104,7 +122,7 @@ public final class Mono {
         if (last != null && last.in == style && last.shadow == shadow && last.oversample == i) {
             return last.out;
         }
-        Style out = style.withFont(style.isBold() ? BOLD_SOURCES[i] : SOURCES[i]).withBold(false);
+        Style out = style.withFont(style.isBold() ? BOLD_SOURCES[font()][i] : SOURCES[font()][i]).withBold(false);
         if (shadow && style.getShadowColor() == null) {
             out = out.withShadowColor(SOFT_SHADOW);
         }
@@ -140,11 +158,14 @@ public final class Mono {
      * glyphs) are left alone. Use a fixed oversample for text drawn in the world.
      */
     public static Text prepare(Text text, int oversample, boolean shadow) {
+        if (!custom()) {
+            return text;
+        }
         int i = MathHelper.clamp(oversample, 1, MAX_OVERSAMPLE);
         MutableText out = Text.empty();
         text.visit((style, s) -> {
             if (isMono(style)) {
-                style = style.withFont(style.isBold() ? BOLD_SOURCES[i] : SOURCES[i]).withBold(false);
+                style = style.withFont(style.isBold() ? BOLD_SOURCES[font()][i] : SOURCES[font()][i]).withBold(false);
                 style = shadow ? style.withShadowColor(SOFT_SHADOW) : style.withoutShadow();
             }
             out.append(Text.literal(isMono(style) ? house(s) : s).setStyle(style));
