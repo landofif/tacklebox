@@ -5,6 +5,7 @@ import dev.landofif.dofisaddons.compat.FoeRarity;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,20 +18,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  */
 @Mixin(targets = "io.github.foecollab.handler.ItemMarkerHandler")
 abstract class ItemMarkerHandlerMixin {
-    /** Set while the slot being drawn never gets a circle: menu slots, the first and last hotbar slot and the helmet slot. */
+    /** Set while the slot being drawn never gets a circle: the first and last hotbar slot and the helmet slot. */
     private static boolean dofisaddons$skip;
 
     @Inject(method = "renderItemMarkerBackground(Lnet/minecraft/class_332;Lnet/minecraft/class_1735;)V", at = @At("HEAD"), remap = false, require = 0)
     private void dofisaddons$plainSlot(DrawContext ctx, Slot slot, CallbackInfo ci) {
         int i = slot.getIndex();
-        // only your own items get one, not the buttons and fillers of a menu; and not the slots that are always full
-        dofisaddons$skip = !(slot.inventory instanceof PlayerInventory) || i == 0 || i == 8 || i == 39;
+        dofisaddons$skip = slot.inventory instanceof PlayerInventory && (i == 0 || i == 8 || i == 39); // always full, nothing special
     }
 
     @Inject(method = "renderItemMarkerBackground(Lnet/minecraft/class_332;Lnet/minecraft/class_1799;II)V", at = @At("HEAD"), remap = false, require = 0)
     private void dofisaddons$circle(DrawContext ctx, ItemStack stack, int x, int y, CallbackInfo ci) {
         if (!DofiSettings.get().rarityCircles || dofisaddons$skip) {
             return;
+        }
+        if (Registries.ITEM.getId(stack.getItem()).getPath().endsWith("glass_pane")) {
+            return; // the filler of a menu
         }
         int rgb = FoeRarity.color(stack);
         if (rgb < 0) {
