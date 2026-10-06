@@ -86,7 +86,17 @@ public class SettingsScreen extends DofiScreen {
     @Override
     protected void init() {
         int bottom = height - 36;
-        int sideW = Math.max(84, Math.min(120, width / 4)); // narrower on small windows, so the rows keep their room
+        // as wide as the longest label needs (small capitals are wide), but the rows keep at least half the screen
+        int widest = 84;
+        for (String c : FoeConfig.available() ? foeCategories() : List.<String>of()) {
+            widest = Math.max(widest, textRenderer.getWidth(Foe.text(c)) + 24);
+            if (("f:" + c).equals(key)) {
+                for (String section : foeSections(c, (bottom - TOP - 24) / ROW_H)) {
+                    widest = Math.max(widest, textRenderer.getWidth(Foe.text(shortLabel(section))) + 24 + 8);
+                }
+            }
+        }
+        int sideW = Math.min(widest, width / 2 - 20);
         RowListWidget side = new RowListWidget(client, LEFT, TOP, sideW, bottom - TOP, 22);
         List<String> foe = FoeConfig.available() ? foeCategories() : List.of();
         if (!foe.isEmpty()) {
@@ -96,7 +106,7 @@ public class SettingsScreen extends DofiScreen {
                 if (("f:" + c).equals(key)) { // the picked category opens a dropdown of its sections, if it is long
                     for (String section : foeSections(c, (bottom - TOP - 24) / ROW_H)) {
                         side.addRow(new RowListWidget.Row(List.of(new Label(6, Text.empty(), 20),
-                                pick(side, section, section.equals(sub) && query.isBlank(), 8, () -> sub = section))));
+                                pick(side, shortLabel(section), section.equals(sub) && query.isBlank(), 8, () -> sub = section))));
                     }
                 }
             }
@@ -138,6 +148,11 @@ public class SettingsScreen extends DofiScreen {
         menu.active = FoeConfig.available();
         addDrawableChild(menu);
         addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close()).dimensions(x + (bw + 4) * 2, height - 30, bw, 20).build());
+    }
+
+    /** A section's name without the "options" every foecollab section ends in. */
+    private static String shortLabel(String section) {
+        return section.replaceAll("(?i) options$", "");
     }
 
     /** A category. The picked one is orange and cannot be clicked again. */
