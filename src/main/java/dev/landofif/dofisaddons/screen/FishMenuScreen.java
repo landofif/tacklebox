@@ -149,6 +149,9 @@ public class FishMenuScreen extends DofiScreen {
             if (stack.isEmpty() || stack.isOf(net.minecraft.item.Items.BREAD) || (name.isEmpty() && stack.getItem().toString().contains("glass_pane"))) {
                 continue; // empty and filler slots
             }
+            if (name.equalsIgnoreCase("close")) {
+                continue; // escape closes it, so the button is only in the way
+            }
             Locations.Location loc = Locations.byName(name);
             tiles.add(new Tile(slot, stack, name, loc != null ? "travel:" + loc.id() : "main:" + name,
                     loc, loc != null ? levelOf(loc, stack) : null));
@@ -313,7 +316,8 @@ public class FishMenuScreen extends DofiScreen {
         int left = vx() + PAD, top = vy() + TOP, areaH = vh() - TOP - BAR - 6;
         int panelW = travel ? Math.min(200, vw() / 3) : 0;
         int areaW = right - left - panelW - (travel ? 10 : 0);
-        arrange(4, !travel);
+        boolean oneRow = !travel && !tiles.isEmpty() && tiles.size() <= 4; // a few buttons go in a single line
+        arrange(oneRow ? tiles.size() : 4, !travel && !oneRow);
         fit(left, top, areaW, areaH, travel ? 84 : 66, travel ? 96 : 76, travel ? 1.4f : 2f);
 
         int hover = dragged != null ? -1 : tileAt(mouseX, mouseY);
