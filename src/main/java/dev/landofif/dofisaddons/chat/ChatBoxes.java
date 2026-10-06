@@ -131,7 +131,7 @@ public final class ChatBoxes {
     /** Where a box is on screen: x, y, width, height in gui units (title included). */
     public static int[] rect(ChatBox box, int screenW, int screenH) {
         int w = Math.max(80, Math.min(screenW, box.width));
-        int h = PAD_Y * 2 + Math.max(1, box.lines) * LINE_H - (LINE_H - 9) + 4;
+        int h = PAD_Y * 2 + Math.max(1, box.lines) * LINE_H - (LINE_H - 9) + 4 + 9; // + title row
         int x = (int) Math.round(box.x / 100.0 * screenW);
         int y = (int) Math.round(box.y / 100.0 * screenH);
         x = Math.max(0, Math.min(screenW - w, x));
@@ -210,7 +210,7 @@ public final class ChatBoxes {
 
         List<OrderedText> lines = visible(box, st, tr);
         if (lines.isEmpty()) {
-            ctx.drawText(tr, Mono.text("nothing here yet").withColor(S24.TEXT_4 & 0xFFFFFF), x + PAD_X, y + PAD_Y + 2, 0xFFFFFFFF, false);
+            ctx.drawText(tr, Mono.text("nothing here yet").withColor(S24.TEXT_4 & 0xFFFFFF), x + PAD_X, y + h - PAD_Y - 9, 0xFFFFFFFF, false);
         }
         int ty = y + h - PAD_Y - 9 - (lines.size() - 1) * LINE_H;
         for (OrderedText line : lines) {
