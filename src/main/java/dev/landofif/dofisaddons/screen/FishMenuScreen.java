@@ -91,17 +91,18 @@ public class FishMenuScreen extends DofiScreen {
 
     @Override
     protected void init() {
-        int y = height - BAR + 4;
-        editButton = addDrawableChild(ButtonWidget.builder(Mono.text("rearrange"), b -> toggleEdit()).dimensions(PAD, y, 90, 20).build());
+        int y = vy() + vh() - BAR + 4;
+        int left = vx() + PAD;
+        editButton = addDrawableChild(ButtonWidget.builder(Mono.text("rearrange"), b -> toggleEdit()).dimensions(left, y, 90, 20).build());
         addDrawableChild(ButtonWidget.builder(Mono.text("reset layout"), b -> {
             DofiSettings s = StatsTracker.settings();
             s.menuCells.keySet().removeIf(k -> k.startsWith(prefix()));
             StatsTracker.saveSettings();
-        }).dimensions(PAD + 96, y, 90, 20).build());
+        }).dimensions(left + 96, y, 90, 20).build());
         addDrawableChild(ButtonWidget.builder(Mono.text("chest view"), b -> {
             FishMenu.bypass = true;
             client.setScreen(original);
-        }).dimensions(width - PAD - 90, y, 90, 20).build());
+        }).dimensions(vx() + vw() - PAD - 90, y, 90, 20).build());
     }
 
     private void toggleEdit() {
@@ -291,11 +292,12 @@ public class FishMenuScreen extends DofiScreen {
         super.render(ctx, mouseX, mouseY, delta);
         collect();
         boolean travel = isTravel();
-        int right = width - PAD;
-        int panelW = travel ? Math.min(200, width / 3) : 0;
-        int areaW = right - PAD - panelW - (travel ? 10 : 0);
+        int right = vx() + vw() - PAD;
+        int left = vx() + PAD, top = vy() + TOP, areaH = vh() - TOP - BAR - 6;
+        int panelW = travel ? Math.min(200, vw() / 3) : 0;
+        int areaW = right - left - panelW - (travel ? 10 : 0);
         arrange(4, !travel);
-        fit(PAD, TOP, areaW, height - TOP - BAR - 6, travel ? 84 : 66, travel ? 96 : 76, travel ? 1.4f : 2f);
+        fit(left, top, areaW, areaH, travel ? 84 : 66, travel ? 96 : 76, travel ? 1.4f : 2f);
 
         int hover = dragged != null ? -1 : tileAt(mouseX, mouseY);
         for (int i = 0; i < tiles.size(); i++) {
@@ -307,10 +309,10 @@ public class FishMenuScreen extends DofiScreen {
             drawTile(ctx, dragged, (float) dragX - cellW / 2, (float) dragY - cellH / 2, true);
         }
         if (tiles.isEmpty()) {
-            ctx.drawCenteredTextWithShadow(textRenderer, Mono.text("waiting for the menu..."), width / 2, height / 2, S24.TEXT_4);
+            ctx.drawCenteredTextWithShadow(textRenderer, Mono.text("waiting for the menu..."), vx() + vw() / 2, vy() + vh() / 2, S24.TEXT_4);
         }
         if (travel) {
-            drawBest(ctx, right - panelW, TOP, panelW, height - TOP - BAR - 6, hover >= 0 ? tiles.get(hover) : null);
+            drawBest(ctx, right - panelW, top, panelW, areaH, hover >= 0 ? tiles.get(hover) : null);
         }
         if (hover >= 0 && !editing) {
             ctx.drawItemTooltip(textRenderer, tiles.get(hover).stack, mouseX, mouseY);
@@ -322,7 +324,7 @@ public class FishMenuScreen extends DofiScreen {
         ctx.getMatrices().translate(x, y);
         ctx.getMatrices().scale(scale, scale);
         float w = cellW / scale, h = cellH / scale;
-        S24.rect(ctx, 2, 2, (int) w - 4, (int) h - 4, hot ? S24.BG_1 : S24.BG_2, hot ? S24.ACCENT : S24.BORDER);
+        S24.rect(ctx, 2, 2, (int) w - 4, (int) h - 4, hot ? S24.BG_1 : S24.BG_2, hot ? accent() : S24.BORDER);
         if (t.loc != null) {
             drawLocation(ctx, t, w, h);
         } else {
@@ -339,7 +341,7 @@ public class FishMenuScreen extends DofiScreen {
             label(ctx, t.name, w / 2f, 62, w - 8, S24.TEXT_2);
         }
         if (editing) {
-            ctx.drawText(textRenderer, Mono.text("↔"), 6, 5, S24.ACCENT, false);
+            ctx.drawText(textRenderer, Mono.text("↔"), 6, 5, accent(), false);
         }
         ctx.getMatrices().popMatrix();
     }
@@ -370,7 +372,7 @@ public class FishMenuScreen extends DofiScreen {
         float r = d / 2f + 4;
         Arc.draw(ctx, cx, cy, r, 3, 0, 1, S24.BG_1);
         if (t.info.progress() >= 0) {
-            Arc.draw(ctx, cx, cy, r, 3, 0, t.info.progress(), S24.ACCENT);
+            Arc.draw(ctx, cx, cy, r, 3, 0, t.info.progress(), accent());
         }
         String level = t.info.level() >= 0 ? Integer.toString(t.info.level()) : "?";
         Text text = Mono.prepare(Mono.bold(level), 2.5f, true);
@@ -406,7 +408,7 @@ public class FishMenuScreen extends DofiScreen {
         }
         for (int i = 0; i < Math.min(3, ranked.size()); i++) {
             Tile t = ranked.get(i);
-            ctx.drawText(textRenderer, Mono.text((i + 1) + ". " + t.loc.name()), x + 8, ty, i == 0 ? S24.ACCENT : S24.TEXT_2, false);
+            ctx.drawText(textRenderer, Mono.text((i + 1) + ". " + t.loc.name()), x + 8, ty, i == 0 ? accent() : S24.TEXT_2, false);
             Text lvl = Mono.text("lvl " + t.info.level());
             ctx.drawText(textRenderer, lvl, x + w - 8 - textRenderer.getWidth(lvl), ty, S24.TEXT_4, false);
             ty += 12;
@@ -441,5 +443,24 @@ public class FishMenuScreen extends DofiScreen {
             y += 10;
         }
         return y;
+    }
+
+    @Override
+    public boolean keyPressed(net.minecraft.client.input.KeyInput input) {
+        if (client.options.inventoryKey.matchesKey(input)) { // e closes it like the chest
+            close();
+            return true;
+        }
+        return super.keyPressed(input);
+    }
+
+    @Override
+    protected int sizePct() {
+        return StatsTracker.settings().menuSize;
+    }
+
+    private static int accent() {
+        DofiSettings s = StatsTracker.settings();
+        return s == null || s.menuColor == DofiSettings.DEFAULT_GUI_COLOR ? S24.ACCENT : 0xFF000000 | s.menuColor;
     }
 }

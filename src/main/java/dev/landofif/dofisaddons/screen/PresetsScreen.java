@@ -1,6 +1,8 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.menu.FishMenu;
+import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.ui.S24;
 import dev.landofif.dofisaddons.util.Glyphs;
@@ -64,15 +66,16 @@ public class PresetsScreen extends DofiScreen {
 
     @Override
     protected void init() {
-        int y = height - BAR + 4;
-        addDrawableChild(ButtonWidget.builder(Mono.text("previous"), b -> nav("prev")).dimensions(PAD, y, 70, 20).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("next"), b -> nav("next")).dimensions(PAD + 74, y, 70, 20).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("switch armor / parts"), b -> nav("filter")).dimensions(width / 2 - 70, y, 140, 20).build());
+        int y = vy() + vh() - BAR + 4;
+        int left = vx() + PAD, right = vx() + vw() - PAD;
+        addDrawableChild(ButtonWidget.builder(Mono.text("previous"), b -> nav("prev")).dimensions(left, y, 70, 20).build());
+        addDrawableChild(ButtonWidget.builder(Mono.text("next"), b -> nav("next")).dimensions(left + 74, y, 70, 20).build());
+        addDrawableChild(ButtonWidget.builder(Mono.text("switch armor / parts"), b -> nav("filter")).dimensions(vx() + vw() / 2 - 70, y, 140, 20).build());
         addDrawableChild(ButtonWidget.builder(Mono.text("chest view"), b -> {
             FishMenu.bypass = true;
             client.setScreen(original);
-        }).dimensions(width - PAD - 144, y, 70, 20).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("close"), b -> close()).dimensions(width - PAD - 70, y, 70, 20).build());
+        }).dimensions(right - 144, y, 70, 20).build());
+        addDrawableChild(ButtonWidget.builder(Mono.text("close"), b -> close()).dimensions(right - 70, y, 70, 20).build());
     }
 
     @Override
@@ -176,17 +179,17 @@ public class PresetsScreen extends DofiScreen {
         super.render(ctx, mouseX, mouseY, delta);
         collect();
         if (cards.isEmpty()) {
-            ctx.drawCenteredTextWithShadow(textRenderer, Mono.text("waiting for the menu...").withColor(S24.TEXT_4 & 0xFFFFFF), width / 2, height / 2, 0xFFFFFFFF);
+            ctx.drawCenteredTextWithShadow(textRenderer, Mono.text("waiting for the menu...").withColor(S24.TEXT_4 & 0xFFFFFF), vx() + vw() / 2, vy() + vh() / 2, 0xFFFFFFFF);
             return;
         }
         gap = 8;
         int n = cards.size();
-        cardW = Math.min(150, (width - 2 * PAD - (n - 1) * gap) / n);
-        int avail = height - TOP - BAR - 6;
+        cardW = Math.min(150, (vw() - 2 * PAD - (n - 1) * gap) / n);
+        int avail = vh() - TOP - BAR - 6;
         cardH = others.isEmpty() ? avail : avail * 62 / 100;
         otherH = avail - cardH - gap;
-        cardX = (width - (n * cardW + (n - 1) * gap)) / 2;
-        cardY = TOP;
+        cardX = vx() + (vw() - (n * cardW + (n - 1) * gap)) / 2;
+        cardY = vy() + TOP;
         otherY = cardY + cardH + gap;
         int hover = cardAt(mouseX, mouseY);
         ItemStack tip = ItemStack.EMPTY;
@@ -217,9 +220,9 @@ public class PresetsScreen extends DofiScreen {
 
     /** Draws one card and returns the item under the mouse, if any. */
     private ItemStack drawCard(DrawContext ctx, Card c, int x, int y, int w, int h, boolean hover, int mouseX, int mouseY) {
-        S24.rect(ctx, x, y, w, h, hover ? S24.BG_1 : S24.BG_2, hover ? S24.ACCENT : S24.BORDER);
+        S24.rect(ctx, x, y, w, h, hover ? S24.BG_1 : S24.BG_2, hover ? accent() : S24.BORDER);
         Text label = Mono.text(c.label());
-        ctx.drawText(textRenderer, label, x + (w - textRenderer.getWidth(label)) / 2, y + 6, hover ? S24.ACCENT : S24.TEXT_2, false);
+        ctx.drawText(textRenderer, label, x + (w - textRenderer.getWidth(label)) / 2, y + 6, hover ? accent() : S24.TEXT_2, false);
 
         boolean armor = c.pieces.stream().anyMatch(s -> armorSlot(s) != null);
         int iconSize = armor ? 16 : Math.max(16, Math.min(40, (w - 12) / Math.max(1, c.pieces.size())));
@@ -255,5 +258,24 @@ public class PresetsScreen extends DofiScreen {
             ix += iconSize + 4;
         }
         return tip;
+    }
+
+    @Override
+    public boolean keyPressed(net.minecraft.client.input.KeyInput input) {
+        if (client.options.inventoryKey.matchesKey(input)) { // e closes it like the chest
+            close();
+            return true;
+        }
+        return super.keyPressed(input);
+    }
+
+    @Override
+    protected int sizePct() {
+        return StatsTracker.settings().presetsSize;
+    }
+
+    private static int accent() {
+        DofiSettings s = StatsTracker.settings();
+        return s == null || s.presetsColor == DofiSettings.DEFAULT_GUI_COLOR ? S24.ACCENT : 0xFF000000 | s.presetsColor;
     }
 }

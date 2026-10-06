@@ -58,10 +58,31 @@ public abstract class DofiScreen extends Screen {
         if (e >= 1f) {
             return;
         }
-        int w = ctx.getScaledWindowWidth();
-        int h = ctx.getScaledWindowHeight();
-        int top = MARGIN + S24.LABEL_RISE + 1;
-        ctx.fill(MARGIN + 1, top, w - MARGIN - 1, h - MARGIN - 1, S24.alpha((int) ((1f - e) * 255), S24.BG_4));
+        int x0 = vx() + MARGIN, y0 = vy() + MARGIN, x1 = vx() + vw() - MARGIN, y1 = vy() + vh() - MARGIN;
+        int top = y0 + S24.LABEL_RISE + 1;
+        ctx.fill(x0 + 1, top, x1 - 1, y1 - 1, S24.alpha((int) ((1f - e) * 255), S24.BG_4));
+    }
+
+    /** How much of the screen the frame takes, in percent (custom guis let the player shrink it). */
+    protected int sizePct() {
+        return 100;
+    }
+
+    /** The frame area: the whole screen at 100%, otherwise centred. Contents lay out inside it. */
+    protected int vw() {
+        return width * sizePct() / 100;
+    }
+
+    protected int vh() {
+        return height * sizePct() / 100;
+    }
+
+    protected int vx() {
+        return (width - vw()) / 2;
+    }
+
+    protected int vy() {
+        return (height - vh()) / 2;
     }
 
     /** False for screens that must show the game behind them (e.g. moving HUDs). */
@@ -81,7 +102,7 @@ public abstract class DofiScreen extends Screen {
         int w = ctx.getScaledWindowWidth();
         int h = ctx.getScaledWindowHeight();
         ctx.fill(0, 0, w, h, 0xE6000000 | (S24.BG_3 & 0xFFFFFF));
-        S24.panel(ctx, MARGIN, MARGIN + S24.LABEL_RISE, w - MARGIN * 2, h - MARGIN * 2 - S24.LABEL_RISE,
+        S24.panel(ctx, vx() + MARGIN, vy() + MARGIN + S24.LABEL_RISE, vw() - MARGIN * 2, vh() - MARGIN * 2 - S24.LABEL_RISE,
                 Mono.text(title.getString().toLowerCase(java.util.Locale.ROOT)));
     }
 }

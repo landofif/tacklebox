@@ -191,6 +191,17 @@ public class SettingsScreen extends DofiScreen {
                 toggle("fishonmc menu",
                         "shows the main menu (book in the 9th slot, /menu) and /travel as a screen of dofis addons with big icons you can rearrange. turn it off to get the chest back.",
                         () -> s.fishMenu, v -> s.fishMenu = v, defaults.fishMenu);
+                toggle("presets screen",
+                        "shows /presets as a wardrobe of cards with player models. turn it off to get the chest back.",
+                        () -> s.presetsMenu, v -> s.presetsMenu = v, defaults.presetsMenu);
+                slider("menu size", "how much of the screen the fishonmc menu takes.", 40, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
+                        () -> s.menuSize, v -> s.menuSize = (int) Math.round(v), defaults.menuSize);
+                color("menu colour", "the highlight colour of the fishonmc menu. the default follows the flavor.",
+                        () -> s.menuColor, v -> s.menuColor = v, defaults.menuColor);
+                slider("presets size", "how much of the screen the presets screen takes.", 40, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
+                        () -> s.presetsSize, v -> s.presetsSize = (int) Math.round(v), defaults.presetsSize);
+                color("presets colour", "the highlight colour of the presets screen. the default follows the flavor.",
+                        () -> s.presetsColor, v -> s.presetsColor = v, defaults.presetsColor);
                 toggle("restyle hotbar", "flat boxes for the hotbar, with an accent border on the selected slot.",
                         () -> s.s24Hotbar, v -> s.s24Hotbar = v, defaults.s24Hotbar);
                 toggle("restyle foecollab huds",

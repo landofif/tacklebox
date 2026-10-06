@@ -33,6 +33,14 @@ public class DofiSettings {
     // ---- fishonmc menu (see menu/FishMenu) ----
     /** Show the main menu and /travel as the mods own screens instead of the chest gui. */
     public boolean fishMenu = true;
+    /** The /presets wardrobe screen, and for both custom guis: size in percent of the screen and accent colour. */
+    public boolean presetsMenu = true;
+    public int menuSize = 100;
+    public int presetsSize = 100;
+    public int menuColor = DEFAULT_GUI_COLOR;
+    public int presetsColor = DEFAULT_GUI_COLOR;
+    /** The system24 accent: a gui colour left at this follows the flavor. */
+    public static final int DEFAULT_GUI_COLOR = 0xB589D6;
     /** Where you put each menu button: "main:name" or "travel:id" to {column, row}. */
     public java.util.Map<String, int[]> menuCells = new java.util.HashMap<>();
 
@@ -234,6 +242,10 @@ public class DofiSettings {
         bobberSlowSeconds = Math.max(0, Math.min(120, bobberSlowSeconds));
         bobberWarnSeconds = Math.max(0, Math.min(120, bobberWarnSeconds));
         bobberColor &= 0xFFFFFF;
+        menuSize = Math.max(40, Math.min(100, menuSize));
+        presetsSize = Math.max(40, Math.min(100, presetsSize));
+        menuColor &= 0xFFFFFF;
+        presetsColor &= 0xFFFFFF;
         bobberWarnColor &= 0xFFFFFF;
         bobberSlowColor &= 0xFFFFFF;
         bobberBiteColor &= 0xFFFFFF;

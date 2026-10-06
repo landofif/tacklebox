@@ -64,7 +64,7 @@ public final class FishMenu {
         }
         DofiSettings s = StatsTracker.settings();
         var server = MinecraftClient.getInstance().getCurrentServerEntry();
-        if (s == null || !s.fishMenu || server == null || !server.address.toLowerCase(Locale.ROOT).contains("fishonmc")) {
+        if (s == null || !(isPresets(screen) ? s.presetsMenu : s.fishMenu) || server == null || !server.address.toLowerCase(Locale.ROOT).contains("fishonmc")) {
             return false;
         }
         boolean typed = Util.getMeasuringTimeMs() - commandAt < 4000;
