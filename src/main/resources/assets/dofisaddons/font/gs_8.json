@@ -1,12 +1,19 @@
 {
   "providers": [
     {
+      "type": "space",
+      "advances": {
+        " ": 4.0,
+        "\u00a0": 4.0
+      }
+    },
+    {
       "type": "ttf",
       "file": "dofisaddons:google_sans_flex_regular.ttf",
       "size": 10.0,
       "oversample": 8.0,
       "shift": [
-        1.0,
+        0.0,
         0.0
       ],
       "skip": []
