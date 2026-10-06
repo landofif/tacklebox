@@ -18,7 +18,8 @@
     "LivingEntityMixin",
     "MinecraftClientMixin",
     "MoveHudScreenMixin",
-    "PlayerNameLabelMixin"
+    "PlayerNameLabelMixin",
+    "PressableWidgetMixin"
   ],
   "injectors": {
     "defaultRequire": 1

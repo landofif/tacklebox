@@ -209,6 +209,8 @@ public class SettingsScreen extends DofiScreen {
         header("menus");
         toggle("simple menus", "chests, your inventory and fishonmc menus as one plain box without slot boxes. hides the menu art from the server pack.",
                 () -> s.flatMenus, v -> s.flatMenus = v);
+        toggle("flat buttons", "every button in one plain colour instead of the bevelled texture, in the game menus too.",
+                () -> s.flatButtons, v -> s.flatButtons = v);
         toggle("fishonmc menu", "the main menu and /travel as a screen with big icons you can rearrange. off gives the chest back.",
                 () -> s.fishMenu, v -> s.fishMenu = v);
         slider("menu size", "how much of the screen the fishonmc menu fills.", 40, 100, 1, "%", PCT,
