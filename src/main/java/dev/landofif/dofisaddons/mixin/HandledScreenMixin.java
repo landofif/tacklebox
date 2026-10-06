@@ -28,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * Chests, the inventory and fishonmc menus as system24 panels: the menu name set into the top border,
- * a labelled line above your own inventory, and flat slot boxes instead of the texture. fishonmc draws
+ * a labelled line above your own inventory, and no slot boxes (the panel is one solid colour). fishonmc draws
  * its menu art with glyphs in the title, so dropping the title glyphs drops the art too (see util/Glyphs).
  * Only screens that are a plain grid of slots are restyled; furnaces, anvils and the like keep their
  * textures because their backgrounds carry progress arrows and buttons.
@@ -101,21 +101,6 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
     private void dofisaddons$noForeground(HandledScreen<?> self, DrawContext ctx, int mouseX, int mouseY, Operation<Void> original) {
         if (!dofisaddons$restyled()) {
             original.call(self, ctx, mouseX, mouseY);
-        }
-    }
-
-    @Inject(method = "drawSlots", at = @At("HEAD"))
-    private void dofisaddons$slotBoxes(DrawContext ctx, int mouseX, int mouseY, CallbackInfo ci) {
-        if (!dofisaddons$restyled()) {
-            return;
-        }
-        for (Slot slot : handler.slots) {
-            // empty and blank-named (filler) menu slots stay clear, so the panel is solid there
-            boolean dead = !(slot.inventory instanceof PlayerInventory)
-                    && (slot.getStack().isEmpty() || slot.getStack().getName().getString().isBlank());
-            if (slot.isEnabled() && !dead) {
-                S24.fill(ctx, slot.x - 1, slot.y - 1, 17, 17, S24.BG_2);
-            }
         }
     }
 
