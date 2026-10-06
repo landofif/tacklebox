@@ -15,6 +15,7 @@ public final class TriggerPresets {
                 new Preset("quest completed", "quests > quest #1-8 has been completed!", TriggerPresets::questComplete),
                 new Preset("pet drop", "pet drop! you pulled ...", TriggerPresets::petDrop),
                 new Preset("rare catch", "rare catch! you pulled ... (shards, bottles, capsules)", TriggerPresets::rareCatch),
+                new Preset("climate shard", "rare catch! you pulled a 1x subarctic shard (one per climate)", TriggerPresets::climateShard),
                 new Preset("variant catch", "albino! / melanistic! / trophy! ... you caught a ...", TriggerPresets::variant),
                 new Preset("fabled event", "fabled > a fabled event is active at ...", TriggerPresets::fabled),
                 new Preset("storm", "storm > a thunderstorm / supercell has formed!", TriggerPresets::storm),
@@ -65,6 +66,22 @@ public final class TriggerPresets {
         t.title.title = "&lrare catch!";
         t.title.titleColor = "#ffaa00";
         t.title.subtitle = "{item.lower}";
+        t.title.animation = Trigger.Animation.POP;
+        t.sound.soundId = "minecraft:block.amethyst_block.chime";
+        t.sound.plays = 3;
+        t.sound.secondsBetween = 0.15;
+        return t;
+    }
+
+    /** One shard per climate: "RARE CATCH! You pulled a 1x Subarctic Shard". */
+    public static Trigger climateShard() {
+        Trigger t = new Trigger();
+        t.name = "climate shard";
+        t.mode = Trigger.MatchMode.REGEX;
+        t.pattern = "You pulled an? (?<n>\\d+)x (?<climate>semi-arid|arid|subtropical|oceanic|arctic|savanna|subarctic|continental|monsoon|rainforest) Shard";
+        t.title.title = "&l{climate.lower} shard!";
+        t.title.titleColor = "#ffaa00";
+        t.title.subtitle = "{n}x";
         t.title.animation = Trigger.Animation.POP;
         t.sound.soundId = "minecraft:block.amethyst_block.chime";
         t.sound.plays = 3;
