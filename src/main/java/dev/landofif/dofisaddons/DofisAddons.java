@@ -46,6 +46,10 @@ public final class DofisAddons implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        // a pack of our own for foecollabs old title logo: mod resources load in id order, so foecollabs own would win over ours
+        net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer(MOD_ID).ifPresent(c ->
+                net.fabricmc.fabric.api.resource.v1.ResourceLoader.registerBuiltinPack(net.minecraft.util.Identifier.of(MOD_ID, "foelogo"), c,
+                        net.minecraft.text.Text.literal("foecollab old logo"), net.fabricmc.fabric.api.resource.v1.pack.PackActivationType.ALWAYS_ENABLED));
         dev.landofif.dofisaddons.menu.FishMenu.register();
         TriggerStore.load();
         DofiSettings.load();
