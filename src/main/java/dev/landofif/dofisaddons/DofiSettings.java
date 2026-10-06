@@ -75,6 +75,7 @@ public class DofiSettings {
     public boolean hotbarOffhand = true;
     /** Foecollabs equipment hud (armour and rod parts), moved by this much on top of the hotbar's offset. */
     public int equipX = 0;
+    public int equipScale = 100;
     public int equipY = 0;
 
     // ---- fishonmc menu (see menu/FishMenu) ----

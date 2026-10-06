@@ -273,6 +273,8 @@ public class SettingsScreen extends DofiScreen {
                 () -> s.hotbarSelection, v -> s.hotbarSelection = v);
         toggle("offhand box", "the box next to the hotbar for your offhand item.",
                 () -> s.hotbarOffhand, v -> s.hotbarOffhand = v);
+        slider("equipment size", "how big foecollabs armour and rod parts row is. move it with move huds.", 50, 200, 5, "%", PCT,
+                () -> s.equipScale, v -> s.equipScale = (int) Math.round(v));
         header("quests left");
         toggle("quests left hud", "quests until your next level and the next level of your location. it learns from /menu, /quests and the compendium. move it with move huds.",
                 () -> s.questsHud, v -> s.questsHud = v);

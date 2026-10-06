@@ -20,7 +20,12 @@ abstract class EquipmentHudMixin {
     private void dofisaddons$move(DrawContext ctx, MinecraftClient client, Operation<Void> original) {
         DofiSettings s = DofiSettings.get();
         ctx.getMatrices().pushMatrix();
-        ctx.getMatrices().translate(s.hotbarX + s.equipX, s.hotbarY + s.equipY);
+        float k = s.equipScale / 100f;
+        int cx = ctx.getScaledWindowWidth() / 2;
+        int base = ctx.getScaledWindowHeight() - 28; // the bottom middle of foecollabs default row, where it grows from
+        ctx.getMatrices().translate(cx + s.hotbarX + s.equipX, base + s.hotbarY + s.equipY);
+        ctx.getMatrices().scale(k, k);
+        ctx.getMatrices().translate(-cx, -base);
         original.call(ctx, client);
         ctx.getMatrices().popMatrix();
     }
