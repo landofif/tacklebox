@@ -16,6 +16,7 @@
     "FishingBobberStateMixin",
     "HandledScreenMixin",
     "HeldItemRendererMixin",
+    "InGameHudHotbarMixin",
     "InGameHudOverlayMixin",
     "ItemMarkerHandlerMixin",
     "LivingEntityMixin",

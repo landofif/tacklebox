@@ -8,6 +8,8 @@ import dev.landofif.dofisaddons.chat.ChatFilter;
 import dev.landofif.dofisaddons.screen.ChatFilterScreen;
 import dev.landofif.dofisaddons.trigger.Matcher;
 import dev.landofif.dofisaddons.trigger.Trigger;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -91,6 +93,11 @@ abstract class ChatScreenMixin extends Screen {
             client.player.sendMessage(Foe.text("dofi » ").withColor(Foe.TITLE & 0xFFFFFF).append(Foe.text("message copied").withColor(Foe.DIM & 0xFFFFFF)), false);
         }
         cir.setReturnValue(true);
+    }
+
+    /** The bar you type in has no background. */
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V"))
+    private void dofisaddons$clearInput(DrawContext ctx, int x1, int y1, int x2, int y2, int color, Operation<Void> original) {
     }
 
     /** A light background behind the whole message under the mouse, so it is clear which lines belong together. */

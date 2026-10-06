@@ -264,6 +264,9 @@ public class SettingsScreen extends DofiScreen {
     }
 
     private void huds() {
+        header("hotbar");
+        toggle("hotbar background", "the box behind the hotbar slots. off leaves just the items and the selection. move the hotbar with move huds.",
+                () -> s.hotbarBackground, v -> s.hotbarBackground = v);
         header("quests left");
         toggle("quests left hud", "quests until your next level and the next level of your location. it learns from /menu, /quests and the compendium. move it with move huds.",
                 () -> s.questsHud, v -> s.questsHud = v);

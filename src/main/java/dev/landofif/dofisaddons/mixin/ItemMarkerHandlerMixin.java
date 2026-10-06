@@ -31,15 +31,6 @@ abstract class ItemMarkerHandlerMixin {
         if (!DofiSettings.get().rarityCircles || dofisaddons$skip) {
             return;
         }
-        int rgb = FoeRarity.color(stack);
-        if (rgb < 0) {
-            return;
-        }
-        int argb = 0x66 << 24 | rgb;
-        for (int row = 0; row < 16; row++) {
-            double dy = row + 0.5 - 8;
-            int half = (int) Math.round(Math.sqrt(64 - dy * dy));
-            ctx.fill(x + 8 - half, y + row, x + 8 + half, y + row + 1, argb);
-        }
+        FoeRarity.circle(ctx, x, y, stack);
     }
 }

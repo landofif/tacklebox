@@ -65,6 +65,10 @@ public class DofiSettings {
     public boolean flatButtons = true;
     /** A see-through circle in the rarity colour behind items in slots (foecollabs rarity, drawn by its item markers). */
     public boolean rarityCircles = false;
+    /** The hotbar: moved by this many gui pixels from where vanilla puts it, and whether its slot background is drawn. */
+    public int hotbarX = 0;
+    public int hotbarY = 0;
+    public boolean hotbarBackground = false;
 
     // ---- fishonmc menu (see menu/FishMenu) ----
     /** Show the main menu and /travel as the mods own screens instead of the chest gui. */

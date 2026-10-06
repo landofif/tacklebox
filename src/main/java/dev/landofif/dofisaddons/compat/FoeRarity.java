@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.compat;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
 
 import java.lang.reflect.Field;
@@ -14,6 +15,20 @@ public final class FoeRarity {
     private static boolean tried;
 
     private FoeRarity() {}
+
+    /** A see-through circle in the items rarity colour, 16x16 at x, y, if the item has a rarity. */
+    public static void circle(DrawContext ctx, int x, int y, ItemStack stack) {
+        int rgb = color(stack);
+        if (rgb < 0) {
+            return;
+        }
+        int argb = 0x66 << 24 | rgb;
+        for (int row = 0; row < 16; row++) {
+            double dy = row + 0.5 - 8;
+            int half = (int) Math.round(Math.sqrt(64 - dy * dy));
+            ctx.fill(x + 8 - half, y + row, x + 8 + half, y + row + 1, argb);
+        }
+    }
 
     public static int color(ItemStack stack) {
         if (!tried) {

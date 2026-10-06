@@ -46,6 +46,16 @@ public final class FoeMover {
             s.chatX = 0;
             s.chatY = 0;
         }));
+        add.add(new Box(ctx -> {
+            int[] r = {sw() / 2 - 91 + s.hotbarX, sh() - 22 + s.hotbarY, 182, 22};
+            return r;
+        }, (x, y, r) -> {
+            s.hotbarX = Math.max(-sw() / 2 + 91, Math.min(sw() / 2 - 91, x - (sw() / 2 - 91)));
+            s.hotbarY = Math.max(-sh() + 22, Math.min(0, y - (sh() - 22)));
+        }, null, () -> {
+            s.hotbarX = 0;
+            s.hotbarY = 0;
+        }));
         if (s.questsHud) {
             add.add(new Box(ctx -> XpEstimate.draw(ctx, true), (x, y, r) -> {
                 s.questsX = Math.max(0, Math.min(sw() - 40, x));
