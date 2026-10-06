@@ -62,12 +62,17 @@ public final class Foe {
         slice(ctx, hot ? SOLID_ALT : SOLID, x, y, w, h, 100);
     }
 
-    /** A box with its title inside the top edge. */
-    public static void panel(DrawContext ctx, int x, int y, int w, int h, Text title, int opacity) {
-        box(ctx, x, y, w, h, opacity);
+    /** A title where a panel puts it, inside the top left edge. Alone it is the title of something with no box. */
+    public static void title(DrawContext ctx, int x, int y, Text title) {
         if (title != null && !title.getString().isEmpty()) {
             ctx.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, title, x + 8, y + 7, TITLE);
         }
+    }
+
+    /** A box with its title inside the top edge. */
+    public static void panel(DrawContext ctx, int x, int y, int w, int h, Text title, int opacity) {
+        box(ctx, x, y, w, h, opacity);
+        title(ctx, x, y, title);
     }
 
     /** The atlas as a 3x3 grid: corners as they are, edges and the middle stretched. */

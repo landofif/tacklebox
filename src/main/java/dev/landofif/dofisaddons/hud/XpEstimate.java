@@ -242,7 +242,7 @@ public final class XpEstimate {
         w += 16;
         int h = 25 + rows.length * 11;
         var s = DofiSettings.get();
-        Foe.panel(ctx, s.questsX, s.questsY, w, h, Foe.text("quests left"), s.hudOpacity);
+        Foe.title(ctx, s.questsX, s.questsY, Foe.text("quests left")); // no box behind it
         for (int i = 0; i < rows.length; i++) {
             int y = s.questsY + 20 + i * 11;
             ctx.drawTextWithShadow(tr, Foe.text(rows[i][0]), s.questsX + 8, y, Foe.DIM);

@@ -25,8 +25,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 /**
- * Chests, the inventory and fishonmc menus as one foecollab box: the menu name in its top edge, a label
- * above your own inventory, and no slot boxes. fishonmc draws its menu art with glyphs in the title, so
+ * Chests, the inventory and fishonmc menus with no box at all: the menu name where a box would put it, a
+ * label above your own inventory, and no slot boxes. fishonmc draws its menu art with glyphs in the title, so
  * dropping the title glyphs drops the art too (see util/Glyphs). Only screens that are a plain grid of
  * slots are restyled; furnaces, anvils and the like keep their textures because their backgrounds carry
  * progress arrows and buttons.
@@ -78,14 +78,15 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
             return;
         }
         boolean inventory = self instanceof InventoryScreen;
-        Foe.panel(ctx, x, y, backgroundWidth, backgroundHeight, inventory ? null : Foe.text(Glyphs.menuName(title)), 100); // the armour slots start at the top of the inventory
+        if (!inventory) { // the armour slots start at the top of the inventory, so it has no title
+            Foe.title(ctx, x, y, Foe.text(Glyphs.menuName(title)));
+        }
         int grid = dofisaddons$playerGridTop();
         if (grid > 0 && !inventory) {
             ctx.drawTextWithShadow(textRenderer, Foe.text("inventory"), x + 8, y + grid - 11, Foe.TITLE);
         }
         if (inventory && client != null && client.player != null) {
             // the player preview and the crafting arrow were part of the texture
-            Foe.box(ctx, x + 26, y + 8, 49, 70, 100);
             InventoryScreen.drawEntity(ctx, x + 26, y + 8, x + 75, y + 78, 30, 0.0625F, mouseX, mouseY, client.player);
             ctx.drawCenteredTextWithShadow(textRenderer, Foe.text("→"), x + 143, y + 32, Foe.DIM);
         }

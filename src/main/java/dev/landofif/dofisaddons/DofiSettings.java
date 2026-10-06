@@ -84,8 +84,7 @@ public class DofiSettings {
     /** Location levels read from the fish compendium, "level|progress" by location id, shown in /turbotravel which has none. */
     public java.util.Map<String, String> locationLevels = new java.util.LinkedHashMap<>();
     public int menuSize = 100;
-    /** How opaque the huds (quests left, chat boxes) and the mods screens are, in percent. */
-    public int hudOpacity = 100;
+    /** How opaque the box of the mods screens is, in percent. */
     public int screenOpacity = 100;
     public int presetsSize = 100;
     /** Where you put each menu button: "main:name" or "travel:id" to {column, row}. */
@@ -202,7 +201,6 @@ public class DofiSettings {
         if (locationLevels == null) locationLevels = new java.util.LinkedHashMap<>();
         if (presetCache == null) presetCache = new java.util.LinkedHashMap<>();
         menuSize = Math.max(40, Math.min(100, menuSize));
-        hudOpacity = Math.max(10, Math.min(100, hudOpacity));
         screenOpacity = Math.max(20, Math.min(100, screenOpacity));
         presetsSize = Math.max(40, Math.min(100, presetsSize));
     }

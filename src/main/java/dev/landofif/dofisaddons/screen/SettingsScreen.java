@@ -225,10 +225,12 @@ public class SettingsScreen extends DofiScreen {
 
     private void menus() {
         header("menus");
-        toggle("simple menus", "chests, your inventory and fishonmc menus as one plain box without slot boxes. hides the menu art from the server pack.",
+        toggle("simple menus", "chests, your inventory and fishonmc menus with no box and no slot boxes, just the items. hides the menu art from the server pack.",
                 () -> s.flatMenus, v -> s.flatMenus = v);
         toggle("flat buttons", "every button in one plain colour instead of the bevelled texture, in the game menus too.",
                 () -> s.flatButtons, v -> s.flatButtons = v);
+        slider("screen opacity", "how see-through the box of the mods own screens is.", 20, 100, 5, "%", PCT,
+                () -> s.screenOpacity, v -> s.screenOpacity = (int) Math.round(v));
         toggle("fishonmc menu", "the main menu and /travel as a screen with big icons you can rearrange. off gives the chest back.",
                 () -> s.fishMenu, v -> s.fishMenu = v);
         slider("menu size", "how much of the screen the fishonmc menu fills.", 40, 100, 1, "%", PCT,
@@ -246,11 +248,6 @@ public class SettingsScreen extends DofiScreen {
         header("quests left");
         toggle("quests left hud", "quests until your next level and the next level of your location. it learns from /menu, /quests and the compendium. move it with move huds.",
                 () -> s.questsHud, v -> s.questsHud = v);
-        header("see-through");
-        slider("hud opacity", "how see-through the quests left hud and the chat boxes are.", 10, 100, 5, "%", PCT,
-                () -> s.hudOpacity, v -> s.hudOpacity = (int) Math.round(v));
-        slider("screen opacity", "how see-through the box of the mods screens is.", 20, 100, 5, "%", PCT,
-                () -> s.screenOpacity, v -> s.screenOpacity = (int) Math.round(v));
     }
 
     private void bobber() {

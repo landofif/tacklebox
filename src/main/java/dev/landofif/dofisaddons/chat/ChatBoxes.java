@@ -198,7 +198,6 @@ public final class ChatBoxes {
         int x = r[0], y = r[1], w = r[2], h = r[3];
         State st = state(box);
 
-        Foe.box(ctx, x, y, w, h, DofiSettings.get().hudOpacity);
         Text title = Foe.text((box.name.isBlank() ? "chat" : box.name) + (st.scroll > 0 ? " ↓" + st.scroll : "")).withColor(Foe.TITLE & 0xFFFFFF);
         if (highlight) { // the move screen outlines the box so you can find it
             ctx.drawStrokedRectangle(x, y, w, h, Foe.ACCENT);
