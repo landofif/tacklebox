@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.landofif.dofisaddons.DofiSettings;
+import dev.landofif.dofisaddons.compat.FoeRarity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,6 +29,19 @@ abstract class EquipmentHudMixin {
         ctx.getMatrices().translate(-cx, -base);
         original.call(ctx, client);
         ctx.getMatrices().popMatrix();
+    }
+
+    /** The rarity bar under a slot: left alone, recoloured, or a circle behind the item instead. */
+    @WrapOperation(method = "renderBox", remap = false, require = 0,
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/class_332;method_73198(IIIII)V", remap = false))
+    private void dofisaddons$bar(DrawContext ctx, int x, int y, int w, int h, int color, Operation<Void> original) {
+        DofiSettings s = DofiSettings.get();
+        int shown = s.equipRecolor ? (color & 0xFF000000) | s.equipColor : color;
+        if (!s.equipCircle) {
+            original.call(ctx, x, y, w, h, shown);
+        } else if ((color & 0xFFFFFF) != 0xFFFFFF || s.equipRecolor) { // plain items get no circle
+            FoeRarity.disc(ctx, x + 2, y - 18, 0x66000000 | (shown & 0xFFFFFF)); // the bar sits just under the 20x20 slot
+        }
     }
 
     @WrapOperation(method = "renderBox", remap = false, require = 0,

@@ -22,7 +22,11 @@ public final class FoeRarity {
         if (rgb < 0) {
             return;
         }
-        int argb = 0x66 << 24 | rgb;
+        disc(ctx, x, y, 0x66 << 24 | rgb);
+    }
+
+    /** A filled circle, 16x16 at x, y. */
+    public static void disc(DrawContext ctx, int x, int y, int argb) {
         for (int row = 0; row < 16; row++) {
             double dy = row + 0.5 - 8;
             int half = (int) Math.round(Math.sqrt(64 - dy * dy));

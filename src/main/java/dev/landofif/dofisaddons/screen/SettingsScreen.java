@@ -277,6 +277,12 @@ public class SettingsScreen extends DofiScreen {
                 () -> s.hotbarOffhand, v -> s.hotbarOffhand = v);
         slider("equipment size", "how big foecollabs armour and rod parts row is. move it with move huds.", 50, 200, 5, "%", PCT,
                 () -> s.equipScale, v -> s.equipScale = (int) Math.round(v));
+        toggle("equipment circles", "a circle in the rarity colour behind each equipment item, instead of foecollabs bar under it.",
+                () -> s.equipCircle, v -> s.equipCircle = v);
+        toggle("equipment colour", "uses one colour for the circle or bar instead of the rarity colour.",
+                () -> s.equipRecolor, v -> s.equipRecolor = v);
+        color("equipment colour pick", "the colour used when equipment colour is on.",
+                () -> s.equipColor, v -> s.equipColor = v);
         header("quests left");
         toggle("quests left hud", "quests until your next level and the next level of your location. it learns from /menu, /quests and the compendium. move it with move huds.",
                 () -> s.questsHud, v -> s.questsHud = v);

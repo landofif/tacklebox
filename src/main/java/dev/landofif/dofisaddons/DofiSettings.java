@@ -77,6 +77,10 @@ public class DofiSettings {
     /** Foecollabs equipment hud (armour and rod parts), moved by this much on top of the hotbar's offset. */
     public int equipX = 0;
     public int equipScale = 100;
+    /** Foecollabs rarity bar under each equipment slot as a circle behind the item, and a colour to use instead of the rarity's. */
+    public boolean equipCircle = true;
+    public boolean equipRecolor = false;
+    public int equipColor = 0xFFFFFF;
     public int equipY = 0;
 
     // ---- fishonmc menu (see menu/FishMenu) ----
