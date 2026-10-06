@@ -37,7 +37,12 @@ public final class XpEstimate {
     private static final Pattern POPUP = Pattern.compile("\\+" + NUM + "(l?)xp", Pattern.CASE_INSENSITIVE);
     private static final Pattern GAINED = Pattern.compile("^location > (.+?) gained " + NUM + "\\s*xp");
 
+    /** The profile item in /menu: "Fishing Level [274]" then "(1.02M/3.73M)". */
+    private static final Pattern PROFILE = Pattern.compile("fishing level \\[(\\d+)\\]\\s*\\(\\s*" + NUM + "\\s*/\\s*" + NUM + "\\s*\\)", Pattern.CASE_INSENSITIVE);
+
     private static double questXp, questLxp;
+    /** {level, xp the level takes} from the /menu profile, or null until it was opened. */
+    private static double[] profile;
     /** Location id to {level, xp into the level}. */
     private static final Map<String, double[]> LOCATION = new HashMap<>();
     private static int baseLevel = -1;
@@ -118,7 +123,14 @@ public final class XpEstimate {
                 LOCATION.put(loc.id(), new double[]{info.level(), info.progress() * need(info.level() + 1)});
             }
             LoreComponent lore = stack.get(DataComponentTypes.LORE);
-            if (!quests || lore == null) {
+            if (lore == null) {
+                continue;
+            }
+            Matcher pm = PROFILE.matcher(lore.lines().stream().map(Glyphs::plain).collect(java.util.stream.Collectors.joining(" ")));
+            if (pm.find()) {
+                profile = new double[]{Integer.parseInt(pm.group(1)), num(pm.group(4), pm.group(5))};
+            }
+            if (!quests) {
                 continue;
             }
             for (Text line : lore.lines()) {
@@ -148,6 +160,9 @@ public final class XpEstimate {
     /** Quests until the next fishing level, like "~12", or null while it is not known yet. */
     public static String levelQuests() {
         ClientPlayerEntity p = MinecraftClient.getInstance().player;
+        if (p != null && profile != null && p.experienceLevel == (int) profile[0] && questXp > 0) {
+            return "~" + (long) Math.ceil((1 - p.experienceProgress) * profile[1] / questXp);
+        }
         Double need = p == null ? null : StatsTracker.allTime().need.get(String.valueOf(p.experienceLevel));
         return need == null || questXp <= 0 ? null : "~" + (long) Math.ceil((1 - p.experienceProgress) * need / questXp);
     }
