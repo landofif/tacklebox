@@ -277,6 +277,8 @@ public class SettingsScreen extends DofiScreen {
                 () -> s.hotbarOffhand, v -> s.hotbarOffhand = v);
         slider("equipment size", "how big foecollabs armour and rod parts row is. move it with move huds.", 50, 200, 5, "%", PCT,
                 () -> s.equipScale, v -> s.equipScale = (int) Math.round(v));
+        cycle("equipment place", "where the armour and rod parts row sits: above the hotbar, or level with it on its left or right. you can still drag it from there.",
+                DofiSettings.EquipPlace.values(), k -> k.label, () -> s.equipPlace, v -> s.equipPlace = v);
         toggle("equipment circles", "a circle in the rarity colour behind each equipment item, instead of foecollabs bar under it.",
                 () -> s.equipCircle, v -> s.equipCircle = v);
         toggle("equipment colour", "uses one colour for the circle or bar instead of the rarity colour.",

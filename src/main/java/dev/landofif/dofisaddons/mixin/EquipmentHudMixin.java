@@ -24,7 +24,8 @@ abstract class EquipmentHudMixin {
         float k = s.equipScale / 100f;
         int cx = ctx.getScaledWindowWidth() / 2;
         int base = ctx.getScaledWindowHeight() - 28; // the bottom middle of foecollabs default row, where it grows from
-        ctx.getMatrices().translate(cx + s.hotbarX + s.equipX, base + s.hotbarY + s.equipY);
+        int[] off = s.equipOffset();
+        ctx.getMatrices().translate(cx + s.hotbarX + s.equipX + off[0], base + s.hotbarY + s.equipY + off[1]);
         ctx.getMatrices().scale(k, k);
         ctx.getMatrices().translate(-cx, -base);
         original.call(ctx, client);

@@ -77,6 +77,7 @@ public class DofiSettings {
     /** Foecollabs equipment hud (armour and rod parts), moved by this much on top of the hotbar's offset. */
     public int equipX = 0;
     public int equipScale = 100;
+    public EquipPlace equipPlace = EquipPlace.ABOVE;
     /** Foecollabs rarity bar under each equipment slot as a circle behind the item, and a colour to use instead of the rarity's. */
     public boolean equipCircle = true;
     public boolean equipRecolor = false;
@@ -179,6 +180,26 @@ public class DofiSettings {
         }
     }
 
+    /** Where foecollabs equipment row sits next to the hotbar, before any dragging. */
+    public enum EquipPlace {
+        ABOVE("above"), LEFT("left"), RIGHT("right");
+
+        public final String label;
+
+        EquipPlace(String label) {
+            this.label = label;
+        }
+    }
+
+    /** How far the equipment row is from its default place above the hotbar for {@link #equipPlace}: {dx, dy} in gui pixels. */
+    public int[] equipOffset() {
+        if (equipPlace == EquipPlace.ABOVE) {
+            return new int[]{0, 0};
+        }
+        int side = 91 * hotbarScale / 100 + 6 + 65 * equipScale / 100; // from the hotbar's middle to the rows middle
+        return new int[]{equipPlace == EquipPlace.LEFT ? -side : side, 27}; // level with the hotbar
+    }
+
     public enum SelectionStyle {
         FRAME("frame"), ROUND("round"), SIMPLE("simple"), NONE("off");
 
@@ -202,6 +223,7 @@ public class DofiSettings {
     public void sanitize() {
         if (bobberSkin == null) bobberSkin = BobberSkin.DEFAULT;
         if (swingStyle == null) swingStyle = SwingStyle.NORMAL;
+        if (equipPlace == null) equipPlace = EquipPlace.ABOVE;
         if (hotbarSelection == null) hotbarSelection = SelectionStyle.FRAME;
         if (chatFilters == null) chatFilters = new java.util.ArrayList<>();
         chatFilters.removeIf(java.util.Objects::isNull);

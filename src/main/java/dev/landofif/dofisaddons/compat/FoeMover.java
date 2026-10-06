@@ -59,10 +59,12 @@ public final class FoeMover {
         }));
         add.add(new Box(ctx -> {
             int w = 131 * s.equipScale / 100, h = 20 * s.equipScale / 100; // foecollabs default place: the row above the hotbar
-            return new int[]{sw() / 2 - w / 2 + s.hotbarX + s.equipX, sh() - 28 - h + s.hotbarY + s.equipY, w, h};
+            int[] off = s.equipOffset();
+            return new int[]{sw() / 2 - w / 2 + s.hotbarX + s.equipX + off[0], sh() - 28 - h + s.hotbarY + s.equipY + off[1], w, h};
         }, (x, y, r) -> {
-            s.equipX = x - (sw() / 2 - r[2] / 2 + s.hotbarX);
-            s.equipY = y - (sh() - 28 - r[3] + s.hotbarY);
+            int[] off = s.equipOffset();
+            s.equipX = x - (sw() / 2 - r[2] / 2 + s.hotbarX + off[0]);
+            s.equipY = y - (sh() - 28 - r[3] + s.hotbarY + off[1]);
         }, (step, shift) -> s.equipScale = Math.max(50, Math.min(200, s.equipScale + step * 5)), () -> {
             s.equipX = 0;
             s.equipY = 0;
