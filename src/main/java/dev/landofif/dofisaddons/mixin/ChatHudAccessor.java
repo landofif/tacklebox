@@ -17,6 +17,9 @@ public interface ChatHudAccessor {
     @Accessor("visibleMessages")
     List<ChatHudLine.Visible> dofisaddons$visibleMessages();
 
+    @Invoker("refresh")
+    void dofisaddons$refresh();
+
     @Invoker("render")
     void dofisaddons$render(ChatHud.Backend backend, int windowHeight, int currentTick, boolean expanded);
 }

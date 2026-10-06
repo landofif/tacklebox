@@ -353,3 +353,8 @@ List of rules → editor with a **"test against text"** box (paste a chat line, 
 - /travel (title `픁`): 16 location items (glowstone dust) in slots 1-7, 10-16, 19-21, lore has climate, temperature, `fastTravel:1b` custom_data. no level on them.
 - fish compendium location page (title `픂`): same slots, lore `Level: [17] (354.17K/1.46M)`, `Catches: n`, `Runes Discovered: (a/b)`, then small-caps rarity lines `normal -> (14/14)`. progress can exceed the max (lake biwa `11.85M/2.32M`), so progress is clamped.
 - profile head lore: `Fishing Level [274]`, `(1.02M/3.73M)`, power, stats, luck and so on.
+
+## presets menu dump, 2026-10-06
+
+- title `Presets핲` (menuName `presets`). 54 slots, bread filler. Each preset is one row: slot 2, 11, 20, 29, 38 is a gunpowder equip button (`custom_data {type:"equip", preset:n, filter:"armor"}`, lore "Preset #n"), followed by its leather chestplate, leggings and boots (`custom_data` has `name`, `piece`, `rarity`, `tier`, `quality`, `infusion`, `fish_bonus`).
+- slot 48 flint `{navigation:"filter"}` switches armor and part presets, slot 52 "Next" `{navigation:"next", page}` (a previous button should be `prev`, not seen yet), slot 49 Close. Rod part presets were not dumped yet.

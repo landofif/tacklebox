@@ -97,7 +97,7 @@ public class ChatFilterScreen extends DofiScreen {
             addDrawableChild(ButtonWidget.builder(Mono.text("done"), b -> close()).dimensions(left + (bw + 4) * 2, y, bw, 20).build());
             return;
         }
-        int bw = (w - 16) / 5;
+        int bw = (w - 20) / 6;
         addDrawableChild(ButtonWidget.builder(Mono.text("+ hide rule"), b -> addRule()).dimensions(left, y, bw, 20)
                 .tooltip(Tooltip.of(Mono.text("add a rule. use * for anything, like: tackle shop > *restocked*"))).build());
         addDrawableChild(ButtonWidget.builder(Mono.text("chat boxes"), b -> {
@@ -113,7 +113,16 @@ public class ChatFilterScreen extends DofiScreen {
             b.setMessage(copyLabel());
         }).dimensions(left + (bw + 4) * 3, y, bw, 20)
                 .tooltip(Tooltip.of(Mono.text("with chat open, right click a line to copy it. shift + right click adds a hide rule for it."))).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("done"), b -> close()).dimensions(left + (bw + 4) * 4, y, bw, 20).build());
+        addDrawableChild(ButtonWidget.builder(stackLabel(), b -> {
+            s.chatStack = !s.chatStack;
+            b.setMessage(stackLabel());
+        }).dimensions(left + (bw + 4) * 4, y, bw, 20)
+                .tooltip(Tooltip.of(Mono.text("the same line again and again becomes one line with a count, like (x3)"))).build());
+        addDrawableChild(ButtonWidget.builder(Mono.text("done"), b -> close()).dimensions(left + (bw + 4) * 5, y, bw, 20).build());
+    }
+
+    private Text stackLabel() {
+        return Mono.text("stack: ").append(Mono.text(s.chatStack ? "on" : "off").formatted(s.chatStack ? Formatting.GREEN : Formatting.RED));
     }
 
     private void addRule() {

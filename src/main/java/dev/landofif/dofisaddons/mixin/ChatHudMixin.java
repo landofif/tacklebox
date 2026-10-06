@@ -25,12 +25,46 @@ import java.util.function.Consumer;
  */
 @Mixin(ChatHud.class)
 abstract class ChatHudMixin {
+    private static boolean stacking;
+    private static String lastPlain = "", lastShown = "";
+    private static int lastCount;
+
     /** Lines a chat box takes (dms, crew chat) skip the main chat, see chat/ChatBoxes. */
     @Inject(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
             at = @At("HEAD"), cancellable = true)
     private void dofisaddons$chatBoxes(Text message, @Nullable MessageSignatureData signature, @Nullable MessageIndicator indicator, CallbackInfo ci) {
+        if (stacking) {
+            return;
+        }
         if (ChatBoxes.route(message, indicator)) {
             ci.cancel();
+        }
+        if (ci.isCancelled()) {
+            return;
+        }
+        DofiSettings st = StatsTracker.settings();
+        if (st != null && st.chatStack) {
+            ChatHudAccessor acc = (ChatHudAccessor) this;
+            String plain = message.getString();
+            var lines = acc.dofisaddons$messages();
+            if (!plain.isBlank() && plain.equals(lastPlain) && !lines.isEmpty()
+                    && lines.getFirst().content().getString().equals(lastShown)) {
+                lines.removeFirst();
+                acc.dofisaddons$refresh();
+                lastCount++;
+                lastShown = plain + " (x" + lastCount + ")";
+                stacking = true;
+                try {
+                    ((ChatHud) (Object) this).addMessage(message.copy().append(Text.literal(" (x" + lastCount + ")").formatted(net.minecraft.util.Formatting.GRAY)), signature, indicator);
+                } finally {
+                    stacking = false;
+                }
+                ci.cancel();
+                return;
+            }
+            lastPlain = plain;
+            lastShown = plain;
+            lastCount = 1;
         }
     }
 

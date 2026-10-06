@@ -44,6 +44,8 @@ public class DofiSettings {
     public int chatY = 0;
     /** Right click a chat line (with chat open) to copy it. */
     public boolean chatCopy = true;
+    /** Repeats of the same chat line become one line with a count, like "text (x3)". */
+    public boolean chatStack = true;
     /** Separate chat boxes (dms, crew chat). null until sanitize fills in the defaults. */
     public java.util.List<dev.landofif.dofisaddons.chat.ChatBox> chatBoxes = null;
     /** Keys that run a command when pressed in game, see input/KeyCommands. */
