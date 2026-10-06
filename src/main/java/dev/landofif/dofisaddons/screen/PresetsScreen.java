@@ -88,8 +88,37 @@ public class PresetsScreen extends DofiScreen {
         this.handler = original.getScreenHandler();
     }
 
+    private boolean armorWasHidden;
+    private boolean armorTouched;
+
+    /** foecollabs "hide armor" cancels armor drawing everywhere, the models here included: switch it off while this screen is open. */
+    private void showArmor(boolean show) {
+        try {
+            Object cfg = Class.forName("io.github.foecollab.config.FOEConfig").getMethod("getConfig").invoke(null);
+            Object fun = cfg.getClass().getField("fun").get(cfg);
+            var f = fun.getClass().getField("hideArmor");
+            if (show && !armorTouched) {
+                armorWasHidden = f.getBoolean(fun);
+                armorTouched = true;
+                f.setBoolean(fun, false);
+            } else if (!show && armorTouched) {
+                f.setBoolean(fun, armorWasHidden);
+                armorTouched = false;
+            }
+        } catch (ReflectiveOperationException | LinkageError e) {
+            // no foecollab, nothing hides the armor
+        }
+    }
+
+    @Override
+    public void removed() {
+        showArmor(false);
+        super.removed();
+    }
+
     @Override
     protected void init() {
+        showArmor(true);
         int y = vy() + vh() - BAR + 4;
         int left = vx() + PAD, right = vx() + vw() - PAD;
         addDrawableChild(ButtonWidget.builder(Mono.text("previous"), b -> nav("prev")).dimensions(left, y, 70, 20).build());
@@ -227,11 +256,14 @@ public class PresetsScreen extends DofiScreen {
         int n = cards.size();
         cardW = Math.min(150, (vw() - 2 * PAD - (n - 1) * gap) / n);
         int avail = vh() - TOP - BAR - 6;
-        cardH = others.isEmpty() ? avail : avail * 62 / 100;
-        otherH = avail - cardH - gap;
+        cardH = others.isEmpty() ? avail : (avail - gap) / 2;
+        otherH = cardH;
         cardX = vx() + (vw() - (n * cardW + (n - 1) * gap)) / 2;
-        cardY = vy() + TOP;
-        otherY = cardY + cardH + gap;
+        // the rows keep their places (lower page on top), the page you are on is the lit one
+        boolean liveTop = others.isEmpty() || cards.get(0).preset < others.get(0).preset;
+        int topY = vy() + TOP, botY = topY + cardH + gap;
+        cardY = liveTop ? topY : botY;
+        otherY = liveTop ? botY : topY;
         int hover = cardAt(mouseX, mouseY);
         ItemStack tip = ItemStack.EMPTY;
         for (int i = 0; i < n; i++) {
