@@ -7,6 +7,7 @@ import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.util.Mono;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
@@ -400,12 +401,12 @@ public class SettingsScreen extends DofiScreen {
     private void foeSection(List<FoeConfig.Header> path) {
         String key = foeKey(path, path.size());
         boolean closed = folded.contains(key);
-        ButtonWidget b = ButtonWidget.builder(Mono.text((closed ? "+ " : "- ") + path.getLast().label()), btn -> {
+        FoldHeader b = new FoldHeader(rowW(), path.getLast().label(), closed, () -> {
             if (!folded.remove(key)) {
                 folded.add(key);
             }
             refresh();
-        }).dimensions(0, 0, rowW(), 20).build();
+        });
         b.setTooltip(Tooltip.of(Mono.text(closed ? "click to unfold this section" : "click to fold this section")));
         list.addRow(new RowListWidget.Row(List.of(b)));
     }
@@ -565,6 +566,39 @@ public class SettingsScreen extends DofiScreen {
     }
 
     /** A line of text in the list (section headers). */
+    /** A section title you can fold: flat, left aligned, with an arrow and a rule, so it does not look like a toggle button. */
+    private static final class FoldHeader extends ClickableWidget {
+        private final Runnable toggle;
+        private final boolean closed;
+
+        FoldHeader(int width, String name, boolean closed, Runnable toggle) {
+            super(0, 0, width, 20, Mono.text(name));
+            this.closed = closed;
+            this.toggle = toggle;
+        }
+
+        @Override
+        public void onClick(Click click, boolean doubled) {
+            toggle.run();
+        }
+
+        @Override
+        protected void renderWidget(DrawContext ctx, int mouseX, int mouseY, float delta) {
+            var tr = net.minecraft.client.MinecraftClient.getInstance().textRenderer;
+            int color = isHovered() ? S24.ACCENT : S24.TEXT_2;
+            int y = getY() + 6;
+            ctx.drawText(tr, Mono.text(closed ? "▸" : "▾"), getX() + 2, y, color, false);
+            ctx.drawText(tr, getMessage(), getX() + 14, y, color, false);
+            int after = getX() + 20 + tr.getWidth(getMessage());
+            ctx.fill(after, getY() + 10, getX() + width - 2, getY() + 11, isHovered() ? S24.ACCENT_DIM : S24.BORDER);
+        }
+
+        @Override
+        protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+            appendDefaultNarrations(builder);
+        }
+    }
+
     private static final class Label extends ClickableWidget {
         Label(int width, Text text) {
             super(0, 0, width, 20, text);
