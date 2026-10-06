@@ -23,6 +23,16 @@ public final class FoeScreens {
         return make(MOVE, parent);
     }
 
+    /** foecollab's custom hud editor (the list of huds and their lines). */
+    public static Screen customHuds(Screen parent) {
+        try {
+            return (Screen) Class.forName("io.github.foecollab.screens.CustomHudMakerScreen").getConstructor(Screen.class).newInstance(parent);
+        } catch (ReflectiveOperationException | LinkageError | ClassCastException e) {
+            DofisAddons.LOGGER.warn("Could not open foecollabs custom hud editor", e);
+            return null;
+        }
+    }
+
     public static Screen title() {
         try {
             return (Screen) Class.forName(TITLE).getConstructor().newInstance();

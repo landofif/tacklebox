@@ -59,21 +59,11 @@ a catch is counted when fishonmc shows the caught fish title and a new fish with
 
 ## custom huds
 
-your own info boxes on screen, built from stats and server info.
-
-- start from a preset: all-time stats, session stats, dry streaks, where and when, wallet, level, bobber timer
-- each line is text with colours and live values, for example `&7fish%tab%&f%alltime.fish%`
-- `%tab%` splits a line into a label on the left and a value lined up on the right
-- huds are drawn as panels in the style of the system24 discord theme. a bold first line with no values (like `&6&lall-time`) becomes the title in the top border. set the background to 0 for no panel at all
-- **+ insert value** lists every value with what it shows right now, so you never have to remember names
-- a line whose value is not available right now hides itself
-- logic and maths work too: `%condition.(<session.fish_raw>>100)%`, `%round.(<expression.(<a>\/<b>)>,1)%`
-- **move huds** lets you drag every box into place and scroll to resize
-- share codes from foecollab and fishonmc extras import as well
+custom huds are foecollabs: `/dofi huds` (or the custom huds button) opens foecollabs own editor. dofis addons only restyles them. **move huds** is one screen for everything: foecollabs trackers and custom huds, the chat and the chat boxes.
 
 ## level
 
-on fishonmc the vanilla xp bar shows your fishing level. dofis addons hides it (and its number) and shows a level hud instead: your level in its level colour, a progress bar and the percent to the next level. it is a normal custom hud, so you can move it, resize it or rebuild it with `%player.level_colored%`, `%player.level_bar%` and `%player.xp_progress%`. turn the vanilla bar back on in settings.
+on fishonmc the vanilla xp bar shows your fishing level. dofis addons hides it (and its number) because foecollabs bar and level hud show it better. turn the vanilla bar back on in settings.
 
 ## bobber timer
 
@@ -97,15 +87,6 @@ these change only what you see. bobber options are under settings → bobber, th
 - **short fish tooltips**: leaves out the latin name, value, ecosystem and the kg / cm part of fish tooltips
 - **short pet tooltips**: shows maxed stats once and leaves out empty skin, item and trail slots
 
-## bait and events
-
-two more hud presets:
-
-- **bait**: the bait on the rod you are holding and its uses left (gold when low, red when nearly out). values: `%bait.name_colored%`, `%bait.uses%`, `%bait.left%`, `%bait.total%`, `%bait.rarity%`
-- **events**: rain, storms, rainbow, gold rush, blooming oasis and the moons, each with an estimated time left from its chat message. a line only shows while its event is on. values: `%event.rain%`, `%event.gold_rush%`, `%event.blood_moon%` and so on, plus `%event.any%`
-
-there is also a **variant catch** trigger preset (albino!, melanistic!, trophy! ... on your own catches).
-
 ## bobber looks
 
 - **bobber skin**: swap your bobber for one of 10 skins (ocean, gold, emerald, midnight, candy, duck, ember, pearl, star, rainbow). only you see it.
@@ -126,7 +107,7 @@ all of this is in settings under bobber and viewmodel.
 
 ## files
 
-everything lives in `config/dofisaddons/`: `triggers.json`, `huds.json`, `settings.json` and `stats/<your uuid>.json`.
+everything lives in `config/dofisaddons/`: `triggers.json`, `settings.json` and `stats/<your uuid>.json`.
 
 ## look
 

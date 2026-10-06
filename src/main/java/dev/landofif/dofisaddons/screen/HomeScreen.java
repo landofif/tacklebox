@@ -2,7 +2,7 @@ package dev.landofif.dofisaddons.screen;
 
 import dev.landofif.dofisaddons.ui.S24;
 import dev.landofif.dofisaddons.ui.DofiScreen;
-import dev.landofif.dofisaddons.hud.HudStore;
+import dev.landofif.dofisaddons.compat.FoeScreens;
 import dev.landofif.dofisaddons.stats.StatNames;
 import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.trigger.TriggerStore;
@@ -30,8 +30,11 @@ public class HomeScreen extends DofiScreen {
         addDrawableChild(ButtonWidget.builder(entry("chat triggers", TriggerStore.all().size() + " set up"),
                 b -> client.setScreen(new TriggerListScreen(this))).dimensions(x, y, w, 20).build());
         y += 24;
-        addDrawableChild(ButtonWidget.builder(entry("custom huds", HudStore.all().stream().filter(h -> h.enabled).count() + " shown"),
-                b -> client.setScreen(new HudListScreen(this))).dimensions(x, y, w, 20).build());
+        addDrawableChild(ButtonWidget.builder(entry("custom huds", "foecollabs editor"),
+                b -> {
+                    Screen huds = FoeScreens.customHuds(this);
+                    if (huds != null) client.setScreen(huds);
+                }).dimensions(x, y, w, 20).build());
         y += 24;
         long rules = StatsTracker.settings().chatFilters.stream().filter(f -> f.enabled).count();
         long boxes = StatsTracker.settings().chatBoxes.stream().filter(b -> b.enabled).count();

@@ -82,7 +82,10 @@ public class StatsScreen extends DofiScreen {
                             StatsTracker::resetAllTime))
                     .dimensions(left, by, bw, 20).build());
         }
-        addDrawableChild(ButtonWidget.builder(Mono.text("custom huds…"), b -> client.setScreen(new HudListScreen(this)))
+        addDrawableChild(ButtonWidget.builder(Mono.text("custom huds…"), b -> {
+                    net.minecraft.client.gui.screen.Screen huds = dev.landofif.dofisaddons.compat.FoeScreens.customHuds(this);
+                    if (huds != null) client.setScreen(huds);
+                })
                 .dimensions(left + bw + 4, by, bw, 20)
                 .tooltip(Tooltip.of(Mono.text("put any of these numbers on your screen"))).build());
         addDrawableChild(ButtonWidget.builder(Mono.text("done"), b -> close())

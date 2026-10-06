@@ -2,13 +2,10 @@ package dev.landofif.dofisaddons;
 
 /** Small global settings. Saved to {@code config/dofisaddons/settings.json}. */
 public class DofiSettings {
-    /** Set once the old default all-time hud was removed (see HudStore.retireAllTimeDefault). */
-    public boolean allTimeHudRetired = false;
-
     /** Stop the "time fishing" clock after this many seconds without a catch. */
     public int pauseAfterSeconds = 120;
 
-    /** Hide the vanilla XP bar and level number on FishOnMC (the level HUD replaces them). */
+    /** Hide the vanilla XP bar and level number on FishOnMC (foecollabs bar and level hud replace them). */
     public boolean hideVanillaXp = true;
 
     // ---- look (system24 for the whole game, see ui/S24) ----

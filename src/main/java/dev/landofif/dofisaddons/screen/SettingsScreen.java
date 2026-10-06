@@ -134,9 +134,9 @@ public class SettingsScreen extends DofiScreen {
             addDrawableChild(ButtonWidget.builder(Mono.text("foecollab menu"), b -> open(FoeScreens.main(this)))
                     .dimensions(x + w - 2 * bw - 4, 46, bw, 18)
                     .tooltip(Tooltip.of(Mono.text("foecollabs own menu: custom huds, custom buttons, pet calculator and more"))).build());
-            addDrawableChild(ButtonWidget.builder(Mono.text("move huds"), b -> open(FoeScreens.move(this)))
+            addDrawableChild(ButtonWidget.builder(Mono.text("move huds"), b -> client.setScreen(new HudMoveScreen(this)))
                     .dimensions(x + w - bw, 46, bw, 18)
-                    .tooltip(Tooltip.of(Mono.text("drag foecollabs huds into place"))).build());
+                    .tooltip(Tooltip.of(Mono.text("drag every hud, the chat and chat boxes into place"))).build());
         }
         fillRows();
 

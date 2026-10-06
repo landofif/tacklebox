@@ -4,13 +4,9 @@ import dev.landofif.dofisaddons.chat.ChatTweaks;
 import dev.landofif.dofisaddons.display.BobberTimer;
 import dev.landofif.dofisaddons.display.SoundQueue;
 import dev.landofif.dofisaddons.display.TitleOverlay;
-import dev.landofif.dofisaddons.hud.HudRenderer;
-import dev.landofif.dofisaddons.hud.HudStore;
 import dev.landofif.dofisaddons.hud.ServerInfo;
 import dev.landofif.dofisaddons.screen.ChatFilterScreen;
 import dev.landofif.dofisaddons.screen.HomeScreen;
-import dev.landofif.dofisaddons.screen.HudEditScreen;
-import dev.landofif.dofisaddons.screen.HudListScreen;
 import dev.landofif.dofisaddons.screen.HudMoveScreen;
 import dev.landofif.dofisaddons.screen.StatsScreen;
 import dev.landofif.dofisaddons.screen.TriggerEditScreen;
@@ -56,9 +52,7 @@ public final class DofisAddons implements ClientModInitializer {
     public void onInitializeClient() {
         dev.landofif.dofisaddons.menu.FishMenu.register();
         TriggerStore.load();
-        HudStore.load();
         StatsTracker.loadSettings();
-        HudStore.retireAllTimeDefault();
         dev.landofif.dofisaddons.display.FlatLeaves.register();
         dev.landofif.dofisaddons.display.ShortTooltips.register();
         dev.landofif.dofisaddons.compat.FoeLook.register();
@@ -66,7 +60,6 @@ public final class DofisAddons implements ClientModInitializer {
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
             if (!overlay) {
                 StatsTracker.onChat(message);
-                dev.landofif.dofisaddons.hud.EventTracker.onChat(message.getString());
             }
             boolean show = TriggerEngine.onGameMessage(message, overlay);
             return show && (overlay || ChatTweaks.allow(message));
@@ -87,17 +80,15 @@ public final class DofisAddons implements ClientModInitializer {
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> StatsTracker.onJoin());
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             StatsTracker.onLeave();
-            dev.landofif.dofisaddons.hud.EventTracker.clear();
         });
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> StatsTracker.saveAllTime());
 
         HudElementRegistry.addLast(Identifier.of(MOD_ID, "custom_huds"), (context, tickCounter) -> {
             MinecraftClient client = MinecraftClient.getInstance();
             // These screens draw HUD boxes themselves.
-            if (client.options.hudHidden || client.currentScreen instanceof HudMoveScreen || client.currentScreen instanceof HudEditScreen) {
+            if (client.options.hudHidden || client.currentScreen instanceof HudMoveScreen) {
                 return;
             }
-            HudRenderer.renderAll(context);
             BobberTimer.renderHud(context);
         });
         HudElementRegistry.attachElementAfter(net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements.CHAT,
@@ -137,7 +128,7 @@ public final class DofisAddons implements ClientModInitializer {
             dispatcher.register(ClientCommandManager.literal("dofi")
                     .executes(ctx -> open(() -> new HomeScreen(null)))
                     .then(ClientCommandManager.literal("triggers").executes(ctx -> open(() -> new TriggerListScreen(null))))
-                    .then(ClientCommandManager.literal("huds").executes(ctx -> open(() -> new HudListScreen(null))))
+                    .then(ClientCommandManager.literal("huds").executes(ctx -> open(() -> dev.landofif.dofisaddons.compat.FoeScreens.customHuds(null))))
                     .then(ClientCommandManager.literal("stats").executes(ctx -> open(() -> new StatsScreen(null))))
                     .then(ClientCommandManager.literal("chat").executes(ctx -> open(() -> new ChatFilterScreen(null))))
                     .then(ClientCommandManager.literal("debug")
