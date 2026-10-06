@@ -104,7 +104,7 @@ Hook via Fabric `ClientReceiveMessageEvents.ALLOW_GAME` (observe/suppress) and `
 
 **Rare drops**
 - `PET DROP! You pulled ...`: pet drop.
-- `RARE CATCH! You pulled a <N>x ... Shard ...`: shards (count between `a ` and `x `; >1 with Prospecting Amulet).
+- `RARE CATCH! You pulled a <N>x ... Shard ...`: shards (count between `a ` and `x `; >1 with Prospecting Amulet). One shard per climate (l, 2026-10-06): arid, semi-arid, subtropical, oceanic, arctic, savanna, subarctic, continental, monsoon, rainforest, e.g. `Subarctic Shard`.
 - `RARE CATCH! You pulled ... Lightning in a Bottle ...`: only during Thunderstorm.
 - `RARE CATCH! You pulled ... Infusion Capsule ...`: only during Blood Moon.
 - Other rare catch names known from constants: Prospecting Amulet, Bigfoot Fur, Bigfoot Tooth (Witching Hour, Cypress Lake, 12–3 AM in-game, "1 in 300 chance for bigfoot to steal your fish (and leave a gift)").
