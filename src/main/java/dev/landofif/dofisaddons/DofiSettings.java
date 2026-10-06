@@ -69,6 +69,10 @@ public class DofiSettings {
     public int hotbarX = 0;
     public int hotbarY = 0;
     public boolean hotbarBackground = false;
+    public int hotbarScale = 100;
+    /** The selection frame and the offhand box around the hotbar. */
+    public boolean hotbarSelection = true;
+    public boolean hotbarOffhand = true;
     /** Foecollabs equipment hud (armour and rod parts), moved by this much on top of the hotbar's offset. */
     public int equipX = 0;
     public int equipY = 0;

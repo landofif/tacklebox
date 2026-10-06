@@ -47,11 +47,11 @@ public final class FoeMover {
             s.chatY = 0;
         }));
         add.add(new Box(ctx -> {
-            int[] r = {sw() / 2 - 91 + s.hotbarX, sh() - 22 + s.hotbarY, 182, 22};
-            return r;
+            int w = 182 * s.hotbarScale / 100, h = 22 * s.hotbarScale / 100;
+            return new int[]{sw() / 2 - w / 2 + s.hotbarX, sh() - h + s.hotbarY, w, h};
         }, (x, y, r) -> {
-            s.hotbarX = Math.max(-sw() / 2 + 91, Math.min(sw() / 2 - 91, x - (sw() / 2 - 91)));
-            s.hotbarY = Math.max(-sh() + 22, Math.min(0, y - (sh() - 22)));
+            s.hotbarX = Math.max(-sw() / 2 + r[2] / 2, Math.min(sw() / 2 - r[2] / 2, x - (sw() / 2 - r[2] / 2)));
+            s.hotbarY = Math.max(-sh() + r[3], Math.min(0, y - (sh() - r[3])));
         }, null, () -> {
             s.hotbarX = 0;
             s.hotbarY = 0;

@@ -320,9 +320,9 @@ public class PresetsScreen extends DofiScreen {
                 }
             }
             int top = y + 20, bottom = iy - 6;
-            int boxH = bottom - top, boxW = Math.min(w - 8, boxH * 7 / 10);
+            int boxH = bottom - top, boxW = w - 8;
             int mx0 = x + (w - boxW) / 2;
-            InventoryScreen.drawEntity(ctx, mx0, top, mx0 + boxW, bottom, (int) (boxH * 0.34), 0.0625f, mouseX, mouseY, m);
+            InventoryScreen.drawEntity(ctx, mx0, top, mx0 + boxW, bottom, (int) (boxH * 0.47), 0.0625f, mouseX, mouseY, m);
         }
         ItemStack tip = ItemStack.EMPTY;
         int ix = x + (w - rowW) / 2;

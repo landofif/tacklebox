@@ -24,7 +24,12 @@ abstract class InGameHudHotbarMixin {
     private void dofisaddons$move(DrawContext ctx, RenderTickCounter tick, Operation<Void> original) {
         DofiSettings s = DofiSettings.get();
         ctx.getMatrices().pushMatrix();
-        ctx.getMatrices().translate(s.hotbarX, s.hotbarY);
+        float k = s.hotbarScale / 100f;
+        int cx = ctx.getScaledWindowWidth() / 2;
+        int bottom = ctx.getScaledWindowHeight();
+        ctx.getMatrices().translate(cx + s.hotbarX, bottom + s.hotbarY); // grows from the bottom middle
+        ctx.getMatrices().scale(k, k);
+        ctx.getMatrices().translate(-cx, -bottom);
         original.call(ctx, tick);
         ctx.getMatrices().popMatrix();
     }
@@ -32,7 +37,10 @@ abstract class InGameHudHotbarMixin {
     @WrapOperation(method = "renderHotbar", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIII)V"))
     private void dofisaddons$background(DrawContext ctx, RenderPipeline pipeline, Identifier id, int x, int y, int w, int h, Operation<Void> original) {
-        if (id.getPath().equals("hud/hotbar") && !DofiSettings.get().hotbarBackground) {
+        DofiSettings s = DofiSettings.get();
+        String path = id.getPath();
+        if ((path.equals("hud/hotbar") && !s.hotbarBackground) || (path.startsWith("hud/hotbar_selection") && !s.hotbarSelection)
+                || (path.startsWith("hud/hotbar_offhand") && !s.hotbarOffhand)) {
             return;
         }
         original.call(ctx, pipeline, id, x, y, w, h);

@@ -267,6 +267,12 @@ public class SettingsScreen extends DofiScreen {
         header("hotbar");
         toggle("hotbar background", "the box behind the hotbar slots. off leaves just the items and the selection. move the hotbar with move huds.",
                 () -> s.hotbarBackground, v -> s.hotbarBackground = v);
+        slider("hotbar size", "how big the hotbar is. it grows from the bottom middle.", 50, 200, 5, "%", PCT,
+                () -> s.hotbarScale, v -> s.hotbarScale = (int) Math.round(v));
+        toggle("selection box", "the frame around the slot you hold. off leaves only the items.",
+                () -> s.hotbarSelection, v -> s.hotbarSelection = v);
+        toggle("offhand box", "the box next to the hotbar for your offhand item.",
+                () -> s.hotbarOffhand, v -> s.hotbarOffhand = v);
         header("quests left");
         toggle("quests left hud", "quests until your next level and the next level of your location. it learns from /menu, /quests and the compendium. move it with move huds.",
                 () -> s.questsHud, v -> s.questsHud = v);
