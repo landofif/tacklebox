@@ -209,8 +209,8 @@ public final class XpEstimate {
     }
 
     public static void renderHud(DrawContext ctx) {
-        if (StatsTracker.settings().questsHud) {
-            draw(ctx, false);
+        if (StatsTracker.settings().questsHud && dev.landofif.dofisaddons.trigger.TriggerEngine.isOnFishOnMc()) {
+            draw(ctx, true); // dashes until /quests, /travel and some catches have taught it the numbers
         }
     }
 
