@@ -149,7 +149,7 @@ public final class TitleOverlay {
         try {
             context.getMatrices().translate(x, y);
             context.getMatrices().scale(scale, scale);
-            text = Mono.prepare(text, scale, shadow);
+            text = Mono.prepare(Mono.adopt(text), scale, shadow);
             int w = tr.getWidth(text);
             context.drawText(tr, text, -w / 2, -tr.fontHeight / 2, color, shadow);
         } finally {

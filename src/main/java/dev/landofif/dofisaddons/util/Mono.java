@@ -154,6 +154,20 @@ public final class Mono {
 
     private static volatile Converted lastConverted;
 
+    /** Points runs in the default font at the chosen mod font (server glyph fonts stay), so {@link #prepare} can size them. */
+    public static Text adopt(Text text) {
+        if (!custom()) {
+            return text;
+        }
+        MutableText out = Text.empty();
+        text.visit((style, s) -> {
+            boolean plain = StyleSpriteSource.DEFAULT.equals(style.getFont());
+            out.append(Text.literal(s).setStyle(plain ? style.withFont(source(1f)) : style));
+            return Optional.empty();
+        }, Style.EMPTY);
+        return out;
+    }
+
     /** {@link #prepare(Text, int, boolean)} for text drawn at {@code drawScale} in the GUI. */
     public static Text prepare(Text text, float drawScale, boolean shadow) {
         return prepare(text, oversampleFor(drawScale), shadow);
