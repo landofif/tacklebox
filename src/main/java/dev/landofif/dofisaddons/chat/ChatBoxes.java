@@ -200,7 +200,7 @@ public final class ChatBoxes {
         int x = r[0], y = r[1] + 5, w = r[2], h = r[3] - 5;
         State st = state(box);
 
-        int alpha = Math.round((float) (client.options.getTextBackgroundOpacity().getValue() * 0.6 + 0.4) * 255);
+        int alpha = Math.round(client.options.getTextBackgroundOpacity().getValue().floatValue() * 255);
         ctx.fill(x, y, x + w, y + h, alpha << 24 | (S24.HUD_PANEL & 0xFFFFFF));
         Text title = Mono.text((box.name.isBlank() ? "chat" : box.name) + (st.scroll > 0 ? " ↓" + st.scroll : "")).withColor(S24.TEXT_3 & 0xFFFFFF);
         if (highlight) { // the move screen outlines the box so you can find it
