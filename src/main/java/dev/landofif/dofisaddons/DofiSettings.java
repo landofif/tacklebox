@@ -69,6 +69,9 @@ public class DofiSettings {
     public int hotbarX = 0;
     public int hotbarY = 0;
     public boolean hotbarBackground = false;
+    /** Foecollabs equipment hud (armour and rod parts), moved by this much on top of the hotbar's offset. */
+    public int equipX = 0;
+    public int equipY = 0;
 
     // ---- fishonmc menu (see menu/FishMenu) ----
     /** Show the main menu and /travel as the mods own screens instead of the chest gui. */

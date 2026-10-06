@@ -56,6 +56,13 @@ public final class FoeMover {
             s.hotbarX = 0;
             s.hotbarY = 0;
         }));
+        add.add(new Box(ctx -> new int[]{sw() / 2 - 65 + s.hotbarX + s.equipX, sh() - 48 + s.hotbarY + s.equipY, 131, 20}, (x, y, r) -> {
+            s.equipX = x - (sw() / 2 - 65 + s.hotbarX); // foecollabs default place: the row above the hotbar
+            s.equipY = y - (sh() - 48 + s.hotbarY);
+        }, null, () -> {
+            s.equipX = 0;
+            s.equipY = 0;
+        }));
         if (s.questsHud) {
             add.add(new Box(ctx -> XpEstimate.draw(ctx, true), (x, y, r) -> {
                 s.questsX = Math.max(0, Math.min(sw() - 40, x));

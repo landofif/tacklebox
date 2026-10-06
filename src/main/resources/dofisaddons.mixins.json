@@ -10,6 +10,7 @@
     "ChatHudMixin",
     "ChatScreenMixin",
     "EntityInterpolationMixin",
+    "EquipmentHudMixin",
     "EntityRenderManagerMixin",
     "FishingBobberEntityMixin",
     "FishingBobberRendererMixin",
