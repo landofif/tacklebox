@@ -33,6 +33,13 @@ public final class Mono {
     private static final StyleSpriteSource[][] BOLD_SOURCES = new StyleSpriteSource[PREFIX.length][MAX_OVERSAMPLE + 1];
     /** Shadow for mono text drawn straight over the world, where it needs a little contrast. */
     private static final int SOFT_SHADOW = 0x66000000;
+    /** Scale of the gui text being prepared right now (see TextGuiElementRenderStateMixin). */
+    public static float drawScale = 1f;
+
+    /** google sans flex has thick strokes, where even a soft shadow reads as a smear: it gets none. */
+    private static int shadowColor() {
+        return font() == 2 ? 0 : SOFT_SHADOW;
+    }
 
     static {
         for (int f = 0; f < PREFIX.length; f++) {
@@ -116,7 +123,7 @@ public final class Mono {
         if (color != null && isPackShaderColor(color.getRgb())) {
             return style;
         }
-        int i = oversampleFor(1f);
+        int i = oversampleFor(drawScale);
         // Called once per character; consecutive characters share one Style object, so remember the last.
         Converted last = lastConverted;
         if (last != null && last.in == style && last.shadow == shadow && last.oversample == i) {
@@ -124,7 +131,7 @@ public final class Mono {
         }
         Style out = style.withFont(style.isBold() ? BOLD_SOURCES[font()][i] : SOURCES[font()][i]).withBold(false);
         if (shadow && style.getShadowColor() == null) {
-            out = out.withShadowColor(SOFT_SHADOW);
+            out = out.withShadowColor(shadowColor());
         }
         lastConverted = new Converted(style, shadow, i, out);
         return out;
@@ -166,7 +173,7 @@ public final class Mono {
         text.visit((style, s) -> {
             if (isMono(style)) {
                 style = style.withFont(style.isBold() ? BOLD_SOURCES[font()][i] : SOURCES[font()][i]).withBold(false);
-                style = shadow ? style.withShadowColor(SOFT_SHADOW) : style.withoutShadow();
+                style = shadow ? style.withShadowColor(shadowColor()) : style.withoutShadow();
             }
             out.append(Text.literal(isMono(style) ? house(s) : s).setStyle(style));
             return Optional.empty();
