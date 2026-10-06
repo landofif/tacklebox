@@ -89,7 +89,7 @@ dofis addons has no look of its own. its screens, chests and huds use foecollabs
 
 ## settings
 
-one settings screen for both mods: foecollabs categories first, then dofis addons (menus, huds, bobber, world, viewmodel), each a plain list of label and control with a hover tooltip, and a search box over everything. opening foecollabs config from its menu or from mod menu lands here too. **foecollab menu** opens foecollabs own screens (custom huds, custom buttons, pet calculator), and **move huds** its hud mover.
+one settings screen for both mods: foecollabs categories first, then dofis addons (menus, huds, bobber, world, viewmodel), each a plain list of label and control with a hover tooltip, and a search box over everything. a long foecollab category (trackers, other, cosmetics) opens a dropdown of its sections under it when picked, and a click on one shows only that section. a grey heading folds the rows under it when clicked. opening foecollabs config from its menu or from mod menu lands here too. **foecollab menu** opens foecollabs own screens (custom huds, custom buttons, pet calculator), and **move huds** its hud mover.
 
 ## building
 

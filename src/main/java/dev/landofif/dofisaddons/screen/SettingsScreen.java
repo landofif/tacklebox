@@ -17,8 +17,10 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Language;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleFunction;
@@ -55,6 +57,10 @@ public class SettingsScreen extends DofiScreen {
     private final DofiSettings s = DofiSettings.get();
     /** The category shown: "f:" and a foecollab category, or "d:" and one of the mods own. */
     private String key;
+    /** The section of a foecollab category picked in the dropdown under it, or null for the whole category. */
+    private String sub;
+    /** Grey headings the player folded (by their path), so the rows under them are left out. */
+    private final Set<String> collapsed = new HashSet<>();
     private String query = "";
     private TextFieldWidget search;
     private RowListWidget list;
@@ -87,6 +93,12 @@ public class SettingsScreen extends DofiScreen {
             side.addRow(new RowListWidget.Row(List.of(new Label(side.getRowWidth(), Foe.text("foecollab").withColor(Foe.DIM & 0xFFFFFF), 14))));
             for (String c : foe) {
                 side.addRow(new RowListWidget.Row(List.of(category(side, "f:" + c, c))));
+                if (("f:" + c).equals(key)) { // the picked category opens a dropdown of its sections, if it is long
+                    for (String section : foeSections(c, (bottom - TOP - 24) / ROW_H)) {
+                        side.addRow(new RowListWidget.Row(List.of(new Label(6, Text.empty(), 20),
+                                pick(side, section, section.equals(sub) && query.isBlank(), 8, () -> sub = section))));
+                    }
+                }
             }
         }
         side.addRow(new RowListWidget.Row(List.of(new Label(side.getRowWidth(), Foe.text("dofis addons").withColor(Foe.DIM & 0xFFFFFF), 14))));
@@ -130,11 +142,17 @@ public class SettingsScreen extends DofiScreen {
 
     /** A category. The picked one is orange and cannot be clicked again. */
     private ButtonWidget category(RowListWidget side, String id, String label) {
-        boolean picked = id.equals(key) && query.isBlank();
-        ButtonWidget b = ButtonWidget.builder(picked ? Foe.text(label).withColor(Foe.ACCENT & 0xFFFFFF) : Foe.text(label), btn -> {
+        return pick(side, label, id.equals(key) && sub == null && query.isBlank(), 0, () -> {
             key = id;
+            sub = null;
+        });
+    }
+
+    private ButtonWidget pick(RowListWidget side, String label, boolean picked, int indent, Runnable choose) {
+        ButtonWidget b = ButtonWidget.builder(picked ? Foe.text(label).withColor(Foe.ACCENT & 0xFFFFFF) : Foe.text(label), btn -> {
+            choose.run();
             clearAndInit();
-        }).dimensions(0, 0, side.getRowWidth(), 20).build();
+        }).dimensions(0, 0, side.getRowWidth() - indent, 20).build();
         b.active = !picked;
         return b;
     }
@@ -174,13 +192,13 @@ public class SettingsScreen extends DofiScreen {
         java.util.Arrays.fill(path, null);
         java.util.Arrays.fill(shown, false);
         if (searching) {
-            foeRows(null);
+            foeRows(null, null);
             for (Group g : Group.values()) {
                 header(g.label, 0);
                 fill(g);
             }
         } else if (key.startsWith("f:")) {
-            foeRows(key.substring(2));
+            foeRows(key.substring(2), sub);
         } else {
             for (Group g : Group.values()) {
                 if (key.equals("d:" + g.label)) {
@@ -309,19 +327,57 @@ public class SettingsScreen extends DofiScreen {
                 .map(n -> ((FoeConfig.Header) n).label()).toList();
     }
 
-    /** foecollabs settings as rows: one category, or every category while searching ({@code category} null). */
-    private void foeRows(String category) {
+    /**
+     * The sections of a category that earn a dropdown in the sidebar: at least two, and only when the
+     * category has more rows than fit on screen (a short one needs no scrolling, so no dropdown).
+     */
+    private static List<String> foeSections(String category, int fits) {
+        List<String> out = new ArrayList<>();
+        int rows = 0;
         String current = null;
         for (FoeConfig.Node node : FoeConfig.nodes()) {
             if (node instanceof FoeConfig.Header h) {
                 if (h.depth() == 0) {
                     current = h.label();
+                } else if (category.equals(current)) {
+                    rows++;
+                    if (h.depth() == 1) {
+                        out.add(h.label());
+                    }
                 }
-                if (category == null || category.equals(current)) {
+            } else if (category.equals(current)) {
+                rows += ((FoeConfig.Option) node).prefix() == null || ((FoeConfig.Option) node).prefix().isEmpty() ? 1 : 2;
+            }
+        }
+        return rows > fits && out.size() >= 2 ? out : List.of();
+    }
+
+    /**
+     * foecollabs settings as rows: one category, or every category while searching ({@code category} null),
+     * all of it or only one of its sections ({@code section}).
+     */
+    private void foeRows(String category, String section) {
+        String current = null;
+        String currentSection = null;
+        for (FoeConfig.Node node : FoeConfig.nodes()) {
+            if (node instanceof FoeConfig.Header h) {
+                if (h.depth() == 0) {
+                    current = h.label();
+                    currentSection = null;
+                } else if (h.depth() == 1) {
+                    currentSection = h.label();
+                }
+                if ((category == null || category.equals(current)) && (section == null || section.equals(currentSection))) {
                     header(h.label(), h.depth());
                 }
-            } else if (category == null || category.equals(current)) {
-                foeOption((FoeConfig.Option) node);
+            } else {
+                FoeConfig.Option o = (FoeConfig.Option) node;
+                if (o.depth() == 1) {
+                    currentSection = null; // a plain option of the category, outside any section
+                }
+                if ((category == null || category.equals(current)) && (section == null || section.equals(currentSection))) {
+                    foeOption(o);
+                }
             }
         }
     }
@@ -379,16 +435,48 @@ public class SettingsScreen extends DofiScreen {
         for (int i = depth + 1; i < path.length; i++) {
             path[i] = null;
         }
-        if (!searching && depth > 0) {
+        if (!searching && depth > 0 && !folded(depth)) {
             emit(depth);
         }
     }
 
+    private String pathKey(int depth) {
+        StringBuilder k = new StringBuilder();
+        for (int i = 1; i <= depth; i++) {
+            if (path[i] != null) {
+                k.append('/').append(path[i]);
+            }
+        }
+        return k.toString();
+    }
+
+    /** Whether a grey heading above depth {@code below} is folded, so what sits under it is left out. */
+    private boolean folded(int below) {
+        for (int d = 2; d < below && d < path.length; d++) {
+            if (path[d] != null && collapsed.contains(pathKey(d))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void emit(int depth) {
         shown[depth] = true;
-        Text text = Foe.text(path[depth]);
         // headings sit low in their row: tight to the rows below them, with room above (grouping by proximity)
-        list.addRow(new RowListWidget.Row(List.of(new Label(rowW(), depth <= 1 ? text.copy().withColor(Foe.TITLE & 0xFFFFFF) : text.copy().withColor(Foe.DIM & 0xFFFFFF), ROW_H, true))));
+        if (depth <= 1 || searching) {
+            Text text = Foe.text(path[depth]);
+            list.addRow(new RowListWidget.Row(List.of(new Label(rowW(), text.copy().withColor(depth <= 1 ? Foe.TITLE & 0xFFFFFF : Foe.DIM & 0xFFFFFF), ROW_H, true, null))));
+            return;
+        }
+        String k = pathKey(depth); // a grey heading folds when clicked
+        boolean closed = collapsed.contains(k);
+        Text text = Foe.text((closed ? "▸ " : "▾ ") + path[depth]).withColor(Foe.DIM & 0xFFFFFF);
+        list.addRow(new RowListWidget.Row(List.of(new Label(rowW(), text, ROW_H, true, () -> {
+            if (!collapsed.remove(k)) {
+                collapsed.add(k);
+            }
+            refresh();
+        }))));
     }
 
     private boolean matches(String name, String desc) {
@@ -406,6 +494,9 @@ public class SettingsScreen extends DofiScreen {
 
     /** A label on the left, the control on the right; a hover tooltip explains it. */
     private void row(String name, String desc, ClickableWidget control, ClickableWidget... more) {
+        if (!searching && folded(path.length)) {
+            return;
+        }
         if (searching) {
             if (!matches(name, desc)) {
                 return;
@@ -488,25 +579,34 @@ public class SettingsScreen extends DofiScreen {
     /** A line of text in a list: row labels and section titles. */
     private static final class Label extends ClickableWidget {
         private final boolean low;
+        /** What a click does (folding a heading), or null for plain text. */
+        private final Runnable onClick;
 
         Label(int width, Text text, int height) {
-            this(width, text, height, false);
+            this(width, text, height, false, null);
         }
 
-        Label(int width, Text text, int height, boolean low) {
+        Label(int width, Text text, int height, boolean low, Runnable onClick) {
             super(0, 0, width, height, text);
             this.low = low;
+            this.onClick = onClick;
         }
 
         @Override
         protected void renderWidget(DrawContext ctx, int mouseX, int mouseY, float delta) {
             var tr = net.minecraft.client.MinecraftClient.getInstance().textRenderer;
-            ctx.drawTextWithShadow(tr, Language.getInstance().reorder(tr.trimToWidth(getMessage(), width - 4)), getX() + 2, low ? getY() + height - 12 : getY() + (height - 8) / 2, 0xFFFFFFFF);
+            Text text = onClick != null && isHovered() ? getMessage().copy().withColor(Foe.ACCENT & 0xFFFFFF) : getMessage();
+            ctx.drawTextWithShadow(tr, Language.getInstance().reorder(tr.trimToWidth(text, width - 4)), getX() + 2, low ? getY() + height - 12 : getY() + (height - 8) / 2, 0xFFFFFFFF);
         }
 
         @Override
         public boolean mouseClicked(net.minecraft.client.gui.Click click, boolean doubled) {
-            return false;
+            if (onClick == null || !isMouseOver(click.x(), click.y())) {
+                return false;
+            }
+            playDownSound(net.minecraft.client.MinecraftClient.getInstance().getSoundManager());
+            onClick.run();
+            return true;
         }
 
         @Override
