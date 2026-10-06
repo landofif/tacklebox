@@ -222,7 +222,7 @@ public class DofiSettings {
             b.rules.removeIf(java.util.Objects::isNull);
             b.width = Math.max(80, Math.min(600, b.width));
             b.lines = Math.max(1, Math.min(30, b.lines));
-            b.fadeSeconds = Math.max(0, Math.min(600, b.fadeSeconds));
+            b.fadeSeconds = b.fadeSeconds == 0 ? 10 : Math.max(-1, Math.min(600, b.fadeSeconds));
         }
         lineColor &= 0xFFFFFF;
         biteMessageColor &= 0xFFFFFF;

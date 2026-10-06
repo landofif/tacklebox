@@ -21,8 +21,8 @@ public class ChatBox {
     /** Size in gui units: width of the box, and how many lines it shows. */
     public int width = 220;
     public int lines = 5;
-    /** Hide the box this many seconds after its last line while chat is closed (0 = always show). */
-    public int fadeSeconds = 0;
+    /** Hide the box this many seconds after its last line while chat is closed (-1 = always show). */
+    public int fadeSeconds = 10;
 
     public ChatBox() {}
 

@@ -24,7 +24,7 @@ import java.util.List;
 public class ChatBoxScreen extends DofiScreen {
     private static final int RULES_W = 84;
     private static final int FADE_W = 84;
-    private static final int[] FADES = {0, 10, 30, 60, 300};
+    private static final int[] FADES = {-1, 10, 30, 60, 300};
 
     private final Screen parent;
     private final DofiSettings s = StatsTracker.settings();
@@ -104,7 +104,7 @@ public class ChatBoxScreen extends DofiScreen {
     }
 
     private static Text fadeLabel(ChatBox box) {
-        return Mono.text(box.fadeSeconds == 0 ? "always shown" : "fade: " + box.fadeSeconds + "s");
+        return Mono.text(box.fadeSeconds < 0 ? "always shown" : "fade: " + box.fadeSeconds + "s");
     }
 
     @Override
