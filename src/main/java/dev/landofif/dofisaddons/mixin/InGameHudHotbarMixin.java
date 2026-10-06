@@ -39,8 +39,29 @@ abstract class InGameHudHotbarMixin {
     private void dofisaddons$background(DrawContext ctx, RenderPipeline pipeline, Identifier id, int x, int y, int w, int h, Operation<Void> original) {
         DofiSettings s = DofiSettings.get();
         String path = id.getPath();
-        if ((path.equals("hud/hotbar") && !s.hotbarBackground) || (path.startsWith("hud/hotbar_selection") && !s.hotbarSelection)
-                || (path.startsWith("hud/hotbar_offhand") && !s.hotbarOffhand)) {
+        if ((path.equals("hud/hotbar") && !s.hotbarBackground) || (path.startsWith("hud/hotbar_offhand") && !s.hotbarOffhand)) {
+            return;
+        }
+        if (path.startsWith("hud/hotbar_selection") && s.hotbarSelection != DofiSettings.SelectionStyle.FRAME) {
+            int color = 0xFF000000 | s.hotbarSelectColor;
+            double cx = x + w / 2.0, cy = y + h / 2.0;
+            if (s.hotbarSelection == DofiSettings.SelectionStyle.ROUND) {
+                double outer = 9.5, inner = 8;
+                for (int row = (int) -outer; row <= outer; row++) {
+                    double dy = row + 0.5;
+                    double ho = Math.sqrt(Math.max(0, outer * outer - dy * dy));
+                    double hi = Math.abs(dy) >= inner ? 0 : Math.sqrt(inner * inner - dy * dy);
+                    int py = (int) Math.round(cy + dy - 0.5);
+                    if (hi == 0) {
+                        ctx.fill((int) Math.round(cx - ho), py, (int) Math.round(cx + ho), py + 1, color);
+                    } else {
+                        ctx.fill((int) Math.round(cx - ho), py, (int) Math.round(cx - hi), py + 1, color);
+                        ctx.fill((int) Math.round(cx + hi), py, (int) Math.round(cx + ho), py + 1, color);
+                    }
+                }
+            } else if (s.hotbarSelection == DofiSettings.SelectionStyle.SIMPLE) {
+                ctx.fill((int) cx - 8, y + h - 3, (int) cx + 8, y + h - 1, color);
+            }
             return;
         }
         original.call(ctx, pipeline, id, x, y, w, h);

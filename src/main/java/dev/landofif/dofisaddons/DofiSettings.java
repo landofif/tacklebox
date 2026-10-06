@@ -70,8 +70,9 @@ public class DofiSettings {
     public int hotbarY = 0;
     public boolean hotbarBackground = false;
     public int hotbarScale = 100;
-    /** The selection frame and the offhand box around the hotbar. */
-    public boolean hotbarSelection = true;
+    /** How the held hotbar slot is marked, and in what colour; and whether the offhand box shows. */
+    public SelectionStyle hotbarSelection = SelectionStyle.FRAME;
+    public int hotbarSelectColor = 0xFFFFFF;
     public boolean hotbarOffhand = true;
     /** Foecollabs equipment hud (armour and rod parts), moved by this much on top of the hotbar's offset. */
     public int equipX = 0;
@@ -174,6 +175,16 @@ public class DofiSettings {
         }
     }
 
+    public enum SelectionStyle {
+        FRAME("frame"), ROUND("round"), SIMPLE("simple"), NONE("off");
+
+        public final String label;
+
+        SelectionStyle(String label) {
+            this.label = label;
+        }
+    }
+
     public enum SwingStyle {
         NORMAL("normal"), SMOOTH("smooth"), SNAPPY("snappy"), NONE("no swing");
 
@@ -187,6 +198,7 @@ public class DofiSettings {
     public void sanitize() {
         if (bobberSkin == null) bobberSkin = BobberSkin.DEFAULT;
         if (swingStyle == null) swingStyle = SwingStyle.NORMAL;
+        if (hotbarSelection == null) hotbarSelection = SelectionStyle.FRAME;
         if (chatFilters == null) chatFilters = new java.util.ArrayList<>();
         chatFilters.removeIf(java.util.Objects::isNull);
         if (keyCommands == null) keyCommands = new java.util.ArrayList<>();

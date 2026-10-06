@@ -269,8 +269,10 @@ public class SettingsScreen extends DofiScreen {
                 () -> s.hotbarBackground, v -> s.hotbarBackground = v);
         slider("hotbar size", "how big the hotbar is. it grows from the bottom middle.", 50, 200, 5, "%", PCT,
                 () -> s.hotbarScale, v -> s.hotbarScale = (int) Math.round(v));
-        toggle("selection box", "the frame around the slot you hold. off leaves only the items.",
-                () -> s.hotbarSelection, v -> s.hotbarSelection = v);
+        cycle("selected slot", "how the slot you hold is marked: the vanilla frame, a round ring, a simple line under the item, or nothing.",
+                DofiSettings.SelectionStyle.values(), k -> k.label, () -> s.hotbarSelection, v -> s.hotbarSelection = v);
+        color("selected colour", "the colour of the round ring and the simple line. the frame keeps its own.",
+                () -> s.hotbarSelectColor, v -> s.hotbarSelectColor = v);
         toggle("offhand box", "the box next to the hotbar for your offhand item.",
                 () -> s.hotbarOffhand, v -> s.hotbarOffhand = v);
         slider("equipment size", "how big foecollabs armour and rod parts row is. move it with move huds.", 50, 200, 5, "%", PCT,
