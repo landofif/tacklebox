@@ -140,19 +140,32 @@ public class FishMenuScreen extends DofiScreen {
         }
     }
 
-    /** Puts every tile in a column and row: where the player left it, otherwise the first free spot. */
-    private void arrange(int columns) {
+    /**
+     * Puts every tile in a column and row: where the player left it, otherwise where the server had it in the
+     * chest (main menu, so it matches the wiki picture) or the first free spot.
+     */
+    private void arrange(int columns, boolean serverLayout) {
         DofiSettings settings = StatsTracker.settings();
-        cols = columns;
-        int needed = (tiles.size() + cols - 1) / cols;
-        int maxRow = needed - 1;
+        int minCol = 8, maxCol = 0, minRow = 99, maxRow = 0;
+        for (Tile t : tiles) {
+            minCol = Math.min(minCol, t.slot.id % 9);
+            maxCol = Math.max(maxCol, t.slot.id % 9);
+            minRow = Math.min(minRow, t.slot.id / 9);
+            maxRow = Math.max(maxRow, t.slot.id / 9);
+        }
+        if (serverLayout && !tiles.isEmpty()) {
+            cols = maxCol - minCol + 1;
+            rows = maxRow - minRow + 1;
+        } else {
+            cols = columns;
+            rows = Math.max(1, (tiles.size() + cols - 1) / cols);
+        }
         for (Tile t : tiles) {
             int[] saved = settings.menuCells.get(t.key);
             if (saved != null && saved.length == 2) {
-                maxRow = Math.max(maxRow, saved[1]);
+                rows = Math.max(rows, saved[1] + 1);
             }
         }
-        rows = Math.max(1, maxRow + 1);
         cells = new int[tiles.size()][];
         Set<Integer> used = new HashSet<>();
         for (int i = 0; i < tiles.size(); i++) {
@@ -163,13 +176,21 @@ public class FishMenuScreen extends DofiScreen {
         }
         int next = 0;
         for (int i = 0; i < tiles.size(); i++) {
-            if (cells[i] == null) {
-                while (used.contains(next)) {
-                    next++;
-                }
-                used.add(next);
-                cells[i] = new int[]{next % cols, next / cols};
+            if (cells[i] != null) {
+                continue;
             }
+            int id = tiles.get(i).slot.id;
+            int home = serverLayout ? (id / 9 - minRow) * cols + (id % 9 - minCol) : -1;
+            if (home >= 0 && used.add(home)) {
+                cells[i] = new int[]{home % cols, home / cols};
+                continue;
+            }
+            while (used.contains(next)) {
+                next++;
+            }
+            used.add(next);
+            cells[i] = new int[]{next % cols, next / cols};
+            rows = Math.max(rows, cells[i][1] + 1);
         }
     }
 
@@ -277,7 +298,7 @@ public class FishMenuScreen extends DofiScreen {
         int right = width - PAD;
         int panelW = travel ? Math.min(200, width / 3) : 0;
         int areaW = right - PAD - panelW - (travel ? 10 : 0);
-        arrange(travel ? 4 : 5);
+        arrange(4, !travel);
         fit(PAD, TOP, areaW, height - TOP - BAR - 6, travel ? 84 : 66, travel ? 96 : 76, travel ? 1.4f : 2f);
 
         int hover = dragged != null ? -1 : tileAt(mouseX, mouseY);
