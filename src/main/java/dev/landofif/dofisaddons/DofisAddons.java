@@ -49,6 +49,9 @@ public final class DofisAddons implements ClientModInitializer {
     /** Opens /dofi. Right shift by default; change it in options → controls → dofis addons. */
     private static KeyBinding openKey;
 
+    /** Dumps the open screen (title, slots, lore) to a file and the clipboard, see display/DebugDump.gui. F8 by default. */
+    private static KeyBinding dumpKey;
+
     @Override
     public void onInitializeClient() {
         dev.landofif.dofisaddons.menu.FishMenu.register();
@@ -72,6 +75,14 @@ public final class DofisAddons implements ClientModInitializer {
 
         KeyBinding.Category category = KeyBinding.Category.create(Identifier.of(MOD_ID, "main"));
         openKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.dofisaddons.open", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_SHIFT, category));
+
+        dumpKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.dofisaddons.dump_gui", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_F8, category));
+        net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT.register((client, screen, w, h) ->
+                net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.afterKeyPress(screen).register((s, input) -> {
+                    if (dumpKey.matchesKey(input)) {
+                        dev.landofif.dofisaddons.display.DebugDump.gui(s);
+                    }
+                }));
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> StatsTracker.onJoin());
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {

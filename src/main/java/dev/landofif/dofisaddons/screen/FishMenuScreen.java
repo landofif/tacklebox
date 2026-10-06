@@ -11,7 +11,10 @@ import dev.landofif.dofisaddons.ui.S24;
 import dev.landofif.dofisaddons.util.Glyphs;
 import dev.landofif.dofisaddons.util.Mono;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
+import net.minecraft.block.Block;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.DyeColor;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
@@ -77,6 +80,11 @@ public class FishMenuScreen extends DofiScreen {
     }
 
     /** Travel mode is decided by what is in the chest, because the items arrive just after the screen opens. */
+    /** The chest screen this one replaces (its title is what tells which menu it is). */
+    public GenericContainerScreen original() {
+        return original;
+    }
+
     private boolean isTravel() {
         return travel(original);
     }
@@ -132,19 +140,32 @@ public class FishMenuScreen extends DofiScreen {
         }
     }
 
-    /** Puts every tile in a column and row: where the player left it, otherwise the first free spot. */
-    private void arrange(int columns) {
+    /**
+     * Puts every tile in a column and row: where the player left it, otherwise where the server had it in the
+     * chest (main menu, so it matches the wiki picture) or the first free spot.
+     */
+    private void arrange(int columns, boolean serverLayout) {
         DofiSettings settings = StatsTracker.settings();
-        cols = columns;
-        int needed = (tiles.size() + cols - 1) / cols;
-        int maxRow = needed - 1;
+        int minCol = 8, maxCol = 0, minRow = 99, maxRow = 0;
+        for (Tile t : tiles) {
+            minCol = Math.min(minCol, t.slot.id % 9);
+            maxCol = Math.max(maxCol, t.slot.id % 9);
+            minRow = Math.min(minRow, t.slot.id / 9);
+            maxRow = Math.max(maxRow, t.slot.id / 9);
+        }
+        if (serverLayout && !tiles.isEmpty()) {
+            cols = maxCol - minCol + 1;
+            rows = maxRow - minRow + 1;
+        } else {
+            cols = columns;
+            rows = Math.max(1, (tiles.size() + cols - 1) / cols);
+        }
         for (Tile t : tiles) {
             int[] saved = settings.menuCells.get(t.key);
             if (saved != null && saved.length == 2) {
-                maxRow = Math.max(maxRow, saved[1]);
+                rows = Math.max(rows, saved[1] + 1);
             }
         }
-        rows = Math.max(1, maxRow + 1);
         cells = new int[tiles.size()][];
         Set<Integer> used = new HashSet<>();
         for (int i = 0; i < tiles.size(); i++) {
@@ -155,13 +176,21 @@ public class FishMenuScreen extends DofiScreen {
         }
         int next = 0;
         for (int i = 0; i < tiles.size(); i++) {
-            if (cells[i] == null) {
-                while (used.contains(next)) {
-                    next++;
-                }
-                used.add(next);
-                cells[i] = new int[]{next % cols, next / cols};
+            if (cells[i] != null) {
+                continue;
             }
+            int id = tiles.get(i).slot.id;
+            int home = serverLayout ? (id / 9 - minRow) * cols + (id % 9 - minCol) : -1;
+            if (home >= 0 && used.add(home)) {
+                cells[i] = new int[]{home % cols, home / cols};
+                continue;
+            }
+            while (used.contains(next)) {
+                next++;
+            }
+            used.add(next);
+            cells[i] = new int[]{next % cols, next / cols};
+            rows = Math.max(rows, cells[i][1] + 1);
         }
     }
 
@@ -269,7 +298,7 @@ public class FishMenuScreen extends DofiScreen {
         int right = width - PAD;
         int panelW = travel ? Math.min(200, width / 3) : 0;
         int areaW = right - PAD - panelW - (travel ? 10 : 0);
-        arrange(travel ? 4 : 5);
+        arrange(4, !travel);
         fit(PAD, TOP, areaW, height - TOP - BAR - 6, travel ? 84 : 66, travel ? 96 : 76, travel ? 1.4f : 2f);
 
         int hover = dragged != null ? -1 : tileAt(mouseX, mouseY);
@@ -301,17 +330,41 @@ public class FishMenuScreen extends DofiScreen {
         if (t.loc != null) {
             drawLocation(ctx, t, w, h);
         } else {
-            ctx.getMatrices().pushMatrix();
-            ctx.getMatrices().translate((w - 48) / 2f, 8);
-            ctx.getMatrices().scale(3f, 3f);
-            ctx.drawItem(t.stack, 0, 0);
-            ctx.getMatrices().popMatrix();
+            int square = squareColor(t.stack);
+            if (square != 0) { // the quest menus coloured blocks are flat squares, like in foecollab
+                S24.fill(ctx, (int) (w - 48) / 2, 8, 48, 48, square);
+            } else {
+                ctx.getMatrices().pushMatrix();
+                ctx.getMatrices().translate((w - 48) / 2f, 8);
+                ctx.getMatrices().scale(3f, 3f);
+                ctx.drawItem(t.stack, 0, 0);
+                ctx.getMatrices().popMatrix();
+            }
             label(ctx, t.name, w / 2f, 62, w - 8, S24.TEXT_2);
         }
         if (editing) {
             ctx.drawText(textRenderer, Mono.text("↔"), 6, 5, S24.ACCENT, false);
         }
         ctx.getMatrices().popMatrix();
+    }
+
+    /** The colour of a shulker box, concrete or terracotta button (the quest, difficulty and tier pages), or 0 for any other item. */
+    private static int squareColor(ItemStack stack) {
+        String path = Registries.ITEM.getId(stack.getItem()).getPath();
+        if (path.equals("shulker_box")) {
+            return 0xFF976B97; // undyed has no dye colour
+        }
+        if (path.equals("terracotta") || path.endsWith("_terracotta")) {
+            // map colour keeps terracottas muted tone, so blue terracotta differs from blue concrete
+            return 0xFF000000 | Block.getBlockFromItem(stack.getItem()).getDefaultMapColor().color;
+        }
+        for (String suffix : new String[]{"_shulker_box", "_concrete"}) {
+            if (path.endsWith(suffix)) {
+                DyeColor dye = DyeColor.byId(path.substring(0, path.length() - suffix.length()), null);
+                return dye != null ? 0xFF000000 | dye.getEntityColor() : 0;
+            }
+        }
+        return 0;
     }
 
     private void drawLocation(DrawContext ctx, Tile t, float w, float h) {
