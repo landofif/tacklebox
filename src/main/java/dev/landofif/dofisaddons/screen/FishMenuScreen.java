@@ -128,7 +128,7 @@ public class FishMenuScreen extends DofiScreen {
             }
             ItemStack stack = slot.getStack();
             String name = Glyphs.plain(stack.getName()).trim();
-            if (stack.isEmpty() || (name.isEmpty() && stack.getItem().toString().contains("glass_pane"))) {
+            if (stack.isEmpty() || stack.isOf(net.minecraft.item.Items.BREAD) || (name.isEmpty() && stack.getItem().toString().contains("glass_pane"))) {
                 continue; // empty and filler slots
             }
             Locations.Location loc = Locations.byName(name);
@@ -146,16 +146,12 @@ public class FishMenuScreen extends DofiScreen {
      */
     private void arrange(int columns, boolean serverLayout) {
         DofiSettings settings = StatsTracker.settings();
-        int minCol = 8, maxCol = 0, minRow = 99, maxRow = 0;
-        for (Tile t : tiles) {
-            minCol = Math.min(minCol, t.slot.id % 9);
-            maxCol = Math.max(maxCol, t.slot.id % 9);
-            minRow = Math.min(minRow, t.slot.id / 9);
-            maxRow = Math.max(maxRow, t.slot.id / 9);
-        }
+        // the server leaves gaps (filler bread is hidden): squeeze out empty columns and rows
+        List<Integer> usedCols = tiles.stream().map(t -> t.slot.id % 9).distinct().sorted().toList();
+        List<Integer> usedRows = tiles.stream().map(t -> t.slot.id / 9).distinct().sorted().toList();
         if (serverLayout && !tiles.isEmpty()) {
-            cols = maxCol - minCol + 1;
-            rows = maxRow - minRow + 1;
+            cols = usedCols.size();
+            rows = usedRows.size();
         } else {
             cols = columns;
             rows = Math.max(1, (tiles.size() + cols - 1) / cols);
@@ -180,7 +176,7 @@ public class FishMenuScreen extends DofiScreen {
                 continue;
             }
             int id = tiles.get(i).slot.id;
-            int home = serverLayout ? (id / 9 - minRow) * cols + (id % 9 - minCol) : -1;
+            int home = serverLayout ? usedRows.indexOf(id / 9) * cols + usedCols.indexOf(id % 9) : -1;
             if (home >= 0 && used.add(home)) {
                 cells[i] = new int[]{home % cols, home / cols};
                 continue;

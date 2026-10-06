@@ -345,3 +345,11 @@ List of rules → editor with a **"test against text"** box (paste a chat line, 
 
 ### Reuse from FOECollab (as reference, not copied: AGPL)
 `handler/TitleHandler` + `screens/hud/TitleHud` (custom title renderer that blanks the vanilla title), `handler/NotificationSoundHandler` (note-block sound presets), `customhud/PlaceholderEngine` (placeholder/expression language).
+
+## gui dumps, 2026-10-06 (main menu, /travel, fish compendium)
+
+- every menu pads empty slots with `minecraft:bread` named "Bread" (the mod hides them). real buttons are gunpowder, books, player heads and so on.
+- main menu: profile head slot 4, buttons in rows at slots 20-24 and 29-33, bottom row 46, 48-50, 52. lore lines all start with ` 퀃 ` (art glyphs).
+- /travel (title `픁`): 16 location items (glowstone dust) in slots 1-7, 10-16, 19-21, lore has climate, temperature, `fastTravel:1b` custom_data. no level on them.
+- fish compendium location page (title `픂`): same slots, lore `Level: [17] (354.17K/1.46M)`, `Catches: n`, `Runes Discovered: (a/b)`, then small-caps rarity lines `normal -> (14/14)`. progress can exceed the max (lake biwa `11.85M/2.32M`), so progress is clamped.
+- profile head lore: `Fishing Level [274]`, `(1.02M/3.73M)`, power, stats, luck and so on.
