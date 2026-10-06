@@ -164,10 +164,14 @@ public class SettingsScreen extends DofiScreen {
     }
 
     private ButtonWidget pick(RowListWidget side, String label, boolean picked, int indent, Runnable choose) {
-        ButtonWidget b = ButtonWidget.builder(picked ? Foe.text(label).withColor(Foe.ACCENT & 0xFFFFFF) : Foe.text(label), btn -> {
+        Text text = picked ? Foe.text(label).withColor(Foe.ACCENT & 0xFFFFFF) : Foe.text(label);
+        ButtonWidget.PressAction action = btn -> {
             choose.run();
             clearAndInit();
-        }).dimensions(0, 0, side.getRowWidth() - indent, 20).build();
+        };
+        // the dropdown's entries are indented and right aligned, so they read as belonging to the category above
+        ButtonWidget b = indent > 0 ? new SectionButton(side.getRowWidth() - indent, text, action)
+                : ButtonWidget.builder(text, action).dimensions(0, 0, side.getRowWidth(), 20).build();
         b.active = !picked;
         return b;
     }
@@ -586,6 +590,18 @@ public class SettingsScreen extends DofiScreen {
             FoeConfig.save();
         }
         client.setScreen(parent);
+    }
+
+    /** A button whose text sits at the right edge. */
+    private static final class SectionButton extends ButtonWidget {
+        SectionButton(int width, net.minecraft.text.Text text, PressAction action) {
+            super(0, 0, width, 20, text, action, DEFAULT_NARRATION_SUPPLIER);
+        }
+
+        @Override
+        protected void drawLabel(net.minecraft.client.font.DrawnTextConsumer consumer) {
+            consumer.text(net.minecraft.client.font.Alignment.RIGHT, getX() + getWidth() - 6, getY() + (getHeight() - 8) / 2, getMessage());
+        }
     }
 
     /** A line of text in a list: row labels and section titles. */
