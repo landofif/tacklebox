@@ -229,8 +229,6 @@ public class SettingsScreen extends DofiScreen {
                 () -> s.flatMenus, v -> s.flatMenus = v);
         toggle("flat buttons", "every button in one plain colour instead of the bevelled texture, in the game menus too.",
                 () -> s.flatButtons, v -> s.flatButtons = v);
-        slider("screen opacity", "how see-through the box of the mods own screens is.", 20, 100, 5, "%", PCT,
-                () -> s.screenOpacity, v -> s.screenOpacity = (int) Math.round(v));
         toggle("fishonmc menu", "the main menu and /travel as a screen with big icons you can rearrange. off gives the chest back.",
                 () -> s.fishMenu, v -> s.fishMenu = v);
         slider("menu size", "how much of the screen the fishonmc menu fills.", 40, 100, 1, "%", PCT,

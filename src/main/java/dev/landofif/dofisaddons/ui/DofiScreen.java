@@ -1,13 +1,12 @@
 package dev.landofif.dofisaddons.ui;
 
-import dev.landofif.dofisaddons.DofiSettings;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
 /**
- * Base for the mod's screens: the normal game background with the screen framed as one foecollab box,
- * the title inside its top edge. Contents lay out inside {@link #vx} .. {@link #vh}.
+ * Base for the mod's screens: the normal game background with no frame around it, the title in the top
+ * left corner. Contents lay out inside {@link #vx} .. {@link #vh}.
  */
 public abstract class DofiScreen extends Screen {
     private static final int MARGIN = 4;
@@ -41,6 +40,6 @@ public abstract class DofiScreen extends Screen {
     @Override
     public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.renderBackground(ctx, mouseX, mouseY, delta);
-        Foe.panel(ctx, vx() + MARGIN, vy() + MARGIN, vw() - MARGIN * 2, vh() - MARGIN * 2, title, DofiSettings.get().screenOpacity);
+        Foe.title(ctx, vx() + MARGIN, vy() + MARGIN, title);
     }
 }
