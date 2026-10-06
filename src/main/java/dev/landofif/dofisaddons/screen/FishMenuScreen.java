@@ -120,6 +120,26 @@ public class FishMenuScreen extends DofiScreen {
 
     // ---- model ----
 
+    /** The level from the tooltip, which the compendium has and /travel does not: remembered, and used when it is missing. */
+    private static FishMenu.Info levelOf(Locations.Location loc, ItemStack stack) {
+        FishMenu.Info info = FishMenu.info(stack);
+        var saved = StatsTracker.settings().locationLevels;
+        if (info.level() >= 0) {
+            String now = info.level() + "|" + info.progress();
+            if (!now.equals(saved.get(loc.id()))) {
+                saved.put(loc.id(), now);
+                StatsTracker.saveSettings();
+            }
+            return info;
+        }
+        String old = saved.get(loc.id());
+        if (old == null) {
+            return info;
+        }
+        String[] f = old.split("\\|");
+        return new FishMenu.Info(Integer.parseInt(f[0]), Float.parseFloat(f[1]));
+    }
+
     private void collect() {
         tiles.clear();
         for (Slot slot : handler.slots) {
@@ -133,7 +153,7 @@ public class FishMenuScreen extends DofiScreen {
             }
             Locations.Location loc = Locations.byName(name);
             tiles.add(new Tile(slot, stack, name, loc != null ? "travel:" + loc.id() : "main:" + name,
-                    loc, loc != null ? FishMenu.info(stack) : null));
+                    loc, loc != null ? levelOf(loc, stack) : null));
         }
         if (isTravel()) {
             tiles.removeIf(t -> t.loc == null); // only the sixteen locations; other buttons stay in the chest view
