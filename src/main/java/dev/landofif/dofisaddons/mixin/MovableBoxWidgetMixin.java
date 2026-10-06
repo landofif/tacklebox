@@ -17,8 +17,10 @@ abstract class MovableBoxWidgetMixin {
     @WrapOperation(method = "method_48579", remap = false, require = 0,
             at = @At(value = "INVOKE", target = "Lnet/minecraft/class_332;method_25294(IIIII)V", remap = false))
     private void dofisaddons$outline(DrawContext ctx, int x1, int y1, int x2, int y2, int color, Operation<Void> original) {
-        if (x2 - x1 > 2 && y2 - y1 > 2) { // the fill; the thin alignment lines are left out
+        if (x2 - x1 > 2 && y2 - y1 > 2) { // the fill
             ctx.drawStrokedRectangle(x1, y1, x2 - x1, y2 - y1, ((ClickableWidget) (Object) this).isHovered() ? Foe.ACCENT : Foe.FAINT);
+        } else {
+            original.call(ctx, x1, y1, x2, y2, color); // the alignment line stays as foecollab draws it
         }
     }
 }
