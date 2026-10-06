@@ -17,13 +17,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  */
 @Mixin(targets = "io.github.foecollab.handler.ItemMarkerHandler")
 abstract class ItemMarkerHandlerMixin {
-    /** Set while the slot being drawn never gets a circle: the first and last hotbar slot and the helmet slot. */
+    /** Set while the slot being drawn never gets a circle: menu slots, the first and last hotbar slot and the helmet slot. */
     private static boolean dofisaddons$skip;
 
     @Inject(method = "renderItemMarkerBackground(Lnet/minecraft/class_332;Lnet/minecraft/class_1735;)V", at = @At("HEAD"), remap = false, require = 0)
     private void dofisaddons$plainSlot(DrawContext ctx, Slot slot, CallbackInfo ci) {
         int i = slot.getIndex();
-        dofisaddons$skip = slot.inventory instanceof PlayerInventory && (i == 0 || i == 8 || i == 39); // always filled, nothing special
+        // only your own items get one, not the buttons and fillers of a menu; and not the slots that are always full
+        dofisaddons$skip = !(slot.inventory instanceof PlayerInventory) || i == 0 || i == 8 || i == 39;
     }
 
     @Inject(method = "renderItemMarkerBackground(Lnet/minecraft/class_332;Lnet/minecraft/class_1799;II)V", at = @At("HEAD"), remap = false, require = 0)
