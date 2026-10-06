@@ -49,6 +49,9 @@ public class PresetsScreen extends DofiScreen {
 
     /** A piece reduced to what is needed to draw it: item, dye colour, custom model data and item model. */
     private static String pack(ItemStack st) {
+        if (st.isEmpty()) {
+            return "empty";
+        }
         var dye = st.get(DataComponentTypes.DYED_COLOR);
         var cmd = st.get(DataComponentTypes.CUSTOM_MODEL_DATA);
         var model = st.get(DataComponentTypes.ITEM_MODEL);
@@ -58,6 +61,9 @@ public class PresetsScreen extends DofiScreen {
     }
 
     private static ItemStack unpack(String text) {
+        if (text.equals("empty")) {
+            return ItemStack.EMPTY;
+        }
         String[] f = (text + " ").split("\\|", -1);
         ItemStack st = new ItemStack(Registries.ITEM.get(net.minecraft.util.Identifier.of(f[0])));
         if (!f[1].isEmpty()) {
@@ -170,7 +176,9 @@ public class PresetsScreen extends DofiScreen {
             List<ItemStack> pieces = new ArrayList<>();
             for (int i = slot.id + 1; i % 9 != 0 && i < handler.slots.size(); i++) {
                 ItemStack st = handler.slots.get(i).getStack();
-                if (!st.isEmpty() && !st.isOf(Items.BREAD)) {
+                if (st.isOf(Items.GUNPOWDER) && List.of("reel", "pole", "line").contains(data(st, "type"))) {
+                    pieces.add(ItemStack.EMPTY); // an empty part slot in a parts preset
+                } else if (!st.isEmpty() && !st.isOf(Items.BREAD)) {
                     pieces.add(st.copy());
                 }
             }
@@ -297,9 +305,9 @@ public class PresetsScreen extends DofiScreen {
         ctx.drawText(textRenderer, label, x + (w - textRenderer.getWidth(label)) / 2, y + 6, hover ? accent() : S24.TEXT_2, false);
 
         boolean armor = c.pieces.stream().anyMatch(s -> armorSlot(s) != null);
-        int iconSize = armor ? 16 : Math.max(16, Math.min(40, (w - 12) / Math.max(1, c.pieces.size())));
+        int iconSize = armor ? 16 : Math.max(16, Math.min(Math.min(h - 40, 56), (w - 16 - 4 * c.pieces.size()) / Math.max(1, c.pieces.size())));
         int rowW = c.pieces.size() * iconSize + (c.pieces.size() - 1) * 4;
-        int iy = y + h - iconSize - 8;
+        int iy = armor ? y + h - iconSize - 8 : y + (h - iconSize) / 2 + 6; // parts sit in the middle, armor under the model
         if (armor) {
             OtherClientPlayerEntity m = models.computeIfAbsent(c.preset, id -> new OtherClientPlayerEntity(client.world, client.player.getGameProfile()));
             m.getDataTracker().set(net.minecraft.entity.PlayerLikeEntity.PLAYER_MODE_CUSTOMIZATION_ID,
@@ -321,6 +329,11 @@ public class PresetsScreen extends DofiScreen {
         ItemStack tip = ItemStack.EMPTY;
         int ix = x + (w - rowW) / 2;
         for (ItemStack p : c.pieces) {
+            if (p.isEmpty()) { // empty part slot: just a faint box
+                S24.outline(ctx, ix, iy, iconSize, iconSize, S24.BORDER);
+                ix += iconSize + 4;
+                continue;
+            }
             ctx.getMatrices().pushMatrix();
             ctx.getMatrices().translate(ix, iy);
             ctx.getMatrices().scale(iconSize / 16f, iconSize / 16f);
