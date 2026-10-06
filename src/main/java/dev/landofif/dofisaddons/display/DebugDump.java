@@ -46,7 +46,7 @@ public final class DebugDump {
         LoreComponent lore = stack.get(DataComponentTypes.LORE);
         if (lore != null) {
             for (Text line : lore.lines()) {
-                say("lore: " + ShortTooltips.escape(line.getString()), Formatting.GRAY);
+                say("lore: " + escape(line.getString()), Formatting.GRAY);
             }
         }
         NbtComponent custom = stack.get(DataComponentTypes.CUSTOM_DATA);
@@ -57,11 +57,13 @@ public final class DebugDump {
         return 1;
     }
 
-    /** Arms a one-shot print of the next tooltip you hover, before and after shortening. */
-    public static int nextTooltip() {
-        ShortTooltips.dumpNext = true;
-        say("hover an item: its tooltip will be printed line by line.", Formatting.AQUA);
-        return 1;
+    /** Private-use and other non-ascii characters as \\uXXXX, so glyphs show up in a dump. */
+    private static String escape(String s) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            sb.append(c < 0x20 || c > 0x7E ? String.format(java.util.Locale.ROOT, "\\u%04X", (int) c) : String.valueOf(c));
+        }
+        return sb.toString();
     }
 
     /**
@@ -77,7 +79,7 @@ public final class DebugDump {
         if (screen instanceof FishMenuScreen) {
             out.append("shown as the mods menu screen over the chest above\n");
         }
-        out.append("title text=\"").append(ShortTooltips.escape(title.getString())).append("\"\n");
+        out.append("title text=\"").append(escape(title.getString())).append("\"\n");
         out.append("title plain=\"").append(Glyphs.plain(title)).append("\" menuName=").append(Glyphs.menuName(title)).append('\n');
         ScreenHandler handler = client.player == null ? null : client.player.currentScreenHandler;
         if (handler != null && handler != client.player.playerScreenHandler) {
@@ -88,11 +90,11 @@ public final class DebugDump {
                 }
                 ItemStack stack = slot.getStack();
                 out.append("\nslot ").append(slot.id).append(' ').append(Registries.ITEM.getId(stack.getItem())).append(" x").append(stack.getCount()).append('\n');
-                out.append("  name=\"").append(ShortTooltips.escape(stack.getName().getString())).append("\"\n");
+                out.append("  name=\"").append(escape(stack.getName().getString())).append("\"\n");
                 LoreComponent lore = stack.get(DataComponentTypes.LORE);
                 if (lore != null) {
                     for (Text line : lore.lines()) {
-                        out.append("  lore=\"").append(ShortTooltips.escape(line.getString())).append("\"\n");
+                        out.append("  lore=\"").append(escape(line.getString())).append("\"\n");
                     }
                 }
                 NbtComponent custom = stack.get(DataComponentTypes.CUSTOM_DATA);

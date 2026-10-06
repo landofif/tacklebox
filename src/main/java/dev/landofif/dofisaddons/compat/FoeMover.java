@@ -4,7 +4,6 @@ import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.chat.ChatBox;
 import dev.landofif.dofisaddons.chat.ChatBoxes;
 import dev.landofif.dofisaddons.hud.XpEstimate;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.ui.Foe;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Click;
@@ -38,7 +37,7 @@ public final class FoeMover {
 
     /** A drag box for each of the mods huds that is on. */
     public static List<ClickableWidget> boxes() {
-        DofiSettings s = StatsTracker.settings();
+        DofiSettings s = DofiSettings.get();
         List<ClickableWidget> add = new ArrayList<>();
         add.add(new Box(ctx -> chat(ctx), (x, y, r) -> {
             s.chatX = Math.max(0, Math.min(sw() - r[2], x));
@@ -85,7 +84,7 @@ public final class FoeMover {
     /** Where the default chat is now, drawn as a plain box (mirrors ChatHud's own layout): x, y, width, height. */
     private static int[] chat(DrawContext ctx) {
         GameOptions o = MinecraftClient.getInstance().options;
-        DofiSettings s = StatsTracker.settings();
+        DofiSettings s = DofiSettings.get();
         double scale = o.getChatScale().getValue();
         int lineH = (int) (9 * (o.getChatLineSpacing().getValue() + 1.0));
         int lines = Math.max(1, ChatHud.getHeight(o.getChatHeightUnfocused().getValue()) / lineH);

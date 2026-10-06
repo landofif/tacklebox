@@ -3,7 +3,7 @@
   "id": "dofisaddons",
   "version": "${version}",
   "name": "dofis addons",
-  "description": "an addon for foecollab on fishonmc: chat triggers with your own titles and sounds, session and all-time fishing stats, a quests left hud, chat boxes, a bobber timer, and one settings screen for both mods. display only, no automation.",
+  "description": "an addon for foecollab on fishonmc: chat triggers with your own titles and sounds, a quests left hud, chat boxes, bobber and world tweaks, and one settings screen for both mods. display only, no automation.",
   "authors": [
     "landofif"
   ],

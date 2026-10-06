@@ -3,7 +3,6 @@ package dev.landofif.dofisaddons.screen;
 import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.menu.FishMenu;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.util.Glyphs;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
@@ -189,7 +188,7 @@ public class PresetsScreen extends DofiScreen {
         if (cards.isEmpty()) {
             return;
         }
-        var cache = StatsTracker.settings().presetCache;
+        var cache = DofiSettings.get().presetCache;
         boolean dirty = false;
         for (Card c : cards) { // remember what the page showed, so the other page can be drawn without opening it
             List<String> now = c.pieces.stream().map(PresetsScreen::pack).toList();
@@ -199,7 +198,7 @@ public class PresetsScreen extends DofiScreen {
             }
         }
         if (dirty) {
-            StatsTracker.saveSettings();
+            DofiSettings.save();
         }
         String filter = cards.get(0).filter;
         int first = cards.stream().mapToInt(Card::preset).min().getAsInt();
@@ -279,7 +278,7 @@ public class PresetsScreen extends DofiScreen {
         }
         for (int i = 0; i < Math.min(others.size(), n); i++) { // the other page, greyed out, click to go there
             int x = cardX + i * (cardW + gap);
-            drawCard(ctx, others.get(i), x, otherY, cardW, otherH, false, -1, -1, StatsTracker.settings().presetsOtherBg);
+            drawCard(ctx, others.get(i), x, otherY, cardW, otherH, false, -1, -1, DofiSettings.get().presetsOtherBg);
             ctx.fill(x, otherY, x + cardW, otherY + otherH, 0x80000000);
         }
         if (!tip.isEmpty()) {
@@ -357,6 +356,6 @@ public class PresetsScreen extends DofiScreen {
 
     @Override
     protected int sizePct() {
-        return StatsTracker.settings().presetsSize;
+        return DofiSettings.get().presetsSize;
     }
 }

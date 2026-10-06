@@ -1,7 +1,6 @@
 package dev.landofif.dofisaddons.input;
 
 import dev.landofif.dofisaddons.DofiSettings;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 
@@ -24,7 +23,7 @@ public final class KeyCommands {
     private KeyCommands() {}
 
     public static void tick(MinecraftClient client) {
-        DofiSettings s = StatsTracker.settings();
+        DofiSettings s = DofiSettings.get();
         if (s == null || s.keyCommands.isEmpty()) {
             return;
         }

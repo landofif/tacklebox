@@ -1,7 +1,6 @@
 package dev.landofif.dofisaddons.display;
 
 import dev.landofif.dofisaddons.DofiSettings;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.VertexConsumer;
@@ -24,7 +23,7 @@ public final class BobberLooks {
 
     /** The layer (texture) for the bobber being drawn right now. */
     public static RenderLayer bobberLayer() {
-        DofiSettings s = StatsTracker.settings();
+        DofiSettings s = DofiSettings.get();
         DofiSettings.BobberSkin skin = drawingMine || s.skinEveryone ? s.bobberSkin : DofiSettings.BobberSkin.DEFAULT;
         RenderLayer layer = LAYERS.computeIfAbsent(skin, k -> RenderLayers.entityCutout(k.texture == null
                 ? VANILLA
@@ -35,7 +34,7 @@ public final class BobberLooks {
 
     /** Wraps the fishing line drawing so your line uses your colour. The bobber itself is left alone. */
     public static OrderedRenderCommandQueue.Custom wrap(RenderLayer layer, OrderedRenderCommandQueue.Custom custom) {
-        DofiSettings s = StatsTracker.settings();
+        DofiSettings s = DofiSettings.get();
         if (!drawingMine || !s.customLineColor || layer == lastBobberLayer) {
             return custom;
         }

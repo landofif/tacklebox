@@ -1,7 +1,7 @@
 package dev.landofif.dofisaddons.compat;
 
+import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.DofisAddons;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.TranslatableTextContent;
@@ -25,7 +25,7 @@ public final class FoeScreens {
 
     /** Opens the hud mover from {@code from}, saving the mods settings first. */
     public static void openMover(Screen from) {
-        StatsTracker.saveSettings();
+        DofiSettings.save();
         Screen mover = move(from);
         if (mover != null) {
             MinecraftClient.getInstance().setScreen(mover);

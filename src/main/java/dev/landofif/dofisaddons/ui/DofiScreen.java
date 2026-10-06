@@ -1,6 +1,6 @@
 package dev.landofif.dofisaddons.ui;
 
-import dev.landofif.dofisaddons.stats.StatsTracker;
+import dev.landofif.dofisaddons.DofiSettings;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -41,6 +41,6 @@ public abstract class DofiScreen extends Screen {
     @Override
     public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.renderBackground(ctx, mouseX, mouseY, delta);
-        Foe.panel(ctx, vx() + MARGIN, vy() + MARGIN, vw() - MARGIN * 2, vh() - MARGIN * 2, title, StatsTracker.settings().screenOpacity);
+        Foe.panel(ctx, vx() + MARGIN, vy() + MARGIN, vw() - MARGIN * 2, vh() - MARGIN * 2, title, DofiSettings.get().screenOpacity);
     }
 }

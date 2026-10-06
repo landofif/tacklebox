@@ -1,6 +1,6 @@
 package dev.landofif.dofisaddons.mixin;
 
-import dev.landofif.dofisaddons.stats.StatsTracker;
+import dev.landofif.dofisaddons.DofiSettings;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class LivingEntityMixin {
     @Inject(method = "getHandSwingDuration", at = @At("RETURN"), cancellable = true, require = 0)
     private void dofisaddons$swingDuration(CallbackInfoReturnable<Integer> cir) {
-        double slow = StatsTracker.settings().swingSlowness;
+        double slow = DofiSettings.get().swingSlowness;
         if (slow != 1.0 && (Object) this == MinecraftClient.getInstance().player) {
             cir.setReturnValue(Math.max(1, (int) Math.round(cir.getReturnValue() * slow)));
         }

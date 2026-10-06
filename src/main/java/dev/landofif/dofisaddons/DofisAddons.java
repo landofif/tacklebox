@@ -1,16 +1,14 @@
 package dev.landofif.dofisaddons;
 
 import dev.landofif.dofisaddons.chat.ChatTweaks;
-import dev.landofif.dofisaddons.display.BobberTimer;
 import dev.landofif.dofisaddons.display.SoundQueue;
 import dev.landofif.dofisaddons.display.TitleOverlay;
 import dev.landofif.dofisaddons.hud.ServerInfo;
+import dev.landofif.dofisaddons.hud.XpEstimate;
 import dev.landofif.dofisaddons.screen.ChatFilterScreen;
-import dev.landofif.dofisaddons.screen.HomeScreen;
-import dev.landofif.dofisaddons.screen.StatsScreen;
+import dev.landofif.dofisaddons.screen.SettingsScreen;
 import dev.landofif.dofisaddons.screen.TriggerEditScreen;
 import dev.landofif.dofisaddons.screen.TriggerListScreen;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.trigger.TriggerEngine;
 import dev.landofif.dofisaddons.trigger.TriggerStore;
 import net.fabricmc.api.ClientModInitializer;
@@ -22,7 +20,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
@@ -51,13 +48,12 @@ public final class DofisAddons implements ClientModInitializer {
     public void onInitializeClient() {
         dev.landofif.dofisaddons.menu.FishMenu.register();
         TriggerStore.load();
-        StatsTracker.loadSettings();
+        DofiSettings.load();
         dev.landofif.dofisaddons.display.FlatLeaves.register();
-        dev.landofif.dofisaddons.display.ShortTooltips.register();
 
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
             if (!overlay) {
-                StatsTracker.onChat(message);
+                XpEstimate.onChat(message);
             }
             boolean show = TriggerEngine.onGameMessage(message, overlay);
             return show && (overlay || ChatTweaks.allow(message));
@@ -75,11 +71,10 @@ public final class DofisAddons implements ClientModInitializer {
                     }
                 }));
 
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> StatsTracker.onJoin());
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
-            StatsTracker.onLeave();
+            DofiSettings.save(); // what the quests left hud learned
         });
-        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> StatsTracker.saveAllTime());
+        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> DofiSettings.save());
 
         HudElementRegistry.addLast(Identifier.of(MOD_ID, "custom_huds"), (context, tickCounter) -> {
             MinecraftClient client = MinecraftClient.getInstance();
@@ -87,8 +82,7 @@ public final class DofisAddons implements ClientModInitializer {
             if (client.options.hudHidden || dev.landofif.dofisaddons.compat.FoeMover.isMover(client.currentScreen)) {
                 return;
             }
-            BobberTimer.renderHud(context);
-            dev.landofif.dofisaddons.hud.XpEstimate.renderHud(context);
+            XpEstimate.renderHud(context);
         });
         HudElementRegistry.attachElementAfter(net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements.CHAT,
                 Identifier.of(MOD_ID, "chat_boxes"), (context, tickCounter) -> {
@@ -104,19 +98,15 @@ public final class DofisAddons implements ClientModInitializer {
             }
             TitleOverlay.render(context);
         });
-        WorldRenderEvents.AFTER_ENTITIES.register(BobberTimer::renderWorld);
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             SoundQueue.tick();
             ServerInfo.tick(client);
-            StatsTracker.tick(client);
-            dev.landofif.dofisaddons.hud.XpEstimate.tick(client);
-            BobberTimer.tick(client);
+            XpEstimate.tick(client);
             dev.landofif.dofisaddons.input.KeyCommands.tick(client);
-            dev.landofif.dofisaddons.display.BiteWatch.tick(client);
             while (openKey.wasPressed()) {
                 if (client.currentScreen == null) {
-                    client.setScreen(new HomeScreen(null));
+                    client.setScreen(SettingsScreen.dofis(null));
                 }
             }
             if (pendingScreen != null) {
@@ -127,14 +117,12 @@ public final class DofisAddons implements ClientModInitializer {
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("dofi")
-                    .executes(ctx -> open(() -> new HomeScreen(null)))
+                    .executes(ctx -> open(() -> SettingsScreen.dofis(null)))
                     .then(ClientCommandManager.literal("triggers").executes(ctx -> open(() -> new TriggerListScreen(null))))
                     .then(ClientCommandManager.literal("huds").executes(ctx -> open(() -> dev.landofif.dofisaddons.compat.FoeScreens.customHuds(null))))
-                    .then(ClientCommandManager.literal("stats").executes(ctx -> open(() -> new StatsScreen(null))))
                     .then(ClientCommandManager.literal("chat").executes(ctx -> open(() -> new ChatFilterScreen(null))))
                     .then(ClientCommandManager.literal("debug")
-                            .then(ClientCommandManager.literal("item").executes(ctx -> dev.landofif.dofisaddons.display.DebugDump.heldItem()))
-                            .then(ClientCommandManager.literal("tooltip").executes(ctx -> dev.landofif.dofisaddons.display.DebugDump.nextTooltip())))
+                            .then(ClientCommandManager.literal("item").executes(ctx -> dev.landofif.dofisaddons.display.DebugDump.heldItem())))
                     .then(ClientCommandManager.literal("move").executes(ctx -> open(() -> dev.landofif.dofisaddons.compat.FoeScreens.move(null)))));
             dispatcher.register(ClientCommandManager.literal("triggers").executes(ctx -> open(() -> new TriggerListScreen(null))));
         });

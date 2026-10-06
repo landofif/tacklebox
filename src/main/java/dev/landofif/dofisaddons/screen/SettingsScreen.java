@@ -3,7 +3,6 @@ package dev.landofif.dofisaddons.screen;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.compat.FoeConfig;
 import dev.landofif.dofisaddons.compat.FoeScreens;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.ui.Foe;
 import net.minecraft.client.gui.DrawContext;
@@ -38,7 +37,7 @@ import java.util.function.Supplier;
 public class SettingsScreen extends DofiScreen {
     /** The mods own categories. */
     private enum Group {
-        GENERAL("general"), HUDS("huds"), BOBBER("bobber"), WORLD("world"), VIEWMODEL("viewmodel");
+        MENUS("menus"), HUDS("huds"), BOBBER("bobber"), WORLD("world"), VIEWMODEL("viewmodel");
 
         final String label;
 
@@ -47,13 +46,13 @@ public class SettingsScreen extends DofiScreen {
         }
     }
 
+    private static final DoubleFunction<String> PCT = v -> String.format(Locale.ROOT, "%.0f%%", v);
     private static final int ROW_H = 24;
-    private static final int SIDE_W = 120;
     private static final int LEFT = 14;
     private static final int TOP = 28;
 
     private final Screen parent;
-    private final DofiSettings s = StatsTracker.settings();
+    private final DofiSettings s = DofiSettings.get();
     /** The category shown: "f:" and a foecollab category, or "d:" and one of the mods own. */
     private String key;
     private String query = "";
@@ -68,20 +67,21 @@ public class SettingsScreen extends DofiScreen {
         super(Foe.text("settings"));
         this.parent = parent;
         List<String> foe = FoeConfig.available() ? foeCategories() : List.of();
-        this.key = foe.isEmpty() ? "d:" + Group.GENERAL.label : "f:" + foe.get(0);
+        this.key = foe.isEmpty() ? "d:" + Group.MENUS.label : "f:" + foe.get(0);
     }
 
     /** Opened on the mods own settings. */
     public static SettingsScreen dofis(Screen parent) {
         SettingsScreen screen = new SettingsScreen(parent);
-        screen.key = "d:" + Group.GENERAL.label;
+        screen.key = "d:" + Group.MENUS.label;
         return screen;
     }
 
     @Override
     protected void init() {
         int bottom = height - 36;
-        RowListWidget side = new RowListWidget(client, LEFT, TOP, SIDE_W, bottom - TOP, 22);
+        int sideW = Math.max(84, Math.min(120, width / 4)); // narrower on small windows, so the rows keep their room
+        RowListWidget side = new RowListWidget(client, LEFT, TOP, sideW, bottom - TOP, 22);
         List<String> foe = FoeConfig.available() ? foeCategories() : List.of();
         if (!foe.isEmpty()) {
             side.addRow(new RowListWidget.Row(List.of(new Label(side.getRowWidth(), Foe.text("foecollab").withColor(Foe.DIM & 0xFFFFFF), 14))));
@@ -93,9 +93,13 @@ public class SettingsScreen extends DofiScreen {
         for (Group g : Group.values()) {
             side.addRow(new RowListWidget.Row(List.of(category(side, "d:" + g.label, g.label))));
         }
+        side.addRow(new RowListWidget.Row(List.of(new Label(side.getRowWidth(), Foe.text("screens").withColor(Foe.DIM & 0xFFFFFF), 14))));
+        side.addRow(new RowListWidget.Row(List.of(screenButton(side, "chat triggers", () -> new TriggerListScreen(this)))));
+        side.addRow(new RowListWidget.Row(List.of(screenButton(side, "chat", () -> new ChatFilterScreen(this)))));
+        side.addRow(new RowListWidget.Row(List.of(screenButton(side, "key commands", () -> new KeyCommandScreen(this)))));
         addDrawableChild(side);
 
-        int lx = LEFT + SIDE_W + 8;
+        int lx = LEFT + sideW + 8;
         int lw = width - LEFT - lx;
         search = new TextFieldWidget(textRenderer, lx, TOP, lw - 14, 18, Foe.text("search"));
         search.setMaxLength(64);
@@ -111,7 +115,7 @@ public class SettingsScreen extends DofiScreen {
         addDrawableChild(list);
         fillRows();
 
-        int bw = 100;
+        int bw = Math.min(100, (width - LEFT * 2 - 8) / 3);
         int x = (width - (bw * 3 + 8)) / 2;
         addDrawableChild(ButtonWidget.builder(Foe.text("move huds"), b -> FoeScreens.openMover(this))
                 .dimensions(x, height - 30, bw, 20)
@@ -124,18 +128,25 @@ public class SettingsScreen extends DofiScreen {
         addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close()).dimensions(x + (bw + 4) * 2, height - 30, bw, 20).build());
     }
 
+    /** A category. The picked one is orange and cannot be clicked again. */
     private ButtonWidget category(RowListWidget side, String id, String label) {
-        ButtonWidget b = ButtonWidget.builder(Foe.text(label), btn -> {
+        boolean picked = id.equals(key) && query.isBlank();
+        ButtonWidget b = ButtonWidget.builder(picked ? Foe.text(label).withColor(Foe.ACCENT & 0xFFFFFF) : Foe.text(label), btn -> {
             key = id;
             clearAndInit();
         }).dimensions(0, 0, side.getRowWidth(), 20).build();
-        b.active = !id.equals(key) || !query.isBlank();
+        b.active = !picked;
         return b;
+    }
+
+    /** Opens one of the mods own screens from the list. */
+    private ButtonWidget screenButton(RowListWidget side, String label, Supplier<Screen> screen) {
+        return ButtonWidget.builder(Foe.text(label), btn -> open(screen.get())).dimensions(0, 0, side.getRowWidth(), 20).build();
     }
 
     private void open(Screen screen) {
         if (screen != null) {
-            StatsTracker.saveSettings();
+            DofiSettings.save();
             FoeConfig.save();
             client.setScreen(screen);
         }
@@ -184,7 +195,7 @@ public class SettingsScreen extends DofiScreen {
 
     private void fill(Group g) {
         switch (g) {
-            case GENERAL -> general();
+            case MENUS -> menus();
             case HUDS -> huds();
             case BOBBER -> bobber();
             case WORLD -> world();
@@ -194,157 +205,99 @@ public class SettingsScreen extends DofiScreen {
 
     // ------------------------------------------------------------------ the mods settings
 
-    private void general() {
-        header("level", 1);
-        toggle("hide vanilla xp bar",
-                "on fishonmc the xp bar shows your fishing level. this hides it and its number so foecollabs level hud can take its place.",
-                () -> s.hideVanillaXp, v -> s.hideVanillaXp = v);
-        header("stats", 1);
-        slider("pause fishing clock after",
-                "the time fishing clock (and fish per hour) stops when you havent caught anything for this long, so afk time doesnt count.",
-                10, 600, 10, "s", null,
-                () -> s.pauseAfterSeconds, v -> s.pauseAfterSeconds = (int) v);
-        header("menus", 1);
-        toggle("simple menus",
-                "draws chests, your inventory and fishonmc menus as one box with no slot boxes. this hides the menu art from the fishonmc resource pack.",
+    private void menus() {
+        header("menus");
+        toggle("simple menus", "chests, your inventory and fishonmc menus as one plain box without slot boxes. hides the menu art from the server pack.",
                 () -> s.flatMenus, v -> s.flatMenus = v);
-        toggle("fishonmc menu",
-                "shows the main menu (book in the 9th slot, /menu) and /travel as a screen of dofis addons with big icons you can rearrange. turn it off to get the chest back.",
+        toggle("fishonmc menu", "the main menu and /travel as a screen with big icons you can rearrange. off gives the chest back.",
                 () -> s.fishMenu, v -> s.fishMenu = v);
-        slider("menu size", "how much of the screen the fishonmc menu takes.", 40, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
+        slider("menu size", "how much of the screen the fishonmc menu fills.", 40, 100, 1, "%", PCT,
                 () -> s.menuSize, v -> s.menuSize = (int) Math.round(v));
-        toggle("presets screen",
-                "shows /presets as a wardrobe of cards with player models. turn it off to get the chest back.",
+        header("presets");
+        toggle("presets screen", "/presets as a wardrobe of cards with player models. off gives the chest back.",
                 () -> s.presetsMenu, v -> s.presetsMenu = v);
-        slider("presets size", "how much of the screen the presets screen takes.", 40, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
+        slider("presets size", "how much of the screen the presets screen fills.", 40, 100, 1, "%", PCT,
                 () -> s.presetsSize, v -> s.presetsSize = (int) Math.round(v));
-        toggle("presets other page background", "draws the card boxes behind the dimmed presets of the other page. off by default, so only the models show.",
+        toggle("other page boxes", "draws the card boxes behind the dimmed presets of the other page. off shows only the models.",
                 () -> s.presetsOtherBg, v -> s.presetsOtherBg = v);
     }
 
     private void huds() {
-        header("huds", 1);
-        toggle("quests left hud",
-                "a small box with the estimated quests until your next level and the next level of the location you are at. it learns as you play and reads the /quests menu and the compendium locations. move it in foecollabs hud mover.",
+        header("quests left");
+        toggle("quests left hud", "quests until your next level and the next level of your location. it learns from /menu, /quests and the compendium. move it with move huds.",
                 () -> s.questsHud, v -> s.questsHud = v);
-        slider("hud opacity", "how see-through the mods huds are: quests left and the chat boxes.", 10, 100, 5, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
+        header("see-through");
+        slider("hud opacity", "how see-through the quests left hud and the chat boxes are.", 10, 100, 5, "%", PCT,
                 () -> s.hudOpacity, v -> s.hudOpacity = (int) Math.round(v));
-        slider("screen opacity", "how see-through the box of the mods screens is, this one too.", 20, 100, 5, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
+        slider("screen opacity", "how see-through the box of the mods screens is.", 20, 100, 5, "%", PCT,
                 () -> s.screenOpacity, v -> s.screenOpacity = (int) Math.round(v));
     }
 
     private void bobber() {
-            header("timer");
-            cycle("bobber timer",
-                    "shows how long your line has been in the water. changes colour as the wait gets long, and says bite! when something bites. display only.",
-                    DofiSettings.BobberMode.values(), m -> m.label, () -> s.bobberTimer, v -> s.bobberTimer = v);
-            color("timer colour", "the colour of the timer while the wait is still short.",
-                    () -> s.bobberColor, v -> s.bobberColor = v);
-            slider("warn after", "the timer switches to the warn colour after this many seconds. 0 = never.",
-                    0, 60, 1, "s", v -> v == 0 ? "never" : String.format(Locale.ROOT, "%.0fs", v),
-                    () -> s.bobberWarnSeconds, v -> s.bobberWarnSeconds = v);
-            color("warn colour", "the colour of the timer once it passes the warn time.",
-                    () -> s.bobberWarnColor, v -> s.bobberWarnColor = v);
-            slider("slow after", "the timer switches to the slow colour after this many seconds. 0 = never.",
-                    0, 60, 1, "s", v -> v == 0 ? "never" : String.format(Locale.ROOT, "%.0fs", v),
-                    () -> s.bobberSlowSeconds, v -> s.bobberSlowSeconds = v);
-            color("slow colour", "the colour of the timer once it passes the slow time.",
-                    () -> s.bobberSlowColor, v -> s.bobberSlowColor = v);
-            color("bite colour", "the colour of the timer once something bites.",
-                    () -> s.bobberBiteColor, v -> s.bobberBiteColor = v);
-            toggle("show bite!", "puts bite! in front of the time when something bites. the colour still changes when this is off.",
-                    () -> s.bobberShowBite, v -> s.bobberShowBite = v);
-            slider("decimals", "how many digits after the point. 0 shows whole seconds.",
-                    0, 2, 1, "", v -> String.format(Locale.ROOT, "%.0f", v),
-                    () -> s.bobberDecimals, v -> s.bobberDecimals = (int) Math.round(v));
-            slider("timer size", "how big the timer is. 1 = normal.", 0.5, 3, 0.05, "x", null,
-                    () -> s.bobberScale, v -> s.bobberScale = v);
-            slider("height above bobber", "how many blocks above the bobber the timer floats. above bobber mode only.",
-                    0, 3, 0.05, " blocks", null, () -> s.bobberHeight, v -> s.bobberHeight = v);
-            slider("background", "how solid the box behind the timer above the bobber is. 0 = no box.",
-                    0, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
-                    () -> s.bobberBacking, v -> s.bobberBacking = (int) Math.round(v));
-            toggle("show through walls", "keeps the timer above the bobber visible behind blocks and water.",
-                    () -> s.bobberThroughWalls, v -> s.bobberThroughWalls = v);
-            slider("crosshair offset", "how far below the crosshair the timer sits. under crosshair mode only. negative is above.",
-                    -60, 60, 1, "", v -> String.format(Locale.ROOT, "%.0f", v),
-                    () -> s.bobberCrosshairY, v -> s.bobberCrosshairY = (int) Math.round(v));
-            header("bite");
-            toggle("bite message", "shows a short message in the middle of the screen when your own fish bites.",
-                    () -> s.biteMessage, v -> s.biteMessage = v);
-            text("message text", "what the bite message says.", () -> s.biteMessageText, v -> s.biteMessageText = v);
-            color("message colour", "the colour of the bite message.",
-                    () -> s.biteMessageColor, v -> s.biteMessageColor = v);
-            header("bobber");
-            toggle("still bobber", "holds your bobber still on the water instead of bobbing up and down. it still dips when a fish bites.",
-                    () -> s.stillBobber, v -> s.stillBobber = v);
-            toggle("smooth cast", "on a laggy connection your cast can jump back and fly the path again. this shows your own cast flying smoothly. where it lands stays exact.",
-                    () -> s.smoothCast, v -> s.smoothCast = v);
-            toggle("hide other bobbers", "hides other players bobbers and their lines, on your screen only.",
-                    () -> s.hideOtherBobbers, v -> s.hideOtherBobbers = v);
-            header("skin");
-            cycle("bobber skin", "swaps the look of your bobber. only you see it, other players still see the normal one.",
-                    DofiSettings.BobberSkin.values(), k -> k.label, () -> s.bobberSkin, v -> s.bobberSkin = v);
-            toggle("skin every bobber", "also uses your skin for other players bobbers, on your screen only.",
-                    () -> s.skinEveryone, v -> s.skinEveryone = v);
-            header("line");
-            toggle("custom line colour", "colours your own fishing line. other lines stay normal.",
-                    () -> s.customLineColor, v -> s.customLineColor = v);
-            color("line colour", "the colour of your fishing line. click to pick it.",
-                    () -> s.lineColor, v -> s.lineColor = v);
+        header("bobber");
+        toggle("still bobber", "keeps your bobber still on the water. it still dips on a bite.",
+                () -> s.stillBobber, v -> s.stillBobber = v);
+        toggle("smooth cast", "on a laggy connection your cast flies smoothly instead of jumping back. the landing spot stays exact.",
+                () -> s.smoothCast, v -> s.smoothCast = v);
+        toggle("hide other bobbers", "hides other players bobbers and their lines.",
+                () -> s.hideOtherBobbers, v -> s.hideOtherBobbers = v);
+        header("skin");
+        cycle("bobber skin", "swaps your bobber for a skin. only you see it.",
+                DofiSettings.BobberSkin.values(), k -> k.label, () -> s.bobberSkin, v -> s.bobberSkin = v);
+        toggle("skin every bobber", "uses your skin on other players bobbers too, on your screen only.",
+                () -> s.skinEveryone, v -> s.skinEveryone = v);
+        header("line");
+        toggle("custom line colour", "colours your own fishing line.",
+                () -> s.customLineColor, v -> s.customLineColor = v);
+        color("line colour", "the colour of your fishing line.",
+                () -> s.lineColor, v -> s.lineColor = v);
     }
 
     private void world() {
-            header("nametags");
-            toggle("hide my nametag", "hides the rank, name and power tag the server puts over your own head. other players still see it.",
-                    () -> s.hideOwnNametag, v -> s.hideOwnNametag = v);
-            toggle("hide all nametags", "hides every players nametag on your screen, the servers and the vanilla one.",
-                    () -> s.hideAllNametags, v -> s.hideAllNametags = v);
-            header("clutter");
-            toggle("hide xp popups", "hides the +66xp line above the hotbar after each catch.",
-                    () -> s.hideXpPopups, v -> s.hideXpPopups = v);
-            toggle("flat leaves", "draws leaves flat like vanilla instead of the 3d leaves from the fishonmc pack. reloads resources when you change it.",
-                    () -> s.flatLeaves, v -> {
-                        if (s.flatLeaves != v) {
-                            s.flatLeaves = v;
-                            client.reloadResources();
-                        }
-                    });
-            header("tooltips");
-            toggle("short fish tooltips", "leaves out the latin name, value, ecosystem and the kg / cm part of caught fish tooltips.",
-                    () -> s.shortFishTooltips, v -> s.shortFishTooltips = v);
-            toggle("short pet tooltips", "shows maxed stats once (+175 instead of +175/+175) and leaves out empty skin, item and trail slots.",
-                    () -> s.shortPetTooltips, v -> s.shortPetTooltips = v);
+        header("nametags");
+        toggle("hide my nametag", "hides the rank, name and power tag over your own head. others still see it.",
+                () -> s.hideOwnNametag, v -> s.hideOwnNametag = v);
+        toggle("hide all nametags", "hides every players nametag, the servers and the vanilla one.",
+                () -> s.hideAllNametags, v -> s.hideAllNametags = v);
+        header("clutter");
+        toggle("hide xp popups", "hides the +66xp line above the hotbar after a catch.",
+                () -> s.hideXpPopups, v -> s.hideXpPopups = v);
+        toggle("flat leaves", "draws leaves flat like vanilla instead of the packs 3d leaves. reloads resources.",
+                () -> s.flatLeaves, v -> {
+                    if (s.flatLeaves != v) {
+                        s.flatLeaves = v;
+                        client.reloadResources();
+                    }
+                });
     }
 
     private void viewmodel() {
-            header("held item");
-            toggle("custom viewmodel", "changes how big your held item is and where it sits on screen. turn off to go back to normal.",
-                    () -> s.viewmodel, v -> s.viewmodel = v);
-            slider("size", "how big the held item is. 1 = normal.", 0.1, 3, 0.05, "x", null,
-                    () -> s.vmScale, v -> s.vmScale = v);
-            slider("left / right", "moves the item sideways. mirrored for your off hand.", -1, 1, 0.05, "", null,
-                    () -> s.vmX, v -> s.vmX = v);
-            slider("up / down", "moves the item up or down.", -1, 1, 0.05, "", null,
-                    () -> s.vmY, v -> s.vmY = v);
-            slider("forward / back", "moves the item closer or further away. negative is further.", -1, 1, 0.05, "", null,
-                    () -> s.vmZ, v -> s.vmZ = v);
-            slider("tilt", "tilts the item forward or back, in degrees.", -180, 180, 1, "°", null,
-                    () -> s.vmRotX, v -> s.vmRotX = v);
-            slider("turn", "turns the item left or right, in degrees.", -180, 180, 1, "°", null,
-                    () -> s.vmRotY, v -> s.vmRotY = v);
-            slider("roll", "rolls the item sideways, in degrees.", -180, 180, 1, "°", null,
-                    () -> s.vmRotZ, v -> s.vmRotZ = v);
-            toggle("no switch dip", "stops the item from dipping down when you switch slots or use it.",
-                    () -> s.vmNoEquipDip, v -> s.vmNoEquipDip = v);
-            header("swing");
-            cycle("swing style",
-                    "how your hand swings. smooth eases in and out, snappy moves fast at the start, no swing only turns the item around its own centre without moving it. only you see it.",
-                    DofiSettings.SwingStyle.values(), w -> w.label, () -> s.swingStyle, v -> s.swingStyle = v);
-            slider("swing length", "how long one swing takes. 1 = normal, 2 = twice as slow, 0.5 = twice as fast. only changes how it looks.",
-                    0.25, 4, 0.05, "x", null, () -> s.swingSlowness, v -> s.swingSlowness = v);
-            slider("swing turn", "with no swing, how far the item turns. 100% is the full vanilla turn, 0% keeps it still.",
-                    0, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v), () -> s.swingTurn, v -> s.swingTurn = v);
+        header("held item");
+        toggle("custom viewmodel", "changes the size and place of your held item. off is vanilla.",
+                () -> s.viewmodel, v -> s.viewmodel = v);
+        slider("size", "how big the held item is. 1 = normal.", 0.1, 3, 0.05, "x", null,
+                () -> s.vmScale, v -> s.vmScale = v);
+        slider("left / right", "moves the item sideways. mirrored for your off hand.", -1, 1, 0.05, "", null,
+                () -> s.vmX, v -> s.vmX = v);
+        slider("up / down", "moves the item up or down.", -1, 1, 0.05, "", null,
+                () -> s.vmY, v -> s.vmY = v);
+        slider("forward / back", "moves the item closer or further away.", -1, 1, 0.05, "", null,
+                () -> s.vmZ, v -> s.vmZ = v);
+        slider("tilt", "tilts the item forward or back, in degrees.", -180, 180, 1, "°", null,
+                () -> s.vmRotX, v -> s.vmRotX = v);
+        slider("turn", "turns the item left or right, in degrees.", -180, 180, 1, "°", null,
+                () -> s.vmRotY, v -> s.vmRotY = v);
+        slider("roll", "rolls the item sideways, in degrees.", -180, 180, 1, "°", null,
+                () -> s.vmRotZ, v -> s.vmRotZ = v);
+        toggle("no switch dip", "stops the dip when you switch slots or use the item.",
+                () -> s.vmNoEquipDip, v -> s.vmNoEquipDip = v);
+        header("swing");
+        cycle("swing style", "how your hand swings. no swing only turns the item in place.",
+                DofiSettings.SwingStyle.values(), w -> w.label, () -> s.swingStyle, v -> s.swingStyle = v);
+        slider("swing length", "how long one swing takes. 1 = normal, 2 = twice as slow.",
+                0.25, 4, 0.05, "x", null, () -> s.swingSlowness, v -> s.swingSlowness = v);
+        slider("swing turn", "with no swing, how far the item turns. 100% is vanilla, 0% keeps it still.",
+                0, 100, 1, "%", PCT, () -> s.swingTurn, v -> s.swingTurn = v);
     }
 
     // ------------------------------------------------------------------ foecollab
@@ -432,7 +385,8 @@ public class SettingsScreen extends DofiScreen {
     private void emit(int depth) {
         shown[depth] = true;
         Text text = Foe.text(path[depth]);
-        list.addRow(new RowListWidget.Row(List.of(new Label(rowW(), depth <= 1 ? text.copy().withColor(Foe.TITLE & 0xFFFFFF) : text.copy().withColor(Foe.DIM & 0xFFFFFF), 20))));
+        // headings sit low in their row: tight to the rows below them, with room above (grouping by proximity)
+        list.addRow(new RowListWidget.Row(List.of(new Label(rowW(), depth <= 1 ? text.copy().withColor(Foe.TITLE & 0xFFFFFF) : text.copy().withColor(Foe.DIM & 0xFFFFFF), ROW_H, true))));
     }
 
     private boolean matches(String name, String desc) {
@@ -522,7 +476,7 @@ public class SettingsScreen extends DofiScreen {
 
     @Override
     public void close() {
-        StatsTracker.saveSettings();
+        DofiSettings.save();
         if (FoeConfig.available()) {
             FoeConfig.save();
         }
@@ -531,14 +485,21 @@ public class SettingsScreen extends DofiScreen {
 
     /** A line of text in a list: row labels and section titles. */
     private static final class Label extends ClickableWidget {
+        private final boolean low;
+
         Label(int width, Text text, int height) {
+            this(width, text, height, false);
+        }
+
+        Label(int width, Text text, int height, boolean low) {
             super(0, 0, width, height, text);
+            this.low = low;
         }
 
         @Override
         protected void renderWidget(DrawContext ctx, int mouseX, int mouseY, float delta) {
             var tr = net.minecraft.client.MinecraftClient.getInstance().textRenderer;
-            ctx.drawTextWithShadow(tr, Language.getInstance().reorder(tr.trimToWidth(getMessage(), width - 4)), getX() + 2, getY() + (height - 8) / 2, 0xFFFFFFFF);
+            ctx.drawTextWithShadow(tr, Language.getInstance().reorder(tr.trimToWidth(getMessage(), width - 4)), getX() + 2, low ? getY() + height - 12 : getY() + (height - 8) / 2, 0xFFFFFFFF);
         }
 
         @Override

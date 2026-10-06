@@ -1,6 +1,6 @@
 package dev.landofif.dofisaddons.display;
 
-import dev.landofif.dofisaddons.stats.StatsTracker;
+import dev.landofif.dofisaddons.DofiSettings;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
@@ -20,7 +20,7 @@ public final class SmoothCast {
     private SmoothCast() {}
 
     public static boolean suppress(Entity entity) {
-        if (entity == null || !(entity instanceof FishingBobberEntity) || !StatsTracker.settings().smoothCast) {
+        if (entity == null || !(entity instanceof FishingBobberEntity) || !DofiSettings.get().smoothCast) {
             return false;
         }
         ClientPlayerEntity player = MinecraftClient.getInstance().player;

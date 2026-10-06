@@ -2,7 +2,6 @@ package dev.landofif.dofisaddons.mixin;
 
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.display.Holograms;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.Frustum;
@@ -31,7 +30,7 @@ abstract class EntityRenderManagerMixin {
 
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     private void dofisaddons$cull(Entity entity, Frustum frustum, double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
-        DofiSettings s = StatsTracker.settings();
+        DofiSettings s = DofiSettings.get();
         ClientPlayerEntity self = MinecraftClient.getInstance().player;
 
         if (s.hideOtherBobbers && entity instanceof FishingBobberEntity bobber) {

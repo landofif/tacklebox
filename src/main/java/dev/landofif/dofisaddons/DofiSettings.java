@@ -1,12 +1,62 @@
 package dev.landofif.dofisaddons;
 
-/** Small global settings. Saved to {@code config/dofisaddons/settings.json}. */
-public class DofiSettings {
-    /** Stop the "time fishing" clock after this many seconds without a catch. */
-    public int pauseAfterSeconds = 120;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
+import net.fabricmc.loader.api.FabricLoader;
 
-    /** Hide the vanilla XP bar and level number on FishOnMC (foecollabs bar and level hud replace them). */
-    public boolean hideVanillaXp = true;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+
+/** The mods settings, one {@code config/dofisaddons/settings.json}. Read them with {@link #get()}. */
+public class DofiSettings {
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static DofiSettings current = new DofiSettings();
+
+    public static DofiSettings get() {
+        return current;
+    }
+
+    public static Path dir() {
+        return FabricLoader.getInstance().getConfigDir().resolve(DofisAddons.MOD_ID);
+    }
+
+    public static void load() {
+        Path path = dir().resolve("settings.json");
+        current = new DofiSettings();
+        if (Files.isRegularFile(path)) {
+            try {
+                DofiSettings read = GSON.fromJson(Files.readString(path, StandardCharsets.UTF_8), DofiSettings.class);
+                if (read != null) {
+                    current = read;
+                }
+            } catch (IOException | JsonParseException e) {
+                DofisAddons.LOGGER.error("Could not read {}; keeping a backup and starting fresh", path, e);
+                try {
+                    Files.copy(path, path.resolveSibling("settings.json.broken"), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException ignored) {
+                    // nothing more we can do
+                }
+            }
+        }
+        current.sanitize();
+    }
+
+    public static void save() {
+        current.sanitize();
+        Path path = dir().resolve("settings.json");
+        try {
+            Files.createDirectories(path.getParent());
+            Path tmp = path.resolveSibling("settings.json.tmp");
+            Files.writeString(tmp, GSON.toJson(current), StandardCharsets.UTF_8);
+            Files.move(tmp, path, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (IOException e) {
+            DofisAddons.LOGGER.error("Could not save {}", path, e);
+        }
+    }
 
     // ---- look (foecollabs, see ui/Foe) ----
     /** Chests, the inventory and fishonmc menus as one box with no slot boxes (drops the server's menu art). */
@@ -19,6 +69,11 @@ public class DofiSettings {
     public boolean questsHud = true;
     public int questsX = 4;
     public int questsY = 70;
+    /** What the quests left hud has read in game (hud/XpEstimate): xp per quest, the /menu profile, location levels, fishing xp per level. */
+    public double questXp, questLxp;
+    public double[] profile;
+    public java.util.Map<String, double[]> locLevels = new java.util.LinkedHashMap<>();
+    public java.util.Map<String, Double> need = new java.util.LinkedHashMap<>();
     /** The /presets wardrobe screen, and for both custom guis: size in percent of the screen. */
     public boolean presetsMenu = true;
     /** Preset rows seen on /presets, kept between sessions so the other page can be drawn: "armor:6" to its pieces as "item|color|floats|strings|model". */
@@ -49,37 +104,6 @@ public class DofiSettings {
     /** Keys that run a command when pressed in game, see input/KeyCommands. */
     public java.util.List<dev.landofif.dofisaddons.input.KeyCommands.Entry> keyCommands = new java.util.ArrayList<>();
 
-    // ---- bobber timer ----
-    public BobberMode bobberTimer = BobberMode.ABOVE_BOBBER;
-    /** Turn the timer text the warn colour after this many seconds (0 = never). */
-    public double bobberWarnSeconds = 13;
-    /** Turn the timer text the slow colour after this many seconds (0 = never). */
-    public double bobberSlowSeconds = 20;
-    /** RGB of the timer text: normal, warn, slow, and once something bites. */
-    public int bobberColor = 0xEEEEEE;
-    public int bobberWarnColor = 0xD7B65E;
-    public int bobberSlowColor = 0xDF7A9B;
-    public int bobberBiteColor = 0x3BB693;
-    /** Show "bite!" in front of the time once the server announces a bite. */
-    public boolean bobberShowBite = true;
-    /** Digits after the point (0 to 2). */
-    public int bobberDecimals = 1;
-    /** Size of the timer text, 1 = normal. */
-    public double bobberScale = 1.0;
-    /** Blocks above the bobber (above bobber mode). */
-    public double bobberHeight = 0.75;
-    /** Opacity of the box behind the timer above the bobber, 0 to 100. */
-    public int bobberBacking = 33;
-    /** Show the timer above the bobber through blocks and water. */
-    public boolean bobberThroughWalls = true;
-    /** Gui units below the crosshair (under crosshair mode). */
-    public int bobberCrosshairY = 12;
-
-    /** Show a short message in the middle of the screen when your fish bites. */
-    public boolean biteMessage = false;
-    public String biteMessageText = "fish on!";
-    public int biteMessageColor = 0x3BB693;
-
     // ---- bobber behaviour (only you see these) ----
     /** Hold the bobber still on the water instead of bobbing (it still dips on a bite). */
     public boolean stillBobber = true;
@@ -97,10 +121,6 @@ public class DofiSettings {
     public boolean hideXpPopups = false;
     /** Draw leaves flat like vanilla instead of the server packs 3d leaves. */
     public boolean flatLeaves = false;
-    /** Trim caught fish tooltips: latin name, value, ecosystem, metric units. */
-    public boolean shortFishTooltips = false;
-    /** Trim pet tooltips: maxed stat pairs and empty skin / item / trail slots. */
-    public boolean shortPetTooltips = false;
 
     // ---- bobber looks (only you see these) ----
     public BobberSkin bobberSkin = BobberSkin.DEFAULT;
@@ -151,22 +171,7 @@ public class DofiSettings {
         }
     }
 
-    public enum BobberMode {
-        ABOVE_BOBBER("above bobber"), UNDER_CROSSHAIR("under crosshair"), OFF("off");
-
-        public final String label;
-
-        BobberMode(String label) {
-            this.label = label;
-        }
-
-        public BobberMode next() {
-            return values()[(ordinal() + 1) % values().length];
-        }
-    }
-
     public void sanitize() {
-        if (bobberTimer == null) bobberTimer = BobberMode.ABOVE_BOBBER;
         if (bobberSkin == null) bobberSkin = BobberSkin.DEFAULT;
         if (swingStyle == null) swingStyle = SwingStyle.NORMAL;
         if (chatFilters == null) chatFilters = new java.util.ArrayList<>();
@@ -187,28 +192,16 @@ public class DofiSettings {
             b.fadeSeconds = b.fadeSeconds == 0 ? 10 : Math.max(-1, Math.min(600, b.fadeSeconds));
         }
         lineColor &= 0xFFFFFF;
-        biteMessageColor &= 0xFFFFFF;
-        if (biteMessageText == null) biteMessageText = "";
         vmScale = Math.max(0.1, Math.min(3, vmScale));
         swingSlowness = Math.max(0.25, Math.min(4, swingSlowness));
         swingTurn = Math.max(0, Math.min(100, swingTurn));
-        pauseAfterSeconds = Math.max(10, Math.min(1800, pauseAfterSeconds));
-        bobberSlowSeconds = Math.max(0, Math.min(120, bobberSlowSeconds));
-        bobberWarnSeconds = Math.max(0, Math.min(120, bobberWarnSeconds));
-        bobberColor &= 0xFFFFFF;
+        if (locLevels == null) locLevels = new java.util.LinkedHashMap<>();
+        if (need == null) need = new java.util.LinkedHashMap<>();
         if (locationLevels == null) locationLevels = new java.util.LinkedHashMap<>();
         if (presetCache == null) presetCache = new java.util.LinkedHashMap<>();
         menuSize = Math.max(40, Math.min(100, menuSize));
         hudOpacity = Math.max(10, Math.min(100, hudOpacity));
         screenOpacity = Math.max(20, Math.min(100, screenOpacity));
         presetsSize = Math.max(40, Math.min(100, presetsSize));
-        bobberWarnColor &= 0xFFFFFF;
-        bobberSlowColor &= 0xFFFFFF;
-        bobberBiteColor &= 0xFFFFFF;
-        bobberDecimals = Math.max(0, Math.min(2, bobberDecimals));
-        bobberScale = Math.max(0.5, Math.min(3, bobberScale));
-        bobberHeight = Math.max(0, Math.min(3, bobberHeight));
-        bobberBacking = Math.max(0, Math.min(100, bobberBacking));
-        bobberCrosshairY = Math.max(-120, Math.min(120, bobberCrosshairY));
     }
 }

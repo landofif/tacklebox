@@ -1,11 +1,11 @@
 package dev.landofif.dofisaddons.mixin;
 
+import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.chat.ChatBoxes;
 import dev.landofif.dofisaddons.chat.ChatCopy;
 import dev.landofif.dofisaddons.chat.ChatFilter;
 import dev.landofif.dofisaddons.screen.ChatFilterScreen;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.trigger.Matcher;
 import dev.landofif.dofisaddons.trigger.Trigger;
 import net.minecraft.client.gui.Click;
@@ -80,7 +80,7 @@ abstract class ChatScreenMixin extends Screen {
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void dofisaddons$copyLine(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
-        if (click.button() != 1 || !StatsTracker.settings().chatCopy) {
+        if (click.button() != 1 || !DofiSettings.get().chatCopy) {
             return;
         }
         Text message = ChatBoxes.at(click.x(), click.y()) != null

@@ -2,7 +2,6 @@ package dev.landofif.dofisaddons.chat;
 
 import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.DofiSettings;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.trigger.TriggerEngine;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.DrawnTextConsumer;
@@ -69,7 +68,7 @@ public final class ChatBoxes {
     }
 
     private static List<ChatBox> boxes() {
-        DofiSettings s = StatsTracker.settings();
+        DofiSettings s = DofiSettings.get();
         return s == null || s.chatBoxes == null ? List.of() : s.chatBoxes;
     }
 
@@ -199,7 +198,7 @@ public final class ChatBoxes {
         int x = r[0], y = r[1], w = r[2], h = r[3];
         State st = state(box);
 
-        Foe.box(ctx, x, y, w, h, StatsTracker.settings().hudOpacity);
+        Foe.box(ctx, x, y, w, h, DofiSettings.get().hudOpacity);
         Text title = Foe.text((box.name.isBlank() ? "chat" : box.name) + (st.scroll > 0 ? " ↓" + st.scroll : "")).withColor(Foe.TITLE & 0xFFFFFF);
         if (highlight) { // the move screen outlines the box so you can find it
             ctx.drawStrokedRectangle(x, y, w, h, Foe.ACCENT);

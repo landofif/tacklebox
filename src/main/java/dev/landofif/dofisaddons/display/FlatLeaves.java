@@ -1,6 +1,6 @@
 package dev.landofif.dofisaddons.display;
 
-import dev.landofif.dofisaddons.stats.StatsTracker;
+import dev.landofif.dofisaddons.DofiSettings;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.model.SimpleBlockStateModel;
@@ -27,7 +27,7 @@ public final class FlatLeaves {
 
     public static void register() {
         ModelLoadingPlugin.register(plugin -> plugin.modifyBlockModelOnLoad().register((model, context) -> {
-            if (!StatsTracker.settings().flatLeaves) {
+            if (!DofiSettings.get().flatLeaves) {
                 return model;
             }
             // no BlockTags.LEAVES: tags arent loaded yet during the startup model bake

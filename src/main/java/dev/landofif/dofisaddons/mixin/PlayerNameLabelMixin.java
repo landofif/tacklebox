@@ -1,6 +1,6 @@
 package dev.landofif.dofisaddons.mixin;
 
-import dev.landofif.dofisaddons.stats.StatsTracker;
+import dev.landofif.dofisaddons.DofiSettings;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
@@ -17,7 +17,7 @@ abstract class PlayerNameLabelMixin {
     @Inject(method = "renderLabelIfPresent", at = @At("HEAD"), cancellable = true)
     private void dofisaddons$hideLabel(PlayerEntityRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue,
                                        CameraRenderState camera, CallbackInfo ci) {
-        if (StatsTracker.settings().hideAllNametags) {
+        if (DofiSettings.get().hideAllNametags) {
             ci.cancel();
         }
     }

@@ -1,11 +1,12 @@
 package dev.landofif.dofisaddons.hud;
 
+import dev.landofif.dofisaddons.DofiSettings;
+import dev.landofif.dofisaddons.trigger.TriggerEngine;
 import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.display.Holograms;
 import dev.landofif.dofisaddons.menu.FishMenu;
 import dev.landofif.dofisaddons.menu.Locations;
 import dev.landofif.dofisaddons.screen.FishMenuScreen;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.font.TextRenderer;
 import dev.landofif.dofisaddons.util.Glyphs;
@@ -58,7 +59,18 @@ public final class XpEstimate {
     }
 
     private static double num(String digits, String suffix) {
-        return StatsTracker.parseMoney(digits, suffix);
+        double v;
+        try {
+            v = Double.parseDouble(digits.replace(",", ""));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+        return switch (suffix.toUpperCase(Locale.ROOT)) {
+            case "K" -> v * 1_000;
+            case "M" -> v * 1_000_000;
+            case "B" -> v * 1_000_000_000;
+            default -> v;
+        };
     }
 
     public static void tick(MinecraftClient client) {
@@ -66,20 +78,20 @@ public final class XpEstimate {
         if (p == null) {
             return;
         }
-        if (!loaded) { // what earlier sessions read is kept in the stat book
+        if (!loaded) { // what earlier sessions read is kept in the settings file
             loaded = true;
-            var book = StatsTracker.allTime();
-            questXp = book.questXp;
-            questLxp = book.questLxp;
-            profile = book.profile;
-            LOCATION.putAll(book.locLevels);
-            book.locLevels = LOCATION;
+            var s = DofiSettings.get();
+            questXp = s.questXp;
+            questLxp = s.questLxp;
+            profile = s.profile;
+            LOCATION.putAll(s.locLevels);
+            s.locLevels = LOCATION;
         }
         if (p.experienceLevel != baseLevel || p.experienceProgress < baseProgress) {
             rebase(p);
         } else if (xpSince > 0 && p.experienceProgress - baseProgress >= 0.002f) {
-            StatsTracker.allTime().need.put(String.valueOf(baseLevel), xpSince / (p.experienceProgress - baseProgress));
-            StatsTracker.saveAllTime();
+            DofiSettings.get().need.put(String.valueOf(baseLevel), xpSince / (p.experienceProgress - baseProgress));
+            DofiSettings.save();
             rebase(p);
         }
         if (++ticks % 10 == 0) {
@@ -107,8 +119,12 @@ public final class XpEstimate {
         }
     }
 
-    /** Called with the normalised lowercase chat line, for "location > lake biwa gained 4.17k xp". */
-    public static void onChat(String lower) {
+    /** Every game chat line: "location > lake biwa gained 4.17k xp" moves the location level along. */
+    public static void onChat(net.minecraft.text.Text message) {
+        if (!TriggerEngine.isOnFishOnMc()) {
+            return;
+        }
+        String lower = dev.landofif.dofisaddons.trigger.Matcher.normalize(message.getString()).toLowerCase(Locale.ROOT);
         Matcher m = GAINED.matcher(lower);
         Locations.Location loc = m.find() ? Locations.byName(m.group(1)) : null;
         double[] at = loc == null ? null : LOCATION.get(loc.id());
@@ -164,10 +180,10 @@ public final class XpEstimate {
         if (lxpN > 0) {
             questLxp = lxp / lxpN;
         }
-        var book = StatsTracker.allTime();
-        book.questXp = questXp;
-        book.questLxp = questLxp;
-        book.profile = profile;
+        var s = DofiSettings.get();
+        s.questXp = questXp;
+        s.questLxp = questLxp;
+        s.profile = profile;
     }
 
     /** Quests until the next fishing level, like "~12", or null while it is not known yet. */
@@ -176,7 +192,7 @@ public final class XpEstimate {
         if (p != null && profile != null && p.experienceLevel == (int) profile[0] && questXp > 0) {
             return "~" + (long) Math.ceil((1 - p.experienceProgress) * profile[1] / questXp);
         }
-        Double need = p == null ? null : StatsTracker.allTime().need.get(String.valueOf(p.experienceLevel));
+        Double need = p == null ? null : DofiSettings.get().need.get(String.valueOf(p.experienceLevel));
         return need == null || questXp <= 0 ? null : "~" + (long) Math.ceil((1 - p.experienceProgress) * need / questXp);
     }
 
@@ -225,7 +241,7 @@ public final class XpEstimate {
         }
         w += 16;
         int h = 25 + rows.length * 11;
-        var s = StatsTracker.settings();
+        var s = DofiSettings.get();
         Foe.panel(ctx, s.questsX, s.questsY, w, h, Foe.text("quests left"), s.hudOpacity);
         for (int i = 0; i < rows.length; i++) {
             int y = s.questsY + 20 + i * 11;
@@ -237,7 +253,7 @@ public final class XpEstimate {
     }
 
     public static void renderHud(DrawContext ctx) {
-        if (StatsTracker.settings().questsHud && dev.landofif.dofisaddons.trigger.TriggerEngine.isOnFishOnMc()) {
+        if (DofiSettings.get().questsHud && TriggerEngine.isOnFishOnMc()) {
             draw(ctx, true); // dashes until /quests, /travel and some catches have taught it the numbers
         }
     }

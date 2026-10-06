@@ -1,9 +1,9 @@
 package dev.landofif.dofisaddons.mixin;
 
+import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.ui.Foe;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.util.Glyphs;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -54,7 +54,7 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
     @Unique
     private boolean dofisaddons$restyled() {
         Object self = this;
-        return StatsTracker.settings().flatMenus && (self instanceof GenericContainerScreen || self instanceof ShulkerBoxScreen || self instanceof HopperScreen
+        return DofiSettings.get().flatMenus && (self instanceof GenericContainerScreen || self instanceof ShulkerBoxScreen || self instanceof HopperScreen
                 || self instanceof Generic3x3ContainerScreen || self instanceof InventoryScreen);
     }
 

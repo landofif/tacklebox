@@ -4,7 +4,6 @@ import dev.landofif.dofisaddons.compat.FoeScreens;
 import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.chat.ChatBox;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.ui.DofiScreen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -27,7 +26,7 @@ public class ChatBoxScreen extends DofiScreen {
     private static final int[] FADES = {-1, 10, 30, 60, 300};
 
     private final Screen parent;
-    private final DofiSettings s = StatsTracker.settings();
+    private final DofiSettings s = DofiSettings.get();
     private RowListWidget list;
 
     public ChatBoxScreen(Screen parent) {
@@ -117,7 +116,7 @@ public class ChatBoxScreen extends DofiScreen {
 
     @Override
     public void close() {
-        StatsTracker.saveSettings();
+        DofiSettings.save();
         client.setScreen(parent);
     }
 }

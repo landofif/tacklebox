@@ -8,10 +8,10 @@ needs: fabric api and [foecollab](https://github.com/Kimberlyow/FOECollab) (with
 
 ## getting around
 
-- `/dofi` opens the home screen with everything below
-- `/dofi triggers`, `/dofi huds`, `/dofi chat`, `/dofi stats`, `/dofi move` jump straight to one part
+- `/dofi` opens the settings screen, with chat triggers, chat and key commands in its list on the left
+- `/dofi triggers`, `/dofi huds`, `/dofi chat`, `/dofi move` jump straight to one part
 - right shift opens `/dofi` too
-- `/dofi debug item` prints the held items data, `/dofi debug tooltip` prints the next tooltip you hover
+- `/dofi debug item` prints the held items data, f8 in any screen dumps it to a file
 - with mod menu: mods → dofis addons → configure
 
 ## chat triggers
@@ -34,7 +34,7 @@ switch triggers on and off with the dot, reorder with the arrows, **share** copi
 
 ## chat
 
-`/dofi chat`, or chat on the home screen.
+`/dofi chat`, or chat in the screens list of the settings.
 
 - **hide rules**: lines that match never show up in chat. type part of the line (`*` matches anything), the whole line, or a regex, and pick fishonmc only or every server. paste a line into **test with** to check which rule hides it
 - **move chat**: drag the chat box anywhere in foecollabs hud mover. right click it there to put it back
@@ -45,33 +45,9 @@ switch triggers on and off with the dot, reorder with the arrows, **share** copi
 
 right shift opens `/dofi` from anywhere in game. change it in options → controls → dofis addons.
 
-## stats
-
-counts what you catch, all-time (per account, kept since you installed the mod, survives relaunches) and for the current session.
-
-- fish, fish per hour, time spent fishing, total value, xp
-- every rarity, size and variant, with percentages
-- pets, shards, lightning in a bottle, infusion capsules, quests completed, money from selling
-- fish since your last mythical, pet, shard and so on (dry streaks)
-- most caught species, heaviest fish, top locations
-
-a catch is counted when fishonmc shows the caught fish title and a new fish with your name as catcher lands in your inventory (or on the ground next to you when your inventory is full). every fish has its own id, so nothing is counted twice. the fishing clock pauses when you stop catching, so afk time does not count.
-
 ## custom huds
 
 custom huds are foecollabs: `/dofi huds` (or the custom huds button) opens foecollabs own editor. **move huds** (`/dofi move`) is foecollabs hud mover, with the dofis addons huds in it too: the quests left hud, the chat and the chat boxes. drag one to move it, right click to put it back.
-
-## level
-
-on fishonmc the vanilla xp bar shows your fishing level. dofis addons hides it (and its number) because foecollabs bar and level hud show it better. turn the vanilla bar back on in settings.
-
-## bobber timer
-
-shows how long your line has been in the water, floating above your bobber or under your crosshair. it changes colour as the wait gets long, and says bite! when something bites. in the bobber category of the settings you can pick all four colours (normal, warn, slow, bite) and when they kick in, the size, how many decimals, the height above the bobber, the box behind it, whether it shows through walls and how far under the crosshair it sits.
-
-## bite
-
-the bite is read from your own bobber, so someone fishing next to you can never set it off. it turns the timer to the bite colour, and with **bite message** on it also shows a short message (fish on! by default) in the middle of the screen.
 
 ## bobber and world tweaks
 
@@ -84,8 +60,6 @@ these change only what you see. bobber options are under settings → bobber, th
 - **hide all nametags**: hides every players nametag, the servers and the vanilla one
 - **hide xp popups**: hides the +66xp line above the hotbar after a catch
 - **flat leaves**: draws leaves flat like vanilla instead of the fishonmc packs 3d leaves (reloads resources when changed)
-- **short fish tooltips**: leaves out the latin name, value, ecosystem and the kg / cm part of fish tooltips
-- **short pet tooltips**: shows maxed stats once and leaves out empty skin, item and trail slots
 
 ## bobber looks
 
@@ -107,7 +81,7 @@ all of this is in settings under bobber and viewmodel.
 
 ## files
 
-everything lives in `config/dofisaddons/`: `triggers.json`, `settings.json` and `stats/<your uuid>.json`.
+everything lives in `config/dofisaddons/`: `triggers.json` and `settings.json`.
 
 ## look
 
@@ -115,7 +89,7 @@ dofis addons has no look of its own. its screens, chests and huds use foecollabs
 
 ## settings
 
-one settings screen for both mods: foecollabs categories first, then dofis addons (general, huds, bobber, world, viewmodel), each a plain list of label and control with a hover tooltip, and a search box over everything. opening foecollabs config from its menu or from mod menu lands here too. **foecollab menu** opens foecollabs own screens (custom huds, custom buttons, pet calculator), and **move huds** its hud mover.
+one settings screen for both mods: foecollabs categories first, then dofis addons (menus, huds, bobber, world, viewmodel), each a plain list of label and control with a hover tooltip, and a search box over everything. opening foecollabs config from its menu or from mod menu lands here too. **foecollab menu** opens foecollabs own screens (custom huds, custom buttons, pet calculator), and **move huds** its hud mover.
 
 ## building
 

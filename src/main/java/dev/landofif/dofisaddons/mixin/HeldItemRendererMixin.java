@@ -2,7 +2,6 @@ package dev.landofif.dofisaddons.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.landofif.dofisaddons.DofiSettings;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
@@ -49,7 +48,7 @@ public class HeldItemRendererMixin {
 
     @ModifyVariable(method = FIRST_PERSON, at = @At("HEAD"), argsOnly = true, ordinal = 2, require = 0)
     private float dofisaddons$swing(float swingProgress, @Local(argsOnly = true) ItemStack item) {
-        DofiSettings s = StatsTracker.settings();
+        DofiSettings s = DofiSettings.get();
         return switch (s.swingStyle) {
             case NORMAL -> swingProgress;
             // a held item keeps the real progress, so swingArm can hand its turn over (see dofisaddons$spinOnly);
@@ -64,7 +63,7 @@ public class HeldItemRendererMixin {
 
     @ModifyVariable(method = FIRST_PERSON, at = @At("HEAD"), argsOnly = true, ordinal = 3, require = 0)
     private float dofisaddons$equip(float equipProgress) {
-        DofiSettings s = StatsTracker.settings();
+        DofiSettings s = DofiSettings.get();
         return s.viewmodel && s.vmNoEquipDip ? 0f : equipProgress;
     }
 
@@ -74,7 +73,7 @@ public class HeldItemRendererMixin {
      */
     @Inject(method = "swingArm", at = @At("HEAD"), cancellable = true)
     private void dofisaddons$spinOnly(float swingProgress, MatrixStack matrices, int side, Arm arm, CallbackInfo ci) {
-        if (StatsTracker.settings().swingStyle == DofiSettings.SwingStyle.NONE) {
+        if (DofiSettings.get().swingStyle == DofiSettings.SwingStyle.NONE) {
             dofisaddons$spin = swingProgress;
             ci.cancel();
         }
@@ -90,7 +89,7 @@ public class HeldItemRendererMixin {
     private void dofisaddons$viewmodel(AbstractClientPlayerEntity player, float tickProgress, float pitch, Hand hand,
                                        float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices,
                                        OrderedRenderCommandQueue queue, int light, CallbackInfo ci) {
-        DofiSettings s = StatsTracker.settings();
+        DofiSettings s = DofiSettings.get();
         Arm arm = hand == Hand.MAIN_HAND ? player.getMainArm() : player.getMainArm().getOpposite();
         float side = arm == Arm.RIGHT ? 1f : -1f;
 

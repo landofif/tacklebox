@@ -1,7 +1,6 @@
 package dev.landofif.dofisaddons.chat;
 
 import dev.landofif.dofisaddons.DofiSettings;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.trigger.Matcher;
 import dev.landofif.dofisaddons.trigger.TriggerEngine;
 import net.minecraft.text.Text;
@@ -27,7 +26,7 @@ public final class ChatTweaks {
 
     /** The first enabled rule that hides {@code line}, or null. {@code count} adds to its session count. */
     public static ChatFilter hiddenBy(String line, boolean onFishOnMc, boolean count) {
-        DofiSettings s = StatsTracker.settings();
+        DofiSettings s = DofiSettings.get();
         if (s == null || s.chatFilters == null) {
             return null;
         }

@@ -1,7 +1,6 @@
 package dev.landofif.dofisaddons.mixin;
 
-import dev.landofif.dofisaddons.duck.BobberCatchAccess;
-import dev.landofif.dofisaddons.stats.StatsTracker;
+import dev.landofif.dofisaddons.DofiSettings;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.fluid.FluidState;
@@ -21,21 +20,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * alone: {@code caughtFish} is synced from the server, so the dip still shows. Ported from fishutils.
  */
 @Mixin(FishingBobberEntity.class)
-abstract class FishingBobberEntityMixin implements BobberCatchAccess {
+abstract class FishingBobberEntityMixin {
     @Shadow
     private boolean caughtFish;
 
     @Shadow
     private @Nullable Entity hookedEntity;
 
-    @Override
-    public boolean dofisaddons$caughtFish() {
-        return caughtFish;
-    }
-
     @Inject(method = "tick", at = @At("TAIL"))
     private void dofisaddons$holdStill(CallbackInfo ci) {
-        if (caughtFish || hookedEntity != null || !StatsTracker.settings().stillBobber) {
+        if (caughtFish || hookedEntity != null || !DofiSettings.get().stillBobber) {
             return;
         }
         FishingBobberEntity self = (FishingBobberEntity) (Object) this;

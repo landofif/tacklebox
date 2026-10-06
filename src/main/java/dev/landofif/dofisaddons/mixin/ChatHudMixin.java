@@ -10,7 +10,6 @@ import net.minecraft.text.Text;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import net.minecraft.client.gui.hud.ChatHud;
 import org.joml.Matrix3x2f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -48,7 +47,7 @@ abstract class ChatHudMixin {
         if (ci.isCancelled()) {
             return;
         }
-        DofiSettings st = StatsTracker.settings();
+        DofiSettings st = DofiSettings.get();
         if (st != null && st.chatStack) {
             ChatHudAccessor acc = (ChatHudAccessor) this;
             String plain = message.getString();
@@ -77,7 +76,7 @@ abstract class ChatHudMixin {
     @WrapOperation(method = "render(Lnet/minecraft/client/gui/hud/ChatHud$Backend;IIZ)V", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/gui/hud/ChatHud$Backend;updatePose(Ljava/util/function/Consumer;)V"))
     private void dofisaddons$moveChat(ChatHud.Backend backend, Consumer<Matrix3x2f> transformer, Operation<Void> original) {
-        DofiSettings s = StatsTracker.settings();
+        DofiSettings s = DofiSettings.get();
         if (s == null || (s.chatX == 0 && s.chatY == 0)) {
             original.call(backend, transformer);
             return;

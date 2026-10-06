@@ -6,7 +6,6 @@ import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.chat.ChatBox;
 import dev.landofif.dofisaddons.chat.ChatFilter;
 import dev.landofif.dofisaddons.chat.ChatTweaks;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.trigger.Trigger;
 import dev.landofif.dofisaddons.ui.DofiScreen;
 import net.minecraft.client.gui.DrawContext;
@@ -30,7 +29,7 @@ public class ChatFilterScreen extends DofiScreen {
     private static final int SCOPE_W = 74;
 
     private final Screen parent;
-    private final DofiSettings s = StatsTracker.settings();
+    private final DofiSettings s = DofiSettings.get();
     /** null: the hide rules. Otherwise the box whose rules this edits. */
     private final ChatBox box;
     private final List<ChatFilter> rules;
@@ -54,7 +53,7 @@ public class ChatFilterScreen extends DofiScreen {
         this.rules = s.chatFilters;
         if (newRule != null) {
             s.chatFilters.add(newRule);
-            StatsTracker.saveSettings();
+            DofiSettings.save();
             focusOnOpen = newRule;
         }
     }
@@ -101,7 +100,7 @@ public class ChatFilterScreen extends DofiScreen {
         addDrawableChild(ButtonWidget.builder(Foe.text("+ hide rule"), b -> addRule()).dimensions(left, y, bw, 20)
                 .tooltip(Tooltip.of(Foe.text("add a rule. use * for anything, like: tackle shop > *restocked*"))).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("chat boxes"), b -> {
-            StatsTracker.saveSettings();
+            DofiSettings.save();
             client.setScreen(new ChatBoxScreen(this));
         }).dimensions(left + (bw + 4), y, bw, 20).tooltip(Tooltip.of(Foe.text("separate chat boxes for dms, crew chat or anything else"))).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("move chat"), b -> FoeScreens.openMover(this)).dimensions(left + (bw + 4) * 2, y, bw, 20).tooltip(Tooltip.of(Foe.text("drag the chat box and the chat boxes anywhere, right click chat to put it back"))).build());
@@ -251,7 +250,7 @@ public class ChatFilterScreen extends DofiScreen {
     @Override
     public void close() {
         rules.removeIf(f -> f.pattern == null || f.pattern.isBlank());
-        StatsTracker.saveSettings();
+        DofiSettings.save();
         client.setScreen(parent);
     }
 }

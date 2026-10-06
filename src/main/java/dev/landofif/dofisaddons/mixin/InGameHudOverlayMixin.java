@@ -1,7 +1,7 @@
 package dev.landofif.dofisaddons.mixin;
 
+import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.display.Holograms;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.text.Text;
 import org.jspecify.annotations.Nullable;
@@ -32,7 +32,7 @@ abstract class InGameHudOverlayMixin {
             return;
         }
         dev.landofif.dofisaddons.hud.XpEstimate.onPopup(raw);
-        if (StatsTracker.settings().hideXpPopups && Holograms.isXpPopup(raw)) {
+        if (DofiSettings.get().hideXpPopups && Holograms.isXpPopup(raw)) {
             this.overlayMessage = Text.empty();
             this.overlayRemaining = 0;
             ci.cancel();

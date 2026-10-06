@@ -3,7 +3,6 @@ package dev.landofif.dofisaddons.screen;
 import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.input.KeyCommands;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.ui.DofiScreen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -24,7 +23,7 @@ public class KeyCommandScreen extends DofiScreen {
     private static final int KEY_W = 90;
 
     private final Screen parent;
-    private final DofiSettings s = StatsTracker.settings();
+    private final DofiSettings s = DofiSettings.get();
     private RowListWidget list;
     private KeyCommands.Entry listening;
 
@@ -110,7 +109,7 @@ public class KeyCommandScreen extends DofiScreen {
 
     @Override
     public void close() {
-        StatsTracker.saveSettings();
+        DofiSettings.save();
         client.setScreen(parent);
     }
 }

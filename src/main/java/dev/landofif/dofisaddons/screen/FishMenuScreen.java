@@ -5,7 +5,6 @@ import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.hud.BaitInfo;
 import dev.landofif.dofisaddons.menu.FishMenu;
 import dev.landofif.dofisaddons.menu.Locations;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.ui.Arc;
 import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.util.Glyphs;
@@ -93,9 +92,9 @@ public class FishMenuScreen extends DofiScreen {
         int left = vx() + PAD;
         editButton = addDrawableChild(ButtonWidget.builder(Foe.text("rearrange"), b -> toggleEdit()).dimensions(left, y, 90, 20).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("reset layout"), b -> {
-            DofiSettings s = StatsTracker.settings();
+            DofiSettings s = DofiSettings.get();
             s.menuCells.keySet().removeIf(k -> k.startsWith(prefix()));
-            StatsTracker.saveSettings();
+            DofiSettings.save();
         }).dimensions(left + 96, y, 90, 20).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("chest view"), b -> {
             FishMenu.bypass = true;
@@ -122,12 +121,12 @@ public class FishMenuScreen extends DofiScreen {
     /** The level from the tooltip, which the compendium has and /travel does not: remembered, and used when it is missing. */
     private static FishMenu.Info levelOf(Locations.Location loc, ItemStack stack) {
         FishMenu.Info info = FishMenu.info(stack);
-        var saved = StatsTracker.settings().locationLevels;
+        var saved = DofiSettings.get().locationLevels;
         if (info.level() >= 0) {
             String now = info.level() + "|" + info.progress();
             if (!now.equals(saved.get(loc.id()))) {
                 saved.put(loc.id(), now);
-                StatsTracker.saveSettings();
+                DofiSettings.save();
             }
             return info;
         }
@@ -164,7 +163,7 @@ public class FishMenuScreen extends DofiScreen {
      * chest (main menu, so it matches the wiki picture) or the first free spot.
      */
     private void arrange(int columns, boolean serverLayout) {
-        DofiSettings settings = StatsTracker.settings();
+        DofiSettings settings = DofiSettings.get();
         // the server leaves gaps (filler bread is hidden): squeeze out empty columns and rows
         List<Integer> usedCols = tiles.stream().map(t -> t.slot.id % 9).distinct().sorted().toList();
         List<Integer> usedRows = tiles.stream().map(t -> t.slot.id / 9).distinct().sorted().toList();
@@ -210,11 +209,11 @@ public class FishMenuScreen extends DofiScreen {
     }
 
     private void saveCells() {
-        DofiSettings settings = StatsTracker.settings();
+        DofiSettings settings = DofiSettings.get();
         for (int i = 0; i < tiles.size(); i++) {
             settings.menuCells.put(tiles.get(i).key, cells[i].clone());
         }
-        StatsTracker.saveSettings();
+        DofiSettings.save();
     }
 
     // ---- layout ----
@@ -478,6 +477,6 @@ public class FishMenuScreen extends DofiScreen {
 
     @Override
     protected int sizePct() {
-        return StatsTracker.settings().menuSize;
+        return DofiSettings.get().menuSize;
     }
 }

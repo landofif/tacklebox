@@ -2,7 +2,6 @@ package dev.landofif.dofisaddons.menu;
 
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.screen.FishMenuScreen;
-import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.util.Glyphs;
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.minecraft.client.MinecraftClient;
@@ -62,7 +61,7 @@ public final class FishMenu {
             bypass = false;
             return false;
         }
-        DofiSettings s = StatsTracker.settings();
+        DofiSettings s = DofiSettings.get();
         var server = MinecraftClient.getInstance().getCurrentServerEntry();
         if (s == null || !(isPresets(screen) ? s.presetsMenu : s.fishMenu) || server == null || !server.address.toLowerCase(Locale.ROOT).contains("fishonmc")) {
             return false;
