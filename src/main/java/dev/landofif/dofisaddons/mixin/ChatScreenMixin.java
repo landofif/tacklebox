@@ -29,13 +29,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  */
 @Mixin(ChatScreen.class)
 abstract class ChatScreenMixin extends Screen {
-    @Unique
-    private long dofisaddons$flashUntil;
-    @Unique
-    private int dofisaddons$flashX;
-    @Unique
-    private int dofisaddons$flashY;
-
     private ChatScreenMixin(Text title) {
         super(title);
     }
@@ -95,23 +88,20 @@ abstract class ChatScreenMixin extends Screen {
             client.setScreen(new ChatFilterScreen(null, rule));
         } else {
             client.keyboard.setClipboard(plain);
-            dofisaddons$flashUntil = System.currentTimeMillis() + 1200;
-            dofisaddons$flashX = (int) click.x();
-            dofisaddons$flashY = (int) click.y();
+            client.player.sendMessage(Foe.text("dofi » ").withColor(Foe.TITLE & 0xFFFFFF).append(Foe.text("message copied").withColor(Foe.DIM & 0xFFFFFF)), false);
         }
         cir.setReturnValue(true);
     }
 
+    /** A light background behind the whole message under the mouse, so it is clear which lines belong together. */
     @Inject(method = "render", at = @At("TAIL"))
-    private void dofisaddons$copiedTag(DrawContext ctx, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (System.currentTimeMillis() > dofisaddons$flashUntil) {
+    private void dofisaddons$hoverMessage(DrawContext ctx, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (ChatBoxes.at(mouseX, mouseY) != null) {
             return;
         }
-        Text label = Foe.text("copied");
-        int w = textRenderer.getWidth(label) + 12;
-        int x = dofisaddons$flashX + 8;
-        int y = dofisaddons$flashY - 20;
-        Foe.box(ctx, x, y, w, 18, 100);
-        ctx.drawTextWithShadow(textRenderer, label, x + 6, y + 5, Foe.TEXT);
+        float[] b = ChatCopy.boundsAt(mouseX, mouseY);
+        if (b != null) {
+            ctx.fill(Math.round(b[0]), Math.round(b[1]), Math.round(b[2]), Math.round(b[3]), 0x30FFFFFF);
+        }
     }
 }

@@ -24,7 +24,7 @@ Server knowledge (chat lines, glyph codepoints, item NBT, scoreboard, menus) is 
 - Chat (`chat/`, `screen/ChatFilterScreen`, settings `chatFilters`/`chatX`/`chatY`/`chatCopy`):
   - Hide rules run in `ALLOW_GAME` and `ALLOW_CHAT`, reusing `trigger/Matcher`.
   - `ChatHudMixin` moves the chat by wrapping the one `Backend.updatePose` call in `ChatHud.render(Backend,…)`. Drawing, hover and the `ChatScreen` click handler all go through it.
-  - `chat/ChatCopy` finds the line under the mouse by running that same layout pass with its own `Backend` (via `ChatHudAccessor`).
+  - `chat/ChatCopy` finds the line under the mouse by running that same layout pass with its own `Backend` (via `ChatHudAccessor`); the same pass records each line's screen rectangle, and `ChatScreenMixin` fills the union of the hovered message's lines with a light background (like chatplus) with chat open. Copying says "dofi » message copied" in chat instead of a tag at the cursor.
   - The `/dofi` key is registered in `DofisAddons` (right shift, category `dofisaddons:main`, names in `lang/en_us.json`).
 - Ported from l's older fishutils mod (MIT, l's own code), all only changing what the player sees:
   - Bobber: still bobber (`FishingBobberEntityMixin`), smooth cast (`EntityInterpolationMixin` + `display/SmoothCast`).
