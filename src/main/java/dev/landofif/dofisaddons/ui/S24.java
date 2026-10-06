@@ -156,9 +156,17 @@ public final class S24 {
         ctx.fill(x + w - 1, y + 1, x + w, y + h - 1, color);
     }
 
+    /** How opaque panels are drawn right now, in percent (huds and screens set it around their panel). */
+    public static int panelOpacity = 100;
+
+    /** {@code alpha} (0-255) scaled by {@code pct} percent. */
+    public static int scale(int alpha, int pct) {
+        return alpha * pct / 100;
+    }
+
     /** A panel: bg-4 fill, thin border, and (if given) a muted label set into the top border. */
     public static void panel(DrawContext ctx, int x, int y, int w, int h, Text label) {
-        rect(ctx, x, y, w, h, BG_4, BORDER);
+        rect(ctx, x, y, w, h, alpha(scale(0xFF, panelOpacity), BG_4), BORDER);
         if (label != null && !label.getString().isEmpty()) {
             TextRenderer tr = MinecraftClient.getInstance().textRenderer;
             int lw = tr.getWidth(label);

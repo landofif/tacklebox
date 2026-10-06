@@ -201,6 +201,7 @@ public final class ChatBoxes {
         State st = state(box);
 
         int alpha = Math.round(client.options.getTextBackgroundOpacity().getValue().floatValue() * 255);
+        alpha = S24.scale(alpha, StatsTracker.settings().hudOpacity);
         ctx.fill(x, y, x + w, y + h, alpha << 24 | (S24.HUD_PANEL & 0xFFFFFF));
         Text title = Mono.text((box.name.isBlank() ? "chat" : box.name) + (st.scroll > 0 ? " ↓" + st.scroll : "")).withColor(S24.TEXT_3 & 0xFFFFFF);
         if (highlight) { // the move screen outlines the box so you can find it

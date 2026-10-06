@@ -27,6 +27,10 @@ public class StatBook {
     public long questsCompleted;
     /** Learned xp needed per fishing level, by level. */
     public Map<String, Double> need = new LinkedHashMap<>();
+    /** The quests left hud keeps what it read from /menu, /quests and /travel (hud/XpEstimate). */
+    public double questXp, questLxp;
+    public double[] profile;
+    public Map<String, double[]> locLevels = new LinkedHashMap<>();
     /** Money from selling fish ("SELL » You just earned $..."). */
     public double moneyEarned;
 
@@ -103,6 +107,7 @@ public class StatBook {
         if (heaviest == null) heaviest = new LinkedHashMap<>();
         if (lastAt == null) lastAt = new LinkedHashMap<>();
         if (need == null) need = new LinkedHashMap<>();
+        if (locLevels == null) locLevels = new LinkedHashMap<>();
     }
 
     private static void bump(Map<String, Long> map, String key) {

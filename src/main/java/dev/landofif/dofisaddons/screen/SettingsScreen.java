@@ -197,6 +197,10 @@ public class SettingsScreen extends DofiScreen {
                 toggle("presets screen",
                         "shows /presets as a wardrobe of cards with player models. turn it off to get the chest back.",
                         () -> s.presetsMenu, v -> s.presetsMenu = v, defaults.presetsMenu);
+                slider("hud opacity", "how see-through the huds are: quests left, chat boxes and foecollabs huds.", 10, 100, 5, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
+                        () -> s.hudOpacity, v -> s.hudOpacity = (int) Math.round(v), defaults.hudOpacity);
+                slider("screen opacity", "how see-through the background and panel of the mods screens are (this settings screen too).", 20, 100, 5, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
+                        () -> s.screenOpacity, v -> s.screenOpacity = (int) Math.round(v), defaults.screenOpacity);
                 slider("menu size", "how much of the screen the fishonmc menu takes.", 40, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
                         () -> s.menuSize, v -> s.menuSize = (int) Math.round(v), defaults.menuSize);
                 color("menu colour", "the highlight colour of the fishonmc menu. the default follows the flavor.",

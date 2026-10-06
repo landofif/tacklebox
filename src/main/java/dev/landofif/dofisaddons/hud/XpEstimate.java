@@ -45,6 +45,7 @@ public final class XpEstimate {
     private static double[] profile;
     /** Location id to {level, xp into the level}. */
     private static final Map<String, double[]> LOCATION = new HashMap<>();
+    private static boolean loaded;
     private static int baseLevel = -1;
     private static float baseProgress;
     private static double xpSince;
@@ -65,6 +66,15 @@ public final class XpEstimate {
         ClientPlayerEntity p = client.player;
         if (p == null) {
             return;
+        }
+        if (!loaded) { // what earlier sessions read is kept in the stat book
+            loaded = true;
+            var book = StatsTracker.allTime();
+            questXp = book.questXp;
+            questLxp = book.questLxp;
+            profile = book.profile;
+            LOCATION.putAll(book.locLevels);
+            book.locLevels = LOCATION;
         }
         if (p.experienceLevel != baseLevel || p.experienceProgress < baseProgress) {
             rebase(p);
@@ -155,6 +165,10 @@ public final class XpEstimate {
         if (lxpN > 0) {
             questLxp = lxp / lxpN;
         }
+        var book = StatsTracker.allTime();
+        book.questXp = questXp;
+        book.questLxp = questLxp;
+        book.profile = profile;
     }
 
     /** Quests until the next fishing level, like "~12", or null while it is not known yet. */
@@ -213,7 +227,9 @@ public final class XpEstimate {
         w += 16;
         int h = 14 + rows.length * 11;
         var s = StatsTracker.settings();
+        S24.panelOpacity = s.hudOpacity;
         S24.panel(ctx, s.questsX, s.questsY, w, h, Mono.text("quests left"));
+        S24.panelOpacity = 100;
         for (int i = 0; i < rows.length; i++) {
             int y = s.questsY + 9 + i * 11;
             ctx.drawText(tr, Mono.text(rows[i][0]), s.questsX + 8, y, S24.TEXT_4, false);

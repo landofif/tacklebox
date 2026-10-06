@@ -136,6 +136,7 @@ public final class FoeLook {
         if ((color & 0xFFFFFF) != 0 || alpha == 0 || right - left < 4 || bottom - top < 4) {
             return false; // only the black backgrounds; bars and highlights keep their colour
         }
+        alpha = S24.scale(alpha, StatsTracker.settings().hudOpacity);
         drawing = true;
         try {
             ctx.fill(left, top, right, bottom, alpha << 24 | (S24.HUD_PANEL & 0xFFFFFF));

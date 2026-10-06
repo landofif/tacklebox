@@ -60,7 +60,7 @@ public abstract class DofiScreen extends Screen {
         }
         int x0 = vx() + MARGIN, y0 = vy() + MARGIN, x1 = vx() + vw() - MARGIN, y1 = vy() + vh() - MARGIN;
         int top = y0 + S24.LABEL_RISE + 1;
-        ctx.fill(x0 + 1, top, x1 - 1, y1 - 1, S24.alpha((int) ((1f - e) * 255), S24.BG_4));
+        ctx.fill(x0 + 1, top, x1 - 1, y1 - 1, S24.alpha(S24.scale((int) ((1f - e) * 255), dev.landofif.dofisaddons.stats.StatsTracker.settings().screenOpacity), S24.BG_4));
     }
 
     /** How much of the screen the frame takes, in percent (custom guis let the player shrink it). */
@@ -101,8 +101,11 @@ public abstract class DofiScreen extends Screen {
         }
         int w = ctx.getScaledWindowWidth();
         int h = ctx.getScaledWindowHeight();
-        ctx.fill(0, 0, w, h, 0xE6000000 | (S24.BG_3 & 0xFFFFFF));
+        int pct = dev.landofif.dofisaddons.stats.StatsTracker.settings().screenOpacity;
+        ctx.fill(0, 0, w, h, S24.alpha(S24.scale(0xE6, pct), S24.BG_3));
+        S24.panelOpacity = pct;
         S24.panel(ctx, vx() + MARGIN, vy() + MARGIN + S24.LABEL_RISE, vw() - MARGIN * 2, vh() - MARGIN * 2 - S24.LABEL_RISE,
                 Mono.text(title.getString().toLowerCase(java.util.Locale.ROOT)));
+        S24.panelOpacity = 100;
     }
 }
