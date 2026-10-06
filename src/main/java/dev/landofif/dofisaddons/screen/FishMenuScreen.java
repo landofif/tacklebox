@@ -475,6 +475,14 @@ public class FishMenuScreen extends DofiScreen {
 
     @Override
     public boolean keyPressed(net.minecraft.client.input.KeyInput input) {
+        if (input.isEscape()) { // a menu with a return button goes back instead of closing
+            for (Tile t : tiles) {
+                if (t.name.equalsIgnoreCase("return")) {
+                    sendClick(t.slot.id, 0);
+                    return true;
+                }
+            }
+        }
         if (client.options.inventoryKey.matchesKey(input)) { // e closes it like the chest
             close();
             return true;
