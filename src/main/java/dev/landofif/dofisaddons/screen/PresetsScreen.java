@@ -210,11 +210,8 @@ public class PresetsScreen extends DofiScreen {
     /** A copy of the piece that renders on a player even where the server gives the armor no model of its own. */
     private static ItemStack wearable(ItemStack stack, EquipmentSlot slot) {
         ItemStack out = stack.copy();
-        var eq = out.get(DataComponentTypes.EQUIPPABLE);
-        if (eq == null || eq.assetId().isEmpty()) {
-            out.set(DataComponentTypes.EQUIPPABLE, net.minecraft.component.type.EquippableComponent.builder(slot)
-                    .model(net.minecraft.item.equipment.EquipmentAssetKeys.LEATHER).build());
-        }
+        out.set(DataComponentTypes.EQUIPPABLE, net.minecraft.component.type.EquippableComponent.builder(slot)
+                .model(net.minecraft.item.equipment.EquipmentAssetKeys.LEATHER).build());
         return out;
     }
 
