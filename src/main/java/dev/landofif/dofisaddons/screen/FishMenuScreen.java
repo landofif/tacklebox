@@ -80,6 +80,11 @@ public class FishMenuScreen extends DofiScreen {
     }
 
     /** Travel mode is decided by what is in the chest, because the items arrive just after the screen opens. */
+    /** The chest screen this one replaces (its title is what tells which menu it is). */
+    public GenericContainerScreen original() {
+        return original;
+    }
+
     private boolean isTravel() {
         return travel(original);
     }
