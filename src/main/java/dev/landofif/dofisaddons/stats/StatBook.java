@@ -25,6 +25,8 @@ public class StatBook {
     public long lightningBottles;
     public long infusionCapsules;
     public long questsCompleted;
+    /** Learned xp needed per fishing level, by level. */
+    public Map<String, Double> need = new LinkedHashMap<>();
     /** Money from selling fish ("SELL » You just earned $..."). */
     public double moneyEarned;
 
@@ -100,6 +102,7 @@ public class StatBook {
         if (location == null) location = new LinkedHashMap<>();
         if (heaviest == null) heaviest = new LinkedHashMap<>();
         if (lastAt == null) lastAt = new LinkedHashMap<>();
+        if (need == null) need = new LinkedHashMap<>();
     }
 
     private static void bump(Map<String, Long> map, String key) {

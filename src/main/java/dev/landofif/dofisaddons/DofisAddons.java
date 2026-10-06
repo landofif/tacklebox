@@ -90,6 +90,7 @@ public final class DofisAddons implements ClientModInitializer {
                 return;
             }
             BobberTimer.renderHud(context);
+            dev.landofif.dofisaddons.hud.XpEstimate.renderHud(context);
         });
         HudElementRegistry.attachElementAfter(net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements.CHAT,
                 Identifier.of(MOD_ID, "chat_boxes"), (context, tickCounter) -> {
@@ -111,6 +112,7 @@ public final class DofisAddons implements ClientModInitializer {
             SoundQueue.tick();
             ServerInfo.tick(client);
             StatsTracker.tick(client);
+            dev.landofif.dofisaddons.hud.XpEstimate.tick(client);
             BobberTimer.tick(client);
             dev.landofif.dofisaddons.input.KeyCommands.tick(client);
             dev.landofif.dofisaddons.display.BiteWatch.tick(client);

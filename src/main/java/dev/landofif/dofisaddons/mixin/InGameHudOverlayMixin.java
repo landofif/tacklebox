@@ -31,6 +31,7 @@ abstract class InGameHudOverlayMixin {
         if (raw.isEmpty()) {
             return;
         }
+        dev.landofif.dofisaddons.hud.XpEstimate.onPopup(raw);
         if (StatsTracker.settings().hideXpPopups && Holograms.isXpPopup(raw)) {
             this.overlayMessage = Text.empty();
             this.overlayRemaining = 0;

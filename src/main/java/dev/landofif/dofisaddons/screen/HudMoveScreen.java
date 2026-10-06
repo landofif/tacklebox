@@ -35,6 +35,8 @@ public class HudMoveScreen extends DofiScreen {
     private boolean draggingChat;
     private final Map<ChatBox, int[]> chatBoxes = new IdentityHashMap<>();
     private ChatBox draggingBox;
+    private boolean draggingQuests;
+    private int[] questsBox;
 
     public HudMoveScreen(Screen parent) {
         super(Mono.text("move huds"));
@@ -68,6 +70,11 @@ public class HudMoveScreen extends DofiScreen {
             foe.render(context, mouseX, mouseY, delta);
         }
         renderChatBox(context, mouseX, mouseY);
+        if (draggingQuests) {
+            StatsTracker.settings().questsX = Math.max(0, Math.min(this.width - 40, (int) (mouseX - grabX)));
+            StatsTracker.settings().questsY = Math.max(0, Math.min(this.height - 20, (int) (mouseY - grabY)));
+        }
+        questsBox = dev.landofif.dofisaddons.hud.XpEstimate.draw(context, true);
         for (ChatBox box : StatsTracker.settings().chatBoxes) {
             if (!box.enabled) continue;
             if (box == draggingBox) {
@@ -129,6 +136,12 @@ public class HudMoveScreen extends DofiScreen {
         if (super.mouseClicked(click, doubled)) {
             return true;
         }
+        if (over(questsBox, click.x(), click.y())) {
+            draggingQuests = true;
+            grabX = click.x() - questsBox[0];
+            grabY = click.y() - questsBox[1];
+            return true;
+        }
         ChatBox cb = boxAt(click.x(), click.y());
         if (cb != null) {
             int[] b = chatBoxes.get(cb);
@@ -154,7 +167,7 @@ public class HudMoveScreen extends DofiScreen {
 
     @Override
     public boolean mouseDragged(Click click, double dx, double dy) {
-        if (draggingChat || draggingBox != null) {
+        if (draggingChat || draggingBox != null || draggingQuests) {
             return true;
         }
         return foe != null && foe.mouseDragged(click, dx, dy) || super.mouseDragged(click, dx, dy);
@@ -164,6 +177,7 @@ public class HudMoveScreen extends DofiScreen {
     public boolean mouseReleased(Click click) {
         draggingChat = false;
         draggingBox = null;
+        draggingQuests = false;
         if (foe != null) {
             foe.mouseReleased(click);
         }

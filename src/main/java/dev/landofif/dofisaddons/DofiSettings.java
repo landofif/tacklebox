@@ -33,6 +33,10 @@ public class DofiSettings {
     // ---- fishonmc menu (see menu/FishMenu) ----
     /** Show the main menu and /travel as the mods own screens instead of the chest gui. */
     public boolean fishMenu = true;
+    /** The quests left hud: where it sits (gui units from the top left) and whether it shows. */
+    public boolean questsHud = true;
+    public int questsX = 4;
+    public int questsY = 70;
     /** The /presets wardrobe screen, and for both custom guis: size in percent of the screen and accent colour. */
     public boolean presetsMenu = true;
     /** Preset rows seen on /presets, kept between sessions so the other page can be drawn: "armor:6" to its pieces as "item|color|floats|strings|model". */

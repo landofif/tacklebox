@@ -154,6 +154,8 @@ public final class StatsTracker {
             }
         } else if (lower.startsWith("quests >") && lower.contains("has been completed")) {
             both(b -> b.questsCompleted++);
+        } else if (lower.startsWith("location >") && lower.contains(" gained ")) {
+            dev.landofif.dofisaddons.hud.XpEstimate.onChat(lower);
         } else if (lower.startsWith("sell >") && lower.contains("earned")) {
             java.util.regex.Matcher m = MONEY.matcher(line);
             if (m.find()) {
@@ -255,7 +257,7 @@ public final class StatsTracker {
         dirty = true;
     }
 
-    static double parseMoney(String number, String suffix) {
+    public static double parseMoney(String number, String suffix) {
         double v;
         try {
             v = Double.parseDouble(number.replace(",", ""));

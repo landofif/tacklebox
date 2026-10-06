@@ -191,6 +191,9 @@ public class SettingsScreen extends DofiScreen {
                 toggle("fishonmc menu",
                         "shows the main menu (book in the 9th slot, /menu) and /travel as a screen of dofis addons with big icons you can rearrange. turn it off to get the chest back.",
                         () -> s.fishMenu, v -> s.fishMenu = v, defaults.fishMenu);
+                toggle("quests left hud",
+                        "a small box with the estimated quests until your next level and the next level of the location you are at. it learns as you play and reads the /quests and travel menus. move it with /dofi huds.",
+                        () -> s.questsHud, v -> s.questsHud = v, defaults.questsHud);
                 toggle("presets screen",
                         "shows /presets as a wardrobe of cards with player models. turn it off to get the chest back.",
                         () -> s.presetsMenu, v -> s.presetsMenu = v, defaults.presetsMenu);
