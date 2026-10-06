@@ -599,7 +599,9 @@ public class SettingsScreen extends DofiScreen {
         }
 
         @Override
-        protected void drawIcon(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        protected void drawIcon(DrawContext ctx, int mouseX, int mouseY, float delta) { // what a plain button does: its box, then its label
+            drawButton(ctx);
+            drawLabel(ctx.getHoverListener(this, DrawContext.HoverType.NONE));
         }
 
         @Override
