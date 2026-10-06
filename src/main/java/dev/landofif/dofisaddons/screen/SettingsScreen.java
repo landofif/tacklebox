@@ -54,6 +54,8 @@ public class SettingsScreen extends DofiScreen {
     private TextFieldWidget search;
     private String query = "";
     private RowListWidget list;
+    /** The foecollab category shown (its list of settings is a few hundred long, so one category at a time). */
+    private String foeCategory;
     private int left;
     private int contentW;
 
@@ -71,7 +73,7 @@ public class SettingsScreen extends DofiScreen {
 
     @Override
     protected void init() {
-        contentW = Math.min(400, width - 20);
+        contentW = tab == Tab.FOECOLLAB ? width - 20 : Math.min(400, width - 20); // foecollab has the room, it is a big list
         left = (width - contentW) / 2;
 
         List<Tab> shown = new ArrayList<>(List.of(Tab.values()));
@@ -92,7 +94,26 @@ public class SettingsScreen extends DofiScreen {
         }
 
         int listTop = tab == Tab.FOECOLLAB ? 70 : 46;
-        list = new RowListWidget(client, left, listTop, contentW, height - listTop - 34, ROW_H);
+        int sideW = 0;
+        if (tab == Tab.FOECOLLAB) { // categories down the left, the settings of the picked one to the right
+            sideW = Math.min(140, contentW / 4);
+            List<String> categories = foeCategories();
+            if (foeCategory == null || !categories.contains(foeCategory)) {
+                foeCategory = categories.isEmpty() ? "" : categories.get(0);
+            }
+            RowListWidget side = new RowListWidget(client, left, listTop, sideW, height - listTop - 34, ROW_H);
+            for (String c : categories) {
+                ButtonWidget b = ButtonWidget.builder(Mono.text(c), btn -> {
+                    foeCategory = c;
+                    clearAndInit();
+                }).dimensions(0, 0, side.getRowWidth(), 20).build();
+                b.active = !c.equals(foeCategory);
+                side.addRow(new RowListWidget.Row(List.of(b)));
+            }
+            addDrawableChild(side);
+            sideW += 6;
+        }
+        list = new RowListWidget(client, left + sideW, listTop, contentW - sideW, height - listTop - 34, ROW_H);
         addDrawableChild(list);
         if (tab == Tab.FOECOLLAB) {
             // a search box above the list, lined up with its rows: foecollab has a few hundred options
@@ -333,13 +354,16 @@ public class SettingsScreen extends DofiScreen {
                 while (path.size() > h.depth()) path.removeLast();
                 path.add(h);
                 emitted = Math.min(emitted, path.size() - 1);
+                if (q.isEmpty() && h.depth() > 0 && path.get(0).label().equals(foeCategory) && !foeHidden(path, h)) {
+                    foeSection(path); // sections can be folded, like in foecollabs own screen
+                }
                 continue;
             }
             FoeConfig.Option o = (FoeConfig.Option) node;
-            if (!q.isEmpty() && !foeMatches(o, path, q)) {
-                continue;
+            if (q.isEmpty() ? !path.get(0).label().equals(foeCategory) || foeHidden(path, null) : !foeMatches(o, path, q)) {
+                continue; // no search: only the picked category, minus folded sections; searching looks in all of them
             }
-            for (; emitted < path.size(); emitted++) {
+            for (; !q.isEmpty() && emitted < path.size(); emitted++) { // search: show the headers above a hit
                 FoeConfig.Header h = path.get(emitted);
                 if (h.depth() == 0) {
                     header(h.label());
@@ -353,6 +377,42 @@ public class SettingsScreen extends DofiScreen {
         if (shown == 0) {
             subheader(q.isEmpty() ? "foecollab has no settings to show" : "nothing matches " + q);
         }
+    }
+
+    /** Sections the player folded, by their path ("category/section/..."). Kept while the screen is open. */
+    private final java.util.Set<String> folded = new java.util.HashSet<>();
+
+    private static String foeKey(List<FoeConfig.Header> path, int upTo) {
+        return path.subList(0, upTo).stream().map(FoeConfig.Header::label).collect(java.util.stream.Collectors.joining("/"));
+    }
+
+    /** True when a section above (not counting {@code except}, the one whose own row is being drawn) is folded. */
+    private boolean foeHidden(List<FoeConfig.Header> path, FoeConfig.Header except) {
+        int to = except == null ? path.size() : path.size() - 1;
+        for (int i = 2; i <= to; i++) {
+            if (folded.contains(foeKey(path, i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void foeSection(List<FoeConfig.Header> path) {
+        String key = foeKey(path, path.size());
+        boolean closed = folded.contains(key);
+        ButtonWidget b = ButtonWidget.builder(Mono.text((closed ? "+ " : "- ") + path.getLast().label()), btn -> {
+            if (!folded.remove(key)) {
+                folded.add(key);
+            }
+            refresh();
+        }).dimensions(0, 0, rowW(), 20).build();
+        b.setTooltip(Tooltip.of(Mono.text(closed ? "click to unfold this section" : "click to fold this section")));
+        list.addRow(new RowListWidget.Row(List.of(b)));
+    }
+
+    private static List<String> foeCategories() {
+        return FoeConfig.nodes().stream().filter(n -> n instanceof FoeConfig.Header h && h.depth() == 0)
+                .map(n -> ((FoeConfig.Header) n).label()).toList();
     }
 
     private static boolean foeMatches(FoeConfig.Option o, List<FoeConfig.Header> path, String q) {
