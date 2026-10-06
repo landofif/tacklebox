@@ -41,8 +41,6 @@ public final class ChatBoxes {
     private static final int PAD_X = 6;
     private static final int PAD_Y = 6;
     private static final int LINE_H = 10;
-    private static final int TITLE_X = 6;
-    private static final int TITLE_GAP = 3;
 
     private record Line(Text text, long at) {}
 
@@ -204,19 +202,11 @@ public final class ChatBoxes {
 
         int alpha = Math.round((float) (client.options.getTextBackgroundOpacity().getValue() * 0.6 + 0.4) * 255);
         ctx.fill(x, y, x + w, y + h, alpha << 24 | (S24.HUD_PANEL & 0xFFFFFF));
-        Text title = Mono.text(box.name.isBlank() ? "chat" : box.name).withColor((highlight ? S24.ACCENT : S24.TEXT_3) & 0xFFFFFF);
-        int unseen = st.scroll;
-        if (unseen > 0) {
-            title = title.copy().append(Mono.text(" ↓" + unseen).withColor(S24.ACCENT & 0xFFFFFF));
+        Text title = Mono.text((box.name.isBlank() ? "chat" : box.name) + (st.scroll > 0 ? " ↓" + st.scroll : "")).withColor(S24.TEXT_3 & 0xFFFFFF);
+        if (highlight) { // the move screen outlines the box so you can find it
+            ctx.drawStrokedRectangle(x, y, w, h, S24.ACCENT);
         }
-        int titleW = tr.getWidth(title);
-        int border = highlight ? S24.ACCENT : (Math.min(255, Math.round(alpha * 1.4f)) << 24 | (S24.HUD_BORDER & 0xFFFFFF));
-        ctx.fill(x, y, x + TITLE_X, y + 1, border);
-        ctx.fill(x + TITLE_X + TITLE_GAP * 2 + titleW, y, x + w, y + 1, border);
-        ctx.fill(x, y + h - 1, x + w, y + h, border);
-        ctx.fill(x, y + 1, x + 1, y + h - 1, border);
-        ctx.fill(x + w - 1, y + 1, x + w, y + h - 1, border);
-        ctx.drawText(tr, title, x + TITLE_X + TITLE_GAP, y - 4, 0xFFFFFFFF, false);
+        ctx.drawText(tr, title, x + PAD_X, y + 3, 0xFFFFFFFF, false);
 
         List<OrderedText> lines = visible(box, st, tr);
         if (lines.isEmpty()) {
