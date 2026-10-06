@@ -16,8 +16,6 @@ import java.util.Locale;
  */
 public final class Foe {
     private static final Identifier BOX = tex("box_atlas");
-    private static final Identifier SOLID = tex("box_solid_atlas");
-    private static final Identifier SOLID_ALT = tex("box_solid_alt_atlas");
 
     public static final int TEXT = 0xFFFFFFFF;
     public static final int DIM = 0xFFAAAAAA;
@@ -26,6 +24,10 @@ public final class Foe {
     public static final int TITLE = 0xFF55FF55;
     /** Selected and hovered text, and outlines that follow the mouse. */
     public static final int ACCENT = 0xFFFFAA00;
+
+    private static final int BUTTON = 0x66000000;
+    private static final int BUTTON_HOT = 0x80606060;
+    private static final int BUTTON_OFF = 0x33000000;
 
     private static final int TEX = 15;
     private static final int SLICE = 5;
@@ -57,9 +59,14 @@ public final class Foe {
         slice(ctx, BOX, x, y, w, h, opacity);
     }
 
-    /** A brown filled box, the lighter purple one while hovered. */
+    /** A button: a flat see-through dark fill, lighter grey while hovered, no border. */
     public static void button(DrawContext ctx, int x, int y, int w, int h, boolean hot) {
-        slice(ctx, hot ? SOLID_ALT : SOLID, x, y, w, h, 100);
+        ctx.fill(x, y, x + w, y + h, hot ? BUTTON_HOT : BUTTON);
+    }
+
+    /** A button that cannot be clicked, or the picked one: barely there. */
+    public static void buttonOff(DrawContext ctx, int x, int y, int w, int h) {
+        ctx.fill(x, y, x + w, y + h, BUTTON_OFF);
     }
 
     /** A title where a panel puts it, inside the top left edge. Alone it is the title of something with no box. */

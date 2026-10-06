@@ -85,7 +85,7 @@ everything lives in `config/dofisaddons/`: `triggers.json` and `settings.json`.
 
 ## look
 
-dofis addons has no look of its own. its screens, chests and huds use foecollabs box textures and the normal game font, widgets stay vanilla. settings → general has **simple menus**: chests, your inventory and fishonmc menus lose their box and slot boxes, you see just the items and the menu name (the art from the fishonmc pack is left out). the huds (quests left, chat boxes) have no box either, only text. **flat buttons** draws every button, the game menus too, as one plain foecollab colour instead of the bevelled texture. the mods own screens have no frame either, only the title in the corner.
+dofis addons has no look of its own. its screens, chests and huds use foecollabs box textures and the normal game font, widgets stay vanilla. settings → general has **simple menus**: chests, your inventory and fishonmc menus lose their box and slot boxes, you see just the items and the menu name (the art from the fishonmc pack is left out). the huds (quests left, chat boxes) have no box either, only text. **flat buttons** draws every button, the game menus too, as a flat see-through fill instead of the bevelled texture, lighter when hovered. the mods own screens have no frame either, only the title in the corner.
 
 ## settings
 

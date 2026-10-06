@@ -61,7 +61,7 @@ public class DofiSettings {
     // ---- look (foecollabs, see ui/Foe) ----
     /** Chests, the inventory and fishonmc menus as one box with no slot boxes (drops the server's menu art). */
     public boolean flatMenus = true;
-    /** Every button as one plain foecollab colour (the brown box, purple while hovered) instead of the bevelled texture. */
+    /** Every button as a flat see-through fill (lighter while hovered) instead of the bevelled texture. */
     public boolean flatButtons = true;
 
     // ---- fishonmc menu (see menu/FishMenu) ----
