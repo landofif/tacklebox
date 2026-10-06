@@ -1,9 +1,9 @@
 package dev.landofif.dofisaddons.display;
 
+import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.DofisAddons;
 import dev.landofif.dofisaddons.stats.StatsTracker;
-import dev.landofif.dofisaddons.util.Mono;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.MutableText;
@@ -197,7 +197,7 @@ public final class ShortTooltips {
             String line = String.format(Locale.ROOT, "[tooltip %s] %02d text=\"%s\" folded=\"%s\"", label, i, escape(raw), Holograms.fold(raw));
             DofisAddons.LOGGER.info(line);
             if (client.player != null) {
-                client.player.sendMessage(Mono.text(line).formatted(Formatting.GRAY), false);
+                client.player.sendMessage(Foe.text(line).formatted(Formatting.GRAY), false);
             }
         }
     }

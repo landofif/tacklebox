@@ -1,8 +1,8 @@
 package dev.landofif.dofisaddons.hud;
 
+import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.trigger.TriggerEngine;
-import dev.landofif.dofisaddons.util.Mono;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.text.MutableText;
@@ -43,7 +43,7 @@ public final class LevelInfo {
     public static Text coloredLevel() {
         ClientPlayerEntity p = MinecraftClient.getInstance().player;
         int level = p == null ? 0 : p.experienceLevel;
-        return Mono.text(String.valueOf(level)).withColor(color(level));
+        return Foe.text(String.valueOf(level)).withColor(color(level));
     }
 
     /** The bar font: U+E100 is a solid 2px column, U+E101 a -1px space that closes the glyph gap. */

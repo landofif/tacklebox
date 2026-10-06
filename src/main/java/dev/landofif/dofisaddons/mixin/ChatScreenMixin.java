@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.mixin;
 
+import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.chat.ChatBoxes;
 import dev.landofif.dofisaddons.chat.ChatCopy;
 import dev.landofif.dofisaddons.chat.ChatFilter;
@@ -7,8 +8,6 @@ import dev.landofif.dofisaddons.screen.ChatFilterScreen;
 import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.trigger.Matcher;
 import dev.landofif.dofisaddons.trigger.Trigger;
-import dev.landofif.dofisaddons.ui.S24;
-import dev.landofif.dofisaddons.util.Mono;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -108,11 +107,11 @@ abstract class ChatScreenMixin extends Screen {
         if (System.currentTimeMillis() > dofisaddons$flashUntil) {
             return;
         }
-        Text label = Mono.text("copied");
-        int w = textRenderer.getWidth(label) + 8;
+        Text label = Foe.text("copied");
+        int w = textRenderer.getWidth(label) + 12;
         int x = dofisaddons$flashX + 8;
-        int y = dofisaddons$flashY - 14;
-        S24.rect(ctx, x, y, w, 13, S24.BG_4, S24.ACCENT);
-        ctx.drawText(textRenderer, label, x + 4, y + 3, S24.TEXT_1, false);
+        int y = dofisaddons$flashY - 20;
+        Foe.box(ctx, x, y, w, 18, 100);
+        ctx.drawTextWithShadow(textRenderer, label, x + 6, y + 5, Foe.TEXT);
     }
 }

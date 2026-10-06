@@ -1,9 +1,9 @@
 package dev.landofif.dofisaddons.display;
 
+import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.DofisAddons;
 import dev.landofif.dofisaddons.screen.FishMenuScreen;
 import dev.landofif.dofisaddons.util.Glyphs;
-import dev.landofif.dofisaddons.util.Mono;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerInventory;
@@ -118,14 +118,14 @@ public final class DebugDump {
 
     private static void toast(MinecraftClient client, String line) {
         client.getToastManager().add(new net.minecraft.client.toast.SystemToast(net.minecraft.client.toast.SystemToast.Type.PERIODIC_NOTIFICATION,
-                Mono.text("gui dump"), Mono.text(line)));
+                Foe.text("gui dump"), Foe.text(line)));
     }
 
     private static void say(String line, Formatting color) {
         DofisAddons.LOGGER.info("[debug] {}", line);
         ClientPlayerEntity self = MinecraftClient.getInstance().player;
         if (self != null) {
-            self.sendMessage(Mono.text(line).formatted(color), false);
+            self.sendMessage(Foe.text(line).formatted(color), false);
         }
     }
 }

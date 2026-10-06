@@ -1,11 +1,10 @@
 package dev.landofif.dofisaddons.screen;
 
-import dev.landofif.dofisaddons.ui.S24;
+import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.stats.StatBook;
 import dev.landofif.dofisaddons.stats.StatNames;
 import dev.landofif.dofisaddons.stats.StatsTracker;
-import dev.landofif.dofisaddons.util.Mono;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -46,7 +45,7 @@ public class StatsScreen extends DofiScreen {
     private int contentHeight;
 
     public StatsScreen(Screen parent) {
-        super(Mono.text("dofis addons · stats"));
+        super(Foe.text("dofis addons · stats"));
         this.parent = parent;
     }
 
@@ -58,11 +57,10 @@ public class StatsScreen extends DofiScreen {
         int tabW = (contentW - 4) / 2;
         int i = 0;
         for (Tab t : Tab.values()) {
-            ButtonWidget b = ButtonWidget.builder(Mono.text(t.label), btn -> {
+            ButtonWidget b = ButtonWidget.builder(Foe.text(t.label), btn -> {
                 tab = t;
                 scroll = 0;
                 clearAndInit();
-                replayIntro();
             }).dimensions(left + i * (tabW + 4), 22, tabW, 18).build();
             b.active = t != tab;
             addDrawableChild(b);
@@ -72,23 +70,23 @@ public class StatsScreen extends DofiScreen {
         int by = this.height - 26;
         int bw = (contentW - 8) / 3;
         if (tab == Tab.SESSION) {
-            addDrawableChild(ButtonWidget.builder(Mono.text("reset session"), b -> confirm(
+            addDrawableChild(ButtonWidget.builder(Foe.text("reset session"), b -> confirm(
                             "start a new session?", "this sessions numbers go back to zero. all-time stats are kept.",
                             StatsTracker::resetSession))
                     .dimensions(left, by, bw, 20).build());
         } else if (tab == Tab.ALL_TIME) {
-            addDrawableChild(ButtonWidget.builder(Mono.text("reset all-time").formatted(Formatting.RED), b -> confirm(
+            addDrawableChild(ButtonWidget.builder(Foe.text("reset all-time").formatted(Formatting.RED), b -> confirm(
                             "erase all-time stats?", "every number dofis addons has collected for this account is deleted. this cant be undone.",
                             StatsTracker::resetAllTime))
                     .dimensions(left, by, bw, 20).build());
         }
-        addDrawableChild(ButtonWidget.builder(Mono.text("custom huds…"), b -> {
+        addDrawableChild(ButtonWidget.builder(Foe.text("custom huds…"), b -> {
                     net.minecraft.client.gui.screen.Screen huds = dev.landofif.dofisaddons.compat.FoeScreens.customHuds(this);
                     if (huds != null) client.setScreen(huds);
                 })
                 .dimensions(left + bw + 4, by, bw, 20)
-                .tooltip(Tooltip.of(Mono.text("put any of these numbers on your screen"))).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("done"), b -> close())
+                .tooltip(Tooltip.of(Foe.text("put any of these numbers on your screen"))).build());
+        addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close())
                 .dimensions(left + (bw + 4) * 2, by, bw, 20).build());
     }
 
@@ -98,7 +96,7 @@ public class StatsScreen extends DofiScreen {
                 action.run();
             }
             client.setScreen(this);
-        }, Mono.text(title), Mono.text(body)));
+        }, Foe.text(title), Foe.text(body)));
     }
 
     // ------------------------------------------------------------------ stat sections
@@ -132,7 +130,7 @@ public class StatsScreen extends DofiScreen {
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .limit(5)
                 .forEach(e -> top.add(row(StatNames.pretty(e.getKey()), StatNames.number(e.getValue()))));
-        if (top.isEmpty()) top.add(Mono.text("nothing yet").formatted(Formatting.DARK_GRAY));
+        if (top.isEmpty()) top.add(Foe.text("nothing yet").formatted(Formatting.DARK_GRAY));
         out.add(new Section("most caught", top));
 
         List<Text> heavy = new ArrayList<>();
@@ -140,7 +138,7 @@ public class StatsScreen extends DofiScreen {
                 .sorted(Comparator.comparingDouble((Map.Entry<String, StatBook.Best> e) -> e.getValue().weight).reversed())
                 .limit(5)
                 .forEach(e -> heavy.add(row(StatNames.pretty(e.getKey()), String.format(java.util.Locale.ROOT, "%.1flb", e.getValue().weight))));
-        if (heavy.isEmpty()) heavy.add(Mono.text("nothing yet").formatted(Formatting.DARK_GRAY));
+        if (heavy.isEmpty()) heavy.add(Foe.text("nothing yet").formatted(Formatting.DARK_GRAY));
         out.add(new Section("heaviest", heavy));
 
         List<Text> places = new ArrayList<>();
@@ -148,7 +146,7 @@ public class StatsScreen extends DofiScreen {
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .limit(5)
                 .forEach(e -> places.add(row(StatNames.pretty(e.getKey()), StatNames.number(e.getValue()))));
-        if (places.isEmpty()) places.add(Mono.text("nothing yet").formatted(Formatting.DARK_GRAY));
+        if (places.isEmpty()) places.add(Foe.text("nothing yet").formatted(Formatting.DARK_GRAY));
         out.add(new Section("locations", places));
         return out;
     }
@@ -157,14 +155,14 @@ public class StatsScreen extends DofiScreen {
         List<Text> rows = new ArrayList<>();
         for (StatNames.Kind k : kinds) {
             long n = b.count(map, k.id());
-            MutableText t = Mono.text(k.name() + " ").withColor(k.color())
-                    .append(Mono.text(StatNames.number(n)).formatted(Formatting.WHITE));
+            MutableText t = Foe.text(k.name() + " ").withColor(k.color())
+                    .append(Foe.text(StatNames.number(n)).formatted(Formatting.WHITE));
             if (b.fish > 0 && n > 0) {
-                t.append(Mono.text(String.format(java.util.Locale.ROOT, " %.1f%%", 100.0 * n / b.fish)).formatted(Formatting.DARK_GRAY));
+                t.append(Foe.text(String.format(java.util.Locale.ROOT, " %.1f%%", 100.0 * n / b.fish)).formatted(Formatting.DARK_GRAY));
             }
             if (since) {
                 long s = b.since(prefix + k.id());
-                if (s >= 0) t.append(Mono.text(" (" + StatNames.compact(s) + ")").formatted(Formatting.GRAY));
+                if (s >= 0) t.append(Foe.text(" (" + StatNames.compact(s) + ")").formatted(Formatting.GRAY));
             }
             rows.add(t);
         }
@@ -172,16 +170,16 @@ public class StatsScreen extends DofiScreen {
     }
 
     private Text dropRow(StatBook b, String label, long count, String key, boolean since) {
-        MutableText t = Mono.text(label + " ").formatted(Formatting.GRAY).append(Mono.text(StatNames.number(count)).formatted(Formatting.WHITE));
+        MutableText t = Foe.text(label + " ").formatted(Formatting.GRAY).append(Foe.text(StatNames.number(count)).formatted(Formatting.WHITE));
         if (since) {
             long s = b.since(key);
-            if (s >= 0) t.append(Mono.text(" (" + StatNames.compact(s) + ")").formatted(Formatting.GRAY));
+            if (s >= 0) t.append(Foe.text(" (" + StatNames.compact(s) + ")").formatted(Formatting.GRAY));
         }
         return t;
     }
 
     private static Text row(String label, String value) {
-        return Mono.text(label + " ").formatted(Formatting.GRAY).append(Mono.text(value).formatted(Formatting.WHITE));
+        return Foe.text(label + " ").formatted(Formatting.GRAY).append(Foe.text(value).formatted(Formatting.WHITE));
     }
 
     // ------------------------------------------------------------------ drawing
@@ -195,7 +193,7 @@ public class StatsScreen extends DofiScreen {
         String note = allTime
                 ? "everything this mod has seen on this account since you installed it"
                 : "since you started the game. only counts while on fishonmc";
-        context.drawCenteredTextWithShadow(textRenderer, Mono.text(note).formatted(Formatting.DARK_GRAY),
+        context.drawCenteredTextWithShadow(textRenderer, Foe.text(note).formatted(Formatting.DARK_GRAY),
                 this.width / 2, TOP - 6, 0xFFFFFFFF);
 
         int top = TOP + 8;
@@ -215,11 +213,11 @@ public class StatsScreen extends DofiScreen {
             }
             int x = left + c * colW;
             int y = top + colY[c] - off;
-            context.drawTextWithShadow(textRenderer, Mono.bold(sec.title()).withColor(S24.ACCENT & 0xFFFFFF), x, y, 0xFFFFFFFF);
+            context.drawTextWithShadow(textRenderer, Foe.bold(sec.title()).withColor(Foe.ACCENT & 0xFFFFFF), x, y, 0xFFFFFFFF);
             y += LINE_H + 1;
             for (Text line : sec.lines()) {
                 Text shown = textRenderer.getWidth(line) > colW - 6
-                        ? Mono.text(textRenderer.trimToWidth(line, colW - 12).getString() + "…")
+                        ? Foe.text(textRenderer.trimToWidth(line, colW - 12).getString() + "…")
                         : line;
                 context.drawTextWithShadow(textRenderer, shown, x, y, 0xFFFFFFFF);
                 y += LINE_H;

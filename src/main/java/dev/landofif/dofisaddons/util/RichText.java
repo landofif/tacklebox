@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.util;
 
+import dev.landofif.dofisaddons.ui.Foe;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Parses user-typed text with colour codes into styled segments rendered in the mono font.
+ * Parses user-typed text with colour codes into styled segments rendered in the game font.
  *
  * <p>Supported codes: {@code &0-&9 &a-&f} (colours), {@code &l} bold, {@code &o} italic,
  * {@code &n} underline, {@code &m} strikethrough, {@code &r} reset, and {@code &#RRGGBB} for any
@@ -49,7 +50,7 @@ public final class RichText {
 
     /** Only the first {@code maxChars} characters (for the typewriter reveal). */
     public MutableText toText(int maxChars) {
-        MutableText out = Mono.text("");
+        MutableText out = Foe.text("");
         int remaining = maxChars;
         for (Segment s : segments) {
             if (remaining <= 0) {
@@ -67,7 +68,7 @@ public final class RichText {
      * @param defaultColor colour used until the first colour code (0xRRGGBB)
      */
     public static RichText parse(String input, int defaultColor) {
-        Style base = Mono.style(Style.EMPTY.withColor(TextColor.fromRgb(defaultColor & 0xFFFFFF)));
+        Style base = Style.EMPTY.withColor(TextColor.fromRgb(defaultColor & 0xFFFFFF));
         List<Segment> segments = new ArrayList<>();
         if (input == null || input.isEmpty()) {
             return new RichText(segments);

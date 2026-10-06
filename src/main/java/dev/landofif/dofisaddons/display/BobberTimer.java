@@ -1,9 +1,9 @@
 package dev.landofif.dofisaddons.display;
 
+import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.trigger.TriggerEngine;
-import dev.landofif.dofisaddons.util.Mono;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -88,8 +88,8 @@ public final class BobberTimer {
         } else {
             color = s.bobberColor;
         }
-        MutableText t = Mono.text(time).withColor(color);
-        return s.bobberBold || hasBite() && s.bobberShowBite ? t.formatted(Formatting.BOLD) : t;
+        MutableText t = Foe.text(time).withColor(color);
+        return hasBite() && s.bobberShowBite ? t.formatted(Formatting.BOLD) : t;
     }
 
     private static boolean active(DofiSettings.BobberMode mode) {
@@ -104,7 +104,7 @@ public final class BobberTimer {
         DofiSettings s = StatsTracker.settings();
         float scale = (float) s.bobberScale;
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
-        Text t = Mono.prepare(label(), scale, true);
+        Text t = label();
         ctx.getMatrices().pushMatrix();
         ctx.getMatrices().translate(ctx.getScaledWindowWidth() / 2f, ctx.getScaledWindowHeight() / 2f + s.bobberCrosshairY);
         ctx.getMatrices().scale(scale, scale);
@@ -128,8 +128,7 @@ public final class BobberTimer {
         Vec3d pos = hook.getLerpedPos(delta);
         Vec3d camera = context.worldState().cameraRenderState.pos;
         TextRenderer tr = client.textRenderer;
-        // Seen up close in the world, so rasterise generously; it has its own backing instead of a shadow.
-        Text text = Mono.prepare(label(), Math.round(4 * scale), false);
+        Text text = label();
 
         MatrixStack matrices = new MatrixStack();
         matrices.translate(pos.x - camera.x, pos.y - camera.y + s.bobberHeight, pos.z - camera.z);

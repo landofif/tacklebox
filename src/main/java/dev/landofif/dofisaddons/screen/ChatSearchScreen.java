@@ -1,10 +1,9 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.chat.ChatCopy;
 import dev.landofif.dofisaddons.mixin.ChatHudAccessor;
 import dev.landofif.dofisaddons.ui.DofiScreen;
-import dev.landofif.dofisaddons.ui.S24;
-import dev.landofif.dofisaddons.util.Mono;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -26,16 +25,16 @@ public class ChatSearchScreen extends DofiScreen {
     private int scroll;
 
     public ChatSearchScreen(Screen parent) {
-        super(Mono.text("dofis addons · search chat"));
+        super(Foe.text("dofis addons · search chat"));
         this.parent = parent;
     }
 
     @Override
     protected void init() {
         int w = Math.min(560, width - 20);
-        field = new TextFieldWidget(textRenderer, (width - w) / 2, 24, w, 18, Mono.text("search"));
+        field = new TextFieldWidget(textRenderer, (width - w) / 2, 24, w, 18, Foe.text("search"));
         field.setMaxLength(100);
-        field.setPlaceholder(Mono.text("type to search").formatted(net.minecraft.util.Formatting.DARK_GRAY));
+        field.setPlaceholder(Foe.text("type to search").formatted(net.minecraft.util.Formatting.DARK_GRAY));
         field.setChangedListener(v -> search());
         addDrawableChild(field);
         setInitialFocus(field);
@@ -77,9 +76,9 @@ public class ChatSearchScreen extends DofiScreen {
         int w = Math.min(560, width - 20), x = (width - w) / 2;
         for (int r = 0; r < rows() && scroll + r < hits.size(); r++) {
             var line = Language.getInstance().reorder(textRenderer.trimToWidth(hits.get(scroll + r), w));
-            ctx.drawText(textRenderer, line, x, 48 + r * ROW, S24.TEXT_1, false);
+            ctx.drawText(textRenderer, line, x, 48 + r * ROW, Foe.TEXT, false);
         }
-        ctx.drawText(textRenderer, Mono.text(hits.size() + " lines · newest first · click copies").withColor(S24.TEXT_4 & 0xFFFFFF),
+        ctx.drawText(textRenderer, Foe.text(hits.size() + " lines · newest first · click copies").withColor(Foe.DIM & 0xFFFFFF),
                 x, height - 14, 0xFFFFFFFF, false);
     }
 

@@ -4,7 +4,7 @@ client side fabric mod for **fishonmc** (minecraft 1.21.11).
 
 display only: the mod reacts to what the server sends. it never sends chat, clicks, casts, reels or presses keys for you.
 
-needs: fabric api and [foecollab](https://github.com/Kimberlyow/FOECollab) (with its own requirements, cloth config and mod menu). dofis addons is made to run next to foecollab: it leaves the trackers to foecollab, draws foecollabs huds and screens in the system24 look, and puts foecollabs settings in its own settings screen.
+needs: fabric api and [foecollab](https://github.com/Kimberlyow/FOECollab) (with its own requirements, cloth config and mod menu). dofis addons is an addon for foecollab: it leaves the trackers and the look to foecollab, draws its own screens and huds with foecollabs boxes and the normal game font, puts its huds in foecollabs hud mover, and its settings next to foecollabs in one settings screen.
 
 ## getting around
 
@@ -37,7 +37,7 @@ switch triggers on and off with the dot, reorder with the arrows, **share** copi
 `/dofi chat`, or chat on the home screen.
 
 - **hide rules**: lines that match never show up in chat. type part of the line (`*` matches anything), the whole line, or a regex, and pick fishonmc only or every server. paste a line into **test with** to check which rule hides it
-- **move chat**: drag the chat box anywhere in the move screen. right click it there to put it back
+- **move chat**: drag the chat box anywhere in foecollabs hud mover. right click it there to put it back
 - **copy**: with chat open, right click a message to copy it. shift + right click a message to make a hide rule for it
 - **chat boxes**: separate chat panels, each with its own place on screen. two come set up: **dms** (`✉ from …` and `✉ to …` lines) and **crew** (`[crew chat] …` lines). their lines leave the main chat (or stay there too with **also in chat**). each box has rules like the hide rules, a name in its top border, and can fade out a while after its last line. with chat open you can scroll a box, hover and click its text like normal chat, and right click a line to copy it. move them in the move screen: drag a box, scroll on it for more or fewer lines, shift + scroll for its width. **+ box** makes a new one for anything else
 
@@ -59,7 +59,7 @@ a catch is counted when fishonmc shows the caught fish title and a new fish with
 
 ## custom huds
 
-custom huds are foecollabs: `/dofi huds` (or the custom huds button) opens foecollabs own editor. dofis addons only restyles them. **move huds** is one screen for everything: foecollabs trackers and custom huds, the chat and the chat boxes.
+custom huds are foecollabs: `/dofi huds` (or the custom huds button) opens foecollabs own editor. **move huds** (`/dofi move`) is foecollabs hud mover, with the dofis addons huds in it too: the quests left hud, the chat and the chat boxes. drag one to move it, right click to put it back.
 
 ## level
 
@@ -67,7 +67,7 @@ on fishonmc the vanilla xp bar shows your fishing level. dofis addons hides it (
 
 ## bobber timer
 
-shows how long your line has been in the water, floating above your bobber or under your crosshair. it changes colour as the wait gets long, and says bite! when something bites. in the bobber tab of the settings you can pick all four colours (normal, warn, slow, bite) and when they kick in, the size, how many decimals, bold, the height above the bobber, the box behind it, whether it shows through walls and how far under the crosshair it sits.
+shows how long your line has been in the water, floating above your bobber or under your crosshair. it changes colour as the wait gets long, and says bite! when something bites. in the bobber category of the settings you can pick all four colours (normal, warn, slow, bite) and when they kick in, the size, how many decimals, the height above the bobber, the box behind it, whether it shows through walls and how far under the crosshair it sits.
 
 ## bite
 
@@ -111,23 +111,11 @@ everything lives in `config/dofisaddons/`: `triggers.json`, `settings.json` and 
 
 ## look
 
-screens and huds are styled after the system24 discord theme: flat dark panels, thin borders that light up purple on hover, labels set into the panel border. by default the whole game gets the same look (settings → look turns each part off):
+dofis addons has no look of its own. its screens, chests and huds use foecollabs box textures and the normal game font, widgets stay vanilla. settings → general has **simple menus**: chests, your inventory and fishonmc menus become one box with the menu name in its top edge and no slot boxes (the art from the fishonmc pack is left out). **hud opacity** and **screen opacity** (settings → huds) make the mods huds and screens see-through.
 
-- **flavor**: the colour set, from the flavors of the system24 discord theme: system24, catppuccin mocha, catppuccin macchiato, nord, tokyo night, rose pine, rose pine moon, everforest and vencord. it changes the mod, the restyled screens and the huds right away
-- **restyle all screens**: buttons, sliders, text fields, checkboxes, tabs, lists, scrollbars, screen backgrounds and tooltips in every screen, vanilla and other mods included
-- **restyle menus**: chests, your inventory and fishonmc menus become flat panels with the menu name in the border and flat slots. the art from the fishonmc pack is left out
-- **restyle hotbar**: flat hotbar boxes with an accent border on the selected slot
-- **mono font everywhere**: all text in the game in dm mono. fishonmc pack icons and animated text effects keep the server font
-- **restyle foecollab huds**: foecollabs hud boxes become system24 panels in your flavor. pick any clean theme in foecollab (settings → foecollab → change theme) and the titles sit in the top border like the dofis huds. foecollabs own screens get system24 buttons with restyle all screens
-- **title screen**: dofis addons (a system24 title screen with a **join fishonmc** button that shows how many players are on and your ping), foecollab, or minecraft
+## settings
 
-## foecollab
-
-settings → foecollab has every foecollab option as a row in the same screen, grouped like foecollabs own config, with a search box on top. opening foecollabs config from its menu or from mod menu lands here too. **foecollab menu** opens foecollabs own screens (custom huds, custom buttons, pet calculator), and **move huds** its hud mover.
-
-## font
-
-all mod text uses dm mono light, with dm mono medium for bold (sil open font license 1.1, see `assets/dofisaddons/font/ofl-dmmono.txt`; jetbrains mono and google sans flex are optional in settings → look → font). it is shipped at several resolutions (`font/mono_1.json` … `mono_8.json`, `mono_bold_1.json` … `mono_bold_8.json`) and drawn at the one matching your gui scale, without the vanilla shadow, so it stays crisp.
+one settings screen for both mods: foecollabs categories first, then dofis addons (general, huds, bobber, world, viewmodel), each a plain list of label and control with a hover tooltip, and a search box over everything. opening foecollabs config from its menu or from mod menu lands here too. **foecollab menu** opens foecollabs own screens (custom huds, custom buttons, pet calculator), and **move huds** its hud mover.
 
 ## building
 

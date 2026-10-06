@@ -7,7 +7,6 @@ import dev.landofif.dofisaddons.display.TitleOverlay;
 import dev.landofif.dofisaddons.hud.ServerInfo;
 import dev.landofif.dofisaddons.screen.ChatFilterScreen;
 import dev.landofif.dofisaddons.screen.HomeScreen;
-import dev.landofif.dofisaddons.screen.HudMoveScreen;
 import dev.landofif.dofisaddons.screen.StatsScreen;
 import dev.landofif.dofisaddons.screen.TriggerEditScreen;
 import dev.landofif.dofisaddons.screen.TriggerListScreen;
@@ -55,7 +54,6 @@ public final class DofisAddons implements ClientModInitializer {
         StatsTracker.loadSettings();
         dev.landofif.dofisaddons.display.FlatLeaves.register();
         dev.landofif.dofisaddons.display.ShortTooltips.register();
-        dev.landofif.dofisaddons.compat.FoeLook.register();
 
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
             if (!overlay) {
@@ -86,7 +84,7 @@ public final class DofisAddons implements ClientModInitializer {
         HudElementRegistry.addLast(Identifier.of(MOD_ID, "custom_huds"), (context, tickCounter) -> {
             MinecraftClient client = MinecraftClient.getInstance();
             // These screens draw HUD boxes themselves.
-            if (client.options.hudHidden || client.currentScreen instanceof HudMoveScreen) {
+            if (client.options.hudHidden || dev.landofif.dofisaddons.compat.FoeMover.isMover(client.currentScreen)) {
                 return;
             }
             BobberTimer.renderHud(context);
@@ -94,7 +92,7 @@ public final class DofisAddons implements ClientModInitializer {
         });
         HudElementRegistry.attachElementAfter(net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements.CHAT,
                 Identifier.of(MOD_ID, "chat_boxes"), (context, tickCounter) -> {
-                    if (!(MinecraftClient.getInstance().currentScreen instanceof HudMoveScreen)) { // it draws the boxes itself
+                    if (!dev.landofif.dofisaddons.compat.FoeMover.isMover(MinecraftClient.getInstance().currentScreen)) { // it draws the boxes itself
                         dev.landofif.dofisaddons.chat.ChatBoxes.render(context, tickCounter);
                     }
                 });
@@ -137,7 +135,7 @@ public final class DofisAddons implements ClientModInitializer {
                     .then(ClientCommandManager.literal("debug")
                             .then(ClientCommandManager.literal("item").executes(ctx -> dev.landofif.dofisaddons.display.DebugDump.heldItem()))
                             .then(ClientCommandManager.literal("tooltip").executes(ctx -> dev.landofif.dofisaddons.display.DebugDump.nextTooltip())))
-                    .then(ClientCommandManager.literal("move").executes(ctx -> open(() -> new HudMoveScreen(null)))));
+                    .then(ClientCommandManager.literal("move").executes(ctx -> open(() -> dev.landofif.dofisaddons.compat.FoeScreens.move(null)))));
             dispatcher.register(ClientCommandManager.literal("triggers").executes(ctx -> open(() -> new TriggerListScreen(null))));
         });
     }

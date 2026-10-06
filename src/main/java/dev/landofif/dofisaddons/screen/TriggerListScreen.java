@@ -1,10 +1,10 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.trigger.Trigger;
 import dev.landofif.dofisaddons.trigger.TriggerEngine;
 import dev.landofif.dofisaddons.trigger.TriggerStore;
-import dev.landofif.dofisaddons.util.Mono;
 import dev.landofif.dofisaddons.util.RichText;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmScreen;
@@ -29,7 +29,7 @@ public class TriggerListScreen extends DofiScreen {
     private long statusUntil;
 
     public TriggerListScreen(Screen parent) {
-        super(Mono.text("dofis addons · chat triggers"));
+        super(Foe.text("dofis addons · chat triggers"));
         this.parent = parent;
     }
 
@@ -45,22 +45,22 @@ public class TriggerListScreen extends DofiScreen {
         int buttonY = this.height - 28;
         int bw = Math.min(100, (listWidth - 12) / 4);
         int startX = (this.width - (bw * 4 + 12)) / 2;
-        addDrawableChild(ButtonWidget.builder(Mono.text("+ new trigger"), b -> client.setScreen(new PresetPickerScreen(this)))
+        addDrawableChild(ButtonWidget.builder(Foe.text("+ new trigger"), b -> client.setScreen(new PresetPickerScreen(this)))
                 .dimensions(startX, buttonY, bw, 20)
-                .tooltip(Tooltip.of(Mono.text("start blank or from a ready-made fishonmc preset")))
+                .tooltip(Tooltip.of(Foe.text("start blank or from a ready-made fishonmc preset")))
                 .build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("import"), b -> onImport())
+        addDrawableChild(ButtonWidget.builder(Foe.text("import"), b -> onImport())
                 .dimensions(startX + (bw + 4), buttonY, bw, 20)
-                .tooltip(Tooltip.of(Mono.text("add a trigger from a share code on your clipboard")))
+                .tooltip(Tooltip.of(Foe.text("add a trigger from a share code on your clipboard")))
                 .build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("reload file"), b -> {
+        addDrawableChild(ButtonWidget.builder(Foe.text("reload file"), b -> {
                     TriggerStore.load();
                     rebuild();
                     setStatus("reloaded triggers.json", Formatting.GREEN);
                 }).dimensions(startX + (bw + 4) * 2, buttonY, bw, 20)
-                .tooltip(Tooltip.of(Mono.text("re-read config/dofisaddons/triggers.json (after editing it by hand)")))
+                .tooltip(Tooltip.of(Foe.text("re-read config/dofisaddons/triggers.json (after editing it by hand)")))
                 .build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("done"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close())
                 .dimensions(startX + (bw + 4) * 3, buttonY, bw, 20).build());
 
         rebuild();
@@ -83,34 +83,34 @@ public class TriggerListScreen extends DofiScreen {
                         b.setMessage(toggleLabel(t));
                         rebuild();
                     }).dimensions(0, 0, 20, 20)
-                    .tooltip(Tooltip.of(Mono.text(t.enabled ? "on: click to switch off" : "off: click to switch on")))
+                    .tooltip(Tooltip.of(Foe.text(t.enabled ? "on: click to switch off" : "off: click to switch on")))
                     .build();
 
             ButtonWidget main = ButtonWidget.builder(mainLabel(t, mainWidth), b -> client.setScreen(new TriggerEditScreen(this, t.copyKeepId(), false)))
                     .dimensions(0, 0, mainWidth, 20)
-                    .tooltip(Tooltip.of(Mono.text("click to edit\nwhen chat says: " + t.pattern
+                    .tooltip(Tooltip.of(Foe.text("click to edit\nwhen chat says: " + t.pattern
                             + "\nfired this session: " + TriggerEngine.count(t))))
                     .build();
 
-            ButtonWidget up = ButtonWidget.builder(Mono.text("▲"), b -> {
+            ButtonWidget up = ButtonWidget.builder(Foe.text("▲"), b -> {
                 TriggerStore.move(index, -1);
                 rebuild();
-            }).dimensions(0, 0, 12, 20).tooltip(Tooltip.of(Mono.text("move up"))).build();
+            }).dimensions(0, 0, 12, 20).tooltip(Tooltip.of(Foe.text("move up"))).build();
             up.active = index > 0;
 
-            ButtonWidget down = ButtonWidget.builder(Mono.text("▼"), b -> {
+            ButtonWidget down = ButtonWidget.builder(Foe.text("▼"), b -> {
                 TriggerStore.move(index, 1);
                 rebuild();
-            }).dimensions(0, 0, 12, 20).tooltip(Tooltip.of(Mono.text("move down"))).build();
+            }).dimensions(0, 0, 12, 20).tooltip(Tooltip.of(Foe.text("move down"))).build();
             down.active = index < triggers.size() - 1;
 
-            ButtonWidget share = ButtonWidget.builder(Mono.text("share"), b -> {
+            ButtonWidget share = ButtonWidget.builder(Foe.text("share"), b -> {
                 client.keyboard.setClipboard(TriggerStore.exportCode(t));
                 setStatus("copied \"" + t.name + "\" share code to clipboard", Formatting.GREEN);
-            }).dimensions(0, 0, 40, 20).tooltip(Tooltip.of(Mono.text("copy a code others can import"))).build();
+            }).dimensions(0, 0, 40, 20).tooltip(Tooltip.of(Foe.text("copy a code others can import"))).build();
 
-            ButtonWidget delete = ButtonWidget.builder(Mono.text("✕").formatted(Formatting.RED), b -> confirmDelete(t))
-                    .dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Mono.text("delete"))).build();
+            ButtonWidget delete = ButtonWidget.builder(Foe.text("✕").formatted(Formatting.RED), b -> confirmDelete(t))
+                    .dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Foe.text("delete"))).build();
 
             List<ClickableWidget> row = new ArrayList<>(List.of(toggle, main, up, down, share, delete));
             list.addRow(new RowListWidget.Row(row));
@@ -118,15 +118,15 @@ public class TriggerListScreen extends DofiScreen {
     }
 
     private Text toggleLabel(Trigger t) {
-        return Mono.text(t.enabled ? "●" : "○").formatted(t.enabled ? Formatting.GREEN : Formatting.DARK_GRAY);
+        return Foe.text(t.enabled ? "●" : "○").formatted(t.enabled ? Formatting.GREEN : Formatting.DARK_GRAY);
     }
 
     private Text mainLabel(Trigger t, int width) {
         String name = t.name == null || t.name.isBlank() ? "(unnamed)" : t.name;
         String preview = RichText.strip(t.title.enabled ? t.title.title : "");
         String label = name + (preview.isBlank() ? "" : "  → " + preview);
-        label = this.textRenderer.trimToWidth(Mono.text(label), width - 12).getString();
-        return Mono.text(label).formatted(t.enabled ? Formatting.WHITE : Formatting.GRAY);
+        label = this.textRenderer.trimToWidth(Foe.text(label), width - 12).getString();
+        return Foe.text(label).formatted(t.enabled ? Formatting.WHITE : Formatting.GRAY);
     }
 
     private void confirmDelete(Trigger t) {
@@ -135,7 +135,7 @@ public class TriggerListScreen extends DofiScreen {
                 TriggerStore.remove(t);
             }
             client.setScreen(this);
-        }, Mono.text("delete \"" + t.name + "\"?"), Mono.text("this cant be undone. tip: use share first to keep a copy.")));
+        }, Foe.text("delete \"" + t.name + "\"?"), Foe.text("this cant be undone. tip: use share first to keep a copy.")));
     }
 
     private void onImport() {
@@ -158,16 +158,16 @@ public class TriggerListScreen extends DofiScreen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(textRenderer,
-                Mono.text("show your own titles and sounds when a chat message appears").formatted(Formatting.GRAY),
+                Foe.text("show your own titles and sounds when a chat message appears").formatted(Formatting.GRAY),
                 this.width / 2, 23, 0xFFFFFFFF);
 
         if (TriggerStore.all().isEmpty()) {
             context.drawCenteredTextWithShadow(textRenderer,
-                    Mono.text("no triggers yet. click \"+ new trigger\" to make one.").formatted(Formatting.GRAY),
+                    Foe.text("no triggers yet. click \"+ new trigger\" to make one.").formatted(Formatting.GRAY),
                     this.width / 2, this.height / 2 - 10, 0xFFFFFFFF);
         }
         if (!status.isEmpty() && System.currentTimeMillis() < statusUntil) {
-            context.drawCenteredTextWithShadow(textRenderer, Mono.text(status), this.width / 2, this.height - 42, 0xFFFFFFFF);
+            context.drawCenteredTextWithShadow(textRenderer, Foe.text(status), this.width / 2, this.height - 42, 0xFFFFFFFF);
         }
     }
 

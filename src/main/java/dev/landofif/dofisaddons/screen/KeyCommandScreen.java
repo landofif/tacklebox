@@ -1,11 +1,10 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.input.KeyCommands;
 import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.ui.DofiScreen;
-import dev.landofif.dofisaddons.ui.S24;
-import dev.landofif.dofisaddons.util.Mono;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -30,7 +29,7 @@ public class KeyCommandScreen extends DofiScreen {
     private KeyCommands.Entry listening;
 
     public KeyCommandScreen(Screen parent) {
-        super(Mono.text("dofis addons · key commands"));
+        super(Foe.text("dofis addons · key commands"));
         this.parent = parent;
     }
 
@@ -43,11 +42,11 @@ public class KeyCommandScreen extends DofiScreen {
         rebuild();
         int bw = (w - 4) / 2;
         int y = height - 28;
-        addDrawableChild(ButtonWidget.builder(Mono.text("+ key"), b -> {
+        addDrawableChild(ButtonWidget.builder(Foe.text("+ key"), b -> {
             s.keyCommands.add(new KeyCommands.Entry());
             rebuild();
         }).dimensions(left, y, bw, 20).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("done"), b -> close()).dimensions(left + bw + 4, y, bw, 20).build());
+        addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close()).dimensions(left + bw + 4, y, bw, 20).build());
     }
 
     private void rebuild() {
@@ -58,15 +57,15 @@ public class KeyCommandScreen extends DofiScreen {
             ButtonWidget key = ButtonWidget.builder(keyLabel(e), b -> {
                 listening = e;
                 rebuild();
-            }).dimensions(0, 0, KEY_W, 20).tooltip(Tooltip.of(Mono.text("click, then press the key. esc cancels, delete unbinds"))).build();
+            }).dimensions(0, 0, KEY_W, 20).tooltip(Tooltip.of(Foe.text("click, then press the key. esc cancels, delete unbinds"))).build();
 
-            TextFieldWidget command = new TextFieldWidget(textRenderer, 0, 0, cmdW, 20, Mono.text("command"));
+            TextFieldWidget command = new TextFieldWidget(textRenderer, 0, 0, cmdW, 20, Foe.text("command"));
             command.setMaxLength(256);
             command.setText(e.command);
-            command.setPlaceholder(Mono.text("command, like /menu").formatted(Formatting.DARK_GRAY));
+            command.setPlaceholder(Foe.text("command, like /menu").formatted(Formatting.DARK_GRAY));
             command.setChangedListener(v -> e.command = v);
 
-            ButtonWidget delete = ButtonWidget.builder(Mono.text("✕").formatted(Formatting.RED), b -> {
+            ButtonWidget delete = ButtonWidget.builder(Foe.text("✕").formatted(Formatting.RED), b -> {
                 s.keyCommands.remove(e);
                 rebuild();
             }).dimensions(0, 0, 20, 20).build();
@@ -77,10 +76,10 @@ public class KeyCommandScreen extends DofiScreen {
 
     private Text keyLabel(KeyCommands.Entry e) {
         if (e == listening) {
-            return Mono.text("press a key…").formatted(Formatting.YELLOW);
+            return Foe.text("press a key…").formatted(Formatting.YELLOW);
         }
-        return e.key < 0 ? Mono.text("not set").formatted(Formatting.DARK_GRAY)
-                : Mono.text(InputUtil.Type.KEYSYM.createFromCode(e.key).getLocalizedText().getString().toLowerCase());
+        return e.key < 0 ? Foe.text("not set").formatted(Formatting.DARK_GRAY)
+                : Foe.text(InputUtil.Type.KEYSYM.createFromCode(e.key).getLocalizedText().getString().toLowerCase());
     }
 
     @Override
@@ -101,11 +100,11 @@ public class KeyCommandScreen extends DofiScreen {
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);
-        ctx.drawCenteredTextWithShadow(textRenderer, Mono.text("pressing the key in game runs the command, once per press")
-                .withColor(S24.TEXT_3 & 0xFFFFFF), width / 2, 23, 0xFFFFFFFF);
+        ctx.drawCenteredTextWithShadow(textRenderer, Foe.text("pressing the key in game runs the command, once per press")
+                .withColor(Foe.DIM & 0xFFFFFF), width / 2, 23, 0xFFFFFFFF);
         if (s.keyCommands.isEmpty()) {
-            ctx.drawCenteredTextWithShadow(textRenderer, Mono.text("no keys yet. click + key to add one.")
-                    .withColor(S24.TEXT_4 & 0xFFFFFF), width / 2, 70, 0xFFFFFFFF);
+            ctx.drawCenteredTextWithShadow(textRenderer, Foe.text("no keys yet. click + key to add one.")
+                    .withColor(Foe.DIM & 0xFFFFFF), width / 2, 70, 0xFFFFFFFF);
         }
     }
 

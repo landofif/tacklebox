@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.display.SoundQueue;
 import dev.landofif.dofisaddons.display.TitleOverlay;
@@ -7,7 +8,6 @@ import dev.landofif.dofisaddons.trigger.Matcher;
 import dev.landofif.dofisaddons.trigger.Trigger;
 import dev.landofif.dofisaddons.trigger.TriggerEngine;
 import dev.landofif.dofisaddons.trigger.TriggerStore;
-import dev.landofif.dofisaddons.util.Mono;
 import dev.landofif.dofisaddons.util.RichText;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -81,7 +81,7 @@ public class TriggerEditScreen extends DofiScreen {
     private Matcher.Result testResult;
 
     public TriggerEditScreen(TriggerListScreen parent, Trigger draft, boolean isNew) {
-        super(Mono.text(isNew ? "new trigger" : "edit trigger"));
+        super(Foe.text(isNew ? "new trigger" : "edit trigger"));
         this.parent = parent;
         this.draft = draft;
         this.isNew = isNew;
@@ -99,7 +99,7 @@ public class TriggerEditScreen extends DofiScreen {
         int tabW = (width - 8) / 3;
         int i = 0;
         for (Tab t : Tab.values()) {
-            ButtonWidget b = ButtonWidget.builder(Mono.text(t.label), btn -> switchTab(t))
+            ButtonWidget b = ButtonWidget.builder(Foe.text(t.label), btn -> switchTab(t))
                     .dimensions(left + i * (tabW + 4), 22, tabW, 18).build();
             b.active = t != tab;
             addDrawableChild(b);
@@ -115,13 +115,13 @@ public class TriggerEditScreen extends DofiScreen {
         // Bottom bar
         int by = this.height - 26;
         int bw = (width - 8) / 3;
-        addDrawableChild(ButtonWidget.builder(Mono.text("cancel"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Foe.text("cancel"), b -> close())
                 .dimensions(left, by, bw, 20)
-                .tooltip(Tooltip.of(Mono.text("leave without saving"))).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("▶ preview"), b -> preview())
+                .tooltip(Tooltip.of(Foe.text("leave without saving"))).build());
+        addDrawableChild(ButtonWidget.builder(Foe.text("▶ preview"), b -> preview())
                 .dimensions(left + bw + 4, by, bw, 20)
-                .tooltip(Tooltip.of(Mono.text("show the title and play the sound now, using the test message"))).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("save").formatted(Formatting.GREEN), b -> save())
+                .tooltip(Tooltip.of(Foe.text("show the title and play the sound now, using the test message"))).build());
+        addDrawableChild(ButtonWidget.builder(Foe.text("save").formatted(Formatting.GREEN), b -> save())
                 .dimensions(left + (bw + 4) * 2, by, bw, 20).build());
     }
 
@@ -135,9 +135,9 @@ public class TriggerEditScreen extends DofiScreen {
         addDrawableChild(ButtonWidget.builder(modeLabel(), b -> {
                     draft.mode = Trigger.MatchMode.values()[(draft.mode.ordinal() + 1) % Trigger.MatchMode.values().length];
                     b.setMessage(modeLabel());
-                    b.setTooltip(Tooltip.of(Mono.text(modeHelp())));
+                    b.setTooltip(Tooltip.of(Foe.text(modeHelp())));
                 }).dimensions(fieldX, y, fieldW, 20)
-                .tooltip(Tooltip.of(Mono.text(modeHelp()))).build());
+                .tooltip(Tooltip.of(Foe.text(modeHelp()))).build());
         y += ROW;
 
         textField(y, draft.pattern, 512, s -> draft.pattern = s, "e.g. quests > quest #{n} has been completed!");
@@ -157,7 +157,7 @@ public class TriggerEditScreen extends DofiScreen {
         y += ROW;
 
         TextFieldWidget test = textField(y, testLine, 512, s -> testLine = s, "paste a chat message to test");
-        test.setTooltip(Tooltip.of(Mono.text("type or paste a real chat message. the line below says if it would fire.")));
+        test.setTooltip(Tooltip.of(Foe.text("type or paste a real chat message. the line below says if it would fire.")));
     }
 
     private void initTitle() {
@@ -169,7 +169,7 @@ public class TriggerEditScreen extends DofiScreen {
                     t.animation = Trigger.Animation.values()[(t.animation.ordinal() + 1) % Trigger.Animation.values().length];
                     b.setMessage(animationLabel());
                 }).dimensions(left + half + 4, y, half, 20)
-                .tooltip(Tooltip.of(Mono.text("how the title appears: fade, pop, slide, typewriter or shake"))).build());
+                .tooltip(Tooltip.of(Foe.text("how the title appears: fade, pop, slide, typewriter or shake"))).build());
         y += ROW;
 
         TextFieldWidget titleField = textField(y, t.title, 256, s -> t.title = s, "e.g. &lquest {n} complete");
@@ -188,7 +188,7 @@ public class TriggerEditScreen extends DofiScreen {
                 dropLeadColor(titleField);
             }
         });
-        tc.setTooltip(Tooltip.of(Mono.text("title colour: #ff8800, &a or a name like gold")));
+        tc.setTooltip(Tooltip.of(Foe.text("title colour: #ff8800, &a or a name like gold")));
         addDrawableChild(tc);
         addDrawableChild(colorSwatch(fieldX + colorW + 3, y, "title colour",
                 () -> RichText.parseColor(t.titleColor, 0xFFFFFF), c -> {
@@ -203,7 +203,7 @@ public class TriggerEditScreen extends DofiScreen {
                 dropLeadColor(subtitleField);
             }
         });
-        sc.setTooltip(Tooltip.of(Mono.text("subtitle colour: #ff8800, &a or a name like gray")));
+        sc.setTooltip(Tooltip.of(Foe.text("subtitle colour: #ff8800, &a or a name like gray")));
         addDrawableChild(sc);
         addDrawableChild(colorSwatch(fieldX + colorW * 2 + 31, y, "subtitle colour",
                 () -> RichText.parseColor(t.subtitleColor, 0xBBBBBB), c -> {
@@ -230,7 +230,7 @@ public class TriggerEditScreen extends DofiScreen {
         int y = FIRST_ROW;
         int half = (width - 4) / 2;
         addDrawableChild(toggle(left, y, half, "play sound", () -> s.enabled, v -> s.enabled = v, "turn the sound on or off"));
-        addDrawableChild(ButtonWidget.builder(Mono.text("▶ play sound"), b -> SoundQueue.play(s))
+        addDrawableChild(ButtonWidget.builder(Foe.text("▶ play sound"), b -> SoundQueue.play(s))
                 .dimensions(left + half + 4, y, half, 20).build());
         y += ROW;
 
@@ -243,7 +243,7 @@ public class TriggerEditScreen extends DofiScreen {
                     b.setMessage(soundLabel());
                     SoundQueue.play(s);
                 }).dimensions(fieldX, y, fieldW, 20)
-                .tooltip(Tooltip.of(Mono.text("click to go through popular sounds (plays each one)"))).build();
+                .tooltip(Tooltip.of(Foe.text("click to go through popular sounds (plays each one)"))).build();
         addDrawableChild(pick);
         y += ROW;
 
@@ -251,7 +251,7 @@ public class TriggerEditScreen extends DofiScreen {
             s.soundId = v;
             pick.setMessage(soundLabel());
         }, "e.g. minecraft:block.note_block.pling");
-        idField[0].setTooltip(Tooltip.of(Mono.text("any sound id, including sounds from the fishonmc server pack")));
+        idField[0].setTooltip(Tooltip.of(Foe.text("any sound id, including sounds from the fishonmc server pack")));
         y += ROW;
 
         addDrawableChild(new ValueSlider(left, y, half, 20, "volume", 0, 1, 0.05, "", s.volume, v -> s.volume = v));
@@ -267,7 +267,6 @@ public class TriggerEditScreen extends DofiScreen {
     private void switchTab(Tab next) {
         this.tab = next;
         clearAndInit();
-        replayIntro();
     }
 
     private void preview() {
@@ -318,7 +317,7 @@ public class TriggerEditScreen extends DofiScreen {
         }
 
         if (!status.isEmpty() && System.currentTimeMillis() < statusUntil) {
-            context.drawCenteredTextWithShadow(textRenderer, Mono.text(status), super.width / 2, this.height - 38, 0xFFFFFFFF);
+            context.drawCenteredTextWithShadow(textRenderer, Foe.text(status), super.width / 2, this.height - 38, 0xFFFFFFFF);
         }
 
         // Live preview on top of everything, over a dimmed backdrop so it reads like in-game.
@@ -350,9 +349,9 @@ public class TriggerEditScreen extends DofiScreen {
         }
         Text result;
         if (testMatcher.error() != null) {
-            result = Mono.text("⚠ " + testMatcher.error()).formatted(Formatting.YELLOW);
+            result = Foe.text("⚠ " + testMatcher.error()).formatted(Formatting.YELLOW);
         } else if (testResult == null) {
-            result = Mono.text("✘ this message would not fire the trigger").formatted(Formatting.RED);
+            result = Foe.text("✘ this message would not fire the trigger").formatted(Formatting.RED);
         } else {
             StringBuilder sb = new StringBuilder("✔ fires!");
             for (Map.Entry<String, String> e : testResult.values().entrySet()) {
@@ -360,7 +359,7 @@ public class TriggerEditScreen extends DofiScreen {
                     sb.append("  {").append(e.getKey()).append("} = ").append(e.getValue());
                 }
             }
-            result = Mono.text(textRenderer.trimToWidth(sb.toString(), width)).formatted(Formatting.GREEN);
+            result = Foe.text(textRenderer.trimToWidth(sb.toString(), width)).formatted(Formatting.GREEN);
         }
         context.drawTextWithShadow(textRenderer, result, left, y + 24, 0xFFFFFFFF);
     }
@@ -386,18 +385,18 @@ public class TriggerEditScreen extends DofiScreen {
     }
 
     private void label(DrawContext context, String text, int y) {
-        context.drawTextWithShadow(textRenderer, Mono.text(text).formatted(Formatting.GRAY), left, y + 6, 0xFFFFFFFF);
+        context.drawTextWithShadow(textRenderer, Foe.text(text).formatted(Formatting.GRAY), left, y + 6, 0xFFFFFFFF);
     }
 
     private void hint(DrawContext context, String text, int y) {
-        context.drawTextWithShadow(textRenderer, Mono.text(textRenderer.trimToWidth(text, width)).formatted(Formatting.DARK_GRAY), left, y, 0xFFFFFFFF);
+        context.drawTextWithShadow(textRenderer, Foe.text(textRenderer.trimToWidth(text, width)).formatted(Formatting.DARK_GRAY), left, y, 0xFFFFFFFF);
     }
 
     private SwatchButton colorSwatch(int x, int y, String name, java.util.function.IntSupplier get,
                                      java.util.function.IntConsumer set) {
         SwatchButton b = new SwatchButton(x, y, 22, 20, get,
                 () -> client.setScreen(new ColorPickerScreen(this, name, get.getAsInt(), set)));
-        b.setTooltip(Tooltip.of(Mono.text("click to pick the " + name.toLowerCase(java.util.Locale.ROOT))));
+        b.setTooltip(Tooltip.of(Foe.text("click to pick the " + name.toLowerCase(java.util.Locale.ROOT))));
         return b;
     }
 
@@ -420,7 +419,7 @@ public class TriggerEditScreen extends DofiScreen {
         f.setMaxLength(maxLength);
         f.setText(value == null ? "" : value);
         f.setChangedListener(onChange);
-        f.setPlaceholder(Mono.text(placeholder).formatted(Formatting.DARK_GRAY));
+        f.setPlaceholder(Foe.text(placeholder).formatted(Formatting.DARK_GRAY));
         addDrawableChild(f);
         return f;
     }
@@ -433,15 +432,15 @@ public class TriggerEditScreen extends DofiScreen {
                     set.set(!get.get());
                     b.setMessage(toggleText(name, get.get()));
                 }).dimensions(x, y, w, 20)
-                .tooltip(Tooltip.of(Mono.text(help))).build();
+                .tooltip(Tooltip.of(Foe.text(help))).build();
     }
 
     private static Text toggleText(String name, boolean on) {
-        return Mono.text(name + ": ").append(Mono.text(on ? "on" : "off").formatted(on ? Formatting.GREEN : Formatting.RED));
+        return Foe.text(name + ": ").append(Foe.text(on ? "on" : "off").formatted(on ? Formatting.GREEN : Formatting.RED));
     }
 
     private Text modeLabel() {
-        return Mono.text(switch (draft.mode) {
+        return Foe.text(switch (draft.mode) {
             case SIMPLE -> "contains (simple)";
             case EXACT -> "whole message";
             case REGEX -> "regex (advanced)";
@@ -465,12 +464,12 @@ public class TriggerEditScreen extends DofiScreen {
 
     private Text animationLabel() {
         String name = draft.title.animation.name();
-        return Mono.text("animation: " + name.toLowerCase(java.util.Locale.ROOT));
+        return Foe.text("animation: " + name.toLowerCase(java.util.Locale.ROOT));
     }
 
     private Text soundLabel() {
         int i = soundIndex(draft.sound.soundId);
-        return Mono.text("♪ " + (i >= 0 ? SOUNDS.get(i).label : "custom sound") + "  (click for next)");
+        return Foe.text("♪ " + (i >= 0 ? SOUNDS.get(i).label : "custom sound") + "  (click for next)");
     }
 
     private static int soundIndex(String id) {

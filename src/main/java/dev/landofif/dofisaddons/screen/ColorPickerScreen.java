@@ -1,7 +1,7 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.ui.DofiScreen;
-import dev.landofif.dofisaddons.util.Mono;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -33,7 +33,7 @@ public class ColorPickerScreen extends DofiScreen {
     private boolean syncing;
 
     public ColorPickerScreen(Screen parent, String title, int rgb, IntConsumer onDone) {
-        super(Mono.text(title));
+        super(Foe.text(title));
         this.parent = parent;
         this.original = rgb & 0xFFFFFF;
         this.rgb = this.original;
@@ -80,8 +80,8 @@ public class ColorPickerScreen extends DofiScreen {
 
         y += 20;
         int bw = (PICKER_W - 4) / 2;
-        addDrawableChild(ButtonWidget.builder(Mono.text("cancel"), b -> close()).dimensions(left, y, bw, 20).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("done").formatted(Formatting.GREEN), b -> {
+        addDrawableChild(ButtonWidget.builder(Foe.text("cancel"), b -> close()).dimensions(left, y, bw, 20).build());
+        addDrawableChild(ButtonWidget.builder(Foe.text("done").formatted(Formatting.GREEN), b -> {
             onDone.accept(rgb);
             close();
         }).dimensions(left + bw + 4, y, bw, 20).build());

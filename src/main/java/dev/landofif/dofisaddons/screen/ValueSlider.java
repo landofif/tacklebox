@@ -1,6 +1,6 @@
 package dev.landofif.dofisaddons.screen;
 
-import dev.landofif.dofisaddons.util.Mono;
+import dev.landofif.dofisaddons.ui.Foe;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.text.Text;
 
@@ -44,12 +44,13 @@ public class ValueSlider extends SliderWidget {
     @Override
     protected void updateMessage() {
         double v = getValue();
+        String prefix = label.isEmpty() ? "" : label + ": ";
         if (format != null) {
-            setMessage(Mono.text(label + ": " + format.apply(v)));
+            setMessage(Foe.text(prefix + format.apply(v)));
             return;
         }
         String shown = step >= 1 ? String.valueOf((long) v) : String.format(java.util.Locale.ROOT, step >= 0.1 ? "%.1f" : "%.2f", v);
-        setMessage(Mono.text(label + ": " + shown + unit));
+        setMessage(Foe.text(prefix + shown + unit));
     }
 
     @Override

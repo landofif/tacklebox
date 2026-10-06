@@ -1,12 +1,11 @@
 package dev.landofif.dofisaddons.hud;
 
+import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.display.Holograms;
 import dev.landofif.dofisaddons.menu.FishMenu;
 import dev.landofif.dofisaddons.menu.Locations;
 import dev.landofif.dofisaddons.screen.FishMenuScreen;
 import dev.landofif.dofisaddons.stats.StatsTracker;
-import dev.landofif.dofisaddons.ui.S24;
-import dev.landofif.dofisaddons.util.Mono;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.font.TextRenderer;
 import dev.landofif.dofisaddons.util.Glyphs;
@@ -222,19 +221,17 @@ public final class XpEstimate {
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
         int w = 0;
         for (String[] r : rows) {
-            w = Math.max(w, tr.getWidth(Mono.text(r[0])) + 12 + tr.getWidth(Mono.text(r[1])));
+            w = Math.max(w, tr.getWidth(Foe.text(r[0])) + 12 + tr.getWidth(Foe.text(r[1])));
         }
         w += 16;
-        int h = 14 + rows.length * 11;
+        int h = 25 + rows.length * 11;
         var s = StatsTracker.settings();
-        S24.panelOpacity = s.hudOpacity;
-        S24.panel(ctx, s.questsX, s.questsY, w, h, Mono.text("quests left"));
-        S24.panelOpacity = 100;
+        Foe.panel(ctx, s.questsX, s.questsY, w, h, Foe.text("quests left"), s.hudOpacity);
         for (int i = 0; i < rows.length; i++) {
-            int y = s.questsY + 9 + i * 11;
-            ctx.drawText(tr, Mono.text(rows[i][0]), s.questsX + 8, y, S24.TEXT_4, false);
-            Text v = Mono.text(rows[i][1]);
-            ctx.drawText(tr, v, s.questsX + w - 8 - tr.getWidth(v), y, S24.TEXT_1, false);
+            int y = s.questsY + 20 + i * 11;
+            ctx.drawTextWithShadow(tr, Foe.text(rows[i][0]), s.questsX + 8, y, Foe.DIM);
+            Text v = Foe.text(rows[i][1]);
+            ctx.drawTextWithShadow(tr, v, s.questsX + w - 8 - tr.getWidth(v), y, Foe.TEXT);
         }
         return new int[]{s.questsX, s.questsY, w, h};
     }

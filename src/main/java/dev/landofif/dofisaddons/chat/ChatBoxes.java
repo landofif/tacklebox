@@ -1,10 +1,9 @@
 package dev.landofif.dofisaddons.chat;
 
+import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.trigger.TriggerEngine;
-import dev.landofif.dofisaddons.ui.S24;
-import dev.landofif.dofisaddons.util.Mono;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.DrawnTextConsumer;
 import net.minecraft.client.font.TextRenderer;
@@ -31,15 +30,15 @@ import java.util.Map;
 
 /**
  * Separate chat boxes (direct messages, crew chat, anything with a rule): routing lines into them,
- * drawing each as a system24 panel with its name in the top border, and scrolling, hover text, clicks
+ * drawing each as a foecollab box with its name in the top edge, and scrolling, hover text, clicks
  * and copying while chat is open. Only what you see changes; nothing is sent.
  */
 public final class ChatBoxes {
     /** Logged like vanilla chat, so lines that skip the chat box still show up in latest.log. */
     private static final Logger CHAT_LOG = LoggerFactory.getLogger(ChatHud.class);
     private static final int KEEP = 200;
-    private static final int PAD_X = 6;
-    private static final int PAD_Y = 6;
+    private static final int PAD_X = 8;
+    private static final int PAD_Y = 7;
     private static final int LINE_H = 10;
 
     private record Line(Text text, long at) {}
@@ -135,8 +134,8 @@ public final class ChatBoxes {
         int x = (int) Math.round(box.x / 100.0 * screenW);
         int y = (int) Math.round(box.y / 100.0 * screenH);
         x = Math.max(0, Math.min(screenW - w, x));
-        y = Math.max(5, Math.min(screenH - h, y));
-        return new int[]{x, y - 5, w, h + 5};
+        y = Math.max(0, Math.min(screenH - h, y));
+        return new int[]{x, y, w, h};
     }
 
     private static List<OrderedText> wrapped(ChatBox box, State st, TextRenderer tr, int textW) {
@@ -197,25 +196,23 @@ public final class ChatBoxes {
         MinecraftClient client = MinecraftClient.getInstance();
         TextRenderer tr = client.textRenderer;
         int[] r = rect(box, ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight());
-        int x = r[0], y = r[1] + 5, w = r[2], h = r[3] - 5;
+        int x = r[0], y = r[1], w = r[2], h = r[3];
         State st = state(box);
 
-        int alpha = Math.round(client.options.getTextBackgroundOpacity().getValue().floatValue() * 255);
-        alpha = S24.scale(alpha, StatsTracker.settings().hudOpacity);
-        ctx.fill(x, y, x + w, y + h, alpha << 24 | (S24.HUD_PANEL & 0xFFFFFF));
-        Text title = Mono.text((box.name.isBlank() ? "chat" : box.name) + (st.scroll > 0 ? " ↓" + st.scroll : "")).withColor(S24.TEXT_3 & 0xFFFFFF);
+        Foe.box(ctx, x, y, w, h, StatsTracker.settings().hudOpacity);
+        Text title = Foe.text((box.name.isBlank() ? "chat" : box.name) + (st.scroll > 0 ? " ↓" + st.scroll : "")).withColor(Foe.TITLE & 0xFFFFFF);
         if (highlight) { // the move screen outlines the box so you can find it
-            ctx.drawStrokedRectangle(x, y, w, h, S24.ACCENT);
+            ctx.drawStrokedRectangle(x, y, w, h, Foe.ACCENT);
         }
-        ctx.drawText(tr, title, x + PAD_X, y + 3, 0xFFFFFFFF, false);
+        ctx.drawTextWithShadow(tr, title, x + PAD_X, y + 6, 0xFFFFFFFF);
 
         List<OrderedText> lines = visible(box, st, tr);
         if (lines.isEmpty()) {
-            ctx.drawText(tr, Mono.text("nothing here yet").withColor(S24.TEXT_4 & 0xFFFFFF), x + PAD_X, y + h - PAD_Y - 9, 0xFFFFFFFF, false);
+            ctx.drawTextWithShadow(tr, Foe.text("nothing here yet").withColor(Foe.DIM & 0xFFFFFF), x + PAD_X, y + h - PAD_Y - 9, 0xFFFFFFFF);
         }
         int ty = y + h - PAD_Y - 9 - (lines.size() - 1) * LINE_H;
         for (OrderedText line : lines) {
-            ctx.drawText(tr, line, x + PAD_X, ty, 0xFFFFFFFF, false);
+            ctx.drawTextWithShadow(tr, line, x + PAD_X, ty, 0xFFFFFFFF);
             ty += LINE_H;
         }
         return r;
@@ -263,7 +260,7 @@ public final class ChatBoxes {
         MinecraftClient client = MinecraftClient.getInstance();
         TextRenderer tr = client.textRenderer;
         int[] r = rect(box[0], client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight());
-        int y = r[1] + 5, h = r[3] - 5;
+        int y = r[1], h = r[3];
         State st = state(box[0]);
         List<OrderedText> lines = visible(box[0], st, tr);
         int first = Math.max(0, st.wrapped.size() - st.scroll) - lines.size();

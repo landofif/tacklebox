@@ -1,13 +1,11 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.compat.FoeConfig;
 import dev.landofif.dofisaddons.compat.FoeScreens;
-import dev.landofif.dofisaddons.ui.S24;
-import dev.landofif.dofisaddons.ui.DofiScreen;
-import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.stats.StatsTracker;
-import dev.landofif.dofisaddons.util.Mono;
-import net.minecraft.client.gui.Click;
+import dev.landofif.dofisaddons.ui.DofiScreen;
+import dev.landofif.dofisaddons.ui.Foe;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
@@ -17,6 +15,7 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Language;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,120 +30,118 @@ import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 /**
- * General settings in three tabs. Every change applies right away (so viewmodel tweaks preview live) and
- * is saved when the screen closes. Each row has a ↺ button that puts that one setting back to default.
+ * One settings screen for both mods: foecollabs settings (read from its config, see compat/FoeConfig) and
+ * the mods own, as a list of categories on the left and plain label + control rows on the right. foecollabs
+ * own settings screen opens this one instead. Every change applies right away and is saved when the screen
+ * closes. The search box looks through every category of both.
  */
 public class SettingsScreen extends DofiScreen {
-    private enum Tab {
-        GENERAL("general"), LOOK("look"), BOBBER("bobber"), WORLD("world"), VIEWMODEL("viewmodel"), FOECOLLAB("foecollab");
+    /** The mods own categories. */
+    private enum Group {
+        GENERAL("general"), HUDS("huds"), BOBBER("bobber"), WORLD("world"), VIEWMODEL("viewmodel");
 
         final String label;
 
-        Tab(String label) {
+        Group(String label) {
             this.label = label;
         }
     }
 
     private static final int ROW_H = 24;
-    private static final int RESET_W = 20;
+    private static final int SIDE_W = 120;
+    private static final int LEFT = 14;
+    private static final int TOP = 28;
 
     private final Screen parent;
     private final DofiSettings s = StatsTracker.settings();
-    private final DofiSettings defaults = new DofiSettings();
-    private Tab tab = Tab.GENERAL;
-    private TextFieldWidget search;
+    /** The category shown: "f:" and a foecollab category, or "d:" and one of the mods own. */
+    private String key;
     private String query = "";
+    private TextFieldWidget search;
     private RowListWidget list;
-    /** The foecollab category shown (its list of settings is a few hundred long, so one category at a time). */
-    private String foeCategory;
-    private int left;
-    private int contentW;
+    private boolean searching;
+    /** The section headers above the row being built (by depth), and which of them have a row already. */
+    private final String[] path = new String[4];
+    private final boolean[] shown = new boolean[4];
 
     public SettingsScreen(Screen parent) {
-        super(Mono.text("dofis addons · settings"));
+        super(Foe.text("settings"));
         this.parent = parent;
+        List<String> foe = FoeConfig.available() ? foeCategories() : List.of();
+        this.key = foe.isEmpty() ? "d:" + Group.GENERAL.label : "f:" + foe.get(0);
     }
 
-    /** Opened on the foecollab tab: stands in for foecollab's own cloth config screen. */
-    public static SettingsScreen foecollab(Screen parent) {
+    /** Opened on the mods own settings. */
+    public static SettingsScreen dofis(Screen parent) {
         SettingsScreen screen = new SettingsScreen(parent);
-        screen.tab = Tab.FOECOLLAB;
+        screen.key = "d:" + Group.GENERAL.label;
         return screen;
     }
 
     @Override
     protected void init() {
-        contentW = tab == Tab.FOECOLLAB ? width - 20 : Math.min(400, width - 20); // foecollab has the room, it is a big list
-        left = (width - contentW) / 2;
-
-        List<Tab> shown = new ArrayList<>(List.of(Tab.values()));
-        if (!FoeConfig.available()) {
-            shown.remove(Tab.FOECOLLAB);
-        }
-        int tabs = shown.size();
-        int tabW = (contentW - 4 * (tabs - 1)) / tabs;
-        int i = 0;
-        for (Tab t : shown) {
-            ButtonWidget b = ButtonWidget.builder(Mono.text(t.label), btn -> {
-                tab = t;
-                clearAndInit();
-            }).dimensions(left + i * (tabW + 4), 22, tabW, 18).build();
-            b.active = t != tab;
-            addDrawableChild(b);
-            i++;
-        }
-
-        int listTop = tab == Tab.FOECOLLAB ? 70 : 46;
-        int sideW = 0;
-        if (tab == Tab.FOECOLLAB) { // categories down the left, the settings of the picked one to the right
-            sideW = Math.min(140, contentW / 4);
-            List<String> categories = foeCategories();
-            if (foeCategory == null || !categories.contains(foeCategory)) {
-                foeCategory = categories.isEmpty() ? "" : categories.get(0);
+        int bottom = height - 36;
+        RowListWidget side = new RowListWidget(client, LEFT, TOP, SIDE_W, bottom - TOP, 22);
+        List<String> foe = FoeConfig.available() ? foeCategories() : List.of();
+        if (!foe.isEmpty()) {
+            side.addRow(new RowListWidget.Row(List.of(new Label(side.getRowWidth(), Foe.text("foecollab").withColor(Foe.DIM & 0xFFFFFF), 14))));
+            for (String c : foe) {
+                side.addRow(new RowListWidget.Row(List.of(category(side, "f:" + c, c))));
             }
-            RowListWidget side = new RowListWidget(client, left, listTop, sideW, height - listTop - 34, ROW_H);
-            for (String c : categories) {
-                ButtonWidget b = ButtonWidget.builder(Mono.text(c), btn -> {
-                    foeCategory = c;
-                    clearAndInit();
-                }).dimensions(0, 0, side.getRowWidth(), 20).build();
-                b.active = !c.equals(foeCategory);
-                side.addRow(new RowListWidget.Row(List.of(b)));
-            }
-            addDrawableChild(side);
-            sideW += 6;
         }
-        list = new RowListWidget(client, left + sideW, listTop, contentW - sideW, height - listTop - 34, ROW_H);
+        side.addRow(new RowListWidget.Row(List.of(new Label(side.getRowWidth(), Foe.text("dofis addons").withColor(Foe.DIM & 0xFFFFFF), 14))));
+        for (Group g : Group.values()) {
+            side.addRow(new RowListWidget.Row(List.of(category(side, "d:" + g.label, g.label))));
+        }
+        addDrawableChild(side);
+
+        int lx = LEFT + SIDE_W + 8;
+        int lw = width - LEFT - lx;
+        search = new TextFieldWidget(textRenderer, lx, TOP, lw - 14, 18, Foe.text("search"));
+        search.setMaxLength(64);
+        search.setText(query);
+        search.setPlaceholder(Foe.text("search every setting").formatted(Formatting.DARK_GRAY));
+        search.setChangedListener(v -> {
+            query = v;
+            refresh();
+            list.setScrollY(0);
+        });
+        addDrawableChild(search);
+        list = new RowListWidget(client, lx, TOP + 24, lw, bottom - TOP - 24, ROW_H);
         addDrawableChild(list);
-        if (tab == Tab.FOECOLLAB) {
-            // a search box above the list, lined up with its rows: foecollab has a few hundred options
-            int x = list.getRowLeft();
-            int w = list.getRowWidth();
-            int bw = 92;
-            search = new TextFieldWidget(textRenderer, x, 46, w - 2 * (bw + 4), 18, Mono.text("search"));
-            search.setMaxLength(64);
-            search.setText(query);
-            search.setPlaceholder(Mono.text("search foecollab settings").formatted(Formatting.DARK_GRAY));
-            search.setChangedListener(v -> {
-                query = v;
-                refresh();
-                list.setScrollY(0);
-            });
-            addDrawableChild(search);
-            addDrawableChild(ButtonWidget.builder(Mono.text("foecollab menu"), b -> open(FoeScreens.main(this)))
-                    .dimensions(x + w - 2 * bw - 4, 46, bw, 18)
-                    .tooltip(Tooltip.of(Mono.text("foecollabs own menu: custom huds, custom buttons, pet calculator and more"))).build());
-            addDrawableChild(ButtonWidget.builder(Mono.text("move huds"), b -> client.setScreen(new HudMoveScreen(this)))
-                    .dimensions(x + w - bw, 46, bw, 18)
-                    .tooltip(Tooltip.of(Mono.text("drag every hud, the chat and chat boxes into place"))).build());
-        }
         fillRows();
 
-        addDrawableChild(ButtonWidget.builder(Mono.text("done"), b -> close())
-                .dimensions(width / 2 - 75, height - 26, 150, 20).build());
+        int bw = 100;
+        int x = (width - (bw * 3 + 8)) / 2;
+        addDrawableChild(ButtonWidget.builder(Foe.text("move huds"), b -> FoeScreens.openMover(this))
+                .dimensions(x, height - 30, bw, 20)
+                .tooltip(Tooltip.of(Foe.text("foecollabs hud mover. the quests left hud and the chat boxes are in it too"))).build());
+        ButtonWidget menu = ButtonWidget.builder(Foe.text("foecollab menu"), b -> open(FoeScreens.main(this)))
+                .dimensions(x + bw + 4, height - 30, bw, 20)
+                .tooltip(Tooltip.of(Foe.text("custom huds, custom buttons, pet calculator and more"))).build();
+        menu.active = FoeConfig.available();
+        addDrawableChild(menu);
+        addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close()).dimensions(x + (bw + 4) * 2, height - 30, bw, 20).build());
     }
 
-    /** Rebuilds the rows (after a reset) without losing the scroll position. */
+    private ButtonWidget category(RowListWidget side, String id, String label) {
+        ButtonWidget b = ButtonWidget.builder(Foe.text(label), btn -> {
+            key = id;
+            clearAndInit();
+        }).dimensions(0, 0, side.getRowWidth(), 20).build();
+        b.active = !id.equals(key) || !query.isBlank();
+        return b;
+    }
+
+    private void open(Screen screen) {
+        if (screen != null) {
+            StatsTracker.saveSettings();
+            FoeConfig.save();
+            client.setScreen(screen);
+        }
+    }
+
+    /** Rebuilds the rows without losing the scroll position. */
     private void refresh() {
         double scroll = list.getScrollY();
         list.clearRows();
@@ -156,425 +153,372 @@ public class SettingsScreen extends DofiScreen {
         return list.getRowWidth();
     }
 
+    private int controlW() {
+        return rowW() * 11 / 20;
+    }
+
     private void fillRows() {
-        switch (tab) {
-            case GENERAL -> {
-                header("level");
-                toggle("hide vanilla xp bar",
-                        "on fishonmc the xp bar shows your fishing level. this hides it and its number so the level hud can take its place. add the level hud from custom huds.",
-                        () -> s.hideVanillaXp, v -> s.hideVanillaXp = v, defaults.hideVanillaXp);
-                header("stats");
-                slider("pause fishing clock after",
-                        "the time fishing clock (and fish per hour) stops when you havent caught anything for this long, so afk time doesnt count.",
-                        10, 600, 10, "s", null,
-                        () -> s.pauseAfterSeconds, v -> s.pauseAfterSeconds = (int) v, defaults.pauseAfterSeconds);
+        query = query == null ? "" : query;
+        searching = !query.isBlank();
+        java.util.Arrays.fill(path, null);
+        java.util.Arrays.fill(shown, false);
+        if (searching) {
+            foeRows(null);
+            for (Group g : Group.values()) {
+                header(g.label, 0);
+                fill(g);
             }
-            case LOOK -> {
-                header("system24");
-                cycle("flavor", "the colour set: system24, caelestia, catppuccin, nord, tokyo night, rose pine, everforest or vencord. changes the mod, the restyled screens and the huds.",
-                        dev.landofif.dofisaddons.ui.Flavor.values(), f -> f.label, () -> s.flavor, v -> {
-                            s.flavor = v;
-                            S24.apply(v);
-                            refresh(); // headers and swatches pick up the new colours
-                        }, defaults.flavor);
-                cycle("style", "system24: square panels with thin borders and labels in the top edge. caelestia: rounded borderless boxes like caelestia shell, best with the caelestia flavor. minecraft: no restyling at all, vanilla buttons, backgrounds, menus and hotbar, so a resource pack can retexture them.",
-                        DofiSettings.Style.values(), v -> v.label, () -> s.style, v -> {
-                            s.style = v;
-                            refresh();
-                        }, defaults.style);
-                toggle("restyle all screens",
-                        "draws buttons, sliders, text fields, lists, screen backgrounds and tooltips in every screen in the system24 style, not just in the mods own screens.",
-                        () -> s.s24Everywhere, v -> s.s24Everywhere = v, defaults.s24Everywhere);
-                toggle("restyle menus",
-                        "draws chests, your inventory and fishonmc menus as flat panels with flat slots. this hides the menu art from the fishonmc resource pack.",
-                        () -> s.s24Menus, v -> s.s24Menus = v, defaults.s24Menus);
-                toggle("fishonmc menu",
-                        "shows the main menu (book in the 9th slot, /menu) and /travel as a screen of dofis addons with big icons you can rearrange. turn it off to get the chest back.",
-                        () -> s.fishMenu, v -> s.fishMenu = v, defaults.fishMenu);
-                toggle("quests left hud",
-                        "a small box with the estimated quests until your next level and the next level of the location you are at. it learns as you play and reads the /quests and travel menus. move it with /dofi huds.",
-                        () -> s.questsHud, v -> s.questsHud = v, defaults.questsHud);
-                toggle("presets screen",
-                        "shows /presets as a wardrobe of cards with player models. turn it off to get the chest back.",
-                        () -> s.presetsMenu, v -> s.presetsMenu = v, defaults.presetsMenu);
-                slider("hud opacity", "how see-through the huds are: quests left, chat boxes and foecollabs huds.", 10, 100, 5, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
-                        () -> s.hudOpacity, v -> s.hudOpacity = (int) Math.round(v), defaults.hudOpacity);
-                slider("screen opacity", "how see-through the background and panel of the mods screens are (this settings screen too).", 20, 100, 5, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
-                        () -> s.screenOpacity, v -> s.screenOpacity = (int) Math.round(v), defaults.screenOpacity);
-                slider("menu size", "how much of the screen the fishonmc menu takes.", 40, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
-                        () -> s.menuSize, v -> s.menuSize = (int) Math.round(v), defaults.menuSize);
-                color("menu colour", "the highlight colour of the fishonmc menu. the default follows the flavor.",
-                        () -> s.menuColor, v -> s.menuColor = v, defaults.menuColor);
-                toggle("presets other page background", "draws the card boxes behind the dimmed presets of the other page. off by default, so only the models show.",
-                        () -> s.presetsOtherBg, v -> s.presetsOtherBg = v, defaults.presetsOtherBg);
-                slider("presets size", "how much of the screen the presets screen takes.", 40, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
-                        () -> s.presetsSize, v -> s.presetsSize = (int) Math.round(v), defaults.presetsSize);
-                color("presets colour", "the highlight colour of the presets screen. the default follows the flavor.",
-                        () -> s.presetsColor, v -> s.presetsColor = v, defaults.presetsColor);
-                toggle("restyle hotbar", "flat boxes for the hotbar, with an accent border on the selected slot.",
-                        () -> s.s24Hotbar, v -> s.s24Hotbar = v, defaults.s24Hotbar);
-                toggle("restyle foecollab huds",
-                        "draws foecollabs hud boxes as system24 panels in your flavor. pick any clean theme in foecollab to get the titles set into the top border.",
-                        () -> s.foeHuds, v -> s.foeHuds = v, defaults.foeHuds);
-                header("font");
-                cycle("font", "the font of the mods own text: dm mono, jetbrains mono, google sans flex, or minecraft (the normal game font). also used by mono font everywhere.",
-                        DofiSettings.Font.values(), v -> v.label, () -> s.font, v -> {
-                            s.font = v;
-                            refresh();
-                        }, defaults.font);
-                toggle("mono font everywhere",
-                        "draws all text in the game, chat and menus included, with the font above (not when it is minecraft). icons from the fishonmc pack keep their own font.",
-                        () -> s.monoEverywhere, v -> s.monoEverywhere = v, defaults.monoEverywhere);
-                header("title screen");
-                cycle("title screen",
-                        "which title screen shows when the game starts: the system24 one from dofis addons with a join fishonmc button, foecollabs, or the minecraft one.",
-                        titleChoices(), c -> c.label, () -> s.titleChoice, v -> s.titleChoice = v, DofiSettings.TitleChoice.DOFIS);
+        } else if (key.startsWith("f:")) {
+            foeRows(key.substring(2));
+        } else {
+            for (Group g : Group.values()) {
+                if (key.equals("d:" + g.label)) {
+                    fill(g);
+                }
             }
-            case BOBBER -> {
-                header("timer");
-                cycle("bobber timer",
-                        "shows how long your line has been in the water. changes colour as the wait gets long, and says bite! when something bites. display only.",
-                        DofiSettings.BobberMode.values(), m -> m.label, () -> s.bobberTimer, v -> s.bobberTimer = v, defaults.bobberTimer);
-                color("timer colour", "the colour of the timer while the wait is still short.",
-                        () -> s.bobberColor, v -> s.bobberColor = v, defaults.bobberColor);
-                slider("warn after", "the timer switches to the warn colour after this many seconds. 0 = never.",
-                        0, 60, 1, "s", v -> v == 0 ? "never" : String.format(Locale.ROOT, "%.0fs", v),
-                        () -> s.bobberWarnSeconds, v -> s.bobberWarnSeconds = v, defaults.bobberWarnSeconds);
-                color("warn colour", "the colour of the timer once it passes the warn time.",
-                        () -> s.bobberWarnColor, v -> s.bobberWarnColor = v, defaults.bobberWarnColor);
-                slider("slow after", "the timer switches to the slow colour after this many seconds. 0 = never.",
-                        0, 60, 1, "s", v -> v == 0 ? "never" : String.format(Locale.ROOT, "%.0fs", v),
-                        () -> s.bobberSlowSeconds, v -> s.bobberSlowSeconds = v, defaults.bobberSlowSeconds);
-                color("slow colour", "the colour of the timer once it passes the slow time.",
-                        () -> s.bobberSlowColor, v -> s.bobberSlowColor = v, defaults.bobberSlowColor);
-                color("bite colour", "the colour of the timer once something bites.",
-                        () -> s.bobberBiteColor, v -> s.bobberBiteColor = v, defaults.bobberBiteColor);
-                toggle("show bite!", "puts bite! in front of the time when something bites. the colour still changes when this is off.",
-                        () -> s.bobberShowBite, v -> s.bobberShowBite = v, defaults.bobberShowBite);
-                toggle("bold timer", "draws the timer in the medium face instead of the light one.",
-                        () -> s.bobberBold, v -> s.bobberBold = v, defaults.bobberBold);
-                slider("decimals", "how many digits after the point. 0 shows whole seconds.",
-                        0, 2, 1, "", v -> String.format(Locale.ROOT, "%.0f", v),
-                        () -> s.bobberDecimals, v -> s.bobberDecimals = (int) Math.round(v), defaults.bobberDecimals);
-                slider("timer size", "how big the timer is. 1 = normal.", 0.5, 3, 0.05, "x", null,
-                        () -> s.bobberScale, v -> s.bobberScale = v, defaults.bobberScale);
-                slider("height above bobber", "how many blocks above the bobber the timer floats. above bobber mode only.",
-                        0, 3, 0.05, " blocks", null, () -> s.bobberHeight, v -> s.bobberHeight = v, defaults.bobberHeight);
-                slider("background", "how solid the box behind the timer above the bobber is. 0 = no box.",
-                        0, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
-                        () -> s.bobberBacking, v -> s.bobberBacking = (int) Math.round(v), defaults.bobberBacking);
-                toggle("show through walls", "keeps the timer above the bobber visible behind blocks and water.",
-                        () -> s.bobberThroughWalls, v -> s.bobberThroughWalls = v, defaults.bobberThroughWalls);
-                slider("crosshair offset", "how far below the crosshair the timer sits. under crosshair mode only. negative is above.",
-                        -60, 60, 1, "", v -> String.format(Locale.ROOT, "%.0f", v),
-                        () -> s.bobberCrosshairY, v -> s.bobberCrosshairY = (int) Math.round(v), defaults.bobberCrosshairY);
-                header("bite");
-                toggle("bite message", "shows a short message in the middle of the screen when your own fish bites.",
-                        () -> s.biteMessage, v -> s.biteMessage = v, defaults.biteMessage);
-                text("message text", "what the bite message says.", () -> s.biteMessageText, v -> s.biteMessageText = v, defaults.biteMessageText);
-                color("message colour", "the colour of the bite message.",
-                        () -> s.biteMessageColor, v -> s.biteMessageColor = v, defaults.biteMessageColor);
-                header("bobber");
-                toggle("still bobber", "holds your bobber still on the water instead of bobbing up and down. it still dips when a fish bites.",
-                        () -> s.stillBobber, v -> s.stillBobber = v, defaults.stillBobber);
-                toggle("smooth cast", "on a laggy connection your cast can jump back and fly the path again. this shows your own cast flying smoothly. where it lands stays exact.",
-                        () -> s.smoothCast, v -> s.smoothCast = v, defaults.smoothCast);
-                toggle("hide other bobbers", "hides other players bobbers and their lines, on your screen only.",
-                        () -> s.hideOtherBobbers, v -> s.hideOtherBobbers = v, defaults.hideOtherBobbers);
-                header("skin");
-                cycle("bobber skin", "swaps the look of your bobber. only you see it, other players still see the normal one.",
-                        DofiSettings.BobberSkin.values(), k -> k.label, () -> s.bobberSkin, v -> s.bobberSkin = v, defaults.bobberSkin);
-                toggle("skin every bobber", "also uses your skin for other players bobbers, on your screen only.",
-                        () -> s.skinEveryone, v -> s.skinEveryone = v, defaults.skinEveryone);
-                header("line");
-                toggle("custom line colour", "colours your own fishing line. other lines stay normal.",
-                        () -> s.customLineColor, v -> s.customLineColor = v, defaults.customLineColor);
-                color("line colour", "the colour of your fishing line. click to pick it.",
-                        () -> s.lineColor, v -> s.lineColor = v, defaults.lineColor);
-            }
-            case WORLD -> {
-                header("nametags");
-                toggle("hide my nametag", "hides the rank, name and power tag the server puts over your own head. other players still see it.",
-                        () -> s.hideOwnNametag, v -> s.hideOwnNametag = v, defaults.hideOwnNametag);
-                toggle("hide all nametags", "hides every players nametag on your screen, the servers and the vanilla one.",
-                        () -> s.hideAllNametags, v -> s.hideAllNametags = v, defaults.hideAllNametags);
-                header("clutter");
-                toggle("hide xp popups", "hides the +66xp line above the hotbar after each catch.",
-                        () -> s.hideXpPopups, v -> s.hideXpPopups = v, defaults.hideXpPopups);
-                toggle("flat leaves", "draws leaves flat like vanilla instead of the 3d leaves from the fishonmc pack. reloads resources when you change it.",
-                        () -> s.flatLeaves, v -> {
-                            if (s.flatLeaves != v) {
-                                s.flatLeaves = v;
-                                client.reloadResources();
-                            }
-                        }, defaults.flatLeaves);
-                header("tooltips");
-                toggle("short fish tooltips", "leaves out the latin name, value, ecosystem and the kg / cm part of caught fish tooltips.",
-                        () -> s.shortFishTooltips, v -> s.shortFishTooltips = v, defaults.shortFishTooltips);
-                toggle("short pet tooltips", "shows maxed stats once (+175 instead of +175/+175) and leaves out empty skin, item and trail slots.",
-                        () -> s.shortPetTooltips, v -> s.shortPetTooltips = v, defaults.shortPetTooltips);
-            }
-            case VIEWMODEL -> {
-                header("held item");
-                toggle("custom viewmodel", "changes how big your held item is and where it sits on screen. turn off to go back to normal.",
-                        () -> s.viewmodel, v -> s.viewmodel = v, defaults.viewmodel);
-                slider("size", "how big the held item is. 1 = normal.", 0.1, 3, 0.05, "x", null,
-                        () -> s.vmScale, v -> s.vmScale = v, defaults.vmScale);
-                slider("left / right", "moves the item sideways. mirrored for your off hand.", -1, 1, 0.05, "", null,
-                        () -> s.vmX, v -> s.vmX = v, defaults.vmX);
-                slider("up / down", "moves the item up or down.", -1, 1, 0.05, "", null,
-                        () -> s.vmY, v -> s.vmY = v, defaults.vmY);
-                slider("forward / back", "moves the item closer or further away. negative is further.", -1, 1, 0.05, "", null,
-                        () -> s.vmZ, v -> s.vmZ = v, defaults.vmZ);
-                slider("tilt", "tilts the item forward or back, in degrees.", -180, 180, 1, "°", null,
-                        () -> s.vmRotX, v -> s.vmRotX = v, defaults.vmRotX);
-                slider("turn", "turns the item left or right, in degrees.", -180, 180, 1, "°", null,
-                        () -> s.vmRotY, v -> s.vmRotY = v, defaults.vmRotY);
-                slider("roll", "rolls the item sideways, in degrees.", -180, 180, 1, "°", null,
-                        () -> s.vmRotZ, v -> s.vmRotZ = v, defaults.vmRotZ);
-                toggle("no switch dip", "stops the item from dipping down when you switch slots or use it.",
-                        () -> s.vmNoEquipDip, v -> s.vmNoEquipDip = v, defaults.vmNoEquipDip);
-                header("swing");
-                cycle("swing style",
-                        "how your hand swings. smooth eases in and out, snappy moves fast at the start, no swing only turns the item around its own centre without moving it. only you see it.",
-                        DofiSettings.SwingStyle.values(), w -> w.label, () -> s.swingStyle, v -> s.swingStyle = v, defaults.swingStyle);
-                slider("swing length", "how long one swing takes. 1 = normal, 2 = twice as slow, 0.5 = twice as fast. only changes how it looks.",
-                        0.25, 4, 0.05, "x", null, () -> s.swingSlowness, v -> s.swingSlowness = v, defaults.swingSlowness);
-                slider("swing turn", "with no swing, how far the item turns. 100% is the full vanilla turn, 0% keeps it still.",
-                        0, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v), () -> s.swingTurn, v -> s.swingTurn = v, defaults.swingTurn);
-            }
-            case FOECOLLAB -> foeRows();
+        }
+        if (list.children().isEmpty()) {
+            list.addRow(new RowListWidget.Row(List.of(new Label(rowW(), Foe.text("nothing matches " + query.trim()).withColor(Foe.DIM & 0xFFFFFF), 20))));
         }
     }
 
-    private DofiSettings.TitleChoice[] titleChoices() {
-        if (FoeConfig.available()) {
-            return DofiSettings.TitleChoice.values();
+    private void fill(Group g) {
+        switch (g) {
+            case GENERAL -> general();
+            case HUDS -> huds();
+            case BOBBER -> bobber();
+            case WORLD -> world();
+            case VIEWMODEL -> viewmodel();
         }
-        return new DofiSettings.TitleChoice[]{DofiSettings.TitleChoice.DOFIS, DofiSettings.TitleChoice.MINECRAFT};
     }
 
-    private void open(Screen screen) {
-        if (screen != null) {
-            StatsTracker.saveSettings();
-            FoeConfig.save();
-            client.setScreen(screen);
-        }
+    // ------------------------------------------------------------------ the mods settings
+
+    private void general() {
+        header("level", 1);
+        toggle("hide vanilla xp bar",
+                "on fishonmc the xp bar shows your fishing level. this hides it and its number so foecollabs level hud can take its place.",
+                () -> s.hideVanillaXp, v -> s.hideVanillaXp = v);
+        header("stats", 1);
+        slider("pause fishing clock after",
+                "the time fishing clock (and fish per hour) stops when you havent caught anything for this long, so afk time doesnt count.",
+                10, 600, 10, "s", null,
+                () -> s.pauseAfterSeconds, v -> s.pauseAfterSeconds = (int) v);
+        header("menus", 1);
+        toggle("simple menus",
+                "draws chests, your inventory and fishonmc menus as one box with no slot boxes. this hides the menu art from the fishonmc resource pack.",
+                () -> s.flatMenus, v -> s.flatMenus = v);
+        toggle("fishonmc menu",
+                "shows the main menu (book in the 9th slot, /menu) and /travel as a screen of dofis addons with big icons you can rearrange. turn it off to get the chest back.",
+                () -> s.fishMenu, v -> s.fishMenu = v);
+        slider("menu size", "how much of the screen the fishonmc menu takes.", 40, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
+                () -> s.menuSize, v -> s.menuSize = (int) Math.round(v));
+        toggle("presets screen",
+                "shows /presets as a wardrobe of cards with player models. turn it off to get the chest back.",
+                () -> s.presetsMenu, v -> s.presetsMenu = v);
+        slider("presets size", "how much of the screen the presets screen takes.", 40, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
+                () -> s.presetsSize, v -> s.presetsSize = (int) Math.round(v));
+        toggle("presets other page background", "draws the card boxes behind the dimmed presets of the other page. off by default, so only the models show.",
+                () -> s.presetsOtherBg, v -> s.presetsOtherBg = v);
+    }
+
+    private void huds() {
+        header("huds", 1);
+        toggle("quests left hud",
+                "a small box with the estimated quests until your next level and the next level of the location you are at. it learns as you play and reads the /quests menu and the compendium locations. move it in foecollabs hud mover.",
+                () -> s.questsHud, v -> s.questsHud = v);
+        slider("hud opacity", "how see-through the mods huds are: quests left and the chat boxes.", 10, 100, 5, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
+                () -> s.hudOpacity, v -> s.hudOpacity = (int) Math.round(v));
+        slider("screen opacity", "how see-through the box of the mods screens is, this one too.", 20, 100, 5, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
+                () -> s.screenOpacity, v -> s.screenOpacity = (int) Math.round(v));
+    }
+
+    private void bobber() {
+            header("timer");
+            cycle("bobber timer",
+                    "shows how long your line has been in the water. changes colour as the wait gets long, and says bite! when something bites. display only.",
+                    DofiSettings.BobberMode.values(), m -> m.label, () -> s.bobberTimer, v -> s.bobberTimer = v);
+            color("timer colour", "the colour of the timer while the wait is still short.",
+                    () -> s.bobberColor, v -> s.bobberColor = v);
+            slider("warn after", "the timer switches to the warn colour after this many seconds. 0 = never.",
+                    0, 60, 1, "s", v -> v == 0 ? "never" : String.format(Locale.ROOT, "%.0fs", v),
+                    () -> s.bobberWarnSeconds, v -> s.bobberWarnSeconds = v);
+            color("warn colour", "the colour of the timer once it passes the warn time.",
+                    () -> s.bobberWarnColor, v -> s.bobberWarnColor = v);
+            slider("slow after", "the timer switches to the slow colour after this many seconds. 0 = never.",
+                    0, 60, 1, "s", v -> v == 0 ? "never" : String.format(Locale.ROOT, "%.0fs", v),
+                    () -> s.bobberSlowSeconds, v -> s.bobberSlowSeconds = v);
+            color("slow colour", "the colour of the timer once it passes the slow time.",
+                    () -> s.bobberSlowColor, v -> s.bobberSlowColor = v);
+            color("bite colour", "the colour of the timer once something bites.",
+                    () -> s.bobberBiteColor, v -> s.bobberBiteColor = v);
+            toggle("show bite!", "puts bite! in front of the time when something bites. the colour still changes when this is off.",
+                    () -> s.bobberShowBite, v -> s.bobberShowBite = v);
+            slider("decimals", "how many digits after the point. 0 shows whole seconds.",
+                    0, 2, 1, "", v -> String.format(Locale.ROOT, "%.0f", v),
+                    () -> s.bobberDecimals, v -> s.bobberDecimals = (int) Math.round(v));
+            slider("timer size", "how big the timer is. 1 = normal.", 0.5, 3, 0.05, "x", null,
+                    () -> s.bobberScale, v -> s.bobberScale = v);
+            slider("height above bobber", "how many blocks above the bobber the timer floats. above bobber mode only.",
+                    0, 3, 0.05, " blocks", null, () -> s.bobberHeight, v -> s.bobberHeight = v);
+            slider("background", "how solid the box behind the timer above the bobber is. 0 = no box.",
+                    0, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v),
+                    () -> s.bobberBacking, v -> s.bobberBacking = (int) Math.round(v));
+            toggle("show through walls", "keeps the timer above the bobber visible behind blocks and water.",
+                    () -> s.bobberThroughWalls, v -> s.bobberThroughWalls = v);
+            slider("crosshair offset", "how far below the crosshair the timer sits. under crosshair mode only. negative is above.",
+                    -60, 60, 1, "", v -> String.format(Locale.ROOT, "%.0f", v),
+                    () -> s.bobberCrosshairY, v -> s.bobberCrosshairY = (int) Math.round(v));
+            header("bite");
+            toggle("bite message", "shows a short message in the middle of the screen when your own fish bites.",
+                    () -> s.biteMessage, v -> s.biteMessage = v);
+            text("message text", "what the bite message says.", () -> s.biteMessageText, v -> s.biteMessageText = v);
+            color("message colour", "the colour of the bite message.",
+                    () -> s.biteMessageColor, v -> s.biteMessageColor = v);
+            header("bobber");
+            toggle("still bobber", "holds your bobber still on the water instead of bobbing up and down. it still dips when a fish bites.",
+                    () -> s.stillBobber, v -> s.stillBobber = v);
+            toggle("smooth cast", "on a laggy connection your cast can jump back and fly the path again. this shows your own cast flying smoothly. where it lands stays exact.",
+                    () -> s.smoothCast, v -> s.smoothCast = v);
+            toggle("hide other bobbers", "hides other players bobbers and their lines, on your screen only.",
+                    () -> s.hideOtherBobbers, v -> s.hideOtherBobbers = v);
+            header("skin");
+            cycle("bobber skin", "swaps the look of your bobber. only you see it, other players still see the normal one.",
+                    DofiSettings.BobberSkin.values(), k -> k.label, () -> s.bobberSkin, v -> s.bobberSkin = v);
+            toggle("skin every bobber", "also uses your skin for other players bobbers, on your screen only.",
+                    () -> s.skinEveryone, v -> s.skinEveryone = v);
+            header("line");
+            toggle("custom line colour", "colours your own fishing line. other lines stay normal.",
+                    () -> s.customLineColor, v -> s.customLineColor = v);
+            color("line colour", "the colour of your fishing line. click to pick it.",
+                    () -> s.lineColor, v -> s.lineColor = v);
+    }
+
+    private void world() {
+            header("nametags");
+            toggle("hide my nametag", "hides the rank, name and power tag the server puts over your own head. other players still see it.",
+                    () -> s.hideOwnNametag, v -> s.hideOwnNametag = v);
+            toggle("hide all nametags", "hides every players nametag on your screen, the servers and the vanilla one.",
+                    () -> s.hideAllNametags, v -> s.hideAllNametags = v);
+            header("clutter");
+            toggle("hide xp popups", "hides the +66xp line above the hotbar after each catch.",
+                    () -> s.hideXpPopups, v -> s.hideXpPopups = v);
+            toggle("flat leaves", "draws leaves flat like vanilla instead of the 3d leaves from the fishonmc pack. reloads resources when you change it.",
+                    () -> s.flatLeaves, v -> {
+                        if (s.flatLeaves != v) {
+                            s.flatLeaves = v;
+                            client.reloadResources();
+                        }
+                    });
+            header("tooltips");
+            toggle("short fish tooltips", "leaves out the latin name, value, ecosystem and the kg / cm part of caught fish tooltips.",
+                    () -> s.shortFishTooltips, v -> s.shortFishTooltips = v);
+            toggle("short pet tooltips", "shows maxed stats once (+175 instead of +175/+175) and leaves out empty skin, item and trail slots.",
+                    () -> s.shortPetTooltips, v -> s.shortPetTooltips = v);
+    }
+
+    private void viewmodel() {
+            header("held item");
+            toggle("custom viewmodel", "changes how big your held item is and where it sits on screen. turn off to go back to normal.",
+                    () -> s.viewmodel, v -> s.viewmodel = v);
+            slider("size", "how big the held item is. 1 = normal.", 0.1, 3, 0.05, "x", null,
+                    () -> s.vmScale, v -> s.vmScale = v);
+            slider("left / right", "moves the item sideways. mirrored for your off hand.", -1, 1, 0.05, "", null,
+                    () -> s.vmX, v -> s.vmX = v);
+            slider("up / down", "moves the item up or down.", -1, 1, 0.05, "", null,
+                    () -> s.vmY, v -> s.vmY = v);
+            slider("forward / back", "moves the item closer or further away. negative is further.", -1, 1, 0.05, "", null,
+                    () -> s.vmZ, v -> s.vmZ = v);
+            slider("tilt", "tilts the item forward or back, in degrees.", -180, 180, 1, "°", null,
+                    () -> s.vmRotX, v -> s.vmRotX = v);
+            slider("turn", "turns the item left or right, in degrees.", -180, 180, 1, "°", null,
+                    () -> s.vmRotY, v -> s.vmRotY = v);
+            slider("roll", "rolls the item sideways, in degrees.", -180, 180, 1, "°", null,
+                    () -> s.vmRotZ, v -> s.vmRotZ = v);
+            toggle("no switch dip", "stops the item from dipping down when you switch slots or use it.",
+                    () -> s.vmNoEquipDip, v -> s.vmNoEquipDip = v);
+            header("swing");
+            cycle("swing style",
+                    "how your hand swings. smooth eases in and out, snappy moves fast at the start, no swing only turns the item around its own centre without moving it. only you see it.",
+                    DofiSettings.SwingStyle.values(), w -> w.label, () -> s.swingStyle, v -> s.swingStyle = v);
+            slider("swing length", "how long one swing takes. 1 = normal, 2 = twice as slow, 0.5 = twice as fast. only changes how it looks.",
+                    0.25, 4, 0.05, "x", null, () -> s.swingSlowness, v -> s.swingSlowness = v);
+            slider("swing turn", "with no swing, how far the item turns. 100% is the full vanilla turn, 0% keeps it still.",
+                    0, 100, 1, "%", v -> String.format(Locale.ROOT, "%.0f%%", v), () -> s.swingTurn, v -> s.swingTurn = v);
     }
 
     // ------------------------------------------------------------------ foecollab
-
-    /** foecollab's own settings as rows (compat/FoeConfig), filtered by the search box. */
-    private void foeRows() {
-        String q = query.trim().toLowerCase(Locale.ROOT);
-        List<FoeConfig.Header> path = new ArrayList<>(); // the open categories and sections, by depth
-        int emitted = 0; // how many of them already have a row
-        int shown = 0;
-        for (FoeConfig.Node node : FoeConfig.nodes()) {
-            if (node instanceof FoeConfig.Header h) {
-                while (path.size() > h.depth()) path.removeLast();
-                path.add(h);
-                emitted = Math.min(emitted, path.size() - 1);
-                if (q.isEmpty() && h.depth() > 0 && path.get(0).label().equals(foeCategory) && !foeHidden(path, h)) {
-                    foeSection(path); // sections can be folded, like in foecollabs own screen
-                }
-                continue;
-            }
-            FoeConfig.Option o = (FoeConfig.Option) node;
-            if (q.isEmpty() ? !path.get(0).label().equals(foeCategory) || foeHidden(path, null) : !foeMatches(o, path, q)) {
-                continue; // no search: only the picked category, minus folded sections; searching looks in all of them
-            }
-            for (; !q.isEmpty() && emitted < path.size(); emitted++) { // search: show the headers above a hit
-                FoeConfig.Header h = path.get(emitted);
-                if (h.depth() == 0) {
-                    header(h.label());
-                } else {
-                    subheader(h.label());
-                }
-            }
-            foeOption(o);
-            shown++;
-        }
-        if (shown == 0) {
-            subheader(q.isEmpty() ? "foecollab has no settings to show" : "nothing matches " + q);
-        }
-    }
-
-    /** Sections the player folded, by their path ("category/section/..."). Kept while the screen is open. */
-    private final java.util.Set<String> folded = new java.util.HashSet<>();
-
-    private static String foeKey(List<FoeConfig.Header> path, int upTo) {
-        return path.subList(0, upTo).stream().map(FoeConfig.Header::label).collect(java.util.stream.Collectors.joining("/"));
-    }
-
-    /** True when a section above (not counting {@code except}, the one whose own row is being drawn) is folded. */
-    private boolean foeHidden(List<FoeConfig.Header> path, FoeConfig.Header except) {
-        int to = except == null ? path.size() : path.size() - 1;
-        for (int i = 2; i <= to; i++) {
-            if (folded.contains(foeKey(path, i))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void foeSection(List<FoeConfig.Header> path) {
-        String key = foeKey(path, path.size());
-        boolean closed = folded.contains(key);
-        FoldHeader b = new FoldHeader(rowW(), path.getLast().label(), closed, () -> {
-            if (!folded.remove(key)) {
-                folded.add(key);
-            }
-            refresh();
-        });
-        b.setTooltip(Tooltip.of(Mono.text(closed ? "click to unfold this section" : "click to fold this section")));
-        list.addRow(new RowListWidget.Row(List.of(b)));
-    }
 
     private static List<String> foeCategories() {
         return FoeConfig.nodes().stream().filter(n -> n instanceof FoeConfig.Header h && h.depth() == 0)
                 .map(n -> ((FoeConfig.Header) n).label()).toList();
     }
 
-    private static boolean foeMatches(FoeConfig.Option o, List<FoeConfig.Header> path, String q) {
-        if (o.label().contains(q) || (o.tooltip() != null && o.tooltip().contains(q))) {
-            return true;
+    /** foecollabs settings as rows: one category, or every category while searching ({@code category} null). */
+    private void foeRows(String category) {
+        String current = null;
+        for (FoeConfig.Node node : FoeConfig.nodes()) {
+            if (node instanceof FoeConfig.Header h) {
+                if (h.depth() == 0) {
+                    current = h.label();
+                }
+                if (category == null || category.equals(current)) {
+                    header(h.label(), h.depth());
+                }
+            } else if (category == null || category.equals(current)) {
+                foeOption((FoeConfig.Option) node);
+            }
         }
-        for (FoeConfig.Header h : path) {
-            if (h.label().contains(q)) return true;
-        }
-        return false;
     }
 
     private void foeOption(FoeConfig.Option o) {
         if (o.prefix() != null && !o.prefix().isEmpty()) {
-            subheader(o.prefix());
+            header(o.prefix(), o.depth());
         }
         String name = o.label();
         String desc = o.tooltip() == null ? "" : o.tooltip();
         switch (o.kind()) {
-            case BOOL -> toggle(name, desc, () -> (Boolean) o.get(), o::set, (Boolean) o.def());
+            case BOOL -> toggle(name, desc, () -> (Boolean) o.get(), o::set);
             case SLIDER -> slider(name, desc, o.min(), o.max(), 1, "", v -> String.valueOf((int) Math.round(v)),
-                    () -> ((Number) o.get()).doubleValue(), v -> o.set((int) Math.round(v)), ((Number) o.def()).doubleValue());
+                    () -> ((Number) o.get()).doubleValue(), v -> o.set((int) Math.round(v)));
             case COLOR -> color(name, desc, () -> (Integer) o.get() & 0xFFFFFF,
-                    v -> o.set(((Integer) o.get() & 0xFF000000) | (v & 0xFFFFFF)), (Integer) o.def() & 0xFFFFFF);
+                    v -> o.set(((Integer) o.get() & 0xFF000000) | (v & 0xFFFFFF)));
             case INT -> text(name, desc, () -> String.valueOf(o.get()), v -> {
                 try {
                     o.set(Integer.parseInt(v.trim()));
                 } catch (NumberFormatException ignored) {
                     // keep the old value until the field holds a number
                 }
-            }, String.valueOf(o.def()));
+            });
             case LONG -> text(name, desc, () -> String.valueOf(o.get()), v -> {
                 try {
                     o.set(Long.parseLong(v.trim()));
                 } catch (NumberFormatException ignored) {
                     // keep the old value until the field holds a number
                 }
-            }, String.valueOf(o.def()));
-            case STRING -> text(name, desc, () -> String.valueOf(o.get()), o::set, String.valueOf(o.def()));
+            });
+            case STRING -> text(name, desc, () -> String.valueOf(o.get()), o::set);
             case ENUM -> {
                 Enum<?>[] values = o.constants();
-                ButtonWidget b = ButtonWidget.builder(Mono.text(name + ": " + FoeConfig.enumLabel(o.get())), btn -> {
+                ButtonWidget b = ButtonWidget.builder(Foe.text(FoeConfig.enumLabel(o.get())), btn -> {
                     Enum<?> now = (Enum<?>) o.get();
                     o.set(values[((now == null ? -1 : now.ordinal()) + 1) % values.length]);
-                    btn.setMessage(Mono.text(name + ": " + FoeConfig.enumLabel(o.get())));
+                    btn.setMessage(Foe.text(FoeConfig.enumLabel(o.get())));
                 }).dimensions(0, 0, controlW(), 20).build();
-                row(b, desc.isEmpty() ? "click to change" : desc + " (click to change)", () -> o.set(o.def()));
+                row(name, desc.isEmpty() ? "click to change" : desc + " (click to change)", b);
             }
         }
     }
 
     // ------------------------------------------------------------------ row builders
 
+    /** A section title. While searching it only shows once one of the rows under it matches. */
     private void header(String name) {
-        list.addRow(new RowListWidget.Row(List.of(new Label(rowW(), Mono.bold(name).withColor(S24.ACCENT & 0xFFFFFF)))));
+        header(name, 1);
     }
 
-    /** A smaller grey header for a section inside a category. */
-    private void subheader(String name) {
-        list.addRow(new RowListWidget.Row(List.of(new Label(rowW(), Mono.text(name).withColor(S24.TEXT_3 & 0xFFFFFF)))));
-    }
-
-    private void row(ClickableWidget control, String desc, Runnable reset) {
-        if (!desc.isEmpty()) {
-            control.setTooltip(Tooltip.of(Mono.text(desc)));
+    private void header(String name, int depth) {
+        depth = Math.min(depth, path.length - 1);
+        path[depth] = name;
+        shown[depth] = false;
+        for (int i = depth + 1; i < path.length; i++) {
+            path[i] = null;
         }
-        ButtonWidget r = ButtonWidget.builder(Mono.text("↺"), b -> {
-            reset.run();
-            refresh();
-        }).dimensions(0, 0, RESET_W, 20).tooltip(Tooltip.of(Mono.text("back to default"))).build();
-        List<ClickableWidget> widgets = new ArrayList<>();
-        widgets.add(control);
-        widgets.add(r);
+        if (!searching && depth > 0) {
+            emit(depth);
+        }
+    }
+
+    private void emit(int depth) {
+        shown[depth] = true;
+        Text text = Foe.text(path[depth]);
+        list.addRow(new RowListWidget.Row(List.of(new Label(rowW(), depth <= 1 ? text.copy().withColor(Foe.TITLE & 0xFFFFFF) : text.copy().withColor(Foe.DIM & 0xFFFFFF), 20))));
+    }
+
+    private boolean matches(String name, String desc) {
+        String q = query.trim().toLowerCase(Locale.ROOT);
+        if (name.contains(q) || desc.toLowerCase(Locale.ROOT).contains(q)) {
+            return true;
+        }
+        for (String h : path) {
+            if (h != null && h.contains(q)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** A label on the left, the control on the right; a hover tooltip explains it. */
+    private void row(String name, String desc, ClickableWidget control, ClickableWidget... more) {
+        if (searching) {
+            if (!matches(name, desc)) {
+                return;
+            }
+            for (int i = 0; i < path.length; i++) {
+                if (path[i] != null && !shown[i]) {
+                    emit(i);
+                }
+            }
+        }
+        Label label = new Label(rowW() - controlW() - 2, Foe.text(name), 20);
+        List<ClickableWidget> widgets = new ArrayList<>(List.of(label, control));
+        widgets.addAll(List.of(more));
+        if (!desc.isEmpty()) {
+            Tooltip tip = Tooltip.of(Foe.text(desc));
+            label.setTooltip(tip);
+            control.setTooltip(tip);
+        }
         list.addRow(new RowListWidget.Row(widgets));
     }
 
-    private int controlW() {
-        return rowW() - RESET_W - 2;
+    private static Text onOff(boolean on) {
+        return Foe.text(on ? "on" : "off").formatted(on ? Formatting.GREEN : Formatting.RED);
     }
 
-    private void toggle(String name, String desc, Supplier<Boolean> get, Consumer<Boolean> set, boolean def) {
-        ButtonWidget b = ButtonWidget.builder(onOff(name, get.get()), btn -> {
+    private void toggle(String name, String desc, Supplier<Boolean> get, Consumer<Boolean> set) {
+        ButtonWidget b = ButtonWidget.builder(onOff(get.get()), btn -> {
             set.accept(!get.get());
-            btn.setMessage(onOff(name, get.get()));
+            btn.setMessage(onOff(get.get()));
         }).dimensions(0, 0, controlW(), 20).build();
-        row(b, desc, () -> set.accept(def));
-    }
-
-    private static Text onOff(String name, boolean on) {
-        return Mono.text(name + ": ").append(Mono.text(on ? "on" : "off").formatted(on ? Formatting.GREEN : Formatting.RED));
+        row(name, desc, b);
     }
 
     private <E extends Enum<E>> void cycle(String name, String desc, E[] values, Function<E, String> label,
-                                           Supplier<E> get, Consumer<E> set, E def) {
-        ButtonWidget b = ButtonWidget.builder(Mono.text(name + ": " + label.apply(get.get())), btn -> {
+                                           Supplier<E> get, Consumer<E> set) {
+        ButtonWidget b = ButtonWidget.builder(Foe.text(label.apply(get.get())), btn -> {
             set.accept(values[(get.get().ordinal() + 1) % values.length]);
-            btn.setMessage(Mono.text(name + ": " + label.apply(get.get())));
+            btn.setMessage(Foe.text(label.apply(get.get())));
         }).dimensions(0, 0, controlW(), 20).build();
-        row(b, desc + " (click to change)", () -> set.accept(def));
+        row(name, desc + " (click to change)", b);
     }
 
     private void slider(String name, String desc, double min, double max, double step, String unit,
-                        DoubleFunction<String> format, DoubleSupplier get, DoubleConsumer set, double def) {
-        ValueSlider slider = new ValueSlider(0, 0, controlW(), 20, name, min, max, step, unit, get.getAsDouble(), set);
+                        DoubleFunction<String> format, DoubleSupplier get, DoubleConsumer set) {
+        ValueSlider slider = new ValueSlider(0, 0, controlW(), 20, "", min, max, step, unit, get.getAsDouble(), set);
         if (format != null) {
             slider.format(format);
         }
-        row(slider, desc, () -> set.accept(def));
+        row(name, desc, slider);
     }
 
-    private void text(String name, String desc, Supplier<String> get, Consumer<String> set, String def) {
-        TextFieldWidget field = new TextFieldWidget(textRenderer, 0, 0, controlW(), 20, Mono.text(name));
+    private void text(String name, String desc, Supplier<String> get, Consumer<String> set) {
+        TextFieldWidget field = new TextFieldWidget(textRenderer, 0, 0, controlW(), 20, Foe.text(name));
         field.setMaxLength(64);
         field.setText(get.get());
-        field.setPlaceholder(Mono.text(name).formatted(Formatting.DARK_GRAY));
         field.setChangedListener(set);
-        row(field, desc, () -> set.accept(def));
+        row(name, desc, field);
     }
 
-    private void color(String name, String desc, IntSupplier get, IntConsumer set, int def) {
+    private void color(String name, String desc, IntSupplier get, IntConsumer set) {
         Runnable open = () -> client.setScreen(new ColorPickerScreen(this, name, get.getAsInt(), set));
-        ButtonWidget b = ButtonWidget.builder(Mono.text(name + ": " + String.format(Locale.ROOT, "#%06x", get.getAsInt())),
+        ButtonWidget b = ButtonWidget.builder(Foe.text(String.format(Locale.ROOT, "#%06x", get.getAsInt())),
                 btn -> open.run()).dimensions(0, 0, controlW() - 22, 20).build();
         SwatchButton swatch = new SwatchButton(0, 0, 20, 20, get, open);
-        swatch.setTooltip(Tooltip.of(Mono.text("click to pick a colour")));
-        if (!desc.isEmpty()) {
-            b.setTooltip(Tooltip.of(Mono.text(desc)));
-        }
-        ButtonWidget r = ButtonWidget.builder(Mono.text("↺"), btn -> {
-            set.accept(def);
-            refresh();
-        }).dimensions(0, 0, RESET_W, 20).tooltip(Tooltip.of(Mono.text("back to default"))).build();
-        list.addRow(new RowListWidget.Row(List.of(b, swatch, r)));
+        swatch.setTooltip(Tooltip.of(Foe.text("click to pick a colour")));
+        row(name, desc, b, swatch);
     }
 
     // ------------------------------------------------------------------ screen
-
-    @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-    }
 
     @Override
     public void close() {
@@ -585,50 +529,21 @@ public class SettingsScreen extends DofiScreen {
         client.setScreen(parent);
     }
 
-    /** A line of text in the list (section headers). */
-    /** A section title you can fold: flat, left aligned, with an arrow and a rule, so it does not look like a toggle button. */
-    private static final class FoldHeader extends ClickableWidget {
-        private final Runnable toggle;
-        private final boolean closed;
-
-        FoldHeader(int width, String name, boolean closed, Runnable toggle) {
-            super(0, 0, width, 20, Mono.text(name));
-            this.closed = closed;
-            this.toggle = toggle;
-        }
-
-        @Override
-        public void onClick(Click click, boolean doubled) {
-            toggle.run();
-        }
-
-        @Override
-        protected void renderWidget(DrawContext ctx, int mouseX, int mouseY, float delta) {
-            var tr = net.minecraft.client.MinecraftClient.getInstance().textRenderer;
-            int color = isHovered() ? S24.ACCENT : S24.TEXT_2;
-            int y = getY() + 6;
-            ctx.drawText(tr, Mono.text(closed ? "▸" : "▾"), getX() + 2, y, color, false);
-            ctx.drawText(tr, getMessage(), getX() + 14, y, color, false);
-            int after = getX() + 20 + tr.getWidth(getMessage());
-            ctx.fill(after, getY() + 10, getX() + width - 2, getY() + 11, isHovered() ? S24.ACCENT_DIM : S24.BORDER);
-        }
-
-        @Override
-        protected void appendClickableNarrations(NarrationMessageBuilder builder) {
-            appendDefaultNarrations(builder);
-        }
-    }
-
+    /** A line of text in a list: row labels and section titles. */
     private static final class Label extends ClickableWidget {
-        Label(int width, Text text) {
-            super(0, 0, width, 20, text);
-            this.active = false;
+        Label(int width, Text text, int height) {
+            super(0, 0, width, height, text);
         }
 
         @Override
         protected void renderWidget(DrawContext ctx, int mouseX, int mouseY, float delta) {
             var tr = net.minecraft.client.MinecraftClient.getInstance().textRenderer;
-            ctx.drawTextWithShadow(tr, getMessage(), getX() + 2, getY() + 8, 0xFFFFFFFF);
+            ctx.drawTextWithShadow(tr, Language.getInstance().reorder(tr.trimToWidth(getMessage(), width - 4)), getX() + 2, getY() + (height - 8) / 2, 0xFFFFFFFF);
+        }
+
+        @Override
+        public boolean mouseClicked(net.minecraft.client.gui.Click click, boolean doubled) {
+            return false;
         }
 
         @Override

@@ -1,7 +1,6 @@
 package dev.landofif.dofisaddons.display;
 
 import dev.landofif.dofisaddons.trigger.Trigger;
-import dev.landofif.dofisaddons.util.Mono;
 import dev.landofif.dofisaddons.util.RichText;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -149,7 +148,6 @@ public final class TitleOverlay {
         try {
             context.getMatrices().translate(x, y);
             context.getMatrices().scale(scale, scale);
-            text = Mono.prepare(Mono.adopt(text), scale, shadow);
             int w = tr.getWidth(text);
             context.drawText(tr, text, -w / 2, -tr.fontHeight / 2, color, shadow);
         } finally {

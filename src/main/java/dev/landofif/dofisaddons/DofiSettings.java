@@ -8,27 +8,9 @@ public class DofiSettings {
     /** Hide the vanilla XP bar and level number on FishOnMC (foecollabs bar and level hud replace them). */
     public boolean hideVanillaXp = true;
 
-    // ---- look (system24 for the whole game, see ui/S24) ----
-    /** Which system24 flavor the colours come from. */
-    public dev.landofif.dofisaddons.ui.Flavor flavor = dev.landofif.dofisaddons.ui.Flavor.SYSTEM24;
-    /** Square system24 panels, or caelestia shell's rounded borderless ones. */
-    public Style style = Style.SYSTEM24;
-    /** Buttons, sliders, fields, lists, screen backgrounds and tooltips in every screen, not just the mod's. */
-    public boolean s24Everywhere = true;
-    /** Flat hotbar boxes instead of the stone hotbar. */
-    public boolean s24Hotbar = true;
-    /** Chests, the inventory and fishonmc menus as panels with flat slots (drops the server's menu art). */
-    public boolean s24Menus = true;
-    /** The font of the mods own text (and of the whole game with the option below). Order matches util/Mono. */
-    public Font font = Font.DM_MONO;
-    /** Draw every text in the game with DM Mono instead of the minecraft font. */
-    public boolean monoEverywhere = true;
-    /** Which title screen to show. null until sanitize, so old files fall back to {@link #titleScreen}. */
-    public TitleChoice titleChoice = null;
-    /** Old on/off switch for the mod's title screen, only read to fill in {@link #titleChoice}. */
-    public boolean titleScreen = true;
-    /** Draw foecollabs hud boxes as system24 panels (see compat/FoeLook). */
-    public boolean foeHuds = true;
+    // ---- look (foecollabs, see ui/Foe) ----
+    /** Chests, the inventory and fishonmc menus as one box with no slot boxes (drops the server's menu art). */
+    public boolean flatMenus = true;
 
     // ---- fishonmc menu (see menu/FishMenu) ----
     /** Show the main menu and /travel as the mods own screens instead of the chest gui. */
@@ -37,7 +19,7 @@ public class DofiSettings {
     public boolean questsHud = true;
     public int questsX = 4;
     public int questsY = 70;
-    /** The /presets wardrobe screen, and for both custom guis: size in percent of the screen and accent colour. */
+    /** The /presets wardrobe screen, and for both custom guis: size in percent of the screen. */
     public boolean presetsMenu = true;
     /** Preset rows seen on /presets, kept between sessions so the other page can be drawn: "armor:6" to its pieces as "item|color|floats|strings|model". */
     public java.util.Map<String, java.util.List<String>> presetCache = new java.util.LinkedHashMap<>();
@@ -45,14 +27,10 @@ public class DofiSettings {
     /** Location levels read from the fish compendium, "level|progress" by location id, shown in /turbotravel which has none. */
     public java.util.Map<String, String> locationLevels = new java.util.LinkedHashMap<>();
     public int menuSize = 100;
-    /** How opaque the huds (quests left, chat boxes, foecollab) and the mods screens are, in percent. */
+    /** How opaque the huds (quests left, chat boxes) and the mods screens are, in percent. */
     public int hudOpacity = 100;
     public int screenOpacity = 100;
     public int presetsSize = 100;
-    public int menuColor = DEFAULT_GUI_COLOR;
-    public int presetsColor = DEFAULT_GUI_COLOR;
-    /** The system24 accent: a gui colour left at this follows the flavor. */
-    public static final int DEFAULT_GUI_COLOR = 0xB589D6;
     /** Where you put each menu button: "main:name" or "travel:id" to {column, row}. */
     public java.util.Map<String, int[]> menuCells = new java.util.HashMap<>();
 
@@ -84,8 +62,6 @@ public class DofiSettings {
     public int bobberBiteColor = 0x3BB693;
     /** Show "bite!" in front of the time once the server announces a bite. */
     public boolean bobberShowBite = true;
-    /** Draw the timer in the medium (bold) face. */
-    public boolean bobberBold = false;
     /** Digits after the point (0 to 2). */
     public int bobberDecimals = 1;
     /** Size of the timer text, 1 = normal. */
@@ -165,36 +141,6 @@ public class DofiSettings {
         }
     }
 
-    public enum Font {
-        DM_MONO("dm mono"), JETBRAINS_MONO("jetbrains mono"), GOOGLE_SANS_FLEX("google sans flex"), MINECRAFT("minecraft");
-
-        public final String label;
-
-        Font(String label) {
-            this.label = label;
-        }
-    }
-
-    public enum Style {
-        SYSTEM24("system24"), CAELESTIA("caelestia"), MINECRAFT("minecraft");
-
-        public final String label;
-
-        Style(String label) {
-            this.label = label;
-        }
-    }
-
-    public enum TitleChoice {
-        DOFIS("dofis addons"), FOECOLLAB("foecollab"), MINECRAFT("minecraft");
-
-        public final String label;
-
-        TitleChoice(String label) {
-            this.label = label;
-        }
-    }
-
     public enum SwingStyle {
         NORMAL("normal"), SMOOTH("smooth"), SNAPPY("snappy"), NONE("no swing");
 
@@ -220,10 +166,6 @@ public class DofiSettings {
     }
 
     public void sanitize() {
-        if (flavor == null) flavor = dev.landofif.dofisaddons.ui.Flavor.SYSTEM24;
-        if (style == null) style = Style.SYSTEM24;
-        if (font == null) font = Font.DM_MONO;
-        if (titleChoice == null) titleChoice = titleScreen ? TitleChoice.DOFIS : TitleChoice.MINECRAFT;
         if (bobberTimer == null) bobberTimer = BobberMode.ABOVE_BOBBER;
         if (bobberSkin == null) bobberSkin = BobberSkin.DEFAULT;
         if (swingStyle == null) swingStyle = SwingStyle.NORMAL;
@@ -260,8 +202,6 @@ public class DofiSettings {
         hudOpacity = Math.max(10, Math.min(100, hudOpacity));
         screenOpacity = Math.max(20, Math.min(100, screenOpacity));
         presetsSize = Math.max(40, Math.min(100, presetsSize));
-        menuColor &= 0xFFFFFF;
-        presetsColor &= 0xFFFFFF;
         bobberWarnColor &= 0xFFFFFF;
         bobberSlowColor &= 0xFFFFFF;
         bobberBiteColor &= 0xFFFFFF;

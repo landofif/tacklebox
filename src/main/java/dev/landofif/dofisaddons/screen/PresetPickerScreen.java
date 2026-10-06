@@ -1,8 +1,8 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.ui.DofiScreen;
 import dev.landofif.dofisaddons.trigger.TriggerPresets;
-import dev.landofif.dofisaddons.util.Mono;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -16,7 +16,7 @@ public class PresetPickerScreen extends DofiScreen {
     private final TriggerListScreen parent;
 
     public PresetPickerScreen(TriggerListScreen parent) {
-        super(Mono.text("new trigger"));
+        super(Foe.text("new trigger"));
         this.parent = parent;
     }
 
@@ -27,14 +27,14 @@ public class PresetPickerScreen extends DofiScreen {
         RowListWidget list = new RowListWidget(this.client, x, 36, listWidth, this.height - 36 - 34, 24);
         addDrawableChild(list);
         for (TriggerPresets.Preset preset : TriggerPresets.all()) {
-            ButtonWidget b = ButtonWidget.builder(Mono.text(preset.name()),
+            ButtonWidget b = ButtonWidget.builder(Foe.text(preset.name()),
                             btn -> client.setScreen(new TriggerEditScreen(parent, preset.create().get(), true)))
                     .dimensions(0, 0, list.getRowWidth(), 20)
-                    .tooltip(Tooltip.of(Mono.text(preset.description())))
+                    .tooltip(Tooltip.of(Foe.text(preset.description())))
                     .build();
             list.addRow(new RowListWidget.Row(List.of(b)));
         }
-        addDrawableChild(ButtonWidget.builder(Mono.text("back"), b -> close())
+        addDrawableChild(ButtonWidget.builder(Foe.text("back"), b -> close())
                 .dimensions(this.width / 2 - 50, this.height - 28, 100, 20).build());
     }
 
@@ -42,7 +42,7 @@ public class PresetPickerScreen extends DofiScreen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(textRenderer,
-                Mono.text("pick a starting point. you can change everything after.").formatted(Formatting.GRAY),
+                Foe.text("pick a starting point. you can change everything after.").formatted(Formatting.GRAY),
                 this.width / 2, 22, 0xFFFFFFFF);
     }
 

@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.hud.BaitInfo;
 import dev.landofif.dofisaddons.menu.FishMenu;
@@ -7,9 +8,7 @@ import dev.landofif.dofisaddons.menu.Locations;
 import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.ui.Arc;
 import dev.landofif.dofisaddons.ui.DofiScreen;
-import dev.landofif.dofisaddons.ui.S24;
 import dev.landofif.dofisaddons.util.Glyphs;
-import dev.landofif.dofisaddons.util.Mono;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import net.minecraft.block.Block;
 import net.minecraft.registry.Registries;
@@ -92,13 +91,13 @@ public class FishMenuScreen extends DofiScreen {
     protected void init() {
         int y = vy() + vh() - BAR + 4;
         int left = vx() + PAD;
-        editButton = addDrawableChild(ButtonWidget.builder(Mono.text("rearrange"), b -> toggleEdit()).dimensions(left, y, 90, 20).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("reset layout"), b -> {
+        editButton = addDrawableChild(ButtonWidget.builder(Foe.text("rearrange"), b -> toggleEdit()).dimensions(left, y, 90, 20).build());
+        addDrawableChild(ButtonWidget.builder(Foe.text("reset layout"), b -> {
             DofiSettings s = StatsTracker.settings();
             s.menuCells.keySet().removeIf(k -> k.startsWith(prefix()));
             StatsTracker.saveSettings();
         }).dimensions(left + 96, y, 90, 20).build());
-        addDrawableChild(ButtonWidget.builder(Mono.text("chest view"), b -> {
+        addDrawableChild(ButtonWidget.builder(Foe.text("chest view"), b -> {
             FishMenu.bypass = true;
             client.setScreen(original);
         }).dimensions(vx() + vw() - PAD - 90, y, 90, 20).build());
@@ -106,7 +105,7 @@ public class FishMenuScreen extends DofiScreen {
 
     private void toggleEdit() {
         editing = !editing;
-        editButton.setMessage(Mono.text(editing ? "done" : "rearrange"));
+        editButton.setMessage(Foe.text(editing ? "done" : "rearrange"));
     }
 
     private String prefix() {
@@ -328,7 +327,7 @@ public class FishMenuScreen extends DofiScreen {
             drawTile(ctx, dragged, (float) dragX - cellW / 2, (float) dragY - cellH / 2, true);
         }
         if (tiles.isEmpty()) {
-            ctx.drawCenteredTextWithShadow(textRenderer, Mono.text("waiting for the menu..."), vx() + vw() / 2, vy() + vh() / 2, S24.TEXT_4);
+            ctx.drawCenteredTextWithShadow(textRenderer, Foe.text("waiting for the menu..."), vx() + vw() / 2, vy() + vh() / 2, Foe.DIM);
         }
         if (travel) {
             drawBest(ctx, right - panelW, top, panelW, areaH, hover >= 0 ? tiles.get(hover) : null);
@@ -343,13 +342,13 @@ public class FishMenuScreen extends DofiScreen {
         ctx.getMatrices().translate(x, y);
         ctx.getMatrices().scale(scale, scale);
         float w = cellW / scale, h = cellH / scale;
-        S24.rect(ctx, 2, 2, (int) w - 4, (int) h - 4, hot ? S24.BG_1 : S24.BG_2, hot ? accent() : S24.BORDER);
+        Foe.button(ctx, 2, 2, (int) w - 4, (int) h - 4, hot);
         if (t.loc != null) {
             drawLocation(ctx, t, w, h);
         } else {
             int square = squareColor(t.stack);
             if (square != 0) { // the quest menus coloured blocks are flat squares, like in foecollab
-                S24.fill(ctx, (int) (w - 48) / 2, 8, 48, 48, square);
+                ctx.fill((int) (w - 48) / 2, 8, (int) (w - 48) / 2 + 48, 56, square);
             } else {
                 ctx.getMatrices().pushMatrix();
                 ctx.getMatrices().translate((w - 48) / 2f, 8);
@@ -357,10 +356,10 @@ public class FishMenuScreen extends DofiScreen {
                 ctx.drawItem(t.stack, 0, 0);
                 ctx.getMatrices().popMatrix();
             }
-            label(ctx, t.name, w / 2f, 62, w - 8, S24.TEXT_2);
+            label(ctx, t.name, w / 2f, 62, w - 8, Foe.TEXT);
         }
         if (editing) {
-            ctx.drawText(textRenderer, Mono.text("↔"), 6, 5, accent(), false);
+            ctx.drawText(textRenderer, Foe.text("↔"), 6, 5, Foe.ACCENT, false);
         }
         ctx.getMatrices().popMatrix();
     }
@@ -393,28 +392,28 @@ public class FishMenuScreen extends DofiScreen {
         ctx.drawItem(t.stack, 0, 0);
         ctx.getMatrices().popMatrix();
         float r = d / 2f + 4;
-        Arc.draw(ctx, cx, cy, r, 3, 0, 1, S24.BG_1);
+        Arc.draw(ctx, cx, cy, r, 3, 0, 1, Foe.FAINT);
         if (t.info.progress() >= 0) {
-            Arc.draw(ctx, cx, cy, r, 3, 0, t.info.progress(), accent());
+            Arc.draw(ctx, cx, cy, r, 3, 0, t.info.progress(), Foe.ACCENT);
         }
         String level = t.info.level() >= 0 ? Integer.toString(t.info.level()) : "?";
-        Text text = Mono.prepare(Mono.bold(level), 2.5f, true);
+        Text text = Foe.bold(level);
         ctx.getMatrices().pushMatrix();
         ctx.getMatrices().translate(cx, cy - 11);
         ctx.getMatrices().scale(2.5f, 2.5f);
         ctx.drawTextWithShadow(textRenderer, text, -textRenderer.getWidth(text) / 2, 0, 0xFFFFFFFF);
         ctx.getMatrices().popMatrix();
-        label(ctx, t.loc.name(), cx, 8 + d + 10, w - 8, S24.TEXT_2);
+        label(ctx, t.loc.name(), cx, 8 + d + 10, w - 8, Foe.TEXT);
         if (t.info.progress() >= 0) {
-            label(ctx, Math.round(t.info.progress() * 100) + "%", cx, 8 + d + 20, w - 8, S24.TEXT_4);
+            label(ctx, Math.round(t.info.progress() * 100) + "%", cx, 8 + d + 20, w - 8, Foe.DIM);
         }
     }
 
     private void label(DrawContext ctx, String s, float cx, float y, float maxW, int color) {
-        Text text = Mono.text(s);
+        Text text = Foe.text(s);
         while (textRenderer.getWidth(text) > maxW && s.length() > 1) {
             s = s.substring(0, s.length() - 1);
-            text = Mono.text(s + "..");
+            text = Foe.text(s + "..");
         }
         ctx.drawText(textRenderer, text, (int) (cx - textRenderer.getWidth(text) / 2f), (int) y, color, false);
     }
@@ -422,46 +421,46 @@ public class FishMenuScreen extends DofiScreen {
     // ---- best location ----
 
     private void drawBest(DrawContext ctx, int x, int y, int w, int h, Tile focus) {
-        S24.panel(ctx, x, y, w, h, Mono.text("best place to fish"));
+        Foe.panel(ctx, x, y, w, h, Foe.text("best place to fish"), 100);
         List<Tile> ranked = new ArrayList<>(tiles.stream().filter(t -> t.info.level() >= 0).toList());
         ranked.sort(Comparator.comparingInt((Tile t) -> t.info.level()).thenComparing(t -> t.loc.name()));
-        int ty = y + 10;
+        int ty = y + 21;
         if (ranked.isEmpty()) {
-            ty = wrap(ctx, "no levels found in the tooltips yet, so no ranking. the lowest level is usually the best place.", x + 8, ty, w - 16, S24.TEXT_4);
+            ty = wrap(ctx, "no levels found in the tooltips yet, so no ranking. the lowest level is usually the best place.", x + 8, ty, w - 16, Foe.DIM);
         }
         for (int i = 0; i < Math.min(3, ranked.size()); i++) {
             Tile t = ranked.get(i);
-            ctx.drawText(textRenderer, Mono.text((i + 1) + ". " + t.loc.name()), x + 8, ty, i == 0 ? accent() : S24.TEXT_2, false);
-            Text lvl = Mono.text("lvl " + t.info.level());
-            ctx.drawText(textRenderer, lvl, x + w - 8 - textRenderer.getWidth(lvl), ty, S24.TEXT_4, false);
+            ctx.drawText(textRenderer, Foe.text((i + 1) + ". " + t.loc.name()), x + 8, ty, i == 0 ? Foe.ACCENT : Foe.TEXT, false);
+            Text lvl = Foe.text("lvl " + t.info.level());
+            ctx.drawText(textRenderer, lvl, x + w - 8 - textRenderer.getWidth(lvl), ty, Foe.DIM, false);
             ty += 12;
         }
         Tile show = focus != null ? focus : ranked.isEmpty() ? null : ranked.get(0);
         if (show == null) {
             return;
         }
-        S24.divider(ctx, x, ty + 4, w, Mono.text("bait at " + show.loc.name()));
+        ctx.drawTextWithShadow(textRenderer, Foe.text("bait at " + show.loc.name()), x + 8, ty + 4, Foe.TITLE);
         ty += 12;
         var strategies = Locations.strategies(show.loc);
         if (strategies.isEmpty()) {
-            wrap(ctx, "nothing noted for this one yet.", x + 8, ty, w - 16, S24.TEXT_4);
+            wrap(ctx, "nothing noted for this one yet.", x + 8, ty, w - 16, Foe.DIM);
         }
         for (Locations.Strategy s : strategies) {
             if (ty > y + h - 22) {
                 break;
             }
-            ctx.drawText(textRenderer, Mono.text(s.bait() + (s.rarity().isEmpty() ? "" : " (" + s.rarity() + ")")), x + 8, ty,
-                    s.rarity().isEmpty() ? S24.TEXT_1 : BaitInfo.rarityColor(s.rarity()) | 0xFF000000, false);
+            ctx.drawText(textRenderer, Foe.text(s.bait() + (s.rarity().isEmpty() ? "" : " (" + s.rarity() + ")")), x + 8, ty,
+                    s.rarity().isEmpty() ? Foe.TEXT : BaitInfo.rarityColor(s.rarity()) | 0xFF000000, false);
             ty += 10;
             String detail = String.join(", ", java.util.stream.Stream.of(s.quest().isEmpty() ? "" : s.quest() + " quest",
                     s.targets(), s.extra()).filter(p -> !p.isEmpty()).toList());
-            ty = wrap(ctx, detail.isEmpty() ? "no notes" : detail, x + 14, ty, w - 22, S24.TEXT_4) + 2;
+            ty = wrap(ctx, detail.isEmpty() ? "no notes" : detail, x + 14, ty, w - 22, Foe.DIM) + 2;
         }
     }
 
-    /** Draws wrapped mono text, returns the y below it. */
+    /** Draws wrapped text, returns the y below it. */
     private int wrap(DrawContext ctx, String s, int x, int y, int w, int color) {
-        for (var line : textRenderer.wrapLines(Mono.text(s), w)) {
+        for (var line : textRenderer.wrapLines(Foe.text(s), w)) {
             ctx.drawText(textRenderer, line, x, y, color, false);
             y += 10;
         }
@@ -480,10 +479,5 @@ public class FishMenuScreen extends DofiScreen {
     @Override
     protected int sizePct() {
         return StatsTracker.settings().menuSize;
-    }
-
-    private static int accent() {
-        DofiSettings s = StatsTracker.settings();
-        return s == null || s.menuColor == DofiSettings.DEFAULT_GUI_COLOR ? S24.ACCENT : 0xFF000000 | s.menuColor;
     }
 }
