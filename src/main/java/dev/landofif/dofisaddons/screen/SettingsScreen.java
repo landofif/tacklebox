@@ -210,7 +210,7 @@ public class SettingsScreen extends DofiScreen {
                         "draws foecollabs hud boxes as system24 panels in your flavor. pick any clean theme in foecollab to get the titles set into the top border.",
                         () -> s.foeHuds, v -> s.foeHuds = v, defaults.foeHuds);
                 header("font");
-                cycle("font", "the font of the mods own text: dm mono, jetbrains mono, or minecraft (the normal game font). also used by mono font everywhere.",
+                cycle("font", "the font of the mods own text: dm mono, jetbrains mono, google sans flex, or minecraft (the normal game font). also used by mono font everywhere.",
                         DofiSettings.Font.values(), v -> v.label, () -> s.font, v -> {
                             s.font = v;
                             refresh();

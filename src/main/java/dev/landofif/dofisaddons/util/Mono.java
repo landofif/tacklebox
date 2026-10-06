@@ -28,7 +28,7 @@ import java.util.Optional;
 public final class Mono {
     private static final int MAX_OVERSAMPLE = 8;
     /** Font definition name prefixes, in the order of {@link dev.landofif.dofisaddons.DofiSettings.Font}; minecraft has none. */
-    private static final String[] PREFIX = {"mono", "jb"};
+    private static final String[] PREFIX = {"mono", "jb", "gs"};
     private static final StyleSpriteSource[][] SOURCES = new StyleSpriteSource[PREFIX.length][MAX_OVERSAMPLE + 1];
     private static final StyleSpriteSource[][] BOLD_SOURCES = new StyleSpriteSource[PREFIX.length][MAX_OVERSAMPLE + 1];
     /** Shadow for mono text drawn straight over the world, where it needs a little contrast. */
@@ -74,7 +74,7 @@ public final class Mono {
 
     public static boolean isMono(Style style) {
         return style.getFont() instanceof StyleSpriteSource.Font f
-                && f.id().getNamespace().equals("dofisaddons") && (f.id().getPath().startsWith("mono") || f.id().getPath().startsWith("jb"));
+                && f.id().getNamespace().equals("dofisaddons") && (f.id().getPath().startsWith("mono") || f.id().getPath().startsWith("jb") || f.id().getPath().startsWith("gs"));
     }
 
     /** The font variant for text drawn at {@code drawScale} on top of the GUI scale. */

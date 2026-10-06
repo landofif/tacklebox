@@ -159,7 +159,7 @@ public class DofiSettings {
     }
 
     public enum Font {
-        DM_MONO("dm mono"), JETBRAINS_MONO("jetbrains mono"), MINECRAFT("minecraft");
+        DM_MONO("dm mono"), JETBRAINS_MONO("jetbrains mono"), GOOGLE_SANS_FLEX("google sans flex"), MINECRAFT("minecraft");
 
         public final String label;
 
