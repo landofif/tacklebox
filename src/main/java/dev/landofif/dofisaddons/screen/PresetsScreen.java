@@ -127,7 +127,7 @@ public class PresetsScreen extends DofiScreen {
         showArmor(true);
         int y = vy() + vh() - BAR + 4;
         int left = vx() + PAD, right = vx() + vw() - PAD;
-        addDrawableChild(ButtonWidget.builder(Mono.text("previous"), b -> nav("prev")).dimensions(left, y, 70, 20).build());
+        addDrawableChild(ButtonWidget.builder(Mono.text("previous"), b -> nav("back")).dimensions(left, y, 70, 20).build());
         addDrawableChild(ButtonWidget.builder(Mono.text("next"), b -> nav("next")).dimensions(left + 74, y, 70, 20).build());
         addDrawableChild(ButtonWidget.builder(Mono.text("switch armor / parts"), b -> nav("filter")).dimensions(vx() + vw() / 2 - 70, y, 140, 20).build());
         addDrawableChild(ButtonWidget.builder(Mono.text("chest view"), b -> {
@@ -212,7 +212,7 @@ public class PresetsScreen extends DofiScreen {
             }
         });
         others.sort(java.util.Comparator.comparingInt(Card::preset));
-        otherNav = !others.isEmpty() && others.get(0).preset < first ? "prev" : "next";
+        otherNav = !others.isEmpty() && others.get(0).preset < first ? "back" : "next";
     }
 
     private static EquipmentSlot armorSlot(ItemStack stack) {
