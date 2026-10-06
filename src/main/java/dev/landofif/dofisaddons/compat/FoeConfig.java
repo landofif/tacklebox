@@ -201,13 +201,13 @@ public final class FoeConfig {
         return sb.isEmpty() ? null : sb.toString();
     }
 
-    /** Lower case without formatting codes, apostrophes or capitals, like every other text in the mod. */
+    /** Without formatting codes, a trailing full stop or surrounding blanks; the case stays as foecollab wrote it. */
     static String clean(String s) {
         String plain = Formatting.strip(s);
         if (plain == null) {
             return "";
         }
-        String out = plain.replace("'", "").replace("’", "").toLowerCase(Locale.ROOT).trim();
+        String out = plain.trim();
         // "show the timer." reads oddly before ": on"
         return out.endsWith(".") && !out.endsWith("..") ? out.substring(0, out.length() - 1) : out;
     }

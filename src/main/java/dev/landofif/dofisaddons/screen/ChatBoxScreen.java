@@ -49,9 +49,9 @@ public class ChatBoxScreen extends DofiScreen {
             box.name = "box " + (s.chatBoxes.size() + 1);
             s.chatBoxes.add(box);
             client.setScreen(new ChatFilterScreen(this, box));
-        }).dimensions(left, y, bw, 20).tooltip(Tooltip.of(Foe.text("a new box. you pick which lines go in it next"))).build());
+        }).dimensions(left, y, bw, 20).tooltip(Tooltip.of(Foe.sentence("a new box. you pick which lines go in it next"))).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("move boxes"), b -> FoeScreens.openMover(this)).dimensions(left + bw + 4, y, bw, 20)
-                .tooltip(Tooltip.of(Foe.text("drag the boxes anywhere. scroll on one for more or fewer lines, shift + scroll for its width"))).build());
+                .tooltip(Tooltip.of(Foe.sentence("drag the boxes anywhere. scroll on one for more or fewer lines, shift + scroll for its width"))).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close()).dimensions(left + (bw + 4) * 2, y, bw, 20).build());
     }
 
@@ -64,31 +64,31 @@ public class ChatBoxScreen extends DofiScreen {
             ButtonWidget toggle = ButtonWidget.builder(dot(box), b -> {
                 box.enabled = !box.enabled;
                 b.setMessage(dot(box));
-            }).dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Foe.text("show this box or not. while off its lines stay in chat"))).build();
+            }).dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Foe.sentence("show this box or not. while off its lines stay in chat"))).build();
 
             TextFieldWidget name = new TextFieldWidget(textRenderer, 0, 0, nameW, 20, Foe.text("name"));
             name.setMaxLength(24);
             name.setText(box.name);
             name.setPlaceholder(Foe.text("name").formatted(Formatting.DARK_GRAY));
             name.setChangedListener(v -> box.name = v);
-            name.setTooltip(Tooltip.of(Foe.text("the name in the top border of the box")));
+            name.setTooltip(Tooltip.of(Foe.sentence("the name in the top border of the box")));
 
             int count = box.rules.size();
             ButtonWidget rules = ButtonWidget.builder(Foe.text(count + (count == 1 ? " rule" : " rules") + " →"),
                     b -> client.setScreen(new ChatFilterScreen(this, box))).dimensions(0, 0, RULES_W, 20)
-                    .tooltip(Tooltip.of(Foe.text("which chat lines go to this box"))).build();
+                    .tooltip(Tooltip.of(Foe.sentence("which chat lines go to this box"))).build();
 
             ButtonWidget fade = ButtonWidget.builder(fadeLabel(box), b -> {
                 int i = 0;
                 while (i < FADES.length && FADES[i] != box.fadeSeconds) i++;
                 box.fadeSeconds = FADES[(i + 1) % FADES.length];
                 b.setMessage(fadeLabel(box));
-            }).dimensions(0, 0, FADE_W, 20).tooltip(Tooltip.of(Foe.text("hide the box this long after its last line while chat is closed"))).build();
+            }).dimensions(0, 0, FADE_W, 20).tooltip(Tooltip.of(Foe.sentence("hide the box this long after its last line while chat is closed"))).build();
 
             ButtonWidget delete = ButtonWidget.builder(Foe.text("✕").formatted(Formatting.RED), b -> {
                 s.chatBoxes.remove(box);
                 rebuild();
-            }).dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Foe.text("delete this box. its lines go back to chat"))).build();
+            }).dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Foe.sentence("delete this box. its lines go back to chat"))).build();
 
             list.addRow(new RowListWidget.Row(List.<ClickableWidget>of(toggle, name, rules, fade, delete)));
         }

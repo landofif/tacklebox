@@ -2,6 +2,7 @@ package dev.landofif.dofisaddons.screen;
 
 import dev.landofif.dofisaddons.ui.Foe;
 import net.minecraft.client.gui.widget.SliderWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 
 import java.util.function.DoubleConsumer;
@@ -51,6 +52,16 @@ public class ValueSlider extends SliderWidget {
         }
         String shown = step >= 1 ? String.valueOf((long) v) : String.format(java.util.Locale.ROOT, step >= 0.1 ? "%.1f" : "%.2f", v);
         setMessage(Foe.text(prefix + shown + unit));
+    }
+
+    /** Vanilla moves a slider by a pixel per arrow press, which skips values at fine steps: move exactly one step. */
+    @Override
+    public boolean keyPressed(KeyInput input) {
+        if (isFocused() && (input.isLeft() || input.isRight())) {
+            setValue(this.value + (input.isLeft() ? -step : step) / (max - min));
+            return true;
+        }
+        return super.keyPressed(input);
     }
 
     @Override

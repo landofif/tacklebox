@@ -88,32 +88,32 @@ public class ChatFilterScreen extends DofiScreen {
         if (box != null) {
             int bw = (w - 8) / 3;
             addDrawableChild(ButtonWidget.builder(Foe.text("+ rule"), b -> addRule()).dimensions(left, y, bw, 20)
-                    .tooltip(Tooltip.of(Foe.text("add a rule. use * for anything, like: [crew chat] *"))).build());
+                    .tooltip(Tooltip.of(Foe.sentence("add a rule. use * for anything, like: [crew chat] *"))).build());
             addDrawableChild(ButtonWidget.builder(alsoLabel(), b -> {
                 box.alsoInChat = !box.alsoInChat;
                 b.setMessage(alsoLabel());
-            }).dimensions(left + bw + 4, y, bw, 20).tooltip(Tooltip.of(Foe.text("keep these lines in the main chat as well"))).build());
+            }).dimensions(left + bw + 4, y, bw, 20).tooltip(Tooltip.of(Foe.sentence("keep these lines in the main chat as well"))).build());
             addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close()).dimensions(left + (bw + 4) * 2, y, bw, 20).build());
             return;
         }
         int bw = (w - 20) / 6;
         addDrawableChild(ButtonWidget.builder(Foe.text("+ hide rule"), b -> addRule()).dimensions(left, y, bw, 20)
-                .tooltip(Tooltip.of(Foe.text("add a rule. use * for anything, like: tackle shop > *restocked*"))).build());
+                .tooltip(Tooltip.of(Foe.sentence("add a rule. use * for anything, like: tackle shop > *restocked*"))).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("chat boxes"), b -> {
             DofiSettings.save();
             client.setScreen(new ChatBoxScreen(this));
-        }).dimensions(left + (bw + 4), y, bw, 20).tooltip(Tooltip.of(Foe.text("separate chat boxes for dms, crew chat or anything else"))).build());
-        addDrawableChild(ButtonWidget.builder(Foe.text("move chat"), b -> FoeScreens.openMover(this)).dimensions(left + (bw + 4) * 2, y, bw, 20).tooltip(Tooltip.of(Foe.text("drag the chat box and the chat boxes anywhere, right click chat to put it back"))).build());
+        }).dimensions(left + (bw + 4), y, bw, 20).tooltip(Tooltip.of(Foe.sentence("separate chat boxes for dms, crew chat or anything else"))).build());
+        addDrawableChild(ButtonWidget.builder(Foe.text("move chat"), b -> FoeScreens.openMover(this)).dimensions(left + (bw + 4) * 2, y, bw, 20).tooltip(Tooltip.of(Foe.sentence("drag the chat box and the chat boxes anywhere, right click chat to put it back"))).build());
         addDrawableChild(ButtonWidget.builder(copyLabel(), b -> {
             s.chatCopy = !s.chatCopy;
             b.setMessage(copyLabel());
         }).dimensions(left + (bw + 4) * 3, y, bw, 20)
-                .tooltip(Tooltip.of(Foe.text("with chat open, right click a line to copy it. shift + right click adds a hide rule for it."))).build());
+                .tooltip(Tooltip.of(Foe.sentence("with chat open, right click a line to copy it. shift + right click adds a hide rule for it."))).build());
         addDrawableChild(ButtonWidget.builder(stackLabel(), b -> {
             s.chatStack = !s.chatStack;
             b.setMessage(stackLabel());
         }).dimensions(left + (bw + 4) * 4, y, bw, 20)
-                .tooltip(Tooltip.of(Foe.text("the same line again and again becomes one line with a count, like (x3)"))).build());
+                .tooltip(Tooltip.of(Foe.sentence("the same line again and again becomes one line with a count, like (x3)"))).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close()).dimensions(left + (bw + 4) * 5, y, bw, 20).build());
     }
 
@@ -146,7 +146,7 @@ public class ChatFilterScreen extends DofiScreen {
             ButtonWidget toggle = ButtonWidget.builder(dot(f), b -> {
                 f.enabled = !f.enabled;
                 b.setMessage(dot(f));
-            }).dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Foe.text("switch this rule on or off"))).build();
+            }).dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Foe.sentence("switch this rule on or off"))).build();
 
             TextFieldWidget field = new TextFieldWidget(textRenderer, 0, 0, fieldW, 20, Foe.text("pattern"));
             field.setMaxLength(512);
@@ -163,18 +163,18 @@ public class ChatFilterScreen extends DofiScreen {
                 f.mode = modes[((f.mode == null ? 0 : f.mode.ordinal()) + 1) % modes.length];
                 b.setMessage(Foe.text(modeLabel(f.mode)));
                 field.setTooltip(Tooltip.of(fieldTip(f)));
-            }).dimensions(0, 0, MODE_W, 20).tooltip(Tooltip.of(Foe.text(
+            }).dimensions(0, 0, MODE_W, 20).tooltip(Tooltip.of(Foe.sentence(
                     "contains: the line has this text somewhere (* = anything)\nwhole line: the line is exactly this\nregex: a java regular expression"))).build();
 
             ButtonWidget scope = ButtonWidget.builder(Foe.text(f.fishOnMcOnly ? "fishonmc" : "everywhere"), b -> {
                 f.fishOnMcOnly = !f.fishOnMcOnly;
                 b.setMessage(Foe.text(f.fishOnMcOnly ? "fishonmc" : "everywhere"));
-            }).dimensions(0, 0, SCOPE_W, 20).tooltip(Tooltip.of(Foe.text("hide only on fishonmc, or on every server"))).build();
+            }).dimensions(0, 0, SCOPE_W, 20).tooltip(Tooltip.of(Foe.sentence("hide only on fishonmc, or on every server"))).build();
 
             ButtonWidget delete = ButtonWidget.builder(Foe.text("✕").formatted(Formatting.RED), b -> {
                 rules.remove(f);
                 rebuild();
-            }).dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Foe.text("delete this rule"))).build();
+            }).dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Foe.sentence("delete this rule"))).build();
 
             RowListWidget.Row row = new RowListWidget.Row(List.<ClickableWidget>of(toggle, field, mode, scope, delete));
             list.addRow(row);

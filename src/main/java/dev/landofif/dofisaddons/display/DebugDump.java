@@ -120,14 +120,14 @@ public final class DebugDump {
 
     private static void toast(MinecraftClient client, String line) {
         client.getToastManager().add(new net.minecraft.client.toast.SystemToast(net.minecraft.client.toast.SystemToast.Type.PERIODIC_NOTIFICATION,
-                Foe.text("gui dump"), Foe.text(line)));
+                Foe.text("gui dump"), Text.literal(line)));
     }
 
     private static void say(String line, Formatting color) {
         DofisAddons.LOGGER.info("[debug] {}", line);
         ClientPlayerEntity self = MinecraftClient.getInstance().player;
         if (self != null) {
-            self.sendMessage(Foe.text(line).formatted(color), false);
+            self.sendMessage(Text.literal(line).formatted(color), false);
         }
     }
 }

@@ -30,7 +30,7 @@ public class PresetPickerScreen extends DofiScreen {
             ButtonWidget b = ButtonWidget.builder(Foe.text(preset.name()),
                             btn -> client.setScreen(new TriggerEditScreen(parent, preset.create().get(), true)))
                     .dimensions(0, 0, list.getRowWidth(), 20)
-                    .tooltip(Tooltip.of(Foe.text(preset.description())))
+                    .tooltip(Tooltip.of(Foe.sentence(preset.description())))
                     .build();
             list.addRow(new RowListWidget.Row(List.of(b)));
         }

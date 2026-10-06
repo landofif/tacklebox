@@ -56,7 +56,7 @@ public class KeyCommandScreen extends DofiScreen {
             ButtonWidget key = ButtonWidget.builder(keyLabel(e), b -> {
                 listening = e;
                 rebuild();
-            }).dimensions(0, 0, KEY_W, 20).tooltip(Tooltip.of(Foe.text("click, then press the key. esc cancels, delete unbinds"))).build();
+            }).dimensions(0, 0, KEY_W, 20).tooltip(Tooltip.of(Foe.sentence("click, then press the key. esc cancels, delete unbinds"))).build();
 
             TextFieldWidget command = new TextFieldWidget(textRenderer, 0, 0, cmdW, 20, Foe.text("command"));
             command.setMaxLength(256);

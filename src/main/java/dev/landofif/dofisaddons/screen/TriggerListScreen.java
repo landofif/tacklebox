@@ -47,18 +47,18 @@ public class TriggerListScreen extends DofiScreen {
         int startX = (this.width - (bw * 4 + 12)) / 2;
         addDrawableChild(ButtonWidget.builder(Foe.text("+ new trigger"), b -> client.setScreen(new PresetPickerScreen(this)))
                 .dimensions(startX, buttonY, bw, 20)
-                .tooltip(Tooltip.of(Foe.text("start blank or from a ready-made fishonmc preset")))
+                .tooltip(Tooltip.of(Foe.sentence("start blank or from a ready-made fishonmc preset")))
                 .build());
         addDrawableChild(ButtonWidget.builder(Foe.text("import"), b -> onImport())
                 .dimensions(startX + (bw + 4), buttonY, bw, 20)
-                .tooltip(Tooltip.of(Foe.text("add a trigger from a share code on your clipboard")))
+                .tooltip(Tooltip.of(Foe.sentence("add a trigger from a share code on your clipboard")))
                 .build());
         addDrawableChild(ButtonWidget.builder(Foe.text("reload file"), b -> {
                     TriggerStore.load();
                     rebuild();
                     setStatus("reloaded triggers.json", Formatting.GREEN);
                 }).dimensions(startX + (bw + 4) * 2, buttonY, bw, 20)
-                .tooltip(Tooltip.of(Foe.text("re-read config/dofisaddons/triggers.json (after editing it by hand)")))
+                .tooltip(Tooltip.of(Foe.sentence("re-read config/dofisaddons/triggers.json (after editing it by hand)")))
                 .build());
         addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close())
                 .dimensions(startX + (bw + 4) * 3, buttonY, bw, 20).build());
@@ -83,34 +83,34 @@ public class TriggerListScreen extends DofiScreen {
                         b.setMessage(toggleLabel(t));
                         rebuild();
                     }).dimensions(0, 0, 20, 20)
-                    .tooltip(Tooltip.of(Foe.text(t.enabled ? "on: click to switch off" : "off: click to switch on")))
+                    .tooltip(Tooltip.of(Foe.sentence(t.enabled ? "on: click to switch off" : "off: click to switch on")))
                     .build();
 
             ButtonWidget main = ButtonWidget.builder(mainLabel(t, mainWidth), b -> client.setScreen(new TriggerEditScreen(this, t.copyKeepId(), false)))
                     .dimensions(0, 0, mainWidth, 20)
-                    .tooltip(Tooltip.of(Foe.text("click to edit\nwhen chat says: " + t.pattern
+                    .tooltip(Tooltip.of(Foe.sentence("click to edit\nwhen chat says: " + t.pattern
                             + "\nfired this session: " + TriggerEngine.count(t))))
                     .build();
 
             ButtonWidget up = ButtonWidget.builder(Foe.text("▲"), b -> {
                 TriggerStore.move(index, -1);
                 rebuild();
-            }).dimensions(0, 0, 12, 20).tooltip(Tooltip.of(Foe.text("move up"))).build();
+            }).dimensions(0, 0, 12, 20).tooltip(Tooltip.of(Foe.sentence("move up"))).build();
             up.active = index > 0;
 
             ButtonWidget down = ButtonWidget.builder(Foe.text("▼"), b -> {
                 TriggerStore.move(index, 1);
                 rebuild();
-            }).dimensions(0, 0, 12, 20).tooltip(Tooltip.of(Foe.text("move down"))).build();
+            }).dimensions(0, 0, 12, 20).tooltip(Tooltip.of(Foe.sentence("move down"))).build();
             down.active = index < triggers.size() - 1;
 
             ButtonWidget share = ButtonWidget.builder(Foe.text("share"), b -> {
                 client.keyboard.setClipboard(TriggerStore.exportCode(t));
                 setStatus("copied \"" + t.name + "\" share code to clipboard", Formatting.GREEN);
-            }).dimensions(0, 0, 40, 20).tooltip(Tooltip.of(Foe.text("copy a code others can import"))).build();
+            }).dimensions(0, 0, 40, 20).tooltip(Tooltip.of(Foe.sentence("copy a code others can import"))).build();
 
             ButtonWidget delete = ButtonWidget.builder(Foe.text("✕").formatted(Formatting.RED), b -> confirmDelete(t))
-                    .dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Foe.text("delete"))).build();
+                    .dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Foe.sentence("delete"))).build();
 
             List<ClickableWidget> row = new ArrayList<>(List.of(toggle, main, up, down, share, delete));
             list.addRow(new RowListWidget.Row(row));

@@ -12,7 +12,8 @@ import java.util.Locale;
 /**
  * The look of the mod is foecollabs: its box textures (a 15x15 atlas cut into 5px slices, stretched to
  * any size) in its colours, with the normal game font. The textures are foecollabs own, referenced by
- * name, so the mod only looks right next to it (it depends on it). Widgets stay vanilla.
+ * name, so the mod only looks right next to it (it depends on it). Widgets stay vanilla. Text is small capitals,
+ * like foecollabs labels.
  */
 public final class Foe {
     private static final Identifier BOX = tex("box_atlas");
@@ -38,16 +39,27 @@ public final class Foe {
         return Identifier.of("foecollab", "textures/gui/sprites/elements/" + name + ".png");
     }
 
-    /**
-     * l's house style for everything the mod writes: no capital letters, no apostrophes. Applied here so it
-     * also holds for values that come from the server or the player (wallet "38.48K", chat captures).
-     */
-    public static String house(String s) {
-        return s.toLowerCase(Locale.ROOT).replace("'", "").replace("\u2019", "");
+    private static final String PLAIN = "abcdefghijklmnopqrstuvwxyz";
+    private static final String SMALL = "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢ"; // there is no small capital x
+
+    /** The letters as small capitals, the way foecollab writes its labels. Digits and symbols stay. */
+    public static String smallCaps(String s) {
+        StringBuilder out = new StringBuilder(s.length());
+        for (char c : s.toLowerCase(Locale.ROOT).toCharArray()) {
+            int i = PLAIN.indexOf(c);
+            out.append(i < 0 ? c : SMALL.charAt(i));
+        }
+        return out.toString();
     }
 
+    /** Labels, titles, headings and buttons: small capitals. */
     public static MutableText text(String s) {
-        return Text.literal(house(s));
+        return Text.literal(smallCaps(s));
+    }
+
+    /** Descriptions and tooltips: the normal font in sentence case, which is easier to read at length. */
+    public static MutableText sentence(String s) {
+        return Text.literal(s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1));
     }
 
     public static MutableText bold(String s) {

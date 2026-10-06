@@ -1,6 +1,5 @@
 package dev.landofif.dofisaddons.util;
 
-import dev.landofif.dofisaddons.ui.Foe;
 import net.minecraft.text.Style;
 import net.minecraft.text.StyleSpriteSource;
 import net.minecraft.text.Text;
@@ -76,7 +75,7 @@ public final class Glyphs {
             }
             out.appendCodePoint(cp);
         }
-        return Foe.house(out.toString());
+        return out.toString().toLowerCase(java.util.Locale.ROOT).replace("'", "").replace("\u2019", ""); // lowercase: it is compared with menu names
     }
 
     /** Private-use characters and hangul syllables: what the fishonmc pack maps its images to. */

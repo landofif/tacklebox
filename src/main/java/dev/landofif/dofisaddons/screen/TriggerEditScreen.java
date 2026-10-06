@@ -117,10 +117,10 @@ public class TriggerEditScreen extends DofiScreen {
         int bw = (width - 8) / 3;
         addDrawableChild(ButtonWidget.builder(Foe.text("cancel"), b -> close())
                 .dimensions(left, by, bw, 20)
-                .tooltip(Tooltip.of(Foe.text("leave without saving"))).build());
+                .tooltip(Tooltip.of(Foe.sentence("leave without saving"))).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("▶ preview"), b -> preview())
                 .dimensions(left + bw + 4, by, bw, 20)
-                .tooltip(Tooltip.of(Foe.text("show the title and play the sound now, using the test message"))).build());
+                .tooltip(Tooltip.of(Foe.sentence("show the title and play the sound now, using the test message"))).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("save").formatted(Formatting.GREEN), b -> save())
                 .dimensions(left + (bw + 4) * 2, by, bw, 20).build());
     }
@@ -135,9 +135,9 @@ public class TriggerEditScreen extends DofiScreen {
         addDrawableChild(ButtonWidget.builder(modeLabel(), b -> {
                     draft.mode = Trigger.MatchMode.values()[(draft.mode.ordinal() + 1) % Trigger.MatchMode.values().length];
                     b.setMessage(modeLabel());
-                    b.setTooltip(Tooltip.of(Foe.text(modeHelp())));
+                    b.setTooltip(Tooltip.of(Foe.sentence(modeHelp())));
                 }).dimensions(fieldX, y, fieldW, 20)
-                .tooltip(Tooltip.of(Foe.text(modeHelp()))).build());
+                .tooltip(Tooltip.of(Foe.sentence(modeHelp()))).build());
         y += ROW;
 
         textField(y, draft.pattern, 512, s -> draft.pattern = s, "e.g. quests > quest #{n} has been completed!");
@@ -157,7 +157,7 @@ public class TriggerEditScreen extends DofiScreen {
         y += ROW;
 
         TextFieldWidget test = textField(y, testLine, 512, s -> testLine = s, "paste a chat message to test");
-        test.setTooltip(Tooltip.of(Foe.text("type or paste a real chat message. the line below says if it would fire.")));
+        test.setTooltip(Tooltip.of(Foe.sentence("type or paste a real chat message. the line below says if it would fire.")));
     }
 
     private void initTitle() {
@@ -169,7 +169,7 @@ public class TriggerEditScreen extends DofiScreen {
                     t.animation = Trigger.Animation.values()[(t.animation.ordinal() + 1) % Trigger.Animation.values().length];
                     b.setMessage(animationLabel());
                 }).dimensions(left + half + 4, y, half, 20)
-                .tooltip(Tooltip.of(Foe.text("how the title appears: fade, pop, slide, typewriter or shake"))).build());
+                .tooltip(Tooltip.of(Foe.sentence("how the title appears: fade, pop, slide, typewriter or shake"))).build());
         y += ROW;
 
         TextFieldWidget titleField = textField(y, t.title, 256, s -> t.title = s, "e.g. &lquest {n} complete");
@@ -188,7 +188,7 @@ public class TriggerEditScreen extends DofiScreen {
                 dropLeadColor(titleField);
             }
         });
-        tc.setTooltip(Tooltip.of(Foe.text("title colour: #ff8800, &a or a name like gold")));
+        tc.setTooltip(Tooltip.of(Foe.sentence("title colour: #ff8800, &a or a name like gold")));
         addDrawableChild(tc);
         addDrawableChild(colorSwatch(fieldX + colorW + 3, y, "title colour",
                 () -> RichText.parseColor(t.titleColor, 0xFFFFFF), c -> {
@@ -203,7 +203,7 @@ public class TriggerEditScreen extends DofiScreen {
                 dropLeadColor(subtitleField);
             }
         });
-        sc.setTooltip(Tooltip.of(Foe.text("subtitle colour: #ff8800, &a or a name like gray")));
+        sc.setTooltip(Tooltip.of(Foe.sentence("subtitle colour: #ff8800, &a or a name like gray")));
         addDrawableChild(sc);
         addDrawableChild(colorSwatch(fieldX + colorW * 2 + 31, y, "subtitle colour",
                 () -> RichText.parseColor(t.subtitleColor, 0xBBBBBB), c -> {
@@ -243,7 +243,7 @@ public class TriggerEditScreen extends DofiScreen {
                     b.setMessage(soundLabel());
                     SoundQueue.play(s);
                 }).dimensions(fieldX, y, fieldW, 20)
-                .tooltip(Tooltip.of(Foe.text("click to go through popular sounds (plays each one)"))).build();
+                .tooltip(Tooltip.of(Foe.sentence("click to go through popular sounds (plays each one)"))).build();
         addDrawableChild(pick);
         y += ROW;
 
@@ -251,7 +251,7 @@ public class TriggerEditScreen extends DofiScreen {
             s.soundId = v;
             pick.setMessage(soundLabel());
         }, "e.g. minecraft:block.note_block.pling");
-        idField[0].setTooltip(Tooltip.of(Foe.text("any sound id, including sounds from the fishonmc server pack")));
+        idField[0].setTooltip(Tooltip.of(Foe.sentence("any sound id, including sounds from the fishonmc server pack")));
         y += ROW;
 
         addDrawableChild(new ValueSlider(left, y, half, 20, "volume", 0, 1, 0.05, "", s.volume, v -> s.volume = v));
@@ -396,7 +396,7 @@ public class TriggerEditScreen extends DofiScreen {
                                      java.util.function.IntConsumer set) {
         SwatchButton b = new SwatchButton(x, y, 22, 20, get,
                 () -> client.setScreen(new ColorPickerScreen(this, name, get.getAsInt(), set)));
-        b.setTooltip(Tooltip.of(Foe.text("click to pick the " + name.toLowerCase(java.util.Locale.ROOT))));
+        b.setTooltip(Tooltip.of(Foe.sentence("click to pick the " + name.toLowerCase(java.util.Locale.ROOT))));
         return b;
     }
 
@@ -432,7 +432,7 @@ public class TriggerEditScreen extends DofiScreen {
                     set.set(!get.get());
                     b.setMessage(toggleText(name, get.get()));
                 }).dimensions(x, y, w, 20)
-                .tooltip(Tooltip.of(Foe.text(help))).build();
+                .tooltip(Tooltip.of(Foe.sentence(help))).build();
     }
 
     private static Text toggleText(String name, boolean on) {

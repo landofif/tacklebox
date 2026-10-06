@@ -131,10 +131,10 @@ public class SettingsScreen extends DofiScreen {
         int x = (width - (bw * 3 + 8)) / 2;
         addDrawableChild(ButtonWidget.builder(Foe.text("move huds"), b -> FoeScreens.openMover(this))
                 .dimensions(x, height - 30, bw, 20)
-                .tooltip(Tooltip.of(Foe.text("foecollabs hud mover. the quests left hud and the chat boxes are in it too"))).build());
+                .tooltip(Tooltip.of(Foe.sentence("foecollabs hud mover. the quests left hud and the chat boxes are in it too"))).build());
         ButtonWidget menu = ButtonWidget.builder(Foe.text("foecollab menu"), b -> open(FoeScreens.main(this)))
                 .dimensions(x + bw + 4, height - 30, bw, 20)
-                .tooltip(Tooltip.of(Foe.text("custom huds, custom buttons, pet calculator and more"))).build();
+                .tooltip(Tooltip.of(Foe.sentence("custom huds, custom buttons, pet calculator and more"))).build();
         menu.active = FoeConfig.available();
         addDrawableChild(menu);
         addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close()).dimensions(x + (bw + 4) * 2, height - 30, bw, 20).build());
@@ -290,13 +290,13 @@ public class SettingsScreen extends DofiScreen {
         header("held item");
         toggle("custom viewmodel", "changes the size and place of your held item. off is vanilla.",
                 () -> s.viewmodel, v -> s.viewmodel = v);
-        slider("size", "how big the held item is. 1 = normal.", 0.1, 3, 0.05, "x", null,
+        slider("size", "how big the held item is. 1 = normal.", 0.1, 3, 0.01, "x", null,
                 () -> s.vmScale, v -> s.vmScale = v);
-        slider("left / right", "moves the item sideways. mirrored for your off hand.", -1, 1, 0.05, "", null,
+        slider("left / right", "moves the item sideways. mirrored for your off hand.", -1, 1, 0.01, "", null,
                 () -> s.vmX, v -> s.vmX = v);
-        slider("up / down", "moves the item up or down.", -1, 1, 0.05, "", null,
+        slider("up / down", "moves the item up or down.", -1, 1, 0.01, "", null,
                 () -> s.vmY, v -> s.vmY = v);
-        slider("forward / back", "moves the item closer or further away.", -1, 1, 0.05, "", null,
+        slider("forward / back", "moves the item closer or further away.", -1, 1, 0.01, "", null,
                 () -> s.vmZ, v -> s.vmZ = v);
         slider("tilt", "tilts the item forward or back, in degrees.", -180, 180, 1, "°", null,
                 () -> s.vmRotX, v -> s.vmRotX = v);
@@ -310,7 +310,7 @@ public class SettingsScreen extends DofiScreen {
         cycle("swing style", "how your hand swings. no swing only turns the item in place.",
                 DofiSettings.SwingStyle.values(), w -> w.label, () -> s.swingStyle, v -> s.swingStyle = v);
         slider("swing length", "how long one swing takes. 1 = normal, 2 = twice as slow.",
-                0.25, 4, 0.05, "x", null, () -> s.swingSlowness, v -> s.swingSlowness = v);
+                0.25, 4, 0.01, "x", null, () -> s.swingSlowness, v -> s.swingSlowness = v);
         slider("swing turn", "with no swing, how far the item turns. 100% is vanilla, 0% keeps it still.",
                 0, 100, 1, "%", PCT, () -> s.swingTurn, v -> s.swingTurn = v);
     }
@@ -476,11 +476,11 @@ public class SettingsScreen extends DofiScreen {
 
     private boolean matches(String name, String desc) {
         String q = query.trim().toLowerCase(Locale.ROOT);
-        if (name.contains(q) || desc.toLowerCase(Locale.ROOT).contains(q)) {
+        if (name.toLowerCase(Locale.ROOT).contains(q) || desc.toLowerCase(Locale.ROOT).contains(q)) {
             return true;
         }
         for (String h : path) {
-            if (h != null && h.contains(q)) {
+            if (h != null && h.toLowerCase(Locale.ROOT).contains(q)) {
                 return true;
             }
         }
@@ -506,7 +506,7 @@ public class SettingsScreen extends DofiScreen {
         List<ClickableWidget> widgets = new ArrayList<>(List.of(label, control));
         widgets.addAll(List.of(more));
         if (!desc.isEmpty()) {
-            Tooltip tip = Tooltip.of(Foe.text(desc));
+            Tooltip tip = Tooltip.of(Foe.sentence(desc));
             label.setTooltip(tip);
             control.setTooltip(tip);
         }
@@ -556,7 +556,7 @@ public class SettingsScreen extends DofiScreen {
         ButtonWidget b = ButtonWidget.builder(Foe.text(String.format(Locale.ROOT, "#%06x", get.getAsInt())),
                 btn -> open.run()).dimensions(0, 0, controlW() - 22, 20).build();
         SwatchButton swatch = new SwatchButton(0, 0, 20, 20, get, open);
-        swatch.setTooltip(Tooltip.of(Foe.text("click to pick a colour")));
+        swatch.setTooltip(Tooltip.of(Foe.sentence("click to pick a colour")));
         row(name, desc, b, swatch);
     }
 
