@@ -11,7 +11,10 @@ import dev.landofif.dofisaddons.ui.S24;
 import dev.landofif.dofisaddons.util.Glyphs;
 import dev.landofif.dofisaddons.util.Mono;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
+import net.minecraft.block.Block;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.DyeColor;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
@@ -301,17 +304,41 @@ public class FishMenuScreen extends DofiScreen {
         if (t.loc != null) {
             drawLocation(ctx, t, w, h);
         } else {
-            ctx.getMatrices().pushMatrix();
-            ctx.getMatrices().translate((w - 48) / 2f, 8);
-            ctx.getMatrices().scale(3f, 3f);
-            ctx.drawItem(t.stack, 0, 0);
-            ctx.getMatrices().popMatrix();
+            int square = squareColor(t.stack);
+            if (square != 0) { // the quest menus coloured blocks are flat squares, like in foecollab
+                S24.fill(ctx, (int) (w - 48) / 2, 8, 48, 48, square);
+            } else {
+                ctx.getMatrices().pushMatrix();
+                ctx.getMatrices().translate((w - 48) / 2f, 8);
+                ctx.getMatrices().scale(3f, 3f);
+                ctx.drawItem(t.stack, 0, 0);
+                ctx.getMatrices().popMatrix();
+            }
             label(ctx, t.name, w / 2f, 62, w - 8, S24.TEXT_2);
         }
         if (editing) {
             ctx.drawText(textRenderer, Mono.text("↔"), 6, 5, S24.ACCENT, false);
         }
         ctx.getMatrices().popMatrix();
+    }
+
+    /** The colour of a shulker box, concrete or terracotta button (the quest, difficulty and tier pages), or 0 for any other item. */
+    private static int squareColor(ItemStack stack) {
+        String path = Registries.ITEM.getId(stack.getItem()).getPath();
+        if (path.equals("shulker_box")) {
+            return 0xFF976B97; // undyed has no dye colour
+        }
+        if (path.equals("terracotta") || path.endsWith("_terracotta")) {
+            // map colour keeps terracottas muted tone, so blue terracotta differs from blue concrete
+            return 0xFF000000 | Block.getBlockFromItem(stack.getItem()).getDefaultMapColor().color;
+        }
+        for (String suffix : new String[]{"_shulker_box", "_concrete"}) {
+            if (path.endsWith(suffix)) {
+                DyeColor dye = DyeColor.byId(path.substring(0, path.length() - suffix.length()), null);
+                return dye != null ? 0xFF000000 | dye.getEntityColor() : 0;
+            }
+        }
+        return 0;
     }
 
     private void drawLocation(DrawContext ctx, Tile t, float w, float h) {

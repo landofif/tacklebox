@@ -1,6 +1,7 @@
 package dev.landofif.dofisaddons.menu;
 
 import dev.landofif.dofisaddons.DofiSettings;
+import dev.landofif.dofisaddons.screen.FishMenuScreen;
 import dev.landofif.dofisaddons.stats.StatsTracker;
 import dev.landofif.dofisaddons.util.Glyphs;
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
@@ -14,6 +15,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,8 +27,9 @@ public final class FishMenu {
     /** Level and progress to the next level read off a travel item (-1 when the tooltip had none). */
     public record Info(int level, float progress) {}
 
-    /** The main menu's title is the glyph string U+EEE4 + hangul 할 (research section 8). */
-    private static final String MAIN_TITLE = "할";
+    /** Menus that are only buttons, named by their art glyph (see util/Glyphs). The others (sell, vault, shops, pets, armor) need your inventory. */
+    private static final Set<String> BUTTON_MENUS = Set.of("main menu", "stats", "quests", "crew");
+    private static final Set<String> COMMANDS = Set.of("menu", "travel", "turbotravel", "quests", "stats", "crew");
     private static final Pattern LEVEL = Pattern.compile("(?:level|lvl)\\D{0,8}(\\d+)");
     private static final Pattern PERCENT = Pattern.compile("(\\d+(?:[.,]\\d+)?)\\s*%");
     private static final Pattern FRACTION = Pattern.compile("([\\d,.]+)\\s*([km]?)\\s*/\\s*([\\d,.]+)\\s*([km]?)");
@@ -41,7 +44,7 @@ public final class FishMenu {
     public static void register() {
         ClientSendMessageEvents.COMMAND.register(command -> {
             String name = command.trim().split("\\s+")[0].toLowerCase(Locale.ROOT);
-            if (name.equals("menu") || name.equals("travel") || name.equals("turbotravel")) {
+            if (COMMANDS.contains(name)) {
                 commandAt = Util.getMeasuringTimeMs();
             }
         });
@@ -62,7 +65,12 @@ public final class FishMenu {
         }
         boolean typed = Util.getMeasuringTimeMs() - commandAt < 4000;
         commandAt = 0;
-        return typed || screen.getTitle().getString().contains(MAIN_TITLE);
+        // a button inside one of our menus (quests, then difficulty, then tier) stays in our screen too
+        boolean chained = MinecraftClient.getInstance().currentScreen instanceof FishMenuScreen;
+        String title = Glyphs.plain(screen.getTitle()).toLowerCase(Locale.ROOT);
+        boolean needsInventory = title.contains("merchant") || title.contains("vault") || title.contains("shop")
+                || title.contains("pet menu") || title.contains("armor");
+        return typed || BUTTON_MENUS.contains(Glyphs.menuName(screen.getTitle())) || (chained && !needsInventory);
     }
 
     /** Level and progress from an items name and lore, trying "level n", "n%" and "a/b". */
