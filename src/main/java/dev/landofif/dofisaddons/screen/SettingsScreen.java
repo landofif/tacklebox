@@ -599,6 +599,10 @@ public class SettingsScreen extends DofiScreen {
         }
 
         @Override
+        protected void drawIcon(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        }
+
+        @Override
         protected void drawLabel(net.minecraft.client.font.DrawnTextConsumer consumer) {
             consumer.text(net.minecraft.client.font.Alignment.RIGHT, getX() + getWidth() - 6, getY() + (getHeight() - 8) / 2, getMessage());
         }
