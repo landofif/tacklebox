@@ -1,21 +1,16 @@
 package dev.landofif.dofisaddons.menu;
 
-import net.minecraft.util.Identifier;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 /**
- * The 16 fishing locations (docs/fishonmc-research.md section 7, minus crew island), each with the wiki
- * picture bundled under textures/gui/location, and the bait strategies l and a friend noted down.
+ * The 17 fishing locations (docs/fishonmc-research.md section 7, minus crew island) and the bait strategies
+ * l and a friend noted down. The pictures are the items the server puts in the menu.
  */
 public final class Locations {
     /** {@code key} is matched against a menu item's name; {@code wiki} is the wiki table's spelling. */
     public record Location(String id, String name, String key, String wiki) {
-        public Identifier texture() {
-            return Identifier.of("dofisaddons", "textures/gui/location/" + id + ".png");
-        }
     }
 
     /** One row of the notes: what to fish with, and what you get out of it. */
@@ -37,7 +32,8 @@ public final class Locations {
             new Location("capecod", "cape cod", "cape cod", "cape cod"),
             new Location("hawaii", "hawaii", "hawaii", "hawaii"),
             new Location("lofoten", "lofoten islands", "lofoten", "lofoten islands"),
-            new Location("cairns", "cairns", "cairns", "cairns"));
+            new Location("cairns", "cairns", "cairns", "cairns"),
+            new Location("nile", "nile river", "nile", "nile river"));
 
     /** The location a menu item is named after, or null. */
     public static Location byName(String plainName) {

@@ -12,7 +12,6 @@ import dev.landofif.dofisaddons.util.Glyphs;
 import dev.landofif.dofisaddons.util.Mono;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import net.minecraft.block.Block;
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.DyeColor;
 import net.minecraft.client.gui.DrawContext;
@@ -368,7 +367,11 @@ public class FishMenuScreen extends DofiScreen {
     private void drawLocation(DrawContext ctx, Tile t, float w, float h) {
         int d = 56;
         float cx = w / 2f, cy = 8 + d / 2f + 3;
-        ctx.drawTexture(RenderPipelines.GUI_TEXTURED, t.loc.texture(), (int) (cx - d / 2f), (int) (cy - d / 2f), 0, 0, d, d, d, d, 128, 128);
+        ctx.getMatrices().pushMatrix(); // the menu's own item, which is the picture the game ships for this place
+        ctx.getMatrices().translate(cx - 24, cy - 24);
+        ctx.getMatrices().scale(3f, 3f);
+        ctx.drawItem(t.stack, 0, 0);
+        ctx.getMatrices().popMatrix();
         float r = d / 2f + 4;
         Arc.draw(ctx, cx, cy, r, 3, 0, 1, S24.BG_1);
         if (t.info.progress() >= 0) {
