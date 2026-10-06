@@ -48,7 +48,8 @@ public final class TriggerPresets {
     public static Trigger petDrop() {
         Trigger t = new Trigger();
         t.name = "pet drop";
-        t.pattern = "pet drop! you pulled {pet}";
+        t.mode = Trigger.MatchMode.REGEX;
+        t.pattern = "pet drop! you (?:pulled|caught) (?:an? )?(?<rarity>\\S+) (?<pet>.+?)!?$";
         t.title.title = "&lpet drop!";
         t.title.titleColor = "#fd95f6";
         t.title.subtitle = "{pet.lower}";
@@ -62,7 +63,7 @@ public final class TriggerPresets {
     public static Trigger rareCatch() {
         Trigger t = new Trigger();
         t.name = "rare catch";
-        t.pattern = "rare catch! you pulled {item}";
+        t.pattern = "rare catch! you * {item}";
         t.title.title = "&lrare catch!";
         t.title.titleColor = "#ffaa00";
         t.title.subtitle = "{item.lower}";
@@ -73,12 +74,12 @@ public final class TriggerPresets {
         return t;
     }
 
-    /** One shard per climate: "RARE CATCH! You pulled a 1x Subarctic Shard". */
+    /** One shard per climate: "RARE CATCH! You caught a 1x Subarctic Shard!". */
     public static Trigger climateShard() {
         Trigger t = new Trigger();
         t.name = "climate shard";
         t.mode = Trigger.MatchMode.REGEX;
-        t.pattern = "You pulled an? (?<n>\\d+)x (?<climate>semi-arid|arid|subtropical|oceanic|arctic|savanna|subarctic|continental|monsoon|rainforest) Shard";
+        t.pattern = "You (?:pulled|caught) an? (?<n>\\d+)x (?<climate>[a-z-]+) Shard";
         t.title.title = "&l{climate.lower} shard!";
         t.title.titleColor = "#ffaa00";
         t.title.subtitle = "{n}x";

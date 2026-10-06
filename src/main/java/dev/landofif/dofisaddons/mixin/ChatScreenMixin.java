@@ -56,6 +56,15 @@ abstract class ChatScreenMixin extends Screen {
         }
     }
 
+    /** ctrl + f searches the whole chat history. */
+    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
+    private void dofisaddons$search(net.minecraft.client.input.KeyInput input, CallbackInfoReturnable<Boolean> cir) {
+        if (input.key() == org.lwjgl.glfw.GLFW.GLFW_KEY_F && input.hasCtrl()) {
+            client.setScreen(new dev.landofif.dofisaddons.screen.ChatSearchScreen(this));
+            cir.setReturnValue(true);
+        }
+    }
+
     @Inject(method = "mouseScrolled", at = @At("HEAD"), cancellable = true)
     private void dofisaddons$boxScroll(double mouseX, double mouseY, double horizontal, double vertical, CallbackInfoReturnable<Boolean> cir) {
         if (ChatBoxes.scroll(mouseX, mouseY, vertical)) {

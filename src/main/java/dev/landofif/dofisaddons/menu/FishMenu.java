@@ -28,8 +28,8 @@ public final class FishMenu {
     public record Info(int level, float progress) {}
 
     /** Menus that are only buttons, named by their art glyph (see util/Glyphs). The others (sell, vault, shops, pets, armor) need your inventory. */
-    private static final Set<String> BUTTON_MENUS = Set.of("main menu", "stats", "quests", "crew", "presets");
-    private static final Set<String> COMMANDS = Set.of("menu", "travel", "turbotravel", "quests", "stats", "crew", "presets");
+    private static final Set<String> BUTTON_MENUS = Set.of("main menu", "stats", "crew", "presets");
+    private static final Set<String> COMMANDS = Set.of("menu", "travel", "turbotravel", "stats", "crew", "presets");
     private static final Pattern LEVEL = Pattern.compile("(?:level|lvl)\\D{0,8}(\\d+)");
     private static final Pattern PERCENT = Pattern.compile("(\\d+(?:[.,]\\d+)?)\\s*%");
     private static final Pattern FRACTION = Pattern.compile("([\\d,.]+)\\s*([km]?)\\s*/\\s*([\\d,.]+)\\s*([km]?)");

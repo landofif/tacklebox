@@ -29,6 +29,12 @@ abstract class ChatHudMixin {
     private static String lastPlain = "", lastShown = "";
     private static int lastCount;
 
+    /** Vanilla keeps 100 lines, here 2000 (ctrl + f searches them). */
+    @org.spongepowered.asm.mixin.injection.ModifyConstant(method = {"addVisibleMessage", "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V"}, constant = @org.spongepowered.asm.mixin.injection.Constant(intValue = 100))
+    private int dofisaddons$history(int max) {
+        return 2000;
+    }
+
     /** Lines a chat box takes (dms, crew chat) skip the main chat, see chat/ChatBoxes. */
     @Inject(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
             at = @At("HEAD"), cancellable = true)
