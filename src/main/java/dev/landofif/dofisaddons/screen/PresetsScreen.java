@@ -294,10 +294,34 @@ public class PresetsScreen extends DofiScreen {
         return out;
     }
 
+    /** Whether you are wearing this armor preset: every piece in it matches (by its custom data) what sits in that slot. */
+    private boolean worn(Card c) {
+        int pieces = 0;
+        for (ItemStack st : c.pieces) {
+            net.minecraft.entity.EquipmentSlot slot = armorSlot(st);
+            if (slot == null) {
+                continue;
+            }
+            var mine = client.player.getEquippedStack(slot).get(DataComponentTypes.CUSTOM_DATA);
+            var card = st.get(DataComponentTypes.CUSTOM_DATA);
+            if (card == null || mine == null || !card.copyNbt().equals(mine.copyNbt())) {
+                return false;
+            }
+            pieces++;
+        }
+        return pieces > 0;
+    }
+
     /** Draws one card and returns the item under the mouse, if any. */
     private ItemStack drawCard(DrawContext ctx, Card c, int x, int y, int w, int h, boolean hover, int mouseX, int mouseY, boolean bg) {
         if (bg) {
             Foe.button(ctx, x, y, w, h, hover);
+            if (worn(c)) { // the preset you have on: an orange outline
+                ctx.fill(x, y, x + w, y + 1, Foe.ACCENT);
+                ctx.fill(x, y + h - 1, x + w, y + h, Foe.ACCENT);
+                ctx.fill(x, y, x + 1, y + h, Foe.ACCENT);
+                ctx.fill(x + w - 1, y, x + w, y + h, Foe.ACCENT);
+            }
         }
         Text label = Foe.text(c.label());
         ctx.drawText(textRenderer, label, x + (w - textRenderer.getWidth(label)) / 2, y + 6, hover ? Foe.ACCENT : Foe.TEXT, false);
