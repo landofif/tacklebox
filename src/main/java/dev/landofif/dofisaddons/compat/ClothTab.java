@@ -47,7 +47,6 @@ public final class ClothTab {
         t.huds();
         t.bobber();
         t.world();
-        t.viewmodel();
         t.screens();
         t.flush();
         Runnable saving = builder.getSavingRunnable();
@@ -73,7 +72,7 @@ public final class ClothTab {
 
     private void screens() {
         header("screens");
-        for (String[] b : new String[][]{{"chat triggers", "triggers"}, {"chat", "chat"}, {"key commands", "keys"}, {"word swaps", "words"}, {"move huds", "move"}}) {
+        for (String[] b : new String[][]{{"chat triggers", "triggers"}, {"chat", "chat"}, {"key commands", "keys"}, {"word swaps", "words"}, {"viewmodel", "viewmodel"}, {"move huds", "move"}}) {
             Text link = Foe.text("open " + b[0]).setStyle(net.minecraft.text.Style.EMPTY.withColor(Formatting.GOLD).withUnderline(true)
                     .withClickEvent(new ClickEvent.RunCommand("dofi " + b[1])));
             group.add(new TextListEntry(Foe.text(b[0]), link));
@@ -205,32 +204,4 @@ public final class ClothTab {
                 });
     }
 
-    private void viewmodel() {
-        header("held item");
-        toggle("custom viewmodel", "changes the size and place of your held item. off is vanilla.",
-                () -> s.viewmodel, v -> s.viewmodel = v);
-        slider("size", "how big the held item is. 1 = normal.", 0.1, 3, 0.01, "x", null,
-                () -> s.vmScale, v -> s.vmScale = v);
-        slider("left / right", "moves the item sideways. mirrored for your off hand.", -1, 1, 0.01, "", null,
-                () -> s.vmX, v -> s.vmX = v);
-        slider("up / down", "moves the item up or down.", -1, 1, 0.01, "", null,
-                () -> s.vmY, v -> s.vmY = v);
-        slider("forward / back", "moves the item closer or further away.", -1, 1, 0.01, "", null,
-                () -> s.vmZ, v -> s.vmZ = v);
-        slider("tilt", "tilts the item forward or back, in degrees.", -180, 180, 1, "°", null,
-                () -> s.vmRotX, v -> s.vmRotX = v);
-        slider("turn", "turns the item left or right, in degrees.", -180, 180, 1, "°", null,
-                () -> s.vmRotY, v -> s.vmRotY = v);
-        slider("roll", "rolls the item sideways, in degrees.", -180, 180, 1, "°", null,
-                () -> s.vmRotZ, v -> s.vmRotZ = v);
-        toggle("no switch dip", "stops the dip when you switch slots or use the item.",
-                () -> s.vmNoEquipDip, v -> s.vmNoEquipDip = v);
-        header("swing");
-        cycle("swing style", "how your hand swings. no swing only turns the item in place.",
-                DofiSettings.SwingStyle.values(), w -> w.label, () -> s.swingStyle, v -> s.swingStyle = v);
-        slider("swing length", "how long one swing takes. 1 = normal, 2 = twice as slow.",
-                0.25, 4, 0.01, "x", null, () -> s.swingSlowness, v -> s.swingSlowness = v);
-        slider("swing turn", "with no swing, how far the item turns. 100% is vanilla, 0% keeps it still.",
-                0, 100, 1, "%", PCT, () -> s.swingTurn, v -> s.swingTurn = v);
-    }
 }

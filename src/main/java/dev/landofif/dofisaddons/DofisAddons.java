@@ -125,6 +125,7 @@ public final class DofisAddons implements ClientModInitializer {
                     .then(ClientCommandManager.literal("huds").executes(ctx -> open(() -> dev.landofif.dofisaddons.compat.FoeScreens.customHuds(null))))
                     .then(ClientCommandManager.literal("words").executes(ctx -> open(() -> new dev.landofif.dofisaddons.screen.WordSwapScreen(null))))
                     .then(ClientCommandManager.literal("keys").executes(ctx -> open(() -> new dev.landofif.dofisaddons.screen.KeyCommandScreen(null))))
+                    .then(ClientCommandManager.literal("viewmodel").executes(ctx -> open(() -> new dev.landofif.dofisaddons.screen.ViewmodelScreen(null))))
                     .then(ClientCommandManager.literal("chat").executes(ctx -> open(() -> new ChatFilterScreen(null))))
                     .then(ClientCommandManager.literal("debug")
                             .then(ClientCommandManager.literal("item").executes(ctx -> dev.landofif.dofisaddons.display.DebugDump.heldItem())))
