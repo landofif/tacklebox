@@ -2,8 +2,6 @@
 
 client side fabric mod for **fishonmc** (minecraft 1.21.11).
 
-display only: the mod reacts to what the server sends. it never sends chat, clicks, casts, reels or presses keys for you.
-
 needs: fabric api and [foecollab](https://github.com/Kimberlyow/FOECollab) (with its own requirements, cloth config and mod menu). dofis addons is an addon for foecollab: it leaves the trackers and the look to foecollab, draws its own screens and huds with foecollabs boxes and the normal game font, puts its huds in foecollabs hud mover, and its settings next to foecollabs in one settings screen.
 
 ## getting around
