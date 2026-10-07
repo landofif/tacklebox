@@ -119,6 +119,7 @@ public class SettingsScreen extends DofiScreen {
         side.addRow(new RowListWidget.Row(List.of(screenButton(side, "chat triggers", () -> new TriggerListScreen(this)))));
         side.addRow(new RowListWidget.Row(List.of(screenButton(side, "chat", () -> new ChatFilterScreen(this)))));
         side.addRow(new RowListWidget.Row(List.of(screenButton(side, "key commands", () -> new KeyCommandScreen(this)))));
+        side.addRow(new RowListWidget.Row(List.of(screenButton(side, "word swaps", () -> new WordSwapScreen(this)))));
         addDrawableChild(side);
 
         int lx = LEFT + sideW + 8;

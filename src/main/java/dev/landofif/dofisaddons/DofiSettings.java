@@ -123,6 +123,10 @@ public class DofiSettings {
     /** Keys that run a command when pressed in game, see input/KeyCommands. */
     public java.util.List<dev.landofif.dofisaddons.input.KeyCommands.Entry> keyCommands = new java.util.ArrayList<>();
 
+    // ---- word swaps (see display/WordSwap) ----
+    public boolean wordSwap = true;
+    public java.util.List<dev.landofif.dofisaddons.display.WordSwap.Entry> words = new java.util.ArrayList<>();
+
     // ---- bobber behaviour (only you see these) ----
     /** Hold the bobber still on the water instead of bobbing (it still dips on a bite). */
     public boolean stillBobber = true;
@@ -231,6 +235,12 @@ public class DofiSettings {
         keyCommands.removeIf(java.util.Objects::isNull);
         for (var k : keyCommands) {
             if (k.command == null) k.command = "";
+        }
+        if (words == null) words = new java.util.ArrayList<>();
+        words.removeIf(java.util.Objects::isNull);
+        for (var w : words) {
+            if (w.from == null) w.from = "";
+            if (w.to == null) w.to = "";
         }
         if (chatBoxes == null) chatBoxes = dev.landofif.dofisaddons.chat.ChatBoxes.defaults();
         chatBoxes.removeIf(java.util.Objects::isNull);

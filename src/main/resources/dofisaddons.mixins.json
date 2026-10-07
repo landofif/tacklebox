@@ -25,7 +25,8 @@
     "MovableBoxWidgetMixin",
     "MoveHudScreenMixin",
     "PlayerNameLabelMixin",
-    "PressableWidgetMixin"
+    "PressableWidgetMixin",
+    "TextRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
