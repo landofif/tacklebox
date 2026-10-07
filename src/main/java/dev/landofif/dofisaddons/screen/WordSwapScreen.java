@@ -52,7 +52,7 @@ public class WordSwapScreen extends DofiScreen {
     private void rebuild() {
         double scroll = list.getScrollY();
         list.clearRows();
-        int fieldW = Math.max(50, (list.getRowWidth() - 3 * 20 - 4 * 4) / 2);
+        int fieldW = Math.max(50, (list.getRowWidth() - 5 * 20 - 6 * 4) / 2);
         for (WordSwap.Entry e : s.words) {
             TextFieldWidget from = field(fieldW, "replace this", e.from, v -> e.from = v);
             TextFieldWidget to = field(fieldW, "with this", e.to, v -> e.to = v);
@@ -64,11 +64,16 @@ public class WordSwapScreen extends DofiScreen {
                 e.caseSensitive = !e.caseSensitive;
                 b.setMessage(Foe.text(e.caseSensitive ? "Aa" : "aa"));
             }).dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Foe.sentence("Aa: the capitals must match. aa: any capitals match."))).build();
+            SwatchButton swatch = new SwatchButton(0, 0, 20, 20, () -> e.color < 0 ? 0x404040 : e.color,
+                    () -> client.setScreen(new ColorPickerScreen(this, "word colour", e.color < 0 ? 0xFFFFFF : e.color, c -> e.color = c & 0xFFFFFF)));
+            ButtonWidget noColor = ButtonWidget.builder(Foe.text("∅"), b -> {
+                e.color = -1;
+            }).dimensions(0, 0, 20, 20).tooltip(Tooltip.of(Foe.sentence("use the colour of the text it replaces"))).build();
             ButtonWidget delete = ButtonWidget.builder(Foe.text("✕").formatted(Formatting.RED), b -> {
                 s.words.remove(e);
                 rebuild();
             }).dimensions(0, 0, 20, 20).build();
-            list.addRow(new RowListWidget.Row(List.<ClickableWidget>of(from, to, on, aa, delete)));
+            list.addRow(new RowListWidget.Row(List.<ClickableWidget>of(from, to, swatch, noColor, on, aa, delete)));
         }
         list.setScrollY(scroll);
     }

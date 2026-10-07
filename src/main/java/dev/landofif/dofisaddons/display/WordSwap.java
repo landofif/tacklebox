@@ -17,6 +17,8 @@ public final class WordSwap {
         public String to = "";
         public boolean enabled = true;
         public boolean caseSensitive = false;
+        /** RGB the replacement is drawn in, or -1 to keep the colour of the text it replaces. */
+        public int color = -1;
     }
 
     private record Ch(int cp, Style style) {}
@@ -92,7 +94,8 @@ public final class WordSwap {
         for (int i = 0; i < in.size(); ) {
             if (matches(in, i, from, e.caseSensitive)) {
                 for (int cp : to) {
-                    out.add(new Ch(cp, in.get(i).style));
+                    Style st = in.get(i).style;
+                    out.add(new Ch(cp, e.color < 0 ? st : st.withColor(e.color & 0xFFFFFF)));
                 }
                 i += from.length;
             } else {
