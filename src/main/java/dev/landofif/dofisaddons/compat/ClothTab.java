@@ -72,11 +72,23 @@ public final class ClothTab {
 
     private void screens() {
         header("screens");
-        for (String[] b : new String[][]{{"chat triggers", "triggers"}, {"chat", "chat"}, {"key commands", "keys"}, {"word swaps", "words"}, {"viewmodel", "viewmodel"}, {"move huds", "move"}}) {
-            Text link = title("open " + b[0]).setStyle(net.minecraft.text.Style.EMPTY.withColor(Formatting.GOLD).withUnderline(true)
-                    .withClickEvent(new ClickEvent.RunCommand("dofi " + b[1])));
-            group.add(new TextListEntry(title(b[0]), link));
-        }
+        link("chat triggers", dev.landofif.dofisaddons.screen.TriggerListScreen::new);
+        link("chat", dev.landofif.dofisaddons.screen.ChatFilterScreen::new);
+        link("key commands", dev.landofif.dofisaddons.screen.KeyCommandScreen::new);
+        link("word swaps", dev.landofif.dofisaddons.screen.WordSwapScreen::new);
+        link("viewmodel", dev.landofif.dofisaddons.screen.ViewmodelScreen::new);
+        link("move huds", FoeScreens::move);
+    }
+
+    /** A row with an open button for one of the mods screens; it returns to the config screen when closed. */
+    private void link(String name, Function<net.minecraft.client.gui.screen.Screen, net.minecraft.client.gui.screen.Screen> screen) {
+        group.add(ButtonEntry.action(title(name), title("open"), () -> {
+            var mc = net.minecraft.client.MinecraftClient.getInstance();
+            net.minecraft.client.gui.screen.Screen next = screen.apply(mc.currentScreen);
+            if (next != null) {
+                mc.setScreen(next);
+            }
+        }));
     }
 
     /** Title Case in the normal font (the group headings are bold), like foecollab's own labels (not our small capitals). */
@@ -123,10 +135,9 @@ public final class ClothTab {
     }
 
     private void color(String name, String desc, IntSupplier get, IntConsumer set) {
-        var e = eb.startColorField(title(name), get.getAsInt()).setDefaultValue(get.getAsInt())
-                .setSaveConsumer(v -> set.accept(v & 0xFFFFFF));
-        e.setTooltip(tip(desc));
-        group.add(e.build());
+        ButtonEntry e = ButtonEntry.color(title(name), get, set);
+        e.setTooltipSupplier(() -> java.util.Optional.of(tip(desc)));
+        group.add(e);
     }
 
     private void menus() {
