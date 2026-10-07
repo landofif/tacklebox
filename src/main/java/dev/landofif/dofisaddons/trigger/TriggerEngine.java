@@ -18,7 +18,59 @@ public final class TriggerEngine {
     private static final Map<String, Long> LAST_FIRED = new HashMap<>();
     private static final Map<String, Integer> FIRE_COUNTS = new HashMap<>();
 
+    /** Lines of one trigger that arrive together (two quests finished by one catch) are shown as one. */
+    private static final long MERGE_MS = 250;
+    private static final Map<String, Pending> PENDING = new java.util.LinkedHashMap<>();
+
+    private static final class Pending {
+        final Trigger trigger;
+        final long due;
+        final Map<String, java.util.List<String>> values = new java.util.LinkedHashMap<>();
+        int lines;
+
+        Pending(Trigger trigger, long due) {
+            this.trigger = trigger;
+            this.due = due;
+        }
+
+        void add(Map<String, String> v) {
+            lines++;
+            v.forEach((k, x) -> {
+                java.util.List<String> l = values.computeIfAbsent(k, y -> new java.util.ArrayList<>());
+                if (!l.contains(x)) {
+                    l.add(x);
+                }
+            });
+        }
+    }
+
     private TriggerEngine() {}
+
+    /** Shows the triggers whose merge window has passed. Called every client tick. */
+    public static void tick() {
+        if (PENDING.isEmpty()) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        for (var it = PENDING.values().iterator(); it.hasNext(); ) {
+            Pending p = it.next();
+            if (now < p.due) {
+                continue;
+            }
+            it.remove();
+            Map<String, String> joined = new HashMap<>();
+            p.values.forEach((k, l) -> joined.put(k, join(l)));
+            joined.put("matches", String.valueOf(p.lines));
+            joined.put("s", p.lines > 1 ? "s" : "");
+            fire(p.trigger, joined, FIRE_COUNTS.merge(p.trigger.id, 1, Integer::sum));
+        }
+    }
+
+    /** "1", "1 & 2", "1, 2 & 3". */
+    private static String join(java.util.List<String> l) {
+        return l.size() < 2 ? String.join("", l)
+                : String.join(", ", l.subList(0, l.size() - 1)) + " & " + l.get(l.size() - 1);
+    }
 
     /** Patterns changed: recompile lazily on the next message. */
     public static void invalidate() {
@@ -43,13 +95,17 @@ public final class TriggerEngine {
             if (result == null) {
                 continue;
             }
-            long last = LAST_FIRED.getOrDefault(trigger.id, 0L);
-            if (now - last < (long) (trigger.cooldownSeconds * 1000)) {
-                continue;
+            Pending pending = PENDING.get(trigger.id);
+            if (pending == null) {
+                long last = LAST_FIRED.getOrDefault(trigger.id, 0L);
+                if (now - last < (long) (trigger.cooldownSeconds * 1000)) {
+                    continue;
+                }
+                LAST_FIRED.put(trigger.id, now);
+                pending = new Pending(trigger, now + MERGE_MS);
+                PENDING.put(trigger.id, pending);
             }
-            LAST_FIRED.put(trigger.id, now);
-            int count = FIRE_COUNTS.merge(trigger.id, 1, Integer::sum);
-            fire(trigger, result.values(), count);
+            pending.add(result.values());
             if (trigger.hideMessage) {
                 show = false;
             }
@@ -63,6 +119,8 @@ public final class TriggerEngine {
         MinecraftClient client = MinecraftClient.getInstance();
         all.putIfAbsent("player", client.getSession() != null ? client.getSession().getUsername() : "");
         all.putIfAbsent("count", String.valueOf(count));
+        all.putIfAbsent("s", "");
+        all.putIfAbsent("matches", "1");
         if (trigger.title.enabled) {
             TitleOverlay.show(trigger.title, fill(trigger.title.title, all), fill(trigger.title.subtitle, all));
         }

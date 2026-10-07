@@ -107,6 +107,7 @@ public final class DofisAddons implements ClientModInitializer {
             ServerInfo.tick(client);
             XpEstimate.tick(client);
             dev.landofif.dofisaddons.input.KeyCommands.tick(client);
+            TriggerEngine.tick();
             while (openKey.wasPressed()) {
                 if (client.currentScreen == null) {
                     client.setScreen(dev.landofif.dofisaddons.compat.FoeScreens.config(null));

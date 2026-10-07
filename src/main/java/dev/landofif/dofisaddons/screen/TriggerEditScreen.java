@@ -372,7 +372,7 @@ public class TriggerEditScreen extends DofiScreen {
         y += ROW;
         label(context, "colours", y);
         y += ROW * 4;
-        hint(context, "use {n}-style values from step 1, {player}, {count}. colours: &a &l &o &#ff8800", y + 2);
+        hint(context, "use {n}-style values from step 1, {player}, {count}, {s} ("s" when lines merged), {matches}. colours: &a &l &o &#ff8800", y + 2);
     }
 
     private void renderSound(DrawContext context) {

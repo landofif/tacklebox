@@ -37,7 +37,7 @@ public final class TriggerPresets {
         Trigger t = new Trigger();
         t.name = "quest completed";
         t.pattern = "quests > quest #{n} has been completed!";
-        t.title.title = "&lquest {n} complete";
+        t.title.title = "&lquest{s} {n} complete";
         t.title.subtitle = "type /quests to claim it";
         t.title.titleColor = "#55ff55";
         t.title.animation = Trigger.Animation.POP;
