@@ -37,7 +37,7 @@ public final class ClothTab {
 
     private ClothTab(ConfigBuilder builder) {
         this.eb = builder.entryBuilder();
-        this.tab = builder.getOrCreateCategory(Foe.text("dofis addons"));
+        this.tab = builder.getOrCreateCategory(title("dofis addons"));
     }
 
     /** Adds the tab to foecollab's config screen builder and saves our settings with it. */
@@ -60,7 +60,7 @@ public final class ClothTab {
 
     private void flush() {
         if (groupName != null && !group.isEmpty()) {
-            tab.addEntry(eb.startSubCategory(Foe.text(groupName), new ArrayList<>(group)).setExpanded(false).build());
+            tab.addEntry(eb.startSubCategory(title(groupName).formatted(Formatting.BOLD), new ArrayList<>(group)).setExpanded(false).build());
         }
         group.clear();
     }
@@ -73,10 +73,21 @@ public final class ClothTab {
     private void screens() {
         header("screens");
         for (String[] b : new String[][]{{"chat triggers", "triggers"}, {"chat", "chat"}, {"key commands", "keys"}, {"word swaps", "words"}, {"viewmodel", "viewmodel"}, {"move huds", "move"}}) {
-            Text link = Foe.text("open " + b[0]).setStyle(net.minecraft.text.Style.EMPTY.withColor(Formatting.GOLD).withUnderline(true)
+            Text link = title("open " + b[0]).setStyle(net.minecraft.text.Style.EMPTY.withColor(Formatting.GOLD).withUnderline(true)
                     .withClickEvent(new ClickEvent.RunCommand("dofi " + b[1])));
-            group.add(new TextListEntry(Foe.text(b[0]), link));
+            group.add(new TextListEntry(title(b[0]), link));
         }
+    }
+
+    /** Title Case in the normal font (the group headings are bold), like foecollab's own labels (not our small capitals). */
+    private static net.minecraft.text.MutableText title(String text) {
+        StringBuilder b = new StringBuilder();
+        for (String w : text.split(" ")) {
+            if (!w.isEmpty()) {
+                b.append(b.length() > 0 ? " " : "").append(Character.toUpperCase(w.charAt(0))).append(w.substring(1));
+            }
+        }
+        return Text.literal(b.toString());
     }
 
     private static Text[] tip(String desc) {
@@ -84,7 +95,7 @@ public final class ClothTab {
     }
 
     private void toggle(String name, String desc, Supplier<Boolean> get, Consumer<Boolean> set) {
-        var e = eb.startBooleanToggle(Foe.text(name), get.get()).setDefaultValue(get.get()).setSaveConsumer(set::accept);
+        var e = eb.startBooleanToggle(title(name), get.get()).setDefaultValue(get.get()).setSaveConsumer(set::accept);
         if (!desc.isEmpty()) {
             e.setTooltip(tip(desc));
         }
@@ -93,8 +104,8 @@ public final class ClothTab {
 
     private <E extends Enum<E>> void cycle(String name, String desc, E[] values, Function<E, String> label,
                                            Supplier<E> get, Consumer<E> set) {
-        var e = eb.startEnumSelector(Foe.text(name), values[0].getDeclaringClass(), get.get())
-                .setDefaultValue(get.get()).setEnumNameProvider(v -> Foe.text(label.apply((E) v))).setSaveConsumer(set::accept);
+        var e = eb.startEnumSelector(title(name), values[0].getDeclaringClass(), get.get())
+                .setDefaultValue(get.get()).setEnumNameProvider(v -> title(label.apply((E) v))).setSaveConsumer(set::accept);
         e.setTooltip(tip(desc));
         group.add(e.build());
     }
@@ -102,7 +113,7 @@ public final class ClothTab {
     private void slider(String name, String desc, double min, double max, double step, String unit,
                         DoubleFunction<String> format, DoubleSupplier get, DoubleConsumer set) {
         int cur = (int) Math.round(get.getAsDouble() / step);
-        var e = eb.startIntSlider(Foe.text(name), cur, (int) Math.round(min / step), (int) Math.round(max / step))
+        var e = eb.startIntSlider(title(name), cur, (int) Math.round(min / step), (int) Math.round(max / step))
                 .setDefaultValue(cur)
                 .setTextGetter(v -> Text.literal(step >= 1 ? String.valueOf((int) Math.round(v * step)) + unit
                         : String.format(Locale.ROOT, "%.2f", v * step) + unit))
@@ -112,7 +123,7 @@ public final class ClothTab {
     }
 
     private void color(String name, String desc, IntSupplier get, IntConsumer set) {
-        var e = eb.startColorField(Foe.text(name), get.getAsInt()).setDefaultValue(get.getAsInt())
+        var e = eb.startColorField(title(name), get.getAsInt()).setDefaultValue(get.getAsInt())
                 .setSaveConsumer(v -> set.accept(v & 0xFFFFFF));
         e.setTooltip(tip(desc));
         group.add(e.build());
