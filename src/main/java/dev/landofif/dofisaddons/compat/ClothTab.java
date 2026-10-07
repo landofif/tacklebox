@@ -60,7 +60,7 @@ public final class ClothTab {
 
     private void flush() {
         if (groupName != null && !group.isEmpty()) {
-            tab.addEntry(eb.startSubCategory(title(groupName).formatted(Formatting.BOLD), new ArrayList<>(group)).setExpanded(false).build());
+            tab.addEntry(eb.startSubCategory(title(groupName).formatted(Formatting.BOLD, Formatting.WHITE), new ArrayList<>(group)).setExpanded(false).build());
         }
         group.clear();
     }
