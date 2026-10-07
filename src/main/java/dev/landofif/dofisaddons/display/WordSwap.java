@@ -41,7 +41,8 @@ public final class WordSwap {
 
     private static List<Entry> active() {
         DofiSettings s = DofiSettings.get();
-        return s.wordSwap ? s.words : List.of();
+        // the editor shows what you type, not its own swapped text
+        return s.wordSwap && !(net.minecraft.client.MinecraftClient.getInstance().currentScreen instanceof dev.landofif.dofisaddons.screen.WordSwapScreen) ? s.words : List.of();
     }
 
     public static String swap(String text) {
