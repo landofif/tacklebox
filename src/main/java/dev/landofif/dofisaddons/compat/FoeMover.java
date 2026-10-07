@@ -148,7 +148,7 @@ public final class FoeMover {
         int bottom = r[1] + r[3];
         if (mode == 1 || mode == 2) {
             int px = (mode == 2 ? mx - r[0] : right - mx) - (int) Math.round(12 * scale);
-            double v = Math.max(0, Math.min(1, (px / scale - 40) / 280.0));
+            double v = Math.max(0, Math.min(1, (px - 40) / 280.0));
             o.getChatWidth().setValue(v);
             if (mode == 1) {
                 int w = (int) Math.ceil((Math.ceil(ChatHud.getWidth(v) / scale) + 12) * scale);
@@ -202,6 +202,8 @@ public final class FoeMover {
         private boolean growUp;
         private EdgeDrag edgeDrag;
         private int mode;
+        /** How far from an edge a click still grabs it, inside or outside. */
+        private static final int GRAB = 5;
 
         Box(Function<DrawContext, int[]> draw, MoveTo move, Resize resize, Runnable reset) {
             super(0, 0, 0, 0, Text.empty());
@@ -228,14 +230,39 @@ public final class FoeMover {
             int[] o = openOf == null ? r : openOf.apply(r);
             int top = Math.min(r[1], o[1]);
             int bottom = Math.max(r[1] + r[3], o[1] + o[3]);
-            setX(r[0]); // the widget covers both sizes, so the open size's edge can be grabbed too
-            setY(top);
-            setDimensions(r[2], bottom - top);
+            int m = edgeDrag == null ? 0 : GRAB; // the widget covers both sizes and a margin, so edges can be grabbed from outside too
+            setX(r[0] - m);
+            setY(top - m);
+            setDimensions(r[2] + 2 * m, bottom - top + 2 * m);
             boolean hot = isHovered() || isFocused();
             if (o != r) { // the size while chat is open, fainter, with the closed size on top
                 ctx.drawStrokedRectangle(o[0], o[1], o[2], o[3], hot ? Foe.DIM : Foe.FAINT);
             }
             ctx.drawStrokedRectangle(r[0], r[1], r[2], r[3], hot ? Foe.ACCENT : Foe.FAINT);
+            if (edgeDrag != null) {
+                handles(ctx, r, o, mode != 0 ? mode : hot ? edgeAt(mouseX, mouseY) : 0, hot);
+            }
+        }
+
+        /** Little squares on the edges that can be dragged, the one under the mouse lit up and named. */
+        private void handles(DrawContext ctx, int[] r, int[] o, int picked, boolean hot) {
+            int closedEdge = growUp ? r[1] : r[1] + r[3];
+            int cx = r[0] + r[2] / 2;
+            int cy = r[1] + r[3] / 2;
+            int[][] spots = {{r[0], cy}, {r[0] + r[2], cy}, {cx, closedEdge}, {cx, o[1]}};
+            String[] names = {"width", "width", "height", "open height"};
+            for (int i = 0; i < 4; i++) {
+                if (i == 3 && o[1] == closedEdge) {
+                    continue; // same edge as the closed height
+                }
+                boolean lit = picked == i + 1;
+                int c = lit ? Foe.ACCENT : hot ? Foe.TEXT : Foe.FAINT;
+                ctx.fill(spots[i][0] - 3, spots[i][1] - 3, spots[i][0] + 3, spots[i][1] + 3, c);
+                if (lit) {
+                    var tr = MinecraftClient.getInstance().textRenderer;
+                    ctx.drawTextWithShadow(tr, Foe.text("drag: " + names[i]), spots[i][0] + 6, spots[i][1] - 4, Foe.ACCENT);
+                }
+            }
         }
 
         /** Which edge of the rectangles the click is on: 1 left, 2 right, 3 closed height, 4 open height, 0 none (move). */
@@ -243,7 +270,7 @@ public final class FoeMover {
             if (edgeDrag == null || now == null) {
                 return 0;
             }
-            int tol = 3;
+            int tol = GRAB;
             int[] r = now;
             int[] o = openOf.apply(r);
             int closedEdge = growUp ? r[1] : r[1] + r[3];
@@ -255,7 +282,7 @@ public final class FoeMover {
             if (inX && openEdge != closedEdge && Math.abs(my - openEdge) <= tol) {
                 return 4;
             }
-            if (my >= r[1] && my <= r[1] + r[3]) {
+            if (my >= r[1] - tol && my <= r[1] + r[3] + tol) {
                 if (Math.abs(mx - r[0]) <= tol) {
                     return 1;
                 }
