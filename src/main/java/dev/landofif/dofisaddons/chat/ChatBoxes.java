@@ -145,13 +145,19 @@ public final class ChatBoxes {
         return Math.round((height - heightOf(0)) / (float) LINE_H);
     }
 
+    /** Where a box is. Open chat makes it taller upward: the bottom edge stays, so the newest line does not move. */
     public static int[] rect(ChatBox box, int screenW, int screenH, boolean open) {
         int w = Math.max(80, Math.min(screenW, box.width));
-        int h = heightOf(lines(box, open));
+        int h = heightOf(lines(box, false));
         int x = (int) Math.round(box.x / 100.0 * screenW);
         int y = (int) Math.round(box.y / 100.0 * screenH);
         x = Math.max(0, Math.min(screenW - w, x));
         y = Math.max(0, Math.min(screenH - h, y));
+        if (open) {
+            int bottom = y + h;
+            h = heightOf(lines(box, true));
+            y = Math.max(0, bottom - h);
+        }
         return new int[]{x, y, w, h};
     }
 

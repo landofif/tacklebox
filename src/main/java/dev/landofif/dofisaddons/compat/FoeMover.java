@@ -160,7 +160,7 @@ public final class FoeMover {
         }
     }
 
-    /** Edge drag on a chat box. It grows downward from its top left corner. */
+    /** Edge drag on a chat box. The closed height is its bottom edge; the open height grows upward from there. */
     private static void dragBox(ChatBox box, int mode, int mx, int my, int[] r) {
         int right = r[0] + r[2];
         if (mode == 2) {
@@ -172,7 +172,7 @@ public final class FoeMover {
             box.lines = Math.max(1, Math.min(30, ChatBoxes.linesOf(my - r[1])));
             box.linesOpen = Math.max(box.lines, box.linesOpen);
         } else {
-            box.linesOpen = Math.max(box.lines, Math.min(40, ChatBoxes.linesOf(my - r[1])));
+            box.linesOpen = Math.max(box.lines, Math.min(40, ChatBoxes.linesOf(r[1] + r[3] - my))); // from the top edge of the open outline down to the box's bottom
         }
     }
 
@@ -247,7 +247,7 @@ public final class FoeMover {
             int[] r = now;
             int[] o = openOf.apply(r);
             int closedEdge = growUp ? r[1] : r[1] + r[3];
-            int openEdge = growUp ? o[1] : o[1] + o[3];
+            int openEdge = o[1]; // the open size always grows upward
             boolean inX = mx >= r[0] - tol && mx <= r[0] + r[2] + tol;
             if (inX && Math.abs(my - closedEdge) <= tol) {
                 return 3;
