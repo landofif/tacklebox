@@ -68,7 +68,15 @@ public class DofiSettings {
     /** The hotbar: moved by this many gui pixels from where vanilla puts it, and whether its slot background is drawn. */
     public int hotbarX = 0;
     public int hotbarY = 0;
+    /** The old on/off for the hotbar background; only read once to fill {@link #hotbarLook} and {@link #equipLook}. */
     public boolean hotbarBackground = false;
+    /** What sits behind the hotbar and foecollabs equipment slots, the distance between slots in pixels (20 and 22 are the defaults), and the shared box colours. */
+    public BoxLook hotbarLook = null;
+    public BoxLook equipLook = null;
+    public int hotbarSpacing = 20;
+    public int equipSpacing = 22;
+    public int boxOutlineColor = 0x808080;
+    public int boxOpacity = 50;
     public int hotbarScale = 100;
     /** How the held hotbar slot is marked, and in what colour; and whether the offhand box shows. */
     public SelectionStyle hotbarSelection = SelectionStyle.FRAME;
@@ -204,6 +212,17 @@ public class DofiSettings {
         return new int[]{equipPlace == EquipPlace.LEFT ? -side : side, 27}; // level with the hotbar
     }
 
+    /** DEFAULT is the vanilla hotbar sprite / foecollabs own squares, which only fit at their own spacing. */
+    public enum BoxLook {
+        OFF("off"), DEFAULT("default"), FILL("fill"), OUTLINE("outline"), BOTH("fill + outline");
+
+        public final String label;
+
+        BoxLook(String label) {
+            this.label = label;
+        }
+    }
+
     public enum SelectionStyle {
         FRAME("frame"), ROUND("round"), SIMPLE("simple"), NONE("off");
 
@@ -224,10 +243,25 @@ public class DofiSettings {
         }
     }
 
+    /** The pitch of the hotbar slots: the vanilla 20 when the vanilla sprite is drawn, since it only fits that. */
+    public int hotbarPitch() {
+        return hotbarLook == BoxLook.DEFAULT ? 20 : hotbarSpacing;
+    }
+
+    public int equipPitch() {
+        return equipLook == BoxLook.DEFAULT ? 22 : equipSpacing;
+    }
+
     public void sanitize() {
         if (bobberSkin == null) bobberSkin = BobberSkin.DEFAULT;
         if (swingStyle == null) swingStyle = SwingStyle.NORMAL;
         if (equipPlace == null) equipPlace = EquipPlace.ABOVE;
+        if (hotbarLook == null) hotbarLook = hotbarBackground ? BoxLook.DEFAULT : BoxLook.OFF;
+        if (equipLook == null) equipLook = hotbarBackground ? BoxLook.DEFAULT : BoxLook.OFF;
+        hotbarSpacing = Math.max(16, Math.min(24, hotbarSpacing));
+        equipSpacing = Math.max(16, Math.min(26, equipSpacing));
+        boxOpacity = Math.max(0, Math.min(100, boxOpacity));
+        boxOutlineColor &= 0xFFFFFF;
         if (hotbarSelection == null) hotbarSelection = SelectionStyle.FRAME;
         if (chatFilters == null) chatFilters = new java.util.ArrayList<>();
         chatFilters.removeIf(java.util.Objects::isNull);

@@ -141,8 +141,10 @@ public final class ClothTab {
 
     private void huds() {
         header("hotbar");
-        toggle("hotbar background", "the box behind the hotbar slots. off leaves just the items and the selection. move the hotbar with move huds.",
-                () -> s.hotbarBackground, v -> s.hotbarBackground = v);
+        cycle("hotbar look", "what sits behind the hotbar slots: nothing, the vanilla sprite, a see-through fill, a thin outline or both. the vanilla sprite only fits 20 pixel spacing.",
+                DofiSettings.BoxLook.values(), k -> k.label, () -> s.hotbarLook, v -> s.hotbarLook = v);
+        slider("hotbar spacing", "the distance between hotbar slots in pixels. 20 is vanilla, 16 puts the items right next to each other. not used by the vanilla sprite look.", 16, 24, 1, "", PCT,
+                () -> s.hotbarSpacing, v -> s.hotbarSpacing = (int) Math.round(v));
         slider("hotbar size", "how big the hotbar is. it grows from the bottom middle.", 50, 200, 5, "%", PCT,
                 () -> s.hotbarScale, v -> s.hotbarScale = (int) Math.round(v));
         cycle("selected slot", "how the slot you hold is marked: the vanilla frame, a round ring, a simple line under the item, or nothing.",
@@ -155,6 +157,14 @@ public final class ClothTab {
                 () -> s.equipScale, v -> s.equipScale = (int) Math.round(v));
         cycle("equipment place", "where the armour and rod parts row sits: above the hotbar, or level with it on its left or right. you can still drag it from there.",
                 DofiSettings.EquipPlace.values(), k -> k.label, () -> s.equipPlace, v -> s.equipPlace = v);
+        cycle("equipment look", "what sits behind foecollabs armour and rod parts: nothing, foecollabs own squares, or a fill, outline or both around each group of three.",
+                DofiSettings.BoxLook.values(), k -> k.label, () -> s.equipLook, v -> s.equipLook = v);
+        slider("equipment spacing", "the distance between equipment slots in pixels. 22 is foecollabs own. not used by its own squares look.", 16, 26, 1, "", PCT,
+                () -> s.equipSpacing, v -> s.equipSpacing = (int) Math.round(v));
+        color("box outline colour", "the colour of the thin outline around the hotbar and equipment boxes.",
+                () -> s.boxOutlineColor, v -> s.boxOutlineColor = v);
+        slider("box fill opacity", "how dark the see-through fill behind the hotbar and equipment is.", 0, 100, 5, "%", PCT,
+                () -> s.boxOpacity, v -> s.boxOpacity = (int) Math.round(v));
         toggle("equipment circles", "a circle in the rarity colour behind each equipment item, instead of foecollabs bar under it.",
                 () -> s.equipCircle, v -> s.equipCircle = v);
         toggle("equipment colour", "uses one colour for the circle or bar instead of the rarity colour.",

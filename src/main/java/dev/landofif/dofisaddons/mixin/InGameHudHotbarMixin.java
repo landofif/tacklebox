@@ -6,6 +6,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.compat.FoeRarity;
+import dev.landofif.dofisaddons.display.SlotBox;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
@@ -39,8 +40,20 @@ abstract class InGameHudHotbarMixin {
     private void dofisaddons$background(DrawContext ctx, RenderPipeline pipeline, Identifier id, int x, int y, int w, int h, Operation<Void> original) {
         DofiSettings s = DofiSettings.get();
         String path = id.getPath();
-        if ((path.equals("hud/hotbar") && !s.hotbarBackground) || (path.startsWith("hud/hotbar_offhand") && !s.hotbarOffhand)) {
+        int mid = ctx.getScaledWindowWidth() / 2;
+        int pitch = s.hotbarPitch();
+        if (path.equals("hud/hotbar") && s.hotbarLook != DofiSettings.BoxLook.DEFAULT) {
+            if (s.hotbarLook != DofiSettings.BoxLook.OFF) { // our own box, as wide as the slots are spaced
+                SlotBox.draw(ctx, mid - 4 * pitch - 11, y, mid + 4 * pitch + 11, y + h, s.hotbarLook);
+            }
             return;
+        }
+        if (path.startsWith("hud/hotbar_offhand") && !s.hotbarOffhand) {
+            return;
+        }
+        if (path.startsWith("hud/hotbar_selection")) { // the marker follows its slot when the slots are closer
+            int slot = (int) Math.round((x + w / 2.0 - (mid - 80)) / 20.0);
+            x += (slot - 4) * (pitch - 20);
         }
         if (path.startsWith("hud/hotbar_selection") && s.hotbarSelection != DofiSettings.SelectionStyle.FRAME) {
             int color = 0xFF000000 | s.hotbarSelectColor;
@@ -65,6 +78,21 @@ abstract class InGameHudHotbarMixin {
             return;
         }
         original.call(ctx, pipeline, id, x, y, w, h);
+    }
+
+    /** Slots closer together (or further apart) than vanilla's 20: each item moves toward the middle slot. */
+    @WrapMethod(method = "renderHotbarItem")
+    private void dofisaddons$pitch(DrawContext ctx, int x, int y, RenderTickCounter tick, PlayerEntity player, ItemStack stack, int seed, Operation<Void> original) {
+        int pitch = DofiSettings.get().hotbarPitch();
+        if (pitch == 20) {
+            original.call(ctx, x, y, tick, player, stack, seed);
+            return;
+        }
+        int slot = (int) Math.round((x - 3 - (ctx.getScaledWindowWidth() / 2 - 90)) / 20.0);
+        ctx.getMatrices().pushMatrix();
+        ctx.getMatrices().translate((slot - 4) * (pitch - 20), 0);
+        original.call(ctx, x, y, tick, player, stack, seed);
+        ctx.getMatrices().popMatrix();
     }
 
     @Inject(method = "renderHotbarItem", at = @At("HEAD"))

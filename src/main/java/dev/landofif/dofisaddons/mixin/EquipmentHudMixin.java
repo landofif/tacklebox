@@ -5,8 +5,10 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.compat.FoeRarity;
+import dev.landofif.dofisaddons.display.SlotBox;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -32,6 +34,24 @@ abstract class EquipmentHudMixin {
         ctx.getMatrices().popMatrix();
     }
 
+    /**
+     * One slot. foecollab puts them 22 apart in two groups of three (armour right aligned to the middle, rod parts
+     * starting at it); here the distance is a setting, and each group can sit in a box (drawn with its first slot).
+     */
+    @WrapMethod(method = "renderBox(Lnet/minecraft/class_332;Lnet/minecraft/class_327;IIILnet/minecraft/class_1799;Ljava/lang/String;Ljava/lang/String;)V", remap = false, require = 0)
+    private void dofisaddons$slot(DrawContext ctx, net.minecraft.client.font.TextRenderer tr, int x, int y, int alpha, ItemStack stack,
+                                  String letter, String type, Operation<Void> original) {
+        DofiSettings s = DofiSettings.get();
+        int pitch = s.equipPitch();
+        boolean parts = type != null;
+        int slot = parts ? (type.equals("reel") ? 0 : type.equals("pole") ? 1 : 2) : (letter.equals("ᴄ") ? 0 : letter.equals("ʙ") ? 2 : 1);
+        int nx = x + (parts ? slot : slot - 2) * (pitch - 22);
+        if (slot == 0 && s.equipLook != DofiSettings.BoxLook.DEFAULT && s.equipLook != DofiSettings.BoxLook.OFF) {
+            SlotBox.draw(ctx, nx - 2, y - 2, nx + 2 * pitch + 22, y + 22, s.equipLook);
+        }
+        original.call(ctx, tr, nx, y, alpha, stack, letter, type);
+    }
+
     /** The rarity bar under a slot: left alone, recoloured, or a circle behind the item instead. */
     @WrapOperation(method = "renderBox", remap = false, require = 0,
             at = @At(value = "INVOKE", target = "Lnet/minecraft/class_332;method_73198(IIIII)V", remap = false))
@@ -48,7 +68,7 @@ abstract class EquipmentHudMixin {
     @WrapOperation(method = "renderBox", remap = false, require = 0,
             at = @At(value = "INVOKE", target = "Lnet/minecraft/class_332;method_25294(IIIII)V", remap = false))
     private void dofisaddons$square(DrawContext ctx, int x1, int y1, int x2, int y2, int color, Operation<Void> original) {
-        if (DofiSettings.get().hotbarBackground) {
+        if (DofiSettings.get().equipLook == DofiSettings.BoxLook.DEFAULT) {
             original.call(ctx, x1, y1, x2, y2, color);
         }
     }
