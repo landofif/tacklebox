@@ -128,8 +128,26 @@ public final class ChatBoxes {
 
     /** Where a box is on screen: x, y, width, height in gui units (title included). */
     public static int[] rect(ChatBox box, int screenW, int screenH) {
+        return rect(box, screenW, screenH, chatOpen());
+    }
+
+    /** Lines a box shows: more while chat is open. */
+    public static int lines(ChatBox box, boolean open) {
+        return Math.max(1, open ? Math.max(box.lines, box.linesOpen) : box.lines);
+    }
+
+    /** The height of a box that shows {@code lines} lines, and back (the move screen resizes by height). */
+    public static int heightOf(int lines) {
+        return PAD_Y * 2 + lines * LINE_H - (LINE_H - 9) + 4 + 9; // + title row
+    }
+
+    public static int linesOf(int height) {
+        return Math.round((height - heightOf(0)) / (float) LINE_H);
+    }
+
+    public static int[] rect(ChatBox box, int screenW, int screenH, boolean open) {
         int w = Math.max(80, Math.min(screenW, box.width));
-        int h = PAD_Y * 2 + Math.max(1, box.lines) * LINE_H - (LINE_H - 9) + 4 + 9; // + title row
+        int h = heightOf(lines(box, open));
         int x = (int) Math.round(box.x / 100.0 * screenW);
         int y = (int) Math.round(box.y / 100.0 * screenH);
         x = Math.max(0, Math.min(screenW - w, x));
@@ -151,7 +169,7 @@ public final class ChatBoxes {
             st.wrappedFrom = from;
             st.wrappedWidth = textW;
             st.wrappedVersion = st.version;
-            st.scroll = Math.max(0, Math.min(st.scroll, Math.max(0, out.size() - box.lines)));
+            st.scroll = Math.max(0, Math.min(st.scroll, Math.max(0, out.size() - lines(box, chatOpen()))));
         }
         return st.wrapped;
     }
@@ -160,7 +178,7 @@ public final class ChatBoxes {
     private static List<OrderedText> visible(ChatBox box, State st, TextRenderer tr) {
         List<OrderedText> all = wrapped(box, st, tr, box.width - PAD_X * 2);
         int end = Math.max(0, all.size() - st.scroll);
-        int start = Math.max(0, end - Math.max(1, box.lines));
+        int start = Math.max(0, end - lines(box, chatOpen()));
         return all.subList(start, end);
     }
 
@@ -242,7 +260,7 @@ public final class ChatBoxes {
         }
         State st = state(box);
         int total = wrapped(box, st, MinecraftClient.getInstance().textRenderer, box.width - PAD_X * 2).size();
-        st.scroll = Math.max(0, Math.min(Math.max(0, total - box.lines), st.scroll + (amount > 0 ? 1 : -1)));
+        st.scroll = Math.max(0, Math.min(Math.max(0, total - lines(box, chatOpen())), st.scroll + (amount > 0 ? 1 : -1)));
         return true;
     }
 

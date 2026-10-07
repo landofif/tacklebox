@@ -284,6 +284,7 @@ public class DofiSettings {
             b.rules.removeIf(java.util.Objects::isNull);
             b.width = Math.max(80, Math.min(600, b.width));
             b.lines = Math.max(1, Math.min(30, b.lines));
+            b.linesOpen = Math.max(b.lines, Math.min(40, b.linesOpen));
             b.fadeSeconds = b.fadeSeconds == 0 ? 10 : Math.max(-1, Math.min(600, b.fadeSeconds));
         }
         lineColor &= 0xFFFFFF;
