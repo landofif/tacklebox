@@ -2,6 +2,7 @@ package dev.landofif.dofisaddons.screen;
 
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.hud.XpEstimate;
+import dev.landofif.dofisaddons.menu.BaitPicker;
 import dev.landofif.dofisaddons.menu.Power;
 import dev.landofif.dofisaddons.menu.Power.Row;
 import dev.landofif.dofisaddons.ui.DofiScreen;
@@ -9,6 +10,8 @@ import dev.landofif.dofisaddons.ui.Foe;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
@@ -140,6 +143,18 @@ public class PowerScreen extends DofiScreen {
         y += 52;
         ctx.fill(x0, y, x0 + cw, y + 1, RULE);
         y += 14;
+
+        // what to do: where to fish, which bait for the nearest rarity collection, which variant to look for
+        ctx.drawTextWithShadow(textRenderer, Foe.text("do this next"), x0, y, Foe.TITLE);
+        y += 14;
+        for (String line : plan(next != null ? next : fish)) {
+            for (OrderedText wrapped : textRenderer.wrapLines(Foe.sentence(line), cw)) {
+                ctx.drawTextWithShadow(textRenderer, wrapped, x0, y, Foe.TEXT);
+                y += 11;
+            }
+            y += 3;
+        }
+        y += 8;
 
         // the answer: the next level up that is cheapest for its power, and the place with the most fish left
         int half = cw / 2;
@@ -284,6 +299,52 @@ public class PowerScreen extends DofiScreen {
         if (tip != null) {
             ctx.drawTooltip(textRenderer, tip, mouseX, mouseY);
         }
+    }
+
+    /** The steps at one location: fish there, the bait for the nearest rarity collection, the variant with the most power left. */
+    private List<String> plan(Row r) {
+        List<String> out = new ArrayList<>();
+        if (r == null) {
+            out.add("Open the fish compendium so the plan knows your locations.");
+            return out;
+        }
+        String place = cap(r.loc().name());
+        out.add("Fish at " + place + (r.maxed() ? "." : ": level " + r.level() + " to " + (r.level() + 1) + " gives +" + Power.fmt(r.gain()) + " power."));
+        int best = -1;
+        for (int i = 0; i < r.left().length; i++) {
+            if (r.left()[i] * Power.PER[i] > (best < 0 ? 0 : r.left()[best] * Power.PER[best])) {
+                best = i;
+            }
+        }
+        if (best >= 0) {
+            out.add("Look for " + Power.VARIANTS[best] + " fish: " + r.left()[best] + " missing here, up to +" + Power.fmt(r.left()[best] * Power.PER[best]) + " power.");
+        }
+        String cat = null;
+        long left = Long.MAX_VALUE;
+        for (int x = 1; x < BaitPicker.RARITY.length; x++) {
+            String[] f = s.collections.getOrDefault(BaitPicker.RARITY[x], "").split("\\|");
+            if (f.length == 4 && Long.parseLong(f[2]) - Long.parseLong(f[1]) < left) {
+                left = Long.parseLong(f[2]) - Long.parseLong(f[1]);
+                cat = BaitPicker.RARITY[x];
+            }
+        }
+        BaitPicker.Loc loc = BaitPicker.loc(r.loc());
+        if (cat != null && loc != null) {
+            int x = java.util.Arrays.asList(BaitPicker.RARITY).indexOf(cat);
+            List<ItemStack> worn = new ArrayList<>();
+            if (client != null && client.player != null) {
+                for (EquipmentSlot slot : List.of(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET)) {
+                    worn.add(client.player.getEquippedStack(slot));
+                }
+            }
+            Map<String, Double> stats = s.baitSource.equals("worn") ? BaitPicker.armorStats(worn) : s.presetStats.getOrDefault(s.baitSource, Map.of());
+            int luck = BaitPicker.stat(stats, r.loc(), "luck") + s.baitLuck;
+            var rows = BaitPicker.rows(loc, luck, x, new boolean[]{true, true, true, true, true}, s.baitLures);
+            out.add("Nearest rarity collection: " + cat + ", " + left + " to go. "
+                    + (rows.isEmpty() ? "No bait beats the base odds here." : "Use " + rows.get(0).bait().name() + ", about "
+                    + String.format(Locale.ROOT, "%.1f%%", rows.get(0).chance() * 100) + " per cast for " + cat + " fish (luck " + luck + ")."));
+        }
+        return out;
     }
 
     private List<Text> tooltip(Row r, double q) {
