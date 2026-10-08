@@ -328,7 +328,7 @@ public final class ServerHud {
         long[] d = s.dex.get(loc.id());
         int[] v = s.variants.get(loc.id());
         switch (key) {
-            case "dex location" -> out.add(plain(Text.literal(loc.name()).formatted(Formatting.GREEN)));
+            case "dex location" -> out.add(plain(Text.literal(title(loc.name())).formatted(Formatting.GREEN)));
             case "dex level" -> {
                 if (at != null) {
                     int level = (int) at[0];
