@@ -136,6 +136,12 @@ public class DofiSettings {
     public boolean baitLures = true;
     /** Location levels read from the fish compendium, "level|progress" by location id, shown in /turbotravel which has none. */
     public java.util.Map<String, String> locationLevels = new java.util.LinkedHashMap<>();
+    /** The /stats "Power Breakdown" item as last read (menu/Power): total, leveling, compendium, collections, unique, and "n.normal" and so on (unique fish per variant). */
+    public java.util.Map<String, Double> power = new java.util.LinkedHashMap<>();
+    /** When {@link #power} was last read, epoch millis. */
+    public long powerAt;
+    /** The variant lines of each compendium location page: caught and total for normal, albino, melanistic, trophy, fabled, gigantic (menu/Power). */
+    public java.util.Map<String, int[]> variants = new java.util.LinkedHashMap<>();
     public int menuSize = 100;
     public int presetsSize = 100;
     /** Where you put each menu button: "main:name" or "travel:id" to {column, row}. */
@@ -372,6 +378,9 @@ public class DofiSettings {
         if (locLevels == null) locLevels = new java.util.LinkedHashMap<>();
         if (need == null) need = new java.util.LinkedHashMap<>();
         if (locationLevels == null) locationLevels = new java.util.LinkedHashMap<>();
+        if (power == null) power = new java.util.LinkedHashMap<>();
+        if (variants == null) variants = new java.util.LinkedHashMap<>();
+        variants.values().removeIf(v -> v == null || v.length != 12);
         if (presetCache == null) presetCache = new java.util.LinkedHashMap<>();
         if (petHeads == null) petHeads = new java.util.LinkedHashMap<>();
         if (presetStats == null) presetStats = new java.util.LinkedHashMap<>();

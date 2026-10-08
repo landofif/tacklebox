@@ -6,6 +6,7 @@ import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.display.Holograms;
 import dev.landofif.dofisaddons.menu.FishMenu;
 import dev.landofif.dofisaddons.menu.Locations;
+import dev.landofif.dofisaddons.menu.Power;
 import dev.landofif.dofisaddons.screen.FishMenuScreen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.font.TextRenderer;
@@ -56,11 +57,11 @@ public final class XpEstimate {
     private XpEstimate() {}
 
     /** The wiki's location table: xp from level n-1 to n. */
-    private static double need(int n) {
+    public static double need(int n) {
         return 250.0 * n * n * n;
     }
 
-    private static double num(String digits, String suffix) {
+    public static double num(String digits, String suffix) {
         double v;
         try {
             v = Double.parseDouble(digits.replace(",", ""));
@@ -97,10 +98,11 @@ public final class XpEstimate {
             rebase(p);
         }
         if (++ticks % 10 == 0) {
-            if (client.currentScreen instanceof FishMenuScreen f) {
-                scan(f.original());
-            } else if (client.currentScreen instanceof HandledScreen<?> screen) {
-                scan(screen);
+            HandledScreen<?> open = client.currentScreen instanceof FishMenuScreen f ? f.original()
+                    : client.currentScreen instanceof HandledScreen<?> screen ? screen : null;
+            if (open != null) {
+                scan(open);
+                Power.scan(open);
             }
         }
     }
@@ -206,6 +208,25 @@ public final class XpEstimate {
     private static double[] here() {
         Locations.Location loc = Locations.byName(ServerInfo.locationName);
         return loc == null ? null : LOCATION.get(loc.id());
+    }
+
+    /** Location xp one quest gives, or 0 until /quests was read. */
+    public static double questLxp() {
+        return questLxp;
+    }
+
+    /** {level, xp left to the next one} of a location from the menus plus the xp since, or null while it is unknown. */
+    public static double[] toNext(String id) {
+        double[] at = LOCATION.get(id);
+        if (at == null) {
+            return null;
+        }
+        int level = (int) at[0] + levelsGained(at);
+        double into = at[1];
+        for (int n = (int) at[0] + 1; n <= level; n++) {
+            into -= need(n);
+        }
+        return new double[]{level, need(level + 1) - into};
     }
 
     /** The location level seen in the menus, or null. */
