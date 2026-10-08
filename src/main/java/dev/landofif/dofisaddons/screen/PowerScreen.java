@@ -144,17 +144,29 @@ public class PowerScreen extends DofiScreen {
         ctx.fill(x0, y, x0 + cw, y + 1, RULE);
         y += 14;
 
-        // what to do: where to fish, which bait for the nearest rarity collection, which variant to look for
+        // what to do next: where, which level, what it gives, then the bait and the variant
         ctx.drawTextWithShadow(textRenderer, Foe.text("do this next"), x0, y, Foe.TITLE);
         y += 14;
-        for (String line : plan(next != null ? next : fish)) {
-            for (OrderedText wrapped : textRenderer.wrapLines(Foe.sentence(line), cw)) {
-                ctx.drawTextWithShadow(textRenderer, wrapped, x0, y, Foe.TEXT);
-                y += 11;
+        Plan plan = plan(next != null ? next : fish);
+        if (plan == null) {
+            ctx.drawTextWithShadow(textRenderer, Foe.sentence("Open the fish compendium so the plan knows your locations."), x0, y, MUTED);
+            y += 24;
+        } else {
+            int third = cw / 3;
+            Row r = plan.row();
+            cell(ctx, "fish at", cap(r.loc().name()), x0, y, third - 8, Foe.ACCENT);
+            cell(ctx, "level", r.maxed() ? "max" : r.level() == 0 ? "-" : r.level() + " \u2192 " + (r.level() + 1), x0 + third, y, third - 8, Foe.TEXT);
+            cell(ctx, "gives", "+" + Power.fmt(r.maxed() ? r.fish() : r.gain()) + " \uF064", x0 + 2 * third, y, third - 8, LEVELING);
+            y += 36;
+            cell(ctx, "bait" + (plan.cat() == null ? "" : " for " + plan.cat()), plan.bait() == null ? "-" : plan.bait(), x0, y, third - 8, Foe.TEXT);
+            cell(ctx, "chance per cast", plan.bait() == null ? "-" : String.format(Locale.ROOT, "%.1f%%", plan.chance() * 100), x0 + third, y, third - 8, Foe.TEXT);
+            cell(ctx, "look for", plan.variant() < 0 ? "-" : Power.VARIANTS[plan.variant()] + " x" + r.left()[plan.variant()], x0 + 2 * third, y, third - 8, FISH);
+            if (mouseIn(mouseX, mouseY, x0, y, third, 32, bottom) && plan.bait() != null) {
+                tip = List.of(Foe.sentence("From /dofi bait for " + cap(r.loc().name()) + " with luck " + plan.luck() + ". Baits with the same pool are folded into one."));
             }
-            y += 3;
+            y += 40;
         }
-        y += 8;
+        y += 4;
 
         // the answer: the next level up that is cheapest for its power, and the place with the most fish left
         int half = cw / 2;
@@ -165,14 +177,14 @@ public class PowerScreen extends DofiScreen {
         if (next != null) {
             big(ctx, textRenderer.trimToWidth(cap(next.loc().name()) + " to level " + (next.level() + 1), (int) (colW / 1.25f)), x0, y, 1.25f, Foe.ACCENT);
             double q = XpEstimate.questLxp();
-            ctx.drawTextWithShadow(textRenderer, Foe.sentence(textRenderer.trimToWidth("+" + Power.fmt(next.gain()) + " power, " + Power.fmt(next.xpLeft()) + " xp left"
+            ctx.drawTextWithShadow(textRenderer, Foe.sentence(textRenderer.trimToWidth("+" + Power.fmt(next.gain()) + " \uF064, " + Power.fmt(next.xpLeft()) + " xp left"
                     + (q > 0 ? ", about " + (long) Math.ceil(next.xpLeft() / q) + " quests" : ""), colW)), x0, y + 14, MUTED);
         } else {
             ctx.drawTextWithShadow(textRenderer, Foe.sentence(textRenderer.trimToWidth("Open the fish compendium to read your location levels.", colW)), x0, y + 2, MUTED);
         }
         if (fish != null) {
             big(ctx, textRenderer.trimToWidth(cap(fish.loc().name()), (int) (colW / 1.25f)), x0 + half + 10, y, 1.25f, Foe.ACCENT);
-            ctx.drawTextWithShadow(textRenderer, Foe.sentence(textRenderer.trimToWidth("up to +" + Power.fmt(fish.fish()) + " power from " + java.util.Arrays.stream(fish.left()).sum() + " missing fish", colW)),
+            ctx.drawTextWithShadow(textRenderer, Foe.sentence(textRenderer.trimToWidth("up to +" + Power.fmt(fish.fish()) + " \uF064 from " + java.util.Arrays.stream(fish.left()).sum() + " missing fish", colW)),
                     x0 + half + 10, y + 14, MUTED);
         } else {
             ctx.drawTextWithShadow(textRenderer, Foe.sentence(textRenderer.trimToWidth("Open the fish compendium to read what is missing.", colW)), x0 + half + 10, y + 2, MUTED);
@@ -189,9 +201,9 @@ public class PowerScreen extends DofiScreen {
                 double n = p.getOrDefault("n." + Power.VARIANTS[i], 0.0);
                 ctx.drawTextWithShadow(textRenderer, Foe.text(Power.VARIANTS[i]), cx, y, MUTED);
                 big(ctx, String.valueOf((long) n), cx, y + 12, 1.25f, Foe.TEXT);
-                ctx.drawTextWithShadow(textRenderer, Text.literal("+" + Power.fmt(n * Power.PER[i])), cx, y + 26, FISH);
+                ctx.drawTextWithShadow(textRenderer, Text.literal("+" + Power.fmt(n * Power.PER[i]) + " \uF064"), cx, y + 26, FISH);
                 if (mouseIn(mouseX, mouseY, cx, y, col, 38, bottom)) {
-                    tip = List.of(Foe.sentence("Each new unique " + Power.VARIANTS[i] + " fish gives " + Power.PER[i] + " power."));
+                    tip = List.of(Foe.sentence("Each new unique " + Power.VARIANTS[i] + " fish gives " + Power.PER[i] + " \uF064"));
                 }
             }
             y += 52;
@@ -210,7 +222,7 @@ public class PowerScreen extends DofiScreen {
             for (String[] c : cols) {
                 ctx.drawTextWithShadow(textRenderer, Text.literal(cap(c[0]) + " level " + c[1]), x0, y, c == cols.get(0) ? Foe.ACCENT : Foe.TEXT);
                 ctx.drawTextWithShadow(textRenderer, Text.literal(c[2] + " / " + c[3] + " · " + (Long.parseLong(c[3]) - Long.parseLong(c[2])) + " to go"), x0 + cw * 40 / 100, y, MUTED);
-                Text g = Text.literal("+" + Power.fmt(Long.parseLong(c[4])));
+                Text g = Text.literal("+" + Power.fmt(Long.parseLong(c[4])) + " \uF064");
                 ctx.drawTextWithShadow(textRenderer, g, x0 + cw - textRenderer.getWidth(g), y, COLLECTIONS);
                 y += ROW - 2;
             }
@@ -276,12 +288,12 @@ public class PowerScreen extends DofiScreen {
             if (r.maxed()) {
                 ctx.drawTextWithShadow(textRenderer, Foe.text("max"), cNext, ty, QUIET);
             } else if (r.level() > 0) {
-                ctx.drawTextWithShadow(textRenderer, Text.literal("+" + Power.fmt(r.gain())), cNext, ty, LEVELING);
+                ctx.drawTextWithShadow(textRenderer, Text.literal("+" + Power.fmt(r.gain()) + " \uF064"), cNext, ty, LEVELING);
                 ctx.drawTextWithShadow(textRenderer, Text.literal(Power.fmt(r.xpLeft()) + (q > 0 ? " · ~" + (long) Math.ceil(r.xpLeft() / q) + "q" : "")), cXp, ty, MUTED);
             } else {
                 ctx.drawTextWithShadow(textRenderer, Text.literal("-"), cNext, ty, QUIET);
             }
-            Text f = Text.literal(r.known() ? "+" + Power.fmt(r.fish()) : "-");
+            Text f = Text.literal(r.known() ? "+" + Power.fmt(r.fish()) + " \uF064" : "-");
             ctx.drawTextWithShadow(textRenderer, f, x0 + cw - textRenderer.getWidth(f), ty, r.known() ? FISH : QUIET);
         }
         y += sorted.size() * ROW + 10;
@@ -301,63 +313,45 @@ public class PowerScreen extends DofiScreen {
         }
     }
 
-    /** The steps at one location: fish there, the bait for the nearest rarity collection, the variant with the most power left. */
-    private List<String> plan(Row r) {
-        List<String> out = new ArrayList<>();
+    /** The next step at one location: the bait picker's best bait for the nearest rarity collection (rare when none is read), and the variant with the most power left. */
+    private record Plan(Row row, int variant, String cat, String bait, double chance, int luck) {}
+
+    private Plan plan(Row r) {
         if (r == null) {
-            out.add("Open the fish compendium so the plan knows your locations.");
-            return out;
+            return null;
         }
-        String place = cap(r.loc().name());
-        out.add("Fish at " + place + (r.maxed() ? "." : ": level " + r.level() + " to " + (r.level() + 1) + " gives +" + Power.fmt(r.gain()) + " power."));
         int best = -1;
         for (int i = 0; i < r.left().length; i++) {
             if (r.left()[i] * Power.PER[i] > (best < 0 ? 0 : r.left()[best] * Power.PER[best])) {
                 best = i;
             }
         }
-        if (best >= 0) {
-            out.add("Look for " + Power.VARIANTS[best] + " fish: " + r.left()[best] + " missing here, up to +" + Power.fmt(r.left()[best] * Power.PER[best]) + " power.");
-        }
-        String cat = null;
+        int x = 1;
         long left = Long.MAX_VALUE;
-        for (int x = 1; x < BaitPicker.RARITY.length; x++) {
-            String[] f = s.collections.getOrDefault(BaitPicker.RARITY[x], "").split("\\|");
+        for (int i = 1; i < BaitPicker.RARITY.length; i++) {
+            String[] f = s.collections.getOrDefault(BaitPicker.RARITY[i], "").split("\\|");
             if (f.length == 4 && Long.parseLong(f[2]) - Long.parseLong(f[1]) < left) {
                 left = Long.parseLong(f[2]) - Long.parseLong(f[1]);
-                cat = BaitPicker.RARITY[x];
+                x = i;
             }
         }
+        List<ItemStack> worn = new ArrayList<>();
+        if (client != null && client.player != null) {
+            for (EquipmentSlot slot : List.of(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET)) {
+                worn.add(client.player.getEquippedStack(slot));
+            }
+        }
+        Map<String, Double> stats = s.baitSource.equals("worn") ? BaitPicker.armorStats(worn) : s.presetStats.getOrDefault(s.baitSource, Map.of());
+        int luck = BaitPicker.stat(stats, r.loc(), "luck") + s.baitLuck;
         BaitPicker.Loc loc = BaitPicker.loc(r.loc());
-        String species = null;
-        long toGo = Long.MAX_VALUE;
-        for (var e : s.collections.entrySet()) {
-            String[] f = e.getValue().split("\\|");
-            if (loc != null && f.length == 4 && loc.fish().stream().anyMatch(x -> x.group().equalsIgnoreCase(e.getKey()))
-                    && Long.parseLong(f[2]) - Long.parseLong(f[1]) < toGo) {
-                toGo = Long.parseLong(f[2]) - Long.parseLong(f[1]);
-                species = e.getKey();
-            }
-        }
-        if (species != null) {
-            out.add("Fish here count for the " + species + " collection too: " + toGo + " more to the next level.");
-        }
-        if (cat != null && loc != null) {
-            int x = java.util.Arrays.asList(BaitPicker.RARITY).indexOf(cat);
-            List<ItemStack> worn = new ArrayList<>();
-            if (client != null && client.player != null) {
-                for (EquipmentSlot slot : List.of(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET)) {
-                    worn.add(client.player.getEquippedStack(slot));
-                }
-            }
-            Map<String, Double> stats = s.baitSource.equals("worn") ? BaitPicker.armorStats(worn) : s.presetStats.getOrDefault(s.baitSource, Map.of());
-            int luck = BaitPicker.stat(stats, r.loc(), "luck") + s.baitLuck;
-            var rows = BaitPicker.rows(loc, luck, x, new boolean[]{true, true, true, true, true}, s.baitLures);
-            out.add("Nearest rarity collection: " + cat + ", " + left + " to go. "
-                    + (rows.isEmpty() ? "No bait beats the base odds here." : "Use " + rows.get(0).bait().name() + ", about "
-                    + String.format(Locale.ROOT, "%.1f%%", rows.get(0).chance() * 100) + " per cast for " + cat + " fish (luck " + luck + ")."));
-        }
-        return out;
+        var rows = loc == null ? List.<BaitPicker.Row>of() : BaitPicker.rows(loc, luck, x, new boolean[]{true, true, true, true, true}, s.baitLures);
+        return new Plan(r, best, BaitPicker.RARITY[x], rows.isEmpty() ? null : rows.get(0).bait().name(), rows.isEmpty() ? 0 : rows.get(0).chance(), luck);
+    }
+
+    /** A small caps label over a big value, trimmed to its column. */
+    private void cell(DrawContext ctx, String label, String value, int x, int y, int w, int color) {
+        ctx.drawTextWithShadow(textRenderer, Foe.text(label), x, y, QUIET);
+        big(ctx, textRenderer.trimToWidth(value, (int) (w / 1.5f)), x, y + 12, 1.5f, color);
     }
 
     private List<Text> tooltip(Row r, double q) {
@@ -368,15 +362,15 @@ public class PowerScreen extends DofiScreen {
         } else if (r.maxed()) {
             out.add(Foe.sentence("Level 20, all level power collected: " + Power.fmt(Power.total(Power.MAX_LEVEL))));
         } else {
-            out.add(Foe.sentence("Level " + r.level() + " of 20, next gives +" + Power.fmt(r.gain())));
+            out.add(Foe.sentence("Level " + r.level() + " of 20, next gives +" + Power.fmt(r.gain()) + " \uF064"));
             out.add(Foe.sentence(Power.fmt(r.xpLeft()) + " xp to go" + (q > 0 ? ", about " + (long) Math.ceil(r.xpLeft() / q) + " quests" : "")));
-            out.add(Foe.sentence("Level power left to level 20: " + Power.fmt(r.headroom())));
+            out.add(Foe.sentence("Level power left to level 20: " + Power.fmt(r.headroom()) + " \uF064"));
         }
         if (r.known()) {
-            out.add(Foe.sentence("Fish power left, at most: " + Power.fmt(r.fish())));
+            out.add(Foe.sentence("Fish power left, at most: " + Power.fmt(r.fish()) + " \uF064"));
             for (int i = 0; i < r.left().length; i++) {
                 if (r.left()[i] > 0) {
-                    out.add(Foe.sentence(Power.VARIANTS[i] + ": " + r.left()[i] + " left, +" + Power.fmt(r.left()[i] * Power.PER[i])));
+                    out.add(Foe.sentence(Power.VARIANTS[i] + ": " + r.left()[i] + " left, +" + Power.fmt(r.left()[i] * Power.PER[i]) + " \uF064"));
                 }
             }
         }
