@@ -207,8 +207,45 @@ public final class ServerHud {
         return new Line(t, false);
     }
 
+    /** The key of the line behind each row of the last hud that was built, for the preview's dragging. */
+    private static List<String> rowKeys = List.of();
+
+    public static List<String> rowKeys() {
+        return rowKeys;
+    }
+
+    /** Where row {@code i} of the hud drawn into {@code rect} is on the screen, as {x, y, w, h}. */
+    public static int[] rowBounds(int[] rect, int i) {
+        float k = DofiSettings.get().serverHudScale / 100f;
+        return new int[]{rect[0], rect[1] + Math.round((PAD + i * LINE) * k), rect[2], Math.round(LINE * k)};
+    }
+
+    /** The keys in their start order, for the chips. */
+    public static List<String> keys() {
+        return new ArrayList<>(LABEL.keySet());
+    }
+
+    /**
+     * Moves the line of row {@code from} to just before row {@code gap} (the row count means after the last one), in the saved
+     * order. A line of several rows (the weather) moves as one, and so do the two prospect chips.
+     */
+    public static void move(int from, int gap) {
+        String key = rowKeys.get(from), before = gap < rowKeys.size() ? rowKeys.get(gap) : null;
+        List<String> group = key.startsWith("prospect") ? List.of("prospect", "prospect chance") : List.of(key);
+        if (before != null && group.contains(before)) {
+            return;
+        }
+        List<String> order = order();
+        List<String> moved = new ArrayList<>(order);
+        moved.retainAll(group);
+        order.removeAll(group);
+        order.addAll(before == null ? order.size() : order.indexOf(before), moved);
+        DofiSettings.get().serverHudOrder = order;
+    }
+
     private static List<Line> lines(MinecraftClient mc) {
         List<Line> out = new ArrayList<>();
+        List<String> keys = new ArrayList<>();
         boolean prospect = false;
         for (String key : order()) {
             if (key.startsWith("prospect")) { // two chips, one line, at the place of the first of them
@@ -219,13 +256,18 @@ public final class ServerHud {
             } else if (on(key)) {
                 add(out, key, mc);
             }
+            while (keys.size() < out.size()) {
+                keys.add(key);
+            }
         }
         // switching lines off can leave gaps: no double blanks, none at the ends
         for (int k = out.size() - 1; k >= 0; k--) {
             if (out.get(k).blank() && (k == 0 || k == out.size() - 1 || out.get(k - 1).blank())) {
                 out.remove(k);
+                keys.remove(k);
             }
         }
+        rowKeys = keys;
         return out;
     }
 

@@ -16,46 +16,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Which lines the server hud shows and in what order: one chip per line (green is on, click to switch, drag to move it to
- * another place), the picture's opacity, and the hud itself on the right as it looks with the choices, so there is nothing to guess.
+ * The server hud's lines: one chip per line (green is on) to switch them, the hud itself on the right as it looks with the
+ * choices, where a line is dragged up or down to move it (l found moving chips unclear), and the picture's opacity.
  */
 public class ServerHudScreen extends DofiScreen {
     private static final int LEFT = 14, TOP = 34, CHIP_W = 112, CHIP_H = 16, GAP = 4, COLUMNS = 3;
 
     private final Screen parent;
     private final DofiSettings s = DofiSettings.get();
-    private List<String> order = ServerHud.order();
-    /** The chip being held (index into {@link #order}, -1 for none), where the cursor is, and whether it moved far enough to be a drag. */
-    private int held = -1;
-    private double heldX, heldY, pressX, pressY;
-    private boolean dragging;
     private ButtonWidget shortCatches, roundProspect;
+    /** Where the preview was drawn last frame, the row being dragged (-1 for none) and whether the mouse moved far enough for a drag. */
+    private int[] preview;
+    private int held = -1;
+    private double pressX, pressY;
+    private boolean dragging;
 
     public ServerHudScreen(Screen parent) {
         super(Foe.text("dofis addons · server hud lines"));
         this.parent = parent;
     }
 
-    private int chipX(int i) {
-        return LEFT + i % COLUMNS * (CHIP_W + GAP);
-    }
-
-    private int chipY(int i) {
-        return TOP + i / COLUMNS * (CHIP_H + GAP);
-    }
-
-    private int chipAt(double x, double y) {
-        for (int i = 0; i < order.size(); i++) {
-            if (x >= chipX(i) && x < chipX(i) + CHIP_W && y >= chipY(i) && y < chipY(i) + CHIP_H) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     @Override
     protected void init() {
-        int y = TOP + (order.size() + COLUMNS - 1) / COLUMNS * (CHIP_H + GAP) + 6;
+        int i = 0;
+        for (String key : ServerHud.keys()) {
+            ButtonWidget chip = ButtonWidget.builder(Text.empty(), b -> {
+                if (!s.serverHudHide.remove(key)) {
+                    s.serverHudHide.add(key);
+                }
+                label(b, key);
+            }).dimensions(LEFT + i % COLUMNS * (CHIP_W + GAP), TOP + i / COLUMNS * (CHIP_H + GAP), CHIP_W, CHIP_H).build();
+            label(chip, key);
+            addDrawableChild(chip);
+            i++;
+        }
+        int y = TOP + (i + COLUMNS - 1) / COLUMNS * (CHIP_H + GAP) + 6;
         int full = COLUMNS * CHIP_W + (COLUMNS - 1) * GAP, half = (full - GAP) / 2;
         addDrawableChild(new ValueSlider(LEFT, y, full, 20, "picture opacity", 0, 100, 5, "%", s.serverHudImage, v -> s.serverHudImage = (int) v));
         shortCatches = addDrawableChild(ButtonWidget.builder(Text.empty(), b -> {
@@ -67,10 +62,8 @@ public class ServerHudScreen extends DofiScreen {
             labels();
         }).dimensions(LEFT + half + GAP, y + 24, half, 20).build());
         labels();
-        addDrawableChild(ButtonWidget.builder(Foe.text("reset order"), b -> {
-            s.serverHudOrder = new ArrayList<>();
-            order = ServerHud.order();
-        }).dimensions(LEFT, y + 48, half, 20).build());
+        addDrawableChild(ButtonWidget.builder(Foe.text("reset order"), b -> s.serverHudOrder = new ArrayList<>())
+                .dimensions(LEFT, y + 48, half, 20).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("open picture folder"), b -> {
             try {
                 java.nio.file.Files.createDirectories(ServerHud.IMAGE.getParent());
@@ -80,9 +73,40 @@ public class ServerHudScreen extends DofiScreen {
         }).dimensions(LEFT + half + GAP, y + 48, half, 20).build());
     }
 
+    private void label(ButtonWidget b, String key) {
+        boolean on = !s.serverHudHide.contains(key);
+        b.setMessage(Text.literal(Foe.smallCaps(ServerHud.label(key))).formatted(on ? Formatting.GREEN : Formatting.DARK_GRAY));
+    }
+
     private void labels() {
         shortCatches.setMessage(Text.literal(Foe.smallCaps("short catches 4.3k")).formatted(s.serverHudShortCatches ? Formatting.GREEN : Formatting.DARK_GRAY));
         roundProspect.setMessage(Text.literal(Foe.smallCaps("round prospect 1/35")).formatted(s.serverHudRoundProspect ? Formatting.GREEN : Formatting.DARK_GRAY));
+    }
+
+    /** The row of the preview under the point, or -1. */
+    private int rowAt(double x, double y) {
+        if (preview == null) {
+            return -1;
+        }
+        for (int i = 0; i < ServerHud.rowKeys().size(); i++) {
+            int[] b = ServerHud.rowBounds(preview, i);
+            if (x >= b[0] && x < b[0] + b[2] && y >= b[1] && y < b[1] + b[3]) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /** The gap a dragged line would land in: the number of rows whose middle is above the point. */
+    private int gapAt(double y) {
+        int gap = 0;
+        for (int i = 0; i < ServerHud.rowKeys().size(); i++) {
+            int[] b = ServerHud.rowBounds(preview, i);
+            if (b[1] + b[3] / 2 < y) {
+                gap = i + 1;
+            }
+        }
+        return gap;
     }
 
     @Override
@@ -90,13 +114,13 @@ public class ServerHudScreen extends DofiScreen {
         if (super.mouseClicked(click, doubled)) {
             return true;
         }
-        int i = click.button() == 0 ? chipAt(click.x(), click.y()) : -1;
-        if (i < 0) {
+        int row = click.button() == 0 ? rowAt(click.x(), click.y()) : -1;
+        if (row < 0) {
             return false;
         }
-        held = i;
-        pressX = heldX = click.x();
-        pressY = heldY = click.y();
+        held = row;
+        pressX = click.x();
+        pressY = click.y();
         dragging = false;
         return true;
     }
@@ -104,9 +128,7 @@ public class ServerHudScreen extends DofiScreen {
     @Override
     public boolean mouseDragged(Click click, double dx, double dy) {
         if (held >= 0) {
-            heldX = click.x();
-            heldY = click.y();
-            dragging |= Math.abs(heldX - pressX) + Math.abs(heldY - pressY) > 4;
+            dragging |= Math.abs(click.x() - pressX) + Math.abs(click.y() - pressY) > 4;
             return true;
         }
         return super.mouseDragged(click, dx, dy);
@@ -117,17 +139,10 @@ public class ServerHudScreen extends DofiScreen {
         if (held < 0) {
             return super.mouseReleased(click);
         }
-        int from = held, to = chipAt(click.x(), click.y());
-        held = -1;
-        if (!dragging) { // a click: on or off
-            String key = order.get(from);
-            if (!s.serverHudHide.remove(key)) {
-                s.serverHudHide.add(key);
-            }
-        } else if (to >= 0 && to != from) { // the chip takes the place it was dropped on
-            order.add(to, order.remove(from));
-            s.serverHudOrder = new ArrayList<>(order);
+        if (dragging && held < ServerHud.rowKeys().size()) {
+            ServerHud.move(held, gapAt(click.y()));
         }
+        held = -1;
         dragging = false;
         return true;
     }
@@ -135,30 +150,31 @@ public class ServerHudScreen extends DofiScreen {
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);
-        int target = dragging ? chipAt(mouseX, mouseY) : -1;
-        for (int i = 0; i < order.size(); i++) {
-            chip(ctx, order.get(i), chipX(i), chipY(i), i == held && dragging ? 0.35f : 1f, i != held && chipAt(mouseX, mouseY) == i);
-            if (i == target && i != held) {
-                ctx.drawStrokedRectangle(chipX(i), chipY(i), CHIP_W, CHIP_H, Foe.ACCENT);
-            }
-        }
-        if (dragging) {
-            chip(ctx, order.get(held), (int) heldX - CHIP_W / 2, (int) heldY - CHIP_H / 2, 1f, true);
-        }
         int x = LEFT + COLUMNS * (CHIP_W + GAP) + 24;
         ctx.drawTextWithShadow(textRenderer, Foe.text("preview"), x, TOP - 12, Foe.DIM);
-        ServerHud.draw(ctx, x, TOP);
-        List<OrderedText> hint = textRenderer.wrapLines(Foe.sentence("Click a chip to switch its line on or off, drag it to move the line. The two prospect chips make one line, at the place of the first. Luck, scale, speeds and prospect fill in when you open /menu."), width - 2 * LEFT);
+        preview = ServerHud.draw(ctx, x, TOP);
+        if (preview != null) {
+            List<String> keys = ServerHud.rowKeys();
+            int hover = held < 0 ? rowAt(mouseX, mouseY) : -1;
+            for (int i = 0; i < keys.size(); i++) {
+                int[] b = ServerHud.rowBounds(preview, i);
+                if (dragging && held < keys.size() && keys.get(i).equals(keys.get(held))) { // the line being moved, all its rows
+                    ctx.fill(b[0], b[1], b[0] + b[2], b[1] + b[3], 0x55FFAA00);
+                } else if (i == hover) {
+                    ctx.fill(b[0], b[1], b[0] + b[2], b[1] + b[3], 0x30FFFFFF);
+                }
+            }
+            if (dragging && !keys.isEmpty()) {
+                int gap = gapAt(mouseY);
+                int[] b = ServerHud.rowBounds(preview, Math.min(gap, keys.size() - 1));
+                int y = b[1] + (gap < keys.size() ? 0 : b[3]);
+                ctx.fill(preview[0], y - 1, preview[0] + preview[2], y + 1, Foe.ACCENT);
+            }
+        }
+        List<OrderedText> hint = textRenderer.wrapLines(Foe.sentence("Drag a line in the preview up or down to move it. Click a chip to switch a line on or off. The two prospect chips make one line. Luck, scale, speeds and prospect fill in when you open /menu."), width - 2 * LEFT);
         for (int i = 0; i < hint.size(); i++) {
             ctx.drawTextWithShadow(textRenderer, hint.get(i), LEFT, height - 6 - (hint.size() - i) * 10, Foe.FAINT);
         }
-    }
-
-    private void chip(DrawContext ctx, String key, int x, int y, float alpha, boolean hot) {
-        Foe.button(ctx, x, y, CHIP_W, CHIP_H, hot);
-        boolean on = !s.serverHudHide.contains(key);
-        int color = (on ? 0x55FF55 : 0x555555) | (int) (alpha * 255) << 24;
-        ctx.drawCenteredTextWithShadow(textRenderer, Foe.text(ServerHud.label(key)), x + CHIP_W / 2, y + (CHIP_H - 8) / 2, color);
     }
 
     @Override
