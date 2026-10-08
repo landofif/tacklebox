@@ -81,6 +81,16 @@ public final class FoeMover {
                 s.questsY = 70;
             }));
         }
+        if (s.serverHud) {
+            add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.ServerHud.draw(ctx, true), (x, y, r) -> {
+                s.serverHudX = Math.max(0, Math.min(sw() - 40, x));
+                s.serverHudY = Math.max(0, Math.min(sh() - 20, y));
+            }, (step, shift) -> s.serverHudScale = Math.max(50, Math.min(200, s.serverHudScale + step * 5)), () -> {
+                s.serverHudX = 4;
+                s.serverHudY = 120;
+                s.serverHudScale = 100;
+            }));
+        }
         if (s.timerMode == DofiSettings.TimerMode.HUD || s.timerMode == DofiSettings.TimerMode.BOTH) {
             add.add(new Box(ctx -> dev.landofif.dofisaddons.display.BobberTimer.drawTimer(ctx, true), (x, y, r) -> {
                 s.timerX = Math.max(0, Math.min(100, (x + r[2] / 2.0) * 100 / Math.max(1, sw())));

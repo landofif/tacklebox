@@ -99,6 +99,12 @@ public class DofiSettings {
     public boolean questsHud = true;
     public int questsX = 4;
     public int questsY = 70;
+    /** The sidebar styled server hud (hud/ServerHud): where it sits, its size in percent and how strong the picture behind it is (percent). */
+    public boolean serverHud = true;
+    public int serverHudX = 4;
+    public int serverHudY = 120;
+    public int serverHudScale = 100;
+    public int serverHudImage = 25;
     /** What the quests left hud has read in game (hud/XpEstimate): xp per quest, the /menu profile, location levels, fishing xp per level. */
     public double questXp, questLxp;
     public double[] profile;

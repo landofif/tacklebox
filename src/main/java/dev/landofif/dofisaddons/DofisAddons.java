@@ -58,6 +58,7 @@ public final class DofisAddons implements ClientModInitializer {
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
             if (!overlay) {
                 XpEstimate.onChat(message);
+                dev.landofif.dofisaddons.hud.ServerHud.onChat(message);
             }
             boolean show = TriggerEngine.onGameMessage(message, overlay);
             return show && (overlay || ChatTweaks.allow(message));
@@ -77,6 +78,7 @@ public final class DofisAddons implements ClientModInitializer {
 
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             DofiSettings.save(); // what the quests left hud learned
+            dev.landofif.dofisaddons.hud.ServerHud.reset();
         });
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> DofiSettings.save());
 
@@ -87,6 +89,7 @@ public final class DofisAddons implements ClientModInitializer {
                 return;
             }
             XpEstimate.renderHud(context);
+            dev.landofif.dofisaddons.hud.ServerHud.renderHud(context);
             dev.landofif.dofisaddons.display.BobberTimer.renderHud(context);
         });
         HudElementRegistry.attachElementAfter(net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements.CHAT,

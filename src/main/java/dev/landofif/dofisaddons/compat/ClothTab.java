@@ -45,6 +45,7 @@ public final class ClothTab {
         ClothTab t = new ClothTab(builder);
         t.menus();
         t.huds();
+        t.serverHud();
         t.bobber();
         t.chat();
         t.world();
@@ -202,6 +203,21 @@ public final class ClothTab {
         header("quests left");
         toggle("quests left hud", "quests until your next level and the next level of your location. it learns from /menu, /quests and the compendium. move it with move huds.",
                 () -> s.questsHud, v -> s.questsHud = v);
+    }
+
+    private void serverHud() {
+        header("server hud");
+        toggle("server hud", "a sidebar styled hud: time, location, wallet and credits, the tackle shop and moon timers, and the weather events and moon that are active. move and resize it with move huds.",
+                () -> s.serverHud, v -> s.serverHud = v);
+        slider("picture opacity", "how strong the picture behind the hud is. 0 hides it. the picture is config/dofisaddons/hud.png (any png or jpg renamed png), shown grey.", 0, 100, 5, "%", PCT,
+                () -> s.serverHudImage, v -> s.serverHudImage = (int) Math.round(v));
+        group.add(ButtonEntry.action(title("picture"), title("open folder"), () -> {
+            try {
+                java.nio.file.Files.createDirectories(dev.landofif.dofisaddons.hud.ServerHud.IMAGE.getParent());
+            } catch (java.io.IOException ignored) {
+            }
+            net.minecraft.util.Util.getOperatingSystem().open(dev.landofif.dofisaddons.hud.ServerHud.IMAGE.getParent());
+        }));
     }
 
     private void bobber() {
