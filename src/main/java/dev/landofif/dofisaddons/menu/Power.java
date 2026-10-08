@@ -37,6 +37,8 @@ public final class Power {
     /** "37 (250 per)": the variant name is a pack glyph that is dropped, so the amount per fish tells which one it is. */
     private static final Pattern COUNT = Pattern.compile("(\\d[\\d,]*)\\s*\\(\\s*([\\d.,]+)\\s*([kmb]?)\\S*\\s*per\\s*\\)");
     private static final Pattern VARIANT = Pattern.compile("(normal|albino|melanistic|trophy|fabled|gigantic)\\W+(\\d+)\\s*/\\s*(\\d+)");
+    private static final Pattern CATCHES = Pattern.compile("catches:\\s*(\\d[\\d,]*)");
+    private static final Pattern RUNES = Pattern.compile("runes discovered:\\W*(\\d+)\\s*/\\s*(\\d+)");
     private static final Pattern REQ = Pattern.compile("requirement: \\(([\\d.,]+)\\s*([kmb]?)\\s*/\\s*([\\d.,]+)\\s*([kmb]?)\\)");
     private static final Pattern AMOUNT = Pattern.compile("^([\\d.,]+)\\s*([kmb]?)$");
     private static final String[] SOURCES = {"total", "leveling", "compendium", "collections", "unique"};
@@ -148,6 +150,11 @@ public final class Power {
                 s.variants.put(loc.id(), v);
                 changed = true;
             }
+            long[] d = v == null ? null : dex(lines);
+            if (d != null && !Arrays.equals(d, s.dex.get(loc.id()))) {
+                s.dex.put(loc.id(), d);
+                changed = true;
+            }
         }
         for (var e : found.entrySet()) {
             if (!e.getValue().equals(s.collections.put(e.getKey(), e.getValue()))) {
@@ -201,6 +208,23 @@ public final class Power {
             }
         }
         return out;
+    }
+
+    /** "Catches: 7,955" and "Runes Discovered: (15/15)" of a compendium location item as {catches, runes, runes total}; null without the catches line. */
+    static long[] dex(List<String> lines) {
+        long[] out = {-1, -1, -1};
+        for (String line : lines) {
+            Matcher c = CATCHES.matcher(line);
+            if (c.find()) {
+                out[0] = Long.parseLong(c.group(1).replace(",", ""));
+            }
+            Matcher r = RUNES.matcher(line);
+            if (r.find()) {
+                out[1] = Integer.parseInt(r.group(1));
+                out[2] = Integer.parseInt(r.group(2));
+            }
+        }
+        return out[0] < 0 ? null : out;
     }
 
     /** Caught and total per variant from a compendium location item, or null unless all six lines are there. */

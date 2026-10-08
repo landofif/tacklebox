@@ -148,6 +148,8 @@ public class DofiSettings {
     public java.util.Map<String, String> collections = new java.util.LinkedHashMap<>();
     /** The variant lines of each compendium location page: caught and total for normal, albino, melanistic, trophy, fabled, gigantic (menu/Power). */
     public java.util.Map<String, int[]> variants = new java.util.LinkedHashMap<>();
+    /** The rest of a compendium location item as last read: catches, runes discovered and runes total (-1 = no runes line), by location id (menu/Power, shown by hud/ServerHud). */
+    public java.util.Map<String, long[]> dex = new java.util.LinkedHashMap<>();
     public int menuSize = 100;
     public int presetsSize = 100;
     /** Where you put each menu button: "main:name" or "travel:id" to {column, row}. */
@@ -388,6 +390,8 @@ public class DofiSettings {
         if (collections == null) collections = new java.util.LinkedHashMap<>();
         if (variants == null) variants = new java.util.LinkedHashMap<>();
         variants.values().removeIf(v -> v == null || v.length != 12);
+        if (dex == null) dex = new java.util.LinkedHashMap<>();
+        dex.values().removeIf(v -> v == null || v.length != 3);
         if (presetCache == null) presetCache = new java.util.LinkedHashMap<>();
         if (petHeads == null) petHeads = new java.util.LinkedHashMap<>();
         if (presetStats == null) presetStats = new java.util.LinkedHashMap<>();

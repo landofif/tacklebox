@@ -1,6 +1,8 @@
 package dev.landofif.dofisaddons.hud;
 
 import dev.landofif.dofisaddons.DofiSettings;
+import dev.landofif.dofisaddons.menu.Locations;
+import dev.landofif.dofisaddons.menu.Power;
 import dev.landofif.dofisaddons.trigger.Matcher;
 import dev.landofif.dofisaddons.trigger.TriggerEngine;
 import net.minecraft.client.MinecraftClient;
@@ -152,7 +154,10 @@ public final class ServerHud {
     public static final String[][] LINES = {{"title", "title"}, {"clock", "time"}, {"weather", "weather and events"}, {"location", "location"}, {"players", "players"},
             {"level", "level"}, {"wallet", "wallet"}, {"credits", "credits"}, {"bite speed", "bite speed"}, {"reel speed", "reel speed"},
             {"luck", "luck"}, {"scale", "scale"}, {"prospect", "prospect value"}, {"prospect chance", "prospect chance"},
-            {"shop", "tackle shop timer"}, {"moon", "moon"}};
+            {"shop", "tackle shop timer"}, {"moon", "moon"},
+            {"dex level", "location level"}, {"dex catches", "catches"}, {"dex runes", "runes"}, {"dex normal", "normal fish"},
+            {"dex gigantic", "gigantic fish"}, {"dex albino", "albino fish"}, {"dex melanistic", "melanistic fish"},
+            {"dex trophy", "trophy fish"}, {"dex fabled", "fabled fish"}};
 
     /** The colour of each event, by the tag the server puts in front of its chat line. */
     private static final Map<String, Integer> COLORS = Map.of("Rain", 0x3F9BFF, "Storm", 0xFFD83D, "Rainbow", 0xFF7BE0, "Gold Rush", 0xFFAA00, "Blooming Oasis", 0x4CD964, "Fabled", 0xE0413A);
@@ -210,6 +215,7 @@ public final class ServerHud {
                 out.add(row("Prospect: ", (v ? value : "") + (v && c ? " (" + chance + ")" : c ? chance : ""), Formatting.GREEN));
             }
         }
+        compendium(out);
         out.add(Text.empty());
         long shop = timer("baitShopTimer");
         if (on("shop") && shop >= 0) {
@@ -234,6 +240,40 @@ public final class ServerHud {
             }
         }
         return out;
+    }
+
+    /** The compendium lines of the location you are at, as of the last time its compendium page was open; the level also moves with the location xp in chat. */
+    private static void compendium(List<Text> out) {
+        Locations.Location loc = Locations.byName(ServerInfo.locationName);
+        if (loc == null) {
+            return;
+        }
+        DofiSettings s = DofiSettings.get();
+        List<Text> rows = new ArrayList<>();
+        double[] at = XpEstimate.toNext(loc.id());
+        if (on("dex level") && at != null) {
+            int level = (int) at[0];
+            double next = XpEstimate.need(level + 1);
+            rows.add(row("Location Level: ", level >= Power.MAX_LEVEL ? level + " (max)" : level + " (" + Power.fmt(next - at[1]) + "/" + Power.fmt(next) + ")", Formatting.GREEN));
+        }
+        long[] d = s.dex.get(loc.id());
+        if (d != null && on("dex catches")) {
+            rows.add(row("Catches: ", String.format("%,d", d[0]), Formatting.GREEN));
+        }
+        if (d != null && d[1] >= 0 && on("dex runes")) {
+            rows.add(row("Runes: ", d[1] + "/" + d[2], d[1] >= d[2] ? Formatting.GREEN : Formatting.YELLOW));
+        }
+        int[] v = s.variants.get(loc.id());
+        for (int i : new int[]{0, 5, 1, 2, 3, 4}) { // the compendium's own order: normal, gigantic, albino, melanistic, trophy, fabled
+            String name = Power.VARIANTS[i];
+            if (v != null && on("dex " + name)) {
+                rows.add(row(title(name) + ": ", v[i * 2] + "/" + v[i * 2 + 1], v[i * 2] >= v[i * 2 + 1] ? Formatting.GREEN : v[i * 2] == 0 ? Formatting.RED : Formatting.YELLOW));
+            }
+        }
+        if (!rows.isEmpty()) {
+            out.add(Text.empty());
+            out.addAll(rows);
+        }
     }
 
     private static MutableText weatherLine(String name, String effect, int color) {
