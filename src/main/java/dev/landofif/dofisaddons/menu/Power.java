@@ -37,6 +37,8 @@ public final class Power {
     /** "37 (250 per)": the variant name is a pack glyph that is dropped, so the amount per fish tells which one it is. */
     private static final Pattern COUNT = Pattern.compile("(\\d[\\d,]*)\\s*\\(\\s*([\\d.,]+)\\s*([kmb]?)\\S*\\s*per\\s*\\)");
     private static final Pattern VARIANT = Pattern.compile("(normal|albino|melanistic|trophy|fabled|gigantic)\\W+(\\d+)\\s*/\\s*(\\d+)");
+    private static final Pattern REQ = Pattern.compile("requirement: \\(([\\d.,]+)\\s*([kmb]?)\\s*/\\s*([\\d.,]+)\\s*([kmb]?)\\)");
+    private static final Pattern AMOUNT = Pattern.compile("^([\\d.,]+)\\s*([kmb]?)$");
     private static final String[] SOURCES = {"total", "leveling", "compendium", "collections", "unique"};
 
     /** One location: where its level is, what the next one gives and what fish it still has. {@code level} 0 = not read yet. */
@@ -102,6 +104,7 @@ public final class Power {
     public static void scan(HandledScreen<?> screen) {
         DofiSettings s = DofiSettings.get();
         boolean changed = false;
+        Map<String, String> found = new java.util.LinkedHashMap<>();
         for (Slot slot : screen.getScreenHandler().slots) {
             ItemStack stack = slot.getStack();
             if (stack.isEmpty() || slot.inventory instanceof PlayerInventory) {
@@ -122,6 +125,7 @@ public final class Power {
                     }
                 }
             }
+            collection(Glyphs.plain(stack.getName()), lines, found);
             Locations.Location loc = Locations.byName(Glyphs.plain(stack.getName()));
             int[] v = loc == null ? null : variants(lines);
             if (v != null && !Arrays.equals(v, s.variants.get(loc.id()))) {
@@ -129,8 +133,29 @@ public final class Power {
                 changed = true;
             }
         }
+        for (var e : found.entrySet()) {
+            if (!e.getValue().equals(s.collections.put(e.getKey(), e.getValue()))) {
+                changed = true;
+            }
+        }
         if (changed) {
             DofiSettings.save();
+        }
+    }
+
+    /** A collections level item ("Level 8", lore "albino collection", "Requirement: (60/80)", a line with only the power): keeps the lowest unfinished level per category. */
+    static void collection(String name, List<String> lines, Map<String, String> found) {
+        Matcher level = Pattern.compile("^level (\\d+)$").matcher(name);
+        String cat = lines.stream().filter(l -> l.endsWith(" collection")).findFirst().map(l -> l.substring(0, l.length() - 11)).orElse(null);
+        Matcher req = lines.stream().map(REQ::matcher).filter(Matcher::find).findFirst().orElse(null);
+        Matcher amount = lines.stream().map(AMOUNT::matcher).filter(Matcher::matches).findFirst().orElse(null);
+        if (cat == null || req == null || amount == null || !level.find()) {
+            return;
+        }
+        String old = found.get(cat);
+        if (old == null || Integer.parseInt(old.substring(0, old.indexOf('|'))) > Integer.parseInt(level.group(1))) {
+            found.put(cat, level.group(1) + "|" + (long) XpEstimate.num(req.group(1), req.group(2)) + "|" + (long) XpEstimate.num(req.group(3), req.group(4))
+                    + "|" + (long) XpEstimate.num(amount.group(1), amount.group(2)));
         }
     }
 

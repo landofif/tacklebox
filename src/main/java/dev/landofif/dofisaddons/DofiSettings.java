@@ -140,6 +140,8 @@ public class DofiSettings {
     public java.util.Map<String, Double> power = new java.util.LinkedHashMap<>();
     /** When {@link #power} was last read, epoch millis. */
     public long powerAt;
+    /** The next unfinished level of each collection (menu/Power): category to "level|have|need|power". */
+    public java.util.Map<String, String> collections = new java.util.LinkedHashMap<>();
     /** The variant lines of each compendium location page: caught and total for normal, albino, melanistic, trophy, fabled, gigantic (menu/Power). */
     public java.util.Map<String, int[]> variants = new java.util.LinkedHashMap<>();
     public int menuSize = 100;
@@ -379,6 +381,7 @@ public class DofiSettings {
         if (need == null) need = new java.util.LinkedHashMap<>();
         if (locationLevels == null) locationLevels = new java.util.LinkedHashMap<>();
         if (power == null) power = new java.util.LinkedHashMap<>();
+        if (collections == null) collections = new java.util.LinkedHashMap<>();
         if (variants == null) variants = new java.util.LinkedHashMap<>();
         variants.values().removeIf(v -> v == null || v.length != 12);
         if (presetCache == null) presetCache = new java.util.LinkedHashMap<>();

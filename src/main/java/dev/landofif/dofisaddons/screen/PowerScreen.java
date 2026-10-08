@@ -182,6 +182,28 @@ public class PowerScreen extends DofiScreen {
             y += 52;
         }
 
+        // the next level of each collection, nearest first
+        if (!s.collections.isEmpty()) {
+            ctx.drawTextWithShadow(textRenderer, Foe.text("collections"), x0, y, Foe.TITLE);
+            y += 14;
+            List<String[]> cols = new ArrayList<>();
+            s.collections.forEach((k, v) -> {
+                String[] f = v.split("\\|");
+                cols.add(new String[]{k, f[0], f[1], f[2], f[3]});
+            });
+            cols.sort(Comparator.comparingLong(c -> Long.parseLong(c[3]) - Long.parseLong(c[2])));
+            for (String[] c : cols) {
+                ctx.drawTextWithShadow(textRenderer, Text.literal(cap(c[0]) + " level " + c[1]), x0, y, c == cols.get(0) ? Foe.ACCENT : Foe.TEXT);
+                ctx.drawTextWithShadow(textRenderer, Text.literal(c[2] + " / " + c[3] + " · " + (Long.parseLong(c[3]) - Long.parseLong(c[2])) + " to go"), x0 + cw * 40 / 100, y, MUTED);
+                Text g = Text.literal("+" + Power.fmt(Long.parseLong(c[4])));
+                ctx.drawTextWithShadow(textRenderer, g, x0 + cw - textRenderer.getWidth(g), y, COLLECTIONS);
+                y += ROW - 2;
+            }
+            y += 8;
+            ctx.fill(x0, y, x0 + cw, y + 1, RULE);
+            y += 14;
+        }
+
         // every location: level, what the next one gives, what it costs, what fish are left
         ctx.fill(x0, y, x0 + cw, y + 1, RULE);
         y += 14;
