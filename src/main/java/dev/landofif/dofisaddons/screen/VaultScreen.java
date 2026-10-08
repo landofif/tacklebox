@@ -158,6 +158,9 @@ public class VaultScreen extends DofiScreen {
             }
             String label = "vault " + n + (n == current ? " (open)" : "") + (!query.isEmpty() && items != null ? "  " + found + " found" : "");
             ctx.drawText(textRenderer, Foe.text(label), x, y, n == current || hot || found > 0 ? Foe.ACCENT : Foe.DIM, false);
+            if (n == current) {
+                ctx.drawStrokedRectangle(x - 3, y - 2, gridW + 5, cellH + 4, Foe.ACCENT);
+            }
             if (items == null) {
                 ctx.drawCenteredTextWithShadow(textRenderer, Foe.text("click to load (/pv " + n + ")").withColor((hot ? Foe.ACCENT : Foe.DIM) & 0xFFFFFF), x + gridW / 2, y + LABEL + 2 * slot, 0xFFFFFFFF);
                 continue;
