@@ -221,6 +221,8 @@ public final class ClothTab {
 
     private void chat() {
         header("chat");
+        toggle("hide login messages", "hides the welcome lines fishonmc prints every time you join: the instance, the fish and shader pack lines, the welcome, help, rules and discord lines.",
+                () -> s.hideLoginChat, v -> s.hideLoginChat = v);
         toggle("hide empty lines", "hides chat lines with nothing in them, the blank gaps the server sends around some messages. announcements lose their spacing lines too.",
                 () -> s.hideEmptyChat, v -> s.hideEmptyChat = v);
     }

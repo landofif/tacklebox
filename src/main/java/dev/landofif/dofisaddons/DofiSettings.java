@@ -124,6 +124,8 @@ public class DofiSettings {
     public int chatY = 0;
     /** Right click a chat line (with chat open) to copy it. */
     public boolean chatCopy = true;
+    /** The welcome lines fishonmc prints at every login (instance, packs, welcome, help, rules, discord). */
+    public boolean hideLoginChat = true;
     /** Lines with nothing in them (the server sends them as spacing) never reach the chat. */
     public boolean hideEmptyChat = true;
     /** Repeats of the same chat line become one line with a count, like "text (x3)". */

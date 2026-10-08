@@ -17,11 +17,24 @@ public final class ChatTweaks {
     private static final Map<String, Matcher> MATCHERS = new HashMap<>();
     private static final Map<ChatFilter, Integer> HIDDEN = new IdentityHashMap<>();
 
+    /** What the server says at every login. The fishing simulator line is its tagline (in small capitals), and only the exact lines match. */
+    private static final java.util.regex.Pattern LOGIN = java.util.regex.Pattern.compile(
+            "(?is)connected to instance\\d+ \\(an undefined server\\)"
+                    + "|you are now using the (fish|shader) pack!"
+                    + "|welcome to fishonmc!"
+                    + "|a fishing simulator|ᴀ ꜰɪꜱʜɪɴɢ ꜱɪᴍᴜʟᴀᴛᴏʀ"
+                    + "|type /help or /wiki to learn about the server!"
+                    + "|read up on the /rules and utilize /report when needed\\."
+                    + "|type /discord to join our discord!");
+
     private ChatTweaks() {}
 
     /** @return false to hide the message */
     public static boolean allow(Text message) {
         DofiSettings st = DofiSettings.get();
+        if (st != null && st.hideLoginChat && LOGIN.matcher(message.getString().strip()).matches()) {
+            return false;
+        }
         if (st != null && st.hideEmptyChat && isEmpty(message.getString())) {
             return false;
         }
