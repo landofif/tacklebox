@@ -12,12 +12,16 @@ import java.util.Locale;
 public final class TotemPop {
     private TotemPop() {}
 
+    /** Size multiplier of the pop being shown, read by {@code InGameOverlayRendererMixin}. */
+    public static float scale = 1f;
+
     /** {@code spec} is an item id, {@code pet:<type>} or {@code shard:<climate>}; anything else shows the totem. */
-    public static void show(String spec) {
+    public static void show(String spec, double scale) {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null) {
             return;
         }
+        TotemPop.scale = (float) scale;
         spec = spec.trim();
         ItemStack stack;
         if (spec.toLowerCase(Locale.ROOT).startsWith("pet:")) {

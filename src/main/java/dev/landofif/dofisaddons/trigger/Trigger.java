@@ -68,6 +68,8 @@ public class Trigger {
         public boolean enabled = false;
         /** An item id, or {@code pet:<type>} for that pets head (learned from pet items you have opened). {name} placeholders work. */
         public String item = "minecraft:totem_of_undying";
+        /** Multiplier on the animation's size (1 = vanilla). */
+        public double scale = 1.0;
     }
 
     public static class SoundSettings {

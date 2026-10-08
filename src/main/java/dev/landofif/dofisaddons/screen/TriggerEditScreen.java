@@ -234,6 +234,8 @@ public class TriggerEditScreen extends DofiScreen {
         y += ROW;
         textField(y, t.item, 256, v -> t.item = v, "minecraft:totem_of_undying, pet:{pet} or shard:{climate}")
                 .setTooltip(Tooltip.of(Foe.sentence("an item id, or pet:{pet} for the head of the pet the message names")));
+        y += ROW;
+        addDrawableChild(new ValueSlider(left, y, width, 20, "size", 0.25, 4, 0.05, "x", t.scale, v -> t.scale = v));
     }
 
     private void initSound() {
@@ -288,7 +290,7 @@ public class TriggerEditScreen extends DofiScreen {
                     + (long) ((draft.title.fadeInSeconds + draft.title.staySeconds + draft.title.fadeOutSeconds) * 1000);
         }
         if (draft.totem.enabled) {
-            dev.landofif.dofisaddons.display.TotemPop.show(TriggerEngine.fill(draft.totem.item, values));
+            dev.landofif.dofisaddons.display.TotemPop.show(TriggerEngine.fill(draft.totem.item, values), draft.totem.scale);
         }
         if (draft.sound.enabled) {
             SoundQueue.play(draft.sound);

@@ -20,6 +20,7 @@
     "HeldItemRendererMixin",
     "InGameHudHotbarMixin",
     "InGameHudOverlayMixin",
+    "InGameOverlayRendererMixin",
     "ItemMarkerHandlerMixin",
     "BaitSortingHelperMixin",
     "KeybindHandlerMixin",
