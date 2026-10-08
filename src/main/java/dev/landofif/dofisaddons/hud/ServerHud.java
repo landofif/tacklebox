@@ -38,6 +38,7 @@ public final class ServerHud {
     private static final Pattern EFFECT = Pattern.compile("\\(([^)]*)\\)");
     private static final Pattern NOUN = Pattern.compile("^An? (.+?) has ");
     private static final Pattern AT = Pattern.compile(" at ([^.!(]+)");
+    private static final Pattern SHARDS = Pattern.compile("Base Shard Chance.*?(\\d+)\\s*$");
     private static final Pattern ENDED = Pattern.compile("dissipated|faded|retracted|has ended|caught by");
 
     /** Active events by name with the time they started and the bonus the server named. */
@@ -76,7 +77,7 @@ public final class ServerHud {
             java.util.regex.Matcher e = EFFECT.matcher(body);
             java.util.regex.Matcher noun = NOUN.matcher(body);
             java.util.regex.Matcher place = AT.matcher(body); // the fabled event says where
-            EVENTS.put(name, new Object[]{System.currentTimeMillis(), e.find() ? e.group(1) : place.find() ? "at " + place.group(1) : "",
+            EVENTS.put(name, new Object[]{System.currentTimeMillis(), e.find() ? shorten(e.group(1)) : place.find() ? "at " + place.group(1) : "",
                     name.equals("Fabled") ? "Fabled Event" : noun.find() ? title(noun.group(1)) : name});
         }
     }
@@ -85,6 +86,12 @@ public final class ServerHud {
         EVENTS.clear();
         moon = "";
         moonEffect = "";
+    }
+
+    /** "Base Shard Chance → 1 in 50 25" (the gold rush says the old and the new chance) as "Shards → 1 in 25". */
+    private static String shorten(String effect) {
+        java.util.regex.Matcher m = SHARDS.matcher(effect);
+        return m.find() ? "Shards → 1 in " + m.group(1) : effect;
     }
 
     /** For {@link BoostsHud}: the active events as {name, bonus}. */
@@ -420,8 +427,8 @@ public final class ServerHud {
     }
 
     private static MutableText weatherLine(String name, String effect, int color) {
-        MutableText line = Text.literal(name).styled(st -> st.withColor(color));
-        return effect.isEmpty() ? line : line.append(Text.literal("  " + effect).formatted(Formatting.GRAY));
+        MutableText line = Text.literal(name.toUpperCase(java.util.Locale.ROOT)).styled(st -> st.withColor(color)); // like the chat tag: GOLD RUSH » Shards → 1 in 25
+        return effect.isEmpty() ? line : line.append(Text.literal(" » " + effect).formatted(Formatting.GRAY));
     }
 
     private static MutableText row(String label, String value, Formatting color) {
