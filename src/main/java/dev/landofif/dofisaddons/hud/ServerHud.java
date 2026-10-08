@@ -31,8 +31,8 @@ import java.util.regex.Pattern;
 public final class ServerHud {
     public static final Path IMAGE = net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir().resolve("dofisaddons").resolve("hud.png");
     private static final Identifier TEXTURE = Identifier.of("dofisaddons", "hud_image");
-    private static final Pattern EVENT = Pattern.compile("^[^A-Za-z0-9]*(RAINBOW|STORM|RAIN|GOLD RUSH|BLOOMING OASIS|FABLED) » (.*)$");
-    private static final Pattern MOON = Pattern.compile("^[^A-Za-z0-9]*(FULL|BLUE|SUPER|BLOOD) MOON » .* has (risen|set)");
+    private static final Pattern EVENT = Pattern.compile("^[^A-Za-z0-9]*(RAINBOW|STORM|RAIN|GOLD RUSH|BLOOMING OASIS|FABLED) [>»] (.*)$");
+    private static final Pattern MOON = Pattern.compile("^[^A-Za-z0-9]*(FULL|BLUE|SUPER|BLOOD) MOON [>»] .* has (risen|set)");
     private static final Pattern EFFECT = Pattern.compile("\\(([^)]*)\\)");
     private static final Pattern NOUN = Pattern.compile("^An? (.+?) has ");
     private static final Pattern AT = Pattern.compile(" at ([^.!(]+)");
