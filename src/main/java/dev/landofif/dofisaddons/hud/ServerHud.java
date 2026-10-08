@@ -131,6 +131,12 @@ public final class ServerHud {
             {"luck", "luck"}, {"scale", "scale"}, {"prospect", "prospect value"}, {"prospect chance", "prospect chance"},
             {"shop", "tackle shop timer"}, {"moon", "moon"}, {"events", "active events"}};
 
+    /** The weather the boss bar names, in the colour it is, and what it does (the numbers the server announces). */
+    private static final Map<String, int[]> WEATHER = Map.of("rain", new int[]{0x3F9BFF}, "thunderstorm", new int[]{0xFFD83D},
+            "blooming oasis", new int[]{0x4CD964}, "gold rush", new int[]{0xFFAA00}, "fabled", new int[]{0xE0413A}, "clear", new int[]{0xFFE066});
+    private static final Map<String, String> EFFECT_TEXT = Map.of("rain", "+50 Bite Speed", "thunderstorm", "+100 Bite Speed",
+            "blooming oasis", "+100% Pet Luck", "gold rush", "Better shard chance");
+
     private static boolean titleShown;
 
     private static boolean on(String key) {
@@ -146,9 +152,6 @@ public final class ServerHud {
         String clock = (ServerInfo.time + " " + ServerInfo.ampm + " " + ServerInfo.temperature).trim();
         if (on("clock") && !clock.isEmpty()) {
             out.add(Text.literal(clock).formatted(Formatting.GRAY));
-        }
-        if (on("weather") && !ServerInfo.weather.isEmpty()) {
-            out.add(Text.literal(title(ServerInfo.weather)).formatted(Formatting.GRAY));
         }
         if (on("location") && !ServerInfo.locationName.isEmpty()) {
             out.add(Text.literal("⏣ ").formatted(Formatting.GRAY).append(Text.literal(title(ServerInfo.locationName)).formatted(Formatting.GREEN)));
@@ -196,6 +199,13 @@ public final class ServerHud {
             } else if (timer("moonTimer") >= 0) {
                 out.add(row("Moon Cycle: ", clock(timer("moonTimer")), Formatting.YELLOW));
             }
+        }
+        String weather = ServerInfo.weather;
+        if (on("weather") && !weather.isEmpty() && !weather.equals("moon")) { // the moon has its own line
+            int[] look = WEATHER.getOrDefault(weather, new int[]{0xFFFFFF});
+            MutableText line = Text.literal(title(weather)).styled(st -> st.withColor(look[0]));
+            String effect = EFFECT_TEXT.getOrDefault(weather, "");
+            out.add(effect.isEmpty() ? line : line.append(Text.literal("  " + effect).formatted(Formatting.GRAY)));
         }
         if (on("events") && !EVENTS.isEmpty()) {
             out.add(Text.empty());
