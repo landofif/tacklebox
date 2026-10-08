@@ -81,6 +81,15 @@ public final class FoeMover {
                 s.questsY = 70;
             }));
         }
+        if (s.boostsHud) {
+            add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.BoostsHud.draw(ctx, true), (x, y, r) -> {
+                s.boostsX = Math.max(0, Math.min(sw() - 40, x));
+                s.boostsY = Math.max(0, Math.min(sh() - 20, y));
+            }, null, () -> {
+                s.boostsX = 182;
+                s.boostsY = 70;
+            }));
+        }
         if (s.serverHud) {
             add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.ServerHud.draw(ctx, true), (x, y, r) -> {
                 s.serverHudX = Math.max(0, Math.min(sw() - 40, x));

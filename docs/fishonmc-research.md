@@ -135,6 +135,12 @@ Hook via Fabric `ClientReceiveMessageEvents.ALLOW_GAME` (observe/suppress) and `
 - Moon set: contains `» The ` … ` has set.`
 - Fabled: `FABLED » A Fabled Event is active at <Location>` or `Visit the <Location> to ...`; ends with `Caught by <player>`.
 
+**Boosters and chummers** (from l's logs, checked 2026-10-09)
+- `BOOSTER » <name> has activated a Global <Luck|Scale|Money|XP> Booster » 2x for 30m! (/tipall)`; lengths seen: 30m, 60m. One player can activate several at once and several players can run the same type. Ends with `BOOSTER » Global <type> Booster from <name> has expired!`, exactly the announced length after the activation line (20:09:02 to 20:39:02). Global: nothing repeats them when you join.
+- `CHUMMER » <name> activated a <rarity glyph> Chummer. (+75 Bite Speed)` (+75, +130, +180 seen); no length in the line. Ends with `CHUMMER » Chummer has run out of stock.`, 15:14 to 15:23 after the activation line in every case seen (about 15 minutes). Activations often come seconds after a run out line, so they seem to queue.
+- Event lengths measured from start to end lines (single digits of samples): Rain Shower ~9 min, Thunderstorm ~11 min, Gold Rush ~15 min, Blooming Oasis ~15.5 min. The end lines say it, so the mod shows no countdown for them.
+- Moon lines carry the bonus: `BLUE MOON » A Blue Moon has risen. (5x Fishing XP)`, `SUPER MOON » ... (+150 Reel Speed)`, `FULL MOON » ... (+120 Bite Speed)`, `BLOOD MOON » ... (+120 Bite Speed)`; ends `The <X> Moon has set.`
+
 **Player chat, dms, crew chat** (from l's logs, 2026-09)
 - Player chat is a server line: `<glyphs>! [<level>] <rank glyph> <tag glyph> <name> » <message>`; after `Matcher.normalize` it reads `! [113] Jukoneko > is crc easy...`.
 - Direct messages: `✉ From <name> » <message>` (incoming, seen in logs); outgoing is presumably `✉ To <name> » <message>`.

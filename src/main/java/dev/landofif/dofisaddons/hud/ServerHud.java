@@ -41,6 +41,7 @@ public final class ServerHud {
     /** Active events by name with the time they started and the bonus the server named. */
     private static final Map<String, Object[]> EVENTS = new LinkedHashMap<>();
     private static String moon = "";
+    private static String moonEffect = "";
 
     /** Radius of the picture's rounded corners in gui pixels. */
     private static final int CORNER = 6;
@@ -57,6 +58,8 @@ public final class ServerHud {
         java.util.regex.Matcher m = MOON.matcher(s);
         if (m.find()) {
             moon = m.group(2).equals("risen") ? title(m.group(1)) + " Moon" : "";
+            java.util.regex.Matcher bonus = EFFECT.matcher(s);
+            moonEffect = !moon.isEmpty() && bonus.find() ? bonus.group(1) : "";
             return;
         }
         m = EVENT.matcher(s);
@@ -79,6 +82,21 @@ public final class ServerHud {
     public static void reset() {
         EVENTS.clear();
         moon = "";
+        moonEffect = "";
+    }
+
+    /** For {@link BoostsHud}: the active events as {name, bonus}. */
+    static List<String[]> activeEvents() {
+        List<String[]> out = new ArrayList<>();
+        for (Object[] e : EVENTS.values()) {
+            out.add(new String[]{(String) e[2], (String) e[1]});
+        }
+        return out;
+    }
+
+    /** For {@link BoostsHud}: the moon as {name, bonus}, or null when none is up. */
+    static String[] activeMoon() {
+        return moon.isEmpty() ? null : new String[]{moon, moonEffect};
     }
 
     private static String title(String caps) {
@@ -228,7 +246,7 @@ public final class ServerHud {
     }
 
     /** Above an hour only hours and minutes (it changes once a minute), below it minutes and seconds. */
-    private static String clock(long ms) {
+    static String clock(long ms) {
         long s = ms / 1000;
         return s >= 3600 ? (s / 3600) + "h " + String.format("%02d", s % 3600 / 60) + "m" : minutes(ms);
     }

@@ -101,6 +101,10 @@ public class DofiSettings {
     public boolean questsHud = true;
     public int questsX = 4;
     public int questsY = 70;
+    /** The active boosts hud (hud/BoostsHud): boosters, chummer, weather events and moon, where it sits. */
+    public boolean boostsHud = true;
+    public int boostsX = 182;
+    public int boostsY = 70;
     /** The sidebar styled server hud (hud/ServerHud): where it sits, its size in percent and how strong the picture behind it is (percent). */
     public boolean serverHud = true;
     public int serverHudX = 4;
