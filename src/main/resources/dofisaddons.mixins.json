@@ -23,6 +23,7 @@
     "ItemMarkerHandlerMixin",
     "BaitSortingHelperMixin",
     "KeybindHandlerMixin",
+    "PetEquipHandlerMixin",
     "LivingEntityMixin",
     "MinecraftClientMixin",
     "MovableBoxWidgetMixin",
