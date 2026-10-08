@@ -105,6 +105,8 @@ public class DofiSettings {
     public int serverHudY = 120;
     public int serverHudScale = 100;
     public int serverHudImage = 25;
+    /** Bite speed, reel speed and prospect as /menu showed them (read by hud/XpEstimate, shown by hud/ServerHud). */
+    public java.util.Map<String, String> profileStats = new java.util.LinkedHashMap<>();
     /** What the quests left hud has read in game (hud/XpEstimate): xp per quest, the /menu profile, location levels, fishing xp per level. */
     public double questXp, questLxp;
     public double[] profile;

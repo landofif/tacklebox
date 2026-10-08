@@ -137,6 +137,12 @@ public final class ServerHud {
         if (!ServerInfo.credits.isEmpty()) {
             out.add(row("Credits: ", ServerInfo.credits, Formatting.AQUA));
         }
+        for (String stat : new String[]{"Bite Speed", "Reel Speed", "Prospect"}) {
+            String v = DofiSettings.get().profileStats.get(stat);
+            if (v != null) {
+                out.add(row(stat + ": ", v, Formatting.GREEN));
+            }
+        }
         out.add(Text.empty());
         long shop = timer("baitShopTimer");
         if (shop >= 0) {
