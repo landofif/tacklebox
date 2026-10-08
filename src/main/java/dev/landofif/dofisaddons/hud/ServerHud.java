@@ -34,6 +34,7 @@ public final class ServerHud {
     private static final Pattern EVENT = Pattern.compile("^[^A-Za-z0-9]*(RAINBOW|STORM|RAIN|GOLD RUSH|BLOOMING OASIS) » (.*)$");
     private static final Pattern MOON = Pattern.compile("^[^A-Za-z0-9]*(FULL|BLUE|SUPER|BLOOD) MOON » .* has (risen|set)");
     private static final Pattern EFFECT = Pattern.compile("\\(([^)]*)\\)");
+    private static final Pattern NOUN = Pattern.compile("^An? (.+?) has ");
     private static final Pattern ENDED = Pattern.compile("dissipated|faded|retracted|has ended");
 
     /** Active events by name with the time they started and the bonus the server named. */
@@ -67,7 +68,8 @@ public final class ServerHud {
             EVENTS.remove(name);
         } else if (body.startsWith("A ") || body.startsWith("An ")) {
             java.util.regex.Matcher e = EFFECT.matcher(body);
-            EVENTS.put(name, new Object[]{System.currentTimeMillis(), e.find() ? e.group(1) : ""});
+            java.util.regex.Matcher noun = NOUN.matcher(body);
+            EVENTS.put(name, new Object[]{System.currentTimeMillis(), e.find() ? e.group(1) : "", noun.find() ? title(noun.group(1)) : name});
         }
     }
 
@@ -126,14 +128,15 @@ public final class ServerHud {
     }
 
     /** Every line the hud can show, by the key {@link DofiSettings#serverHudHide} switches it off with. */
-    public static final String[][] LINES = {{"title", "title"}, {"clock", "time"}, {"weather", "weather"}, {"location", "location"}, {"players", "players"},
+    public static final String[][] LINES = {{"title", "title"}, {"clock", "time"}, {"weather", "weather and events"}, {"location", "location"}, {"players", "players"},
             {"level", "level"}, {"wallet", "wallet"}, {"credits", "credits"}, {"bite speed", "bite speed"}, {"reel speed", "reel speed"},
             {"luck", "luck"}, {"scale", "scale"}, {"prospect", "prospect value"}, {"prospect chance", "prospect chance"},
-            {"shop", "tackle shop timer"}, {"moon", "moon"}, {"events", "active events"}};
+            {"shop", "tackle shop timer"}, {"moon", "moon"}};
 
     /** The weather the boss bar names, in the colour it is, and what it does (the numbers the server announces). */
     private static final Map<String, int[]> WEATHER = Map.of("rain", new int[]{0x3F9BFF}, "thunderstorm", new int[]{0xFFD83D},
-            "blooming oasis", new int[]{0x4CD964}, "gold rush", new int[]{0xFFAA00}, "fabled", new int[]{0xE0413A}, "clear", new int[]{0xFFE066});
+            "blooming oasis", new int[]{0x4CD964}, "gold rush", new int[]{0xFFAA00}, "fabled", new int[]{0xE0413A});
+    private static final Map<String, Integer> COLORS = Map.of("Rain", 0x3F9BFF, "Storm", 0xFFD83D, "Rainbow", 0xFF7BE0, "Gold Rush", 0xFFAA00, "Blooming Oasis", 0x4CD964);
     private static final Map<String, String> EFFECT_TEXT = Map.of("rain", "+50 Bite Speed", "thunderstorm", "+100 Bite Speed",
             "blooming oasis", "+100% Pet Luck", "gold rush", "Better shard chance");
 
@@ -200,20 +203,13 @@ public final class ServerHud {
                 out.add(row("Moon Cycle: ", clock(timer("moonTimer")), Formatting.YELLOW));
             }
         }
-        String weather = ServerInfo.weather;
-        if (on("weather") && !weather.isEmpty() && !weather.equals("moon")) { // the moon has its own line
-            int[] look = WEATHER.getOrDefault(weather, new int[]{0xFFFFFF});
-            MutableText line = Text.literal(title(weather)).styled(st -> st.withColor(look[0]));
-            String effect = EFFECT_TEXT.getOrDefault(weather, "");
-            out.add(effect.isEmpty() ? line : line.append(Text.literal("  " + effect).formatted(Formatting.GRAY)));
-        }
-        if (on("events") && !EVENTS.isEmpty()) {
-            out.add(Text.empty());
+        if (on("weather")) { // every active event gets its own line, in its colour, with what it does
             for (Map.Entry<String, Object[]> e : EVENTS.entrySet()) {
-                long up = System.currentTimeMillis() - (long) e.getValue()[0];
-                MutableText t = Text.literal(e.getKey()).formatted(Formatting.LIGHT_PURPLE).append(Text.literal(" " + minutes(up)).formatted(Formatting.GRAY));
-                String bonus = (String) e.getValue()[1];
-                out.add(bonus.isEmpty() ? t : t.append(Text.literal("  " + bonus).formatted(Formatting.DARK_GRAY)));
+                out.add(weatherLine((String) e.getValue()[2], (String) e.getValue()[1], COLORS.getOrDefault(e.getKey(), 0xFFFFFF)));
+            }
+            String weather = ServerInfo.weather; // before chat told us (just joined): what the boss bar says, unless it is nothing
+            if (EVENTS.isEmpty() && WEATHER.containsKey(weather)) {
+                out.add(weatherLine(title(weather), EFFECT_TEXT.getOrDefault(weather, ""), WEATHER.get(weather)[0]));
             }
         }
         // switching lines off can leave gaps: no double blanks, none at the ends
@@ -223,6 +219,11 @@ public final class ServerHud {
             }
         }
         return out;
+    }
+
+    private static MutableText weatherLine(String name, String effect, int color) {
+        MutableText line = Text.literal(name).styled(st -> st.withColor(color));
+        return effect.isEmpty() ? line : line.append(Text.literal("  " + effect).formatted(Formatting.GRAY));
     }
 
     private static MutableText row(String label, String value, Formatting color) {
