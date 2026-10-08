@@ -97,14 +97,14 @@ public final class XpEstimate {
             DofiSettings.save();
             rebase(p);
         }
-        if (++ticks % 10 == 0) {
-            HandledScreen<?> open = client.currentScreen instanceof FishMenuScreen f ? f.original()
-                    : client.currentScreen instanceof HandledScreen<?> screen ? screen : null;
-            if (open != null) {
-                scan(open);
-                Power.scan(open);
-                dev.landofif.dofisaddons.menu.Compendium.scan(open);
-            }
+        HandledScreen<?> open = client.currentScreen instanceof FishMenuScreen f ? f.original()
+                : client.currentScreen instanceof HandledScreen<?> screen ? screen : null;
+        if (open != null) {
+            dev.landofif.dofisaddons.menu.Compendium.scan(open); // every tick: pages flipped faster than the half second below were missed
+        }
+        if (++ticks % 10 == 0 && open != null) {
+            scan(open);
+            Power.scan(open);
         }
     }
 
