@@ -130,7 +130,6 @@ public class DofiSettings {
     public int baitScale = 0;
     public int baitTiers = 0b00111;
     public boolean baitLures = true;
-    public boolean baitBigger = false;
     /** Location levels read from the fish compendium, "level|progress" by location id, shown in /turbotravel which has none. */
     public java.util.Map<String, String> locationLevels = new java.util.LinkedHashMap<>();
     public int menuSize = 100;

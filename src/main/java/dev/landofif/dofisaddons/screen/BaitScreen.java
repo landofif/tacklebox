@@ -47,7 +47,7 @@ public class BaitScreen extends DofiScreen {
     private List<Row> shown = List.of();
     private final List<List<Row>> best = new ArrayList<>();
 
-    private ButtonWidget source, luresBtn, biggerBtn;
+    private ButtonWidget source, luresBtn;
     private final ButtonWidget[] tierBtn = new ButtonWidget[5];
 
     public BaitScreen(Screen parent) {
@@ -95,10 +95,6 @@ public class BaitScreen extends DofiScreen {
             s.baitLures = !s.baitLures;
             refresh();
         }).dimensions(LEFT, y += STEP, LW, 20).build());
-        biggerBtn = addDrawableChild(ButtonWidget.builder(Text.empty(), b -> {
-            s.baitBigger = !s.baitBigger;
-            refresh();
-        }).dimensions(LEFT, y += STEP, LW, 20).tooltip(Tooltip.of(Foe.sentence("Adult and large quests also count the bigger sizes."))).build());
         refresh();
     }
 
@@ -141,8 +137,8 @@ public class BaitScreen extends DofiScreen {
         odds = BaitPicker.odds(luck);
         double[] size = BaitPicker.sizeOdds(scale);
         vals = new double[5];
-        vals[0] = s.baitBigger ? size[2] + size[3] + size[4] : size[2];
-        vals[1] = s.baitBigger ? size[3] + size[4] : size[3];
+        vals[0] = size[2];
+        vals[1] = size[3];
         best.clear();
         for (int q = 0; q < 5; q++) {
             List<Row> rows = q < RARE ? List.of() : BaitPicker.rows(loc, luck, q - 1, tiers, s.baitLures);
@@ -169,7 +165,6 @@ public class BaitScreen extends DofiScreen {
             tierBtn[r].setMessage(Text.literal(Foe.smallCaps(String.valueOf(BaitPicker.RL.charAt(r)))).formatted(tiers[r] ? Formatting.GREEN : Formatting.DARK_GRAY));
         }
         luresBtn.setMessage(Foe.text("lures: " + (s.baitLures ? "on" : "off")));
-        biggerBtn.setMessage(Foe.text("bigger sizes: " + (s.baitBigger ? "on" : "off")));
     }
 
     private void pickList() {
@@ -248,7 +243,7 @@ public class BaitScreen extends DofiScreen {
         int white = Foe.TEXT;
 
         // what feeds the numbers: label left, value right, in one column under the controls
-        int y = TOP + 6 * STEP + 34;
+        int y = TOP + 5 * STEP + 34;
         stat(ctx, "luck", armorLuck + " + " + s.baitLuck + " = " + luck, y, white);
         stat(ctx, "scale", armorScale + " + " + s.baitScale + " = " + scale, y + 12, white);
         stat(ctx, "level here", levelKnown ? String.valueOf(level) : "unknown", y + 24, levelKnown ? white : Foe.ACCENT);
@@ -297,7 +292,7 @@ public class BaitScreen extends DofiScreen {
         int ly = listTop();
         if (quest < RARE) {
             ctx.drawTextWithShadow(textRenderer, Foe.sentence("A " + QUEST_NAMES[quest] + " is " + pct(vals[quest]) + " of casts at scale " + scale
-                    + (s.baitBigger ? " (this size or bigger)" : "") + ". Bait does not change size, so compare this number with the other cards."), x0, ly, MUTED);
+                    + ". Bait does not change size, so compare this number with the other cards."), x0, ly, MUTED);
             return;
         }
         ctx.drawTextWithShadow(textRenderer, Foe.text(QUEST_NAMES[quest] + " quest · no bait " + pct(odds[quest - 1]) + " per cast"), x0, ly - 14, Foe.TITLE);
