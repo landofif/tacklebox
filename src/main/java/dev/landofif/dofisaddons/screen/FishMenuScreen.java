@@ -146,8 +146,8 @@ public class FishMenuScreen extends DofiScreen {
             }
             ItemStack stack = slot.getStack();
             String name = Glyphs.plain(stack.getName()).trim();
-            if (stack.isEmpty() || (stack.isOf(net.minecraft.item.Items.BREAD) && !stack.contains(net.minecraft.component.DataComponentTypes.CUSTOM_NAME) && !stack.contains(net.minecraft.component.DataComponentTypes.LORE)) || (name.isEmpty() && stack.getItem().toString().contains("glass_pane"))) {
-                continue; // empty and filler slots (bread with no name and no lore; the ah buttons are bread with a description)
+            if (stack.isEmpty() || stack.isOf(net.minecraft.item.Items.BREAD) || (name.isEmpty() && stack.getItem().toString().contains("glass_pane"))) {
+                continue; // empty and filler slots
             }
             if (name.equalsIgnoreCase("close")) {
                 continue; // escape closes it, so the button is only in the way

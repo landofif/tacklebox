@@ -75,7 +75,8 @@ public final class FishMenu {
         boolean chained = MinecraftClient.getInstance().currentScreen instanceof FishMenuScreen;
         String title = Glyphs.plain(screen.getTitle()).toLowerCase(Locale.ROOT);
         boolean needsInventory = title.contains("merchant") || title.contains("vault") || title.contains("shop")
-                || title.contains("pet menu") || title.contains("armor");
+                || title.contains("pet menu") || title.contains("armor")
+                || screen.getTitle().getString().chars().anyMatch(c -> c >= 0xD541 && c <= 0xD546); // the auction house pages (title art only) keep their chest art
         return typed || BUTTON_MENUS.contains(Glyphs.menuName(screen.getTitle())) || (chained && !needsInventory);
     }
 
