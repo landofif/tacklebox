@@ -46,8 +46,8 @@ public final class TriggerPresets {
         return t;
     }
 
-    /** The rarity is a tag glyph (removed before matching) or a word, so it is optional here. */
-    private static final String PET_DROP = "pet drop! you (?:pulled|caught) (?:an? )?(?:(?<rarity>common|rare|epic|legendary|mythic|mythical) )?(?<pet>.+?) pet\\b";
+    /** Anchored: other players' drops are broadcast as "! [366] name » PET DROP! ..." and must not fire. The rarity is a tag glyph (removed before matching) or a word, so it is optional here. */
+    private static final String PET_DROP = "^pet drop! you (?:pulled|caught) (?:an? )?(?:(?<rarity>common|rare|epic|legendary|mythic|mythical) )?(?<pet>.+?) pet\\b";
 
     public static Trigger petTotem() {
         Trigger t = new Trigger();
