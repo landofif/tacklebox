@@ -77,6 +77,7 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
             original.call(self, ctx, delta, mouseX, mouseY);
             return;
         }
+        dev.landofif.dofisaddons.display.MenuBackground.draw(ctx, x, y, backgroundWidth, backgroundHeight);
         boolean inventory = self instanceof InventoryScreen;
         if (!inventory) { // the armour slots start at the top of the inventory, so it has no title
             Foe.title(ctx, x, y, Foe.text(Glyphs.menuName(title)));

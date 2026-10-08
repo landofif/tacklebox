@@ -148,6 +148,19 @@ public final class ClothTab {
         header("menus");
         toggle("simple menus", "chests, your inventory and fishonmc menus with no box and no slot boxes, just the items. hides the menu art from the server pack.",
                 () -> s.flatMenus, v -> s.flatMenus = v);
+        color("menu background", "the colour behind chests, your inventory and fishonmc menus when simple menus is on.",
+                () -> s.menuBgColor, v -> s.menuBgColor = v);
+        slider("menu background opacity", "how strong that colour is. 0 is see-through.", 0, 100, 5, "%", PCT,
+                () -> s.menuBgOpacity, v -> s.menuBgOpacity = (int) Math.round(v));
+        slider("menu picture opacity", "how strong your own picture is behind the menus. 0 hides it.", 0, 100, 5, "%", PCT,
+                () -> s.menuImageOpacity, v -> s.menuImageOpacity = (int) Math.round(v));
+        group.add(ButtonEntry.action(title("menu picture"), title("open folder"), () -> {
+            try {
+                java.nio.file.Files.createDirectories(dev.landofif.dofisaddons.display.MenuBackground.IMAGE.getParent());
+            } catch (java.io.IOException ignored) {
+            }
+            net.minecraft.util.Util.getOperatingSystem().open(dev.landofif.dofisaddons.display.MenuBackground.IMAGE.getParent());
+        }));
         toggle("flat buttons", "every button as a flat see-through fill instead of the bevelled texture, in the game menus too.",
                 () -> s.flatButtons, v -> s.flatButtons = v);
         toggle("rarity circles", "a see-through circle in the rarity colour behind items in your inventory. foecollabs corner mark has its own setting.",

@@ -61,6 +61,8 @@ public class DofiSettings {
     // ---- look (foecollabs, see ui/Foe) ----
     /** Chests, the inventory and fishonmc menus as one box with no slot boxes (drops the server's menu art). */
     public boolean flatMenus = true;
+    /** What shows behind the box-less menus (display/MenuBackground): a colour and a picture, each in percent opacity (0 = none). */
+    public int menuBgColor = 0x000000, menuBgOpacity = 0, menuImageOpacity = 0;
     /** Every button as a flat see-through fill (lighter while hovered) instead of the bevelled texture. */
     public boolean flatButtons = true;
     /** A see-through circle in the rarity colour behind items in slots (foecollabs rarity, drawn by its item markers). */
@@ -337,6 +339,7 @@ public class DofiSettings {
         equipSpacing = Math.max(16, Math.min(26, equipSpacing));
         boxOpacity = Math.max(0, Math.min(100, boxOpacity));
         boxOutlineColor &= 0xFFFFFF;
+        menuBgColor &= 0xFFFFFF;
         if (hotbarSelection == null) hotbarSelection = SelectionStyle.FRAME;
         if (chatFilters == null) chatFilters = new java.util.ArrayList<>();
         chatFilters.removeIf(java.util.Objects::isNull);
