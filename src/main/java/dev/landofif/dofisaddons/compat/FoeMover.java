@@ -81,6 +81,26 @@ public final class FoeMover {
                 s.questsY = 70;
             }));
         }
+        if (s.timerMode == DofiSettings.TimerMode.HUD || s.timerMode == DofiSettings.TimerMode.BOTH) {
+            add.add(new Box(ctx -> dev.landofif.dofisaddons.display.BobberTimer.drawTimer(ctx, true), (x, y, r) -> {
+                s.timerX = Math.max(0, Math.min(100, (x + r[2] / 2.0) * 100 / Math.max(1, sw())));
+                s.timerY = Math.max(0, Math.min(100, (y + r[3] / 2.0) * 100 / Math.max(1, sh())));
+            }, (step, shift) -> s.timerSize = Math.max(50, Math.min(500, s.timerSize + step * 10)), () -> {
+                s.timerX = 50;
+                s.timerY = 58;
+                s.timerSize = 100;
+            }));
+        }
+        if (s.biteOn) {
+            add.add(new Box(ctx -> dev.landofif.dofisaddons.display.BobberTimer.drawBite(ctx, true), (x, y, r) -> {
+                s.biteX = Math.max(0, Math.min(100, (x + r[2] / 2.0) * 100 / Math.max(1, sw())));
+                s.biteY = Math.max(0, Math.min(100, (y + r[3] / 2.0) * 100 / Math.max(1, sh())));
+            }, (step, shift) -> s.biteSize = Math.max(50, Math.min(600, s.biteSize + step * 20)), () -> {
+                s.biteX = 50;
+                s.biteY = 40;
+                s.biteSize = 250;
+            }));
+        }
         for (ChatBox box : s.chatBoxes) {
             if (!box.enabled) {
                 continue;

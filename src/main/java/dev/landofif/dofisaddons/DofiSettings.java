@@ -179,6 +179,51 @@ public class DofiSettings {
     /** RGB of your own fishing line. */
     public int lineColor = 0x3FA9F5;
 
+    // ---- bobber timer and bite notification (display/BobberTimer, screen/BobberScreen) ----
+    public TimerMode timerMode = TimerMode.HUD;
+    /** Hud position, percent of the screen; the text is centred on it. */
+    public double timerX = 50;
+    public double timerY = 58;
+    /** Text size in percent, for the hud and for over the bobber. */
+    public int timerSize = 100;
+    public int timerWorldSize = 100;
+    /** How many blocks above the bobber the text floats. */
+    public double timerHeight = 0.6;
+    public int timerColor = 0xFFFFFF;
+    public boolean timerShadow = true;
+    public int timerDecimals = 1;
+    public boolean timerSuffix = true;
+
+    public boolean biteOn = true;
+    public String biteText = "bite!";
+    public double biteX = 50;
+    public double biteY = 40;
+    public int biteSize = 250;
+    public int biteColor = 0xFFD54A;
+    public boolean biteShadow = true;
+    public double biteSeconds = 1.5;
+    public BiteAnim biteAnim = BiteAnim.POP;
+    /** Hide the servers own BITE! title while the notification is on. */
+    public boolean biteHideTitle = true;
+
+    public enum TimerMode {
+        OFF("off"), HUD("hud"), BOBBER("on the bobber"), BOTH("both");
+        public final String label;
+
+        TimerMode(String label) {
+            this.label = label;
+        }
+    }
+
+    public enum BiteAnim {
+        NONE("none"), FADE("fade"), POP("pop"), SLIDE("slide"), SHAKE("shake"), PULSE("pulse");
+        public final String label;
+
+        BiteAnim(String label) {
+            this.label = label;
+        }
+    }
+
     // ---- viewmodel (held item) ----
     public boolean viewmodel = false;
     public double vmScale = 1.0;
@@ -272,6 +317,9 @@ public class DofiSettings {
 
     public void sanitize() {
         if (bobberSkin == null) bobberSkin = BobberSkin.DEFAULT;
+        if (timerMode == null) timerMode = TimerMode.HUD;
+        if (biteAnim == null) biteAnim = BiteAnim.POP;
+        if (biteText == null) biteText = "bite!";
         if (swingStyle == null) swingStyle = SwingStyle.NORMAL;
         if (equipPlace == null) equipPlace = EquipPlace.ABOVE;
         if (hotbarLook == null) hotbarLook = hotbarBackground ? BoxLook.DEFAULT : BoxLook.OFF;

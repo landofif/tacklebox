@@ -32,4 +32,9 @@ abstract class MinecraftClientMixin {
             setScreen(pv > 0 ? new dev.landofif.dofisaddons.screen.VaultScreen(chest, pv) : FishMenu.isPresets(screen) ? new dev.landofif.dofisaddons.screen.PresetsScreen(chest) : new FishMenuScreen(chest));
         }
     }
+
+    @Inject(method = "doItemUse", at = @At("HEAD"))
+    private void dofisaddons$use(CallbackInfo ci) {
+        dev.landofif.dofisaddons.display.BobberTimer.onUse((MinecraftClient) (Object) this);
+    }
 }

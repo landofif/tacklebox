@@ -38,4 +38,11 @@ abstract class InGameHudOverlayMixin {
             ci.cancel();
         }
     }
+
+    @Inject(method = "setTitle", at = @At("HEAD"), cancellable = true)
+    private void dofisaddons$title(Text title, CallbackInfo ci) {
+        if (dev.landofif.dofisaddons.display.BobberTimer.onTitle(title)) {
+            ci.cancel();
+        }
+    }
 }

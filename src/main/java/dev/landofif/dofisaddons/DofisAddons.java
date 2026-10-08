@@ -87,6 +87,7 @@ public final class DofisAddons implements ClientModInitializer {
                 return;
             }
             XpEstimate.renderHud(context);
+            dev.landofif.dofisaddons.display.BobberTimer.renderHud(context);
         });
         HudElementRegistry.attachElementAfter(net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements.CHAT,
                 Identifier.of(MOD_ID, "chat_boxes"), (context, tickCounter) -> {
@@ -107,6 +108,7 @@ public final class DofisAddons implements ClientModInitializer {
             SoundQueue.tick();
             ServerInfo.tick(client);
             XpEstimate.tick(client);
+            dev.landofif.dofisaddons.display.BobberTimer.tick(client);
             dev.landofif.dofisaddons.display.PetHeads.tick(client);
             dev.landofif.dofisaddons.input.KeyCommands.tick(client);
             TriggerEngine.tick();
@@ -129,6 +131,7 @@ public final class DofisAddons implements ClientModInitializer {
                     .then(ClientCommandManager.literal("words").executes(ctx -> open(() -> new dev.landofif.dofisaddons.screen.WordSwapScreen(null))))
                     .then(ClientCommandManager.literal("keys").executes(ctx -> open(() -> new dev.landofif.dofisaddons.screen.KeyCommandScreen(null))))
                     .then(ClientCommandManager.literal("viewmodel").executes(ctx -> open(() -> new dev.landofif.dofisaddons.screen.ViewmodelScreen(null))))
+                    .then(ClientCommandManager.literal("bobber").executes(ctx -> open(() -> new dev.landofif.dofisaddons.screen.BobberScreen(null))))
                     .then(ClientCommandManager.literal("bait").executes(ctx -> open(() -> new dev.landofif.dofisaddons.screen.BaitScreen(null))))
                     .then(ClientCommandManager.literal("chat").executes(ctx -> open(() -> new ChatFilterScreen(null))))
                     .then(ClientCommandManager.literal("debug")

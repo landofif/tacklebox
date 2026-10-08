@@ -233,7 +233,12 @@ public final class ChatBoxes {
             ctx.drawTextWithShadow(tr, Foe.text("nothing here yet").withColor(Foe.DIM & 0xFFFFFF), x + PAD_X, y + h - PAD_Y - 9, 0xFFFFFFFF);
         }
         int ty = y + h - PAD_Y - 9 - (lines.size() - 1) * LINE_H;
+        // the same dark strip vanilla puts behind chat lines, at the "text background opacity" accessibility setting
+        int back = (int) (client.options.getTextBackgroundOpacity().getValue() * 255) << 24;
         for (OrderedText line : lines) {
+            if (back != 0) {
+                ctx.fill(x, ty - 1, x + w, ty + LINE_H - 1, back);
+            }
             ctx.drawTextWithShadow(tr, line, x + PAD_X, ty, 0xFFFFFFFF);
             ty += LINE_H;
         }
