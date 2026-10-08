@@ -42,6 +42,8 @@ public final class ServerHud {
 
     /** Radius of the picture's rounded corners in gui pixels. */
     private static final int CORNER = 6;
+    /** Room around the text, the line pitch and the least width, so it fills out like a sidebar and not a tight label. */
+    private static final int PAD = 10, LINE = 12, MIN_WIDTH = 150;
     private static long imageStamp = -1;
     private static int imageW, imageH;
     private static long nextCheck;
@@ -100,9 +102,10 @@ public final class ServerHud {
         for (Text t : lines) {
             w = Math.max(w, tr.getWidth(t));
         }
+        w = Math.max(w, MIN_WIDTH);
         float k = s.serverHudScale / 100f;
-        int h = lines.size() * 10;
-        int[] rect = {s.serverHudX, s.serverHudY, Math.round((w + 8) * k), Math.round((h + 8) * k)};
+        int h = lines.size() * LINE;
+        int[] rect = {s.serverHudX, s.serverHudY, Math.round((w + 2 * PAD) * k), Math.round((h + 2 * PAD) * k)};
         image(ctx, mc, rect, s.serverHudImage);
         var m = ctx.getMatrices();
         m.pushMatrix();
@@ -110,8 +113,8 @@ public final class ServerHud {
         m.scale(k, k);
         for (int i = 0; i < lines.size(); i++) {
             Text t = lines.get(i);
-            int x = i == 0 ? 4 + (w - tr.getWidth(t)) / 2 : 4; // the title is centred
-            ctx.drawTextWithShadow(tr, t, x, 4 + i * 10, 0xFFFFFFFF);
+            int x = i == 0 ? PAD + (w - tr.getWidth(t)) / 2 : PAD; // the title is centred
+            ctx.drawTextWithShadow(tr, t, x, PAD + i * LINE, 0xFFFFFFFF);
         }
         m.popMatrix();
         return rect;
