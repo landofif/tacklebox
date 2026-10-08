@@ -14,10 +14,11 @@ import java.util.Locale;
 /**
  * The head of each pet type, for the totem pop. The server gives pet items a player head with a texture per pet, and the
  * chat line only names the type, so the texture is remembered from any pet item that shows up in the inventory or an open
- * menu (pets menu, vaults). Pets wearing a skin are skipped, their head is the skin's.
+ * menu (pets menu, vaults, and the vaults saved earlier). Pets wearing a skin are skipped, their head is the skin's.
  */
 public final class PetHeads {
     private static int ticks;
+    private static boolean vaultsRead;
 
     private PetHeads() {}
 
@@ -31,6 +32,15 @@ public final class PetHeads {
             return;
         }
         boolean dirty = false;
+        if (!vaultsRead) { // pets sitting in vaults you opened before
+            vaultsRead = true;
+            for (int n = 1; n <= dev.landofif.dofisaddons.menu.Vaults.COUNT; n++) {
+                var items = dev.landofif.dofisaddons.menu.Vaults.get(n);
+                for (int i = 0; items != null && i < items.size(); i++) {
+                    dirty |= learn(items.get(i));
+                }
+            }
+        }
         for (var slot : client.player.currentScreenHandler.slots) {
             dirty |= learn(slot.getStack());
         }

@@ -3,13 +3,12 @@ package dev.landofif.dofisaddons.display;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
 import java.util.Locale;
 
-/** The vanilla totem of undying animation (floating item and particles, no sound: triggers have their own) with any item. */
+/** The vanilla totem of undying animation (the floating item only, no particles or sound: triggers have their own sound) with any item. */
 public final class TotemPop {
     private TotemPop() {}
 
@@ -28,6 +27,5 @@ public final class TotemPop {
             stack = id != null && Registries.ITEM.containsId(id) ? new ItemStack(Registries.ITEM.get(id)) : new ItemStack(Items.TOTEM_OF_UNDYING);
         }
         mc.gameRenderer.showFloatingItem(stack);
-        mc.particleManager.addEmitter(mc.player, ParticleTypes.TOTEM_OF_UNDYING, 30);
     }
 }
