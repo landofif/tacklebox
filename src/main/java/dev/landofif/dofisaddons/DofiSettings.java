@@ -106,6 +106,8 @@ public class DofiSettings {
     public java.util.Map<String, Double> need = new java.util.LinkedHashMap<>();
     /** The /presets wardrobe screen, and for both custom guis: size in percent of the screen. */
     public boolean presetsMenu = true;
+    /** /pv as all seven personal vaults on one screen with a search (screen/VaultScreen). */
+    public boolean vaultMenu = true;
     /** Preset rows seen on /presets, kept between sessions so the other page can be drawn: "armor:6" to its pieces as "item|color|floats|strings|model". */
     public java.util.Map<String, java.util.List<String>> presetCache = new java.util.LinkedHashMap<>();
     public boolean presetsOtherBg = false;

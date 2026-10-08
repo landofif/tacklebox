@@ -28,7 +28,8 @@ abstract class MinecraftClientMixin {
         if (FishMenu.wants(screen)) {
             ci.cancel();
             GenericContainerScreen chest = (GenericContainerScreen) screen;
-            setScreen(FishMenu.isPresets(screen) ? new dev.landofif.dofisaddons.screen.PresetsScreen(chest) : new FishMenuScreen(chest));
+            int pv = dev.landofif.dofisaddons.menu.Vaults.number(screen);
+            setScreen(pv > 0 ? new dev.landofif.dofisaddons.screen.VaultScreen(chest, pv) : FishMenu.isPresets(screen) ? new dev.landofif.dofisaddons.screen.PresetsScreen(chest) : new FishMenuScreen(chest));
         }
     }
 }

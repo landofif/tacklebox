@@ -50,6 +50,7 @@ public final class DofisAddons implements ClientModInitializer {
                 net.fabricmc.fabric.api.resource.v1.ResourceLoader.registerBuiltinPack(net.minecraft.util.Identifier.of(MOD_ID, "foelogo"), c,
                         net.minecraft.text.Text.literal("foecollab old logo"), net.fabricmc.fabric.api.resource.v1.pack.PackActivationType.ALWAYS_ENABLED));
         dev.landofif.dofisaddons.menu.FishMenu.register();
+        dev.landofif.dofisaddons.menu.Vaults.register();
         TriggerStore.load();
         DofiSettings.load();
         dev.landofif.dofisaddons.display.FlatLeaves.register();

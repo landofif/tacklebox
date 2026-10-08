@@ -160,6 +160,9 @@ public final class ClothTab {
                 () -> s.presetsSize, v -> s.presetsSize = (int) Math.round(v));
         toggle("other page boxes", "draws the card boxes behind the dimmed presets of the other page. off shows only the models.",
                 () -> s.presetsOtherBg, v -> s.presetsOtherBg = v);
+        header("vaults");
+        toggle("vault overview", "/pv as all seven personal vaults on one screen with a search. a vault shows what it held when you last opened it. off gives the chest back.",
+                () -> s.vaultMenu, v -> s.vaultMenu = v);
     }
 
     private void huds() {
