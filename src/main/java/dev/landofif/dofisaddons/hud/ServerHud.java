@@ -127,153 +127,282 @@ public final class ServerHud {
         }
         DofiSettings s = DofiSettings.get();
         TextRenderer tr = mc.textRenderer;
-        List<Text> lines = lines(mc);
-        int w = 0;
-        for (Text t : lines) {
-            w = Math.max(w, tr.getWidth(t));
+        List<Line> lines = lines(mc);
+        int w = MIN_WIDTH, h = 0;
+        for (Line l : lines) {
+            w = Math.max(w, l.width(tr));
+            h += l.pitch();
         }
-        w = Math.max(w, MIN_WIDTH);
         float k = s.serverHudScale / 100f;
-        int h = lines.size() * LINE;
         int[] rect = {hx, hy, Math.round((w + 2 * PAD) * k), Math.round((h + 2 * PAD) * k)};
         image(ctx, mc, rect, s.serverHudImage);
         var m = ctx.getMatrices();
         m.pushMatrix();
         m.translate(hx, hy);
         m.scale(k, k);
-        for (int i = 0; i < lines.size(); i++) {
-            Text t = lines.get(i);
-            int x = i == 0 && titleShown ? PAD + (w - tr.getWidth(t)) / 2 : PAD; // the title is centred
-            ctx.drawTextWithShadow(tr, t, x, PAD + i * LINE, 0xFFFFFFFF);
+        int y = PAD;
+        for (Line l : lines) {
+            int x = PAD + (l.center ? (w - l.width(tr)) / 2 : l.indent ? tr.getWidth(DASH) : 0);
+            scaled(ctx, tr, l.text, x, y, l.scale);
+            if (l.side != null) {
+                scaled(ctx, tr, l.side, x + Math.round(tr.getWidth(l.text) * l.scale) + 4, y + 1, SMALL);
+            }
+            y += l.pitch();
         }
         m.popMatrix();
         return rect;
     }
 
-    /** Every line the hud can show, by the key {@link DofiSettings#serverHudHide} switches it off with. */
-    public static final String[][] LINES = {{"title", "title"}, {"clock", "time"}, {"weather", "weather and events"}, {"location", "location"}, {"players", "players"},
-            {"level", "level"}, {"wallet", "wallet"}, {"credits", "credits"}, {"bite speed", "bite speed"}, {"reel speed", "reel speed"},
-            {"luck", "luck"}, {"scale", "scale"}, {"prospect", "prospect value"}, {"prospect chance", "prospect chance"},
-            {"shop", "tackle shop timer"}, {"moon", "moon"},
-            {"dex level", "location level"}, {"dex catches", "catches"}, {"dex runes", "runes"}, {"dex normal", "normal fish"},
-            {"dex gigantic", "gigantic fish"}, {"dex albino", "albino fish"}, {"dex melanistic", "melanistic fish"},
-            {"dex trophy", "trophy fish"}, {"dex fabled", "fabled fish"}};
+    private static void scaled(DrawContext ctx, TextRenderer tr, Text t, int x, int y, float scale) {
+        if (scale == 1f) {
+            ctx.drawTextWithShadow(tr, t, x, y, 0xFFFFFFFF);
+            return;
+        }
+        var m = ctx.getMatrices();
+        m.pushMatrix();
+        m.translate(x, y);
+        m.scale(scale, scale);
+        ctx.drawTextWithShadow(tr, t, 0, 0, 0xFFFFFFFF);
+        m.popMatrix();
+    }
+
+    /** One line of the hud: the text (at {@code scale}), small grey text after it, centred (the title) or indented under a "- " item (the xp bar). */
+    private record Line(Text text, float scale, Text side, boolean center, boolean indent) {
+        int pitch() {
+            return Math.round(LINE * scale);
+        }
+
+        int width(TextRenderer tr) {
+            return Math.round(tr.getWidth(text) * scale) + (side == null ? 0 : 4 + Math.round(tr.getWidth(side) * SMALL)) + (indent ? tr.getWidth(DASH) : 0);
+        }
+
+        boolean blank() {
+            return side == null && text.getString().isEmpty();
+        }
+    }
+
+    private static final float SMALL = 0.75f;
+    private static final String DASH = "- ";
+    /** The xp bar is this many dashes wide. */
+    private static final int BAR = 10;
+
+    /** Every line the hud can show as {key, name}, in the order they start in; a chip switches one off by its key ({@link DofiSettings#serverHudHide}). */
+    private static final Map<String, String> LABEL = new LinkedHashMap<>();
+
+    static {
+        for (String[] l : new String[][]{{"title", "title"}, {"clock", "time"}, {"location", "location"}, {"players", "players"}, {"space 1", "blank line"},
+                {"level", "level"}, {"wallet", "wallet"}, {"credits", "credits"}, {"space 2", "blank line"},
+                {"bite speed", "bite speed"}, {"reel speed", "reel speed"}, {"luck", "luck"}, {"scale", "scale"},
+                {"prospect", "prospect value"}, {"prospect chance", "prospect chance"}, {"space 3", "blank line"},
+                {"dex location", "compendium location"}, {"dex level", "location level"}, {"dex xp", "location xp bar"}, {"dex catches", "catches"},
+                {"dex runes", "runes"}, {"dex normal", "normal fish"}, {"dex gigantic", "gigantic fish"}, {"dex albino", "albino fish"},
+                {"dex melanistic", "melanistic fish"}, {"dex trophy", "trophy fish"}, {"dex fabled", "fabled fish"}, {"space 4", "blank line"},
+                {"shop", "tackle shop timer"}, {"moon", "moon"}, {"weather", "weather and events"}}) {
+            LABEL.put(l[0], l[1]);
+        }
+    }
+
+    public static String label(String key) {
+        return LABEL.get(key);
+    }
+
+    /** The lines in the order the player arranged them: the saved order, then any line it does not know yet in its start order. */
+    public static List<String> order() {
+        List<String> out = new ArrayList<>();
+        for (String key : DofiSettings.get().serverHudOrder) {
+            if (LABEL.containsKey(key) && !out.contains(key)) {
+                out.add(key);
+            }
+        }
+        for (String key : LABEL.keySet()) {
+            if (!out.contains(key)) {
+                out.add(key);
+            }
+        }
+        return out;
+    }
 
     /** The colour of each event, by the tag the server puts in front of its chat line. */
     private static final Map<String, Integer> COLORS = Map.of("Rain", 0x3F9BFF, "Storm", 0xFFD83D, "Rainbow", 0xFF7BE0, "Gold Rush", 0xFFAA00, "Blooming Oasis", 0x4CD964, "Fabled", 0xE0413A);
     private static final Map<String, String> EFFECT_TEXT = Map.of("rain", "+50 Bite Speed", "thunderstorm", "+100 Bite Speed",
             "blooming oasis", "+100% Pet Luck", "gold rush", "Better shard chance");
 
-    private static boolean titleShown;
-
     private static boolean on(String key) {
         return !DofiSettings.get().serverHudHide.contains(key);
     }
 
-    private static List<Text> lines(MinecraftClient mc) {
-        List<Text> out = new ArrayList<>();
-        titleShown = on("title");
-        if (titleShown) {
-            out.add(Text.literal("FISHONMC").formatted(Formatting.GOLD, Formatting.BOLD));
-        }
-        String clock = (ServerInfo.time + " " + ServerInfo.ampm + " " + ServerInfo.temperature).trim();
-        if (on("clock") && !clock.isEmpty()) {
-            out.add(Text.literal(clock).formatted(Formatting.GRAY));
-        }
-        if (on("location") && !ServerInfo.locationName.isEmpty()) {
-            out.add(Text.literal("⏣ ").formatted(Formatting.GRAY).append(Text.literal(title(ServerInfo.locationName)).formatted(Formatting.GREEN)));
-        }
-        var tab = mc.getNetworkHandler();
-        if (on("players") && tab != null) {
-            out.add(row("Players: ", String.valueOf(tab.getPlayerList().size()), Formatting.GREEN));
-        }
-        out.add(Text.empty());
-        if (on("level")) {
-            out.add(row("Level: ", String.valueOf(mc.player.experienceLevel), Formatting.GREEN));
-        }
-        if (on("wallet") && !ServerInfo.wallet.isEmpty()) {
-            out.add(row("Wallet: ", "$" + ServerInfo.wallet, Formatting.GOLD));
-        }
-        if (on("credits") && !ServerInfo.credits.isEmpty()) {
-            out.add(row("Credits: ", ServerInfo.credits, Formatting.AQUA));
-        }
-        out.add(Text.empty());
-        var stats = DofiSettings.get().profileStats;
-        for (String stat : new String[]{"Bite Speed", "Reel Speed", "Luck", "Scale"}) {
-            String v = stats.get(stat.toLowerCase(java.util.Locale.ROOT));
-            if (on(stat.toLowerCase(java.util.Locale.ROOT)) && v != null) {
-                out.add(row(stat + ": ", v, Formatting.GREEN));
-            }
-        }
-        String prospect = stats.get("prospect");
-        if (prospect != null) { // "236 (1/42.06)": the number, the chance, or both
-            int at = prospect.indexOf(" (");
-            String value = at < 0 ? prospect : prospect.substring(0, at);
-            String chance = at < 0 ? "" : prospect.substring(at + 2, prospect.length() - 1);
-            boolean v = on("prospect"), c = on("prospect chance") && !chance.isEmpty();
-            if (v || c) {
-                out.add(row("Prospect: ", (v ? value : "") + (v && c ? " (" + chance + ")" : c ? chance : ""), Formatting.GREEN));
-            }
-        }
-        compendium(out);
-        out.add(Text.empty());
-        long shop = timer("baitShopTimer");
-        if (on("shop") && shop >= 0) {
-            out.add(row("Tackle Shop: ", clock(shop), Formatting.YELLOW));
-        }
-        if (on("moon")) {
-            if (!moon.isEmpty()) {
-                out.add(row("Moon: ", moon, moon.startsWith("Blood") ? Formatting.RED : Formatting.LIGHT_PURPLE));
-            } else if (timer("moonTimer") >= 0) {
-                out.add(row("Moon Cycle: ", clock(timer("moonTimer")), Formatting.YELLOW));
-            }
-        }
-        if (on("weather")) { // every active event gets its own line, in its colour, with what it does
-            for (Map.Entry<String, Object[]> e : EVENTS.entrySet()) {
-                out.add(weatherLine((String) e.getValue()[2], (String) e.getValue()[1], COLORS.getOrDefault(e.getKey(), 0xFFFFFF)));
+    private static Line plain(Text t) {
+        return new Line(t, 1f, null, false, false);
+    }
+
+    private static List<Line> lines(MinecraftClient mc) {
+        List<Line> out = new ArrayList<>();
+        boolean prospect = false;
+        for (String key : order()) {
+            if (key.startsWith("prospect")) { // two chips, one line, at the place of the first of them
+                if (!prospect) {
+                    prospect = true;
+                    prospect(out);
+                }
+            } else if (on(key)) {
+                add(out, key, mc);
             }
         }
         // switching lines off can leave gaps: no double blanks, none at the ends
         for (int k = out.size() - 1; k >= 0; k--) {
-            if (out.get(k).getString().isEmpty() && (k == 0 || k == out.size() - 1 || out.get(k - 1).getString().isEmpty())) {
+            if (out.get(k).blank() && (k == 0 || k == out.size() - 1 || out.get(k - 1).blank())) {
                 out.remove(k);
             }
         }
         return out;
     }
 
-    /** The compendium lines of the location you are at, as of the last time its compendium page was open; the level also moves with the location xp in chat. */
-    private static void compendium(List<Text> out) {
+    private static void add(List<Line> out, String key, MinecraftClient mc) {
+        var stats = DofiSettings.get().profileStats;
+        switch (key) {
+            case "title" -> out.add(new Line(Text.literal("FISHONMC").formatted(Formatting.GOLD, Formatting.BOLD), 1f, null, true, false));
+            case "clock" -> {
+                String clock = (ServerInfo.time + " " + ServerInfo.ampm + " " + ServerInfo.temperature).trim();
+                if (!clock.isEmpty()) {
+                    out.add(plain(Text.literal(clock).formatted(Formatting.GRAY)));
+                }
+            }
+            case "location" -> {
+                if (!ServerInfo.locationName.isEmpty()) {
+                    out.add(plain(Text.literal("⏣ ").formatted(Formatting.GRAY).append(Text.literal(title(ServerInfo.locationName)).formatted(Formatting.GREEN))));
+                }
+            }
+            case "players" -> {
+                var tab = mc.getNetworkHandler();
+                if (tab != null) {
+                    out.add(plain(row("Players: ", String.valueOf(tab.getPlayerList().size()), Formatting.GREEN)));
+                }
+            }
+            case "level" -> out.add(new Line(row("Level: ", String.valueOf(mc.player.experienceLevel), Formatting.GREEN), 1f,
+                    Text.literal("(" + (int) (mc.player.experienceProgress * 100) + "%)").formatted(Formatting.GRAY), false, false));
+            case "wallet" -> {
+                if (!ServerInfo.wallet.isEmpty()) {
+                    out.add(plain(row("Wallet: ", "$" + ServerInfo.wallet, Formatting.GOLD)));
+                }
+            }
+            case "credits" -> {
+                if (!ServerInfo.credits.isEmpty()) {
+                    out.add(plain(row("Credits: ", ServerInfo.credits, Formatting.AQUA)));
+                }
+            }
+            case "bite speed", "reel speed", "luck", "scale" -> {
+                String v = stats.get(key);
+                if (v != null) {
+                    out.add(plain(row(title(key) + ": ", v, Formatting.GREEN)));
+                }
+            }
+            case "shop" -> {
+                long shop = timer("baitShopTimer");
+                if (shop >= 0) {
+                    out.add(plain(row("Tackle Shop: ", clock(shop), Formatting.YELLOW)));
+                }
+            }
+            case "moon" -> {
+                if (!moon.isEmpty()) {
+                    out.add(plain(row("Moon: ", moon, moon.startsWith("Blood") ? Formatting.RED : Formatting.LIGHT_PURPLE)));
+                } else if (timer("moonTimer") >= 0) {
+                    out.add(plain(row("Moon Cycle: ", clock(timer("moonTimer")), Formatting.YELLOW)));
+                }
+            }
+            case "weather" -> { // every active event gets its own line, in its colour, with what it does
+                for (Map.Entry<String, Object[]> e : EVENTS.entrySet()) {
+                    out.add(plain(weatherLine((String) e.getValue()[2], (String) e.getValue()[1], COLORS.getOrDefault(e.getKey(), 0xFFFFFF))));
+                }
+            }
+            default -> {
+                if (key.startsWith("space")) {
+                    out.add(plain(Text.empty()));
+                } else {
+                    compendium(out, key);
+                }
+            }
+        }
+    }
+
+    private static void prospect(List<Line> out) {
+        String prospect = DofiSettings.get().profileStats.get("prospect");
+        if (prospect != null) { // "236 (1/42.06)": the number, the chance, or both
+            int at = prospect.indexOf(" (");
+            String value = at < 0 ? prospect : prospect.substring(0, at);
+            String chance = at < 0 ? "" : prospect.substring(at + 2, prospect.length() - 1);
+            boolean v = on("prospect"), c = on("prospect chance") && !chance.isEmpty();
+            if (v || c) {
+                out.add(plain(row("Prospect: ", (v ? value : "") + (v && c ? " (" + chance + ")" : c ? chance : ""), Formatting.GREEN)));
+            }
+        }
+    }
+
+    /**
+     * One compendium line of the location you are at, as of the last time its compendium page was open (the level also moves with
+     * the location xp in chat). The location name is the heading, the rest are list items with a "-" in front, and the xp is a
+     * bar of {@link #BAR} dashes with the percentage after it and the amounts under it, small.
+     */
+    private static void compendium(List<Line> out, String key) {
         Locations.Location loc = Locations.byName(ServerInfo.locationName);
         if (loc == null) {
             return;
         }
         DofiSettings s = DofiSettings.get();
-        List<Text> rows = new ArrayList<>();
         double[] at = XpEstimate.toNext(loc.id());
-        if (on("dex level") && at != null) {
-            int level = (int) at[0];
-            double next = XpEstimate.need(level + 1);
-            rows.add(row("Location Level: ", level >= Power.MAX_LEVEL ? level + " (max)" : level + " (" + Power.fmt(next - at[1]) + "/" + Power.fmt(next) + ")", Formatting.GREEN));
-        }
         long[] d = s.dex.get(loc.id());
-        if (d != null && on("dex catches")) {
-            rows.add(row("Catches: ", String.format("%,d", d[0]), Formatting.GREEN));
-        }
-        if (d != null && d[1] >= 0 && on("dex runes")) {
-            rows.add(row("Runes: ", d[1] + "/" + d[2], d[1] >= d[2] ? Formatting.GREEN : Formatting.YELLOW));
-        }
         int[] v = s.variants.get(loc.id());
-        for (int i : new int[]{0, 5, 1, 2, 3, 4}) { // the compendium's own order: normal, gigantic, albino, melanistic, trophy, fabled
-            String name = Power.VARIANTS[i];
-            if (v != null && on("dex " + name)) {
-                rows.add(row(title(name) + ": ", v[i * 2] + "/" + v[i * 2 + 1], v[i * 2] >= v[i * 2 + 1] ? Formatting.GREEN : v[i * 2] == 0 ? Formatting.RED : Formatting.YELLOW));
+        switch (key) {
+            case "dex location" -> out.add(plain(Text.literal(loc.name()).formatted(Formatting.GREEN)));
+            case "dex level" -> {
+                if (at != null) {
+                    int level = (int) at[0];
+                    out.add(item("Location Level: ", level >= Power.MAX_LEVEL ? level + " (max)" : String.valueOf(level), Formatting.GREEN));
+                }
+            }
+            case "dex xp" -> {
+                if (at != null && at[0] < Power.MAX_LEVEL) {
+                    double next = XpEstimate.need((int) at[0] + 1), have = next - at[1];
+                    double p = Math.max(0, Math.min(1, have / next));
+                    int filled = (int) Math.round(p * BAR);
+                    out.add(new Line(Text.literal("-".repeat(filled)).formatted(Formatting.GREEN).append(Text.literal("-".repeat(BAR - filled)).formatted(Formatting.DARK_GRAY)),
+                            1f, Text.literal((int) (p * 100) + "%").formatted(Formatting.GRAY), false, true));
+                    out.add(new Line(Text.literal(Power.fmt(have)).formatted(Formatting.GREEN).append(Text.literal("/").formatted(Formatting.GRAY))
+                            .append(Text.literal(Power.fmt(next)).formatted(Formatting.RED)), SMALL, null, false, true));
+                }
+            }
+            case "dex catches" -> {
+                if (d != null) {
+                    out.add(item("Catches: ", s.serverHudShortCatches ? abbrev(d[0]) : String.format("%,d", d[0]), Formatting.GREEN));
+                }
+            }
+            case "dex runes" -> {
+                if (d != null && d[1] >= 0) {
+                    out.add(item("Runes: ", d[1] + "/" + d[2], d[1] >= d[2] ? Formatting.GREEN : Formatting.YELLOW));
+                }
+            }
+            default -> { // "dex normal" ... "dex fabled"
+                String name = key.substring(4);
+                int i = java.util.Arrays.asList(Power.VARIANTS).indexOf(name);
+                if (v != null && i >= 0) {
+                    out.add(item(title(name) + ": ", v[i * 2] + "/" + v[i * 2 + 1], v[i * 2] >= v[i * 2 + 1] ? Formatting.GREEN : v[i * 2] == 0 ? Formatting.RED : Formatting.YELLOW));
+                }
             }
         }
-        if (!rows.isEmpty()) {
-            out.add(Text.empty());
-            out.addAll(rows);
+    }
+
+    /** 4392 as "4.3K", 1234567 as "1.2M": one decimal, cut and not rounded, and no ".0". */
+    private static String abbrev(long n) {
+        if (n < 1000) {
+            return String.valueOf(n);
         }
+        boolean m = n >= 1_000_000;
+        long tenths = n / (m ? 100_000 : 100);
+        return (tenths % 10 == 0 ? String.valueOf(tenths / 10) : tenths / 10 + "." + tenths % 10) + (m ? "M" : "K");
+    }
+
+    /** A list item: a grey "- " then the row. */
+    private static Line item(String label, String value, Formatting color) {
+        return plain(Text.literal(DASH).formatted(Formatting.GRAY).append(row(label, value, color)));
     }
 
     private static MutableText weatherLine(String name, String effect, int color) {

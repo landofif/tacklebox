@@ -112,8 +112,12 @@ public class DofiSettings {
     public int serverHudScale = 100;
     public int serverHudImage = 25;
     /** Bite speed, reel speed and prospect as /menu showed them (read by hud/XpEstimate, shown by hud/ServerHud). */
-    /** Lines of the server hud that are switched off, by the keys in ServerHud.LINES. */
+    /** Lines of the server hud that are switched off, by the keys of ServerHud.order(). */
     public java.util.Set<String> serverHudHide = new java.util.HashSet<>();
+    /** The order of the server hud's lines, by key; empty = the start order (ServerHud.order fills in what is missing). */
+    public java.util.List<String> serverHudOrder = new java.util.ArrayList<>();
+    /** The catches line as 4.3K instead of 4,392. */
+    public boolean serverHudShortCatches;
     public java.util.Map<String, String> profileStats = new java.util.LinkedHashMap<>();
     /** What the quests left hud has read in game (hud/XpEstimate): xp per quest, the /menu profile, location levels, fishing xp per level. */
     public double questXp, questLxp;
@@ -392,6 +396,7 @@ public class DofiSettings {
         if (collections == null) collections = new java.util.LinkedHashMap<>();
         if (variants == null) variants = new java.util.LinkedHashMap<>();
         variants.values().removeIf(v -> v == null || v.length != 12);
+        if (serverHudOrder == null) serverHudOrder = new java.util.ArrayList<>();
         if (dex == null) dex = new java.util.LinkedHashMap<>();
         dex.values().removeIf(v -> v == null || v.length != 3);
         if (species == null) species = new java.util.LinkedHashMap<>();
