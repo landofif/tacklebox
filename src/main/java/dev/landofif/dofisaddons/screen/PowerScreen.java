@@ -329,6 +329,19 @@ public class PowerScreen extends DofiScreen {
             }
         }
         BaitPicker.Loc loc = BaitPicker.loc(r.loc());
+        String species = null;
+        long toGo = Long.MAX_VALUE;
+        for (var e : s.collections.entrySet()) {
+            String[] f = e.getValue().split("\\|");
+            if (loc != null && f.length == 4 && loc.fish().stream().anyMatch(x -> x.group().equalsIgnoreCase(e.getKey()))
+                    && Long.parseLong(f[2]) - Long.parseLong(f[1]) < toGo) {
+                toGo = Long.parseLong(f[2]) - Long.parseLong(f[1]);
+                species = e.getKey();
+            }
+        }
+        if (species != null) {
+            out.add("Fish here count for the " + species + " collection too: " + toGo + " more to the next level.");
+        }
         if (cat != null && loc != null) {
             int x = java.util.Arrays.asList(BaitPicker.RARITY).indexOf(cat);
             List<ItemStack> worn = new ArrayList<>();
