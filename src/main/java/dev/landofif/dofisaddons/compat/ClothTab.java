@@ -46,6 +46,7 @@ public final class ClothTab {
         t.menus();
         t.huds();
         t.bobber();
+        t.chat();
         t.world();
         t.screens();
         t.flush();
@@ -216,6 +217,12 @@ public final class ClothTab {
                 () -> s.customLineColor, v -> s.customLineColor = v);
         color("line colour", "the colour of your fishing line.",
                 () -> s.lineColor, v -> s.lineColor = v);
+    }
+
+    private void chat() {
+        header("chat");
+        toggle("hide empty lines", "hides chat lines with nothing in them, the blank gaps the server sends around some messages. announcements lose their spacing lines too.",
+                () -> s.hideEmptyChat, v -> s.hideEmptyChat = v);
     }
 
     private void world() {

@@ -21,7 +21,17 @@ public final class ChatTweaks {
 
     /** @return false to hide the message */
     public static boolean allow(Text message) {
+        DofiSettings st = DofiSettings.get();
+        if (st != null && st.hideEmptyChat && isEmpty(message.getString())) {
+            return false;
+        }
         return hiddenBy(message.getString(), TriggerEngine.isOnFishOnMc(), true) == null;
+    }
+
+    /** Nothing to read: only spaces, and the server's invisible spacing glyphs (U+EEE0 to U+EEEF) or zero width characters. */
+    public static boolean isEmpty(String line) {
+        return line.codePoints().allMatch(c -> Character.isWhitespace(c) || Character.isSpaceChar(c)
+                || (c >= 0xEEE0 && c <= 0xEEEF) || (c >= 0x200B && c <= 0x200F));
     }
 
     /** The first enabled rule that hides {@code line}, or null. {@code count} adds to its session count. */
