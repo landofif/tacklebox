@@ -30,6 +30,9 @@ public class Trigger {
     // ---- Sound ----
     public SoundSettings sound = new SoundSettings();
 
+    // ---- Totem pop ----
+    public TotemSettings totem = new TotemSettings();
+
     public enum MatchMode {
         /** Line contains the pattern; {@code *} = anything, {@code {name}} = capture. */
         SIMPLE,
@@ -58,6 +61,13 @@ public class Trigger {
         public double fadeOutSeconds = 0.6;
         public Animation animation = Animation.POP;
         public boolean shadow = true;
+    }
+
+    /** The vanilla totem of undying animation with another item in it. */
+    public static class TotemSettings {
+        public boolean enabled = false;
+        /** An item id, or {@code pet:<type>} for that pets head (learned from pet items you have opened). {name} placeholders work. */
+        public String item = "minecraft:totem_of_undying";
     }
 
     public static class SoundSettings {
@@ -90,6 +100,8 @@ public class Trigger {
         if (pattern == null) pattern = "";
         if (title == null) title = new TitleSettings();
         if (sound == null) sound = new SoundSettings();
+        if (totem == null) totem = new TotemSettings();
+        if (totem.item == null) totem.item = "minecraft:totem_of_undying";
         if (title.title == null) title.title = "";
         if (title.subtitle == null) title.subtitle = "";
         if (title.titleColor == null) title.titleColor = "#ffffff";

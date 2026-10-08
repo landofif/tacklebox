@@ -124,6 +124,9 @@ public final class TriggerEngine {
         if (trigger.title.enabled) {
             TitleOverlay.show(trigger.title, fill(trigger.title.title, all), fill(trigger.title.subtitle, all));
         }
+        if (trigger.totem.enabled) {
+            dev.landofif.dofisaddons.display.TotemPop.show(fill(trigger.totem.item, all));
+        }
         if (trigger.sound.enabled) {
             SoundQueue.play(trigger.sound);
         }

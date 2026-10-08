@@ -33,7 +33,7 @@ import java.util.function.Consumer;
  */
 public class TriggerEditScreen extends DofiScreen {
     private enum Tab {
-        WHEN("1. when"), TITLE("2. title"), SOUND("3. sound");
+        WHEN("1. when"), TITLE("2. title"), TOTEM("3. totem"), SOUND("4. sound");
         final String label;
         Tab(String label) { this.label = label; }
     }
@@ -96,7 +96,7 @@ public class TriggerEditScreen extends DofiScreen {
         this.fieldW = width - LABEL_W - 4;
 
         // Tabs
-        int tabW = (width - 8) / 3;
+        int tabW = (width - 12) / 4;
         int i = 0;
         for (Tab t : Tab.values()) {
             ButtonWidget b = ButtonWidget.builder(Foe.text(t.label), btn -> switchTab(t))
@@ -109,6 +109,7 @@ public class TriggerEditScreen extends DofiScreen {
         switch (tab) {
             case WHEN -> initWhen();
             case TITLE -> initTitle();
+            case TOTEM -> initTotem();
             case SOUND -> initSound();
         }
 
@@ -225,6 +226,16 @@ public class TriggerEditScreen extends DofiScreen {
         addDrawableChild(toggle(left, y, half, "text shadow", () -> t.shadow, v -> t.shadow = v, "dark shadow behind the letters"));
     }
 
+    private void initTotem() {
+        Trigger.TotemSettings t = draft.totem;
+        int y = FIRST_ROW;
+        addDrawableChild(toggle(left, y, width, "totem pop", () -> t.enabled, v -> t.enabled = v,
+                "the totem of undying animation with an item in it"));
+        y += ROW;
+        textField(y, t.item, 256, v -> t.item = v, "minecraft:totem_of_undying or pet:{pet}")
+                .setTooltip(Tooltip.of(Foe.sentence("an item id, or pet:{pet} for the head of the pet the message names")));
+    }
+
     private void initSound() {
         Trigger.SoundSettings s = draft.sound;
         int y = FIRST_ROW;
@@ -276,6 +287,9 @@ public class TriggerEditScreen extends DofiScreen {
             previewUntil = System.currentTimeMillis()
                     + (long) ((draft.title.fadeInSeconds + draft.title.staySeconds + draft.title.fadeOutSeconds) * 1000);
         }
+        if (draft.totem.enabled) {
+            dev.landofif.dofisaddons.display.TotemPop.show(TriggerEngine.fill(draft.totem.item, values));
+        }
         if (draft.sound.enabled) {
             SoundQueue.play(draft.sound);
         }
@@ -313,6 +327,7 @@ public class TriggerEditScreen extends DofiScreen {
         switch (tab) {
             case WHEN -> renderWhen(context);
             case TITLE -> renderTitle(context);
+            case TOTEM -> renderTotem(context);
             case SOUND -> renderSound(context);
         }
 
@@ -373,6 +388,12 @@ public class TriggerEditScreen extends DofiScreen {
         label(context, "colours", y);
         y += ROW * 4;
         hint(context, "use {n}-style values from step 1, {player}, {count}, {s} (s when lines merged), {matches}. colours: &a &l &o &#ff8800", y + 2);
+    }
+
+    private void renderTotem(DrawContext context) {
+        label(context, "item", FIRST_ROW + ROW);
+        hint(context, "pet:{pet} shows that pets head. open the pets menu once so it is known.", FIRST_ROW + ROW * 2 + 2);
+        hint(context, "a pet it has not seen yet shows a plain head. no sound: use the sound tab.", FIRST_ROW + ROW * 2 + 14);
     }
 
     private void renderSound(DrawContext context) {

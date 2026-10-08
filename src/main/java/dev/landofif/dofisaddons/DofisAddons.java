@@ -107,6 +107,7 @@ public final class DofisAddons implements ClientModInitializer {
             SoundQueue.tick();
             ServerInfo.tick(client);
             XpEstimate.tick(client);
+            dev.landofif.dofisaddons.display.PetHeads.tick(client);
             dev.landofif.dofisaddons.input.KeyCommands.tick(client);
             TriggerEngine.tick();
             while (openKey.wasPressed()) {

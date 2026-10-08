@@ -14,6 +14,7 @@ public final class TriggerPresets {
                 new Preset("blank trigger", "start from scratch", TriggerPresets::blank),
                 new Preset("quest completed", "quests > quest #1-8 has been completed!", TriggerPresets::questComplete),
                 new Preset("pet drop", "pet drop! you pulled ...", TriggerPresets::petDrop),
+                new Preset("pet totem", "pet drop! ... as a totem pop showing the pets head", TriggerPresets::petTotem),
                 new Preset("rare catch", "rare catch! you pulled ... (shards, bottles, capsules)", TriggerPresets::rareCatch),
                 new Preset("climate shard", "rare catch! you pulled a 1x subarctic shard (one per climate)", TriggerPresets::climateShard),
                 new Preset("variant catch", "albino! / melanistic! / trophy! ... you caught a ...", TriggerPresets::variant),
@@ -45,11 +46,26 @@ public final class TriggerPresets {
         return t;
     }
 
+    /** The rarity is a tag glyph (removed before matching) or a word, so it is optional here. */
+    private static final String PET_DROP = "pet drop! you (?:pulled|caught) (?:an? )?(?:(?<rarity>common|rare|epic|legendary|mythic|mythical) )?(?<pet>.+?) pet\\b";
+
+    public static Trigger petTotem() {
+        Trigger t = new Trigger();
+        t.name = "pet totem";
+        t.mode = Trigger.MatchMode.REGEX;
+        t.pattern = PET_DROP;
+        t.title.enabled = false;
+        t.totem.enabled = true;
+        t.totem.item = "pet:{pet}";
+        t.sound.soundId = "minecraft:item.totem.use";
+        return t;
+    }
+
     public static Trigger petDrop() {
         Trigger t = new Trigger();
         t.name = "pet drop";
         t.mode = Trigger.MatchMode.REGEX;
-        t.pattern = "pet drop! you (?:pulled|caught) (?:an? )?(?<rarity>\\S+) (?<pet>.+?)!?$";
+        t.pattern = PET_DROP;
         t.title.title = "&lpet drop!";
         t.title.titleColor = "#fd95f6";
         t.title.subtitle = "{pet.lower}";

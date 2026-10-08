@@ -111,6 +111,8 @@ public class DofiSettings {
     /** Preset rows seen on /presets, kept between sessions so the other page can be drawn: "armor:6" to its pieces as "item|color|floats|strings|model". */
     public java.util.Map<String, java.util.List<String>> presetCache = new java.util.LinkedHashMap<>();
     public boolean presetsOtherBg = false;
+    /** The head of each pet type ("fox", "seaturtle") as a profile component in json, learned from pet items seen in menus (display/PetHeads), for the totem pop. */
+    public java.util.Map<String, String> petHeads = new java.util.LinkedHashMap<>();
     /** Luck and scale of each armour preset seen on /presets, "armor:n" to "subtropical_luck" and so on (menu/BaitPicker reads them). */
     public java.util.Map<String, java.util.Map<String, Double>> presetStats = new java.util.LinkedHashMap<>();
     /** The bait picker screen: location id, where luck and scale come from ("worn" or "armor:n"), extra luck and scale on top (rod, pet), bait tiers on (bit per rarity), lures, bigger sizes count. */
@@ -311,6 +313,7 @@ public class DofiSettings {
         if (need == null) need = new java.util.LinkedHashMap<>();
         if (locationLevels == null) locationLevels = new java.util.LinkedHashMap<>();
         if (presetCache == null) presetCache = new java.util.LinkedHashMap<>();
+        if (petHeads == null) petHeads = new java.util.LinkedHashMap<>();
         if (presetStats == null) presetStats = new java.util.LinkedHashMap<>();
         menuSize = Math.max(40, Math.min(100, menuSize));
         presetsSize = Math.max(40, Math.min(100, presetsSize));
