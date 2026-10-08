@@ -40,7 +40,7 @@ public final class XpEstimate {
     /** The profile item in /menu: "Fishing Level [274]" then "(1.02M/3.73M)". */
     private static final Pattern PROFILE = Pattern.compile("fishing level \\[(\\d+)\\]\\s*\\(\\s*" + NUM + "\\s*/\\s*" + NUM + "\\s*\\)", Pattern.CASE_INSENSITIVE);
 
-    private static final Pattern STATS = Pattern.compile("(Bite Speed|Reel Speed|Prospect)\\W{0,3}([\\d,.]+[KkMm]?(?: \\([^)]*\\))?)");
+    private static final Pattern STATS = Pattern.compile("(Bite Speed|Reel Speed|Prospect)\\W{0,3}([\\d,.]+[KkMm]?(?: \\([^)]*\\))?)", Pattern.CASE_INSENSITIVE); // Glyphs.plain lowercases
 
     private static double questXp, questLxp;
     /** {level, xp the level takes} from the /menu profile, or null until it was opened. */
@@ -158,7 +158,7 @@ public final class XpEstimate {
             if (pm.find()) {
                 Matcher st = STATS.matcher(text);
                 while (st.find()) { // the speeds and prospect sit in the same item, the server hud shows them
-                    DofiSettings.get().profileStats.put(st.group(1), st.group(2));
+                    DofiSettings.get().profileStats.put(st.group(1).toLowerCase(Locale.ROOT), st.group(2));
                 }
                 profile = new double[]{Integer.parseInt(pm.group(1)), num(pm.group(4), pm.group(5))};
             }
