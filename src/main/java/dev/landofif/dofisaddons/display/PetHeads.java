@@ -69,10 +69,29 @@ public final class PetHeads {
         return true;
     }
 
-    /** A player head with the pets texture, or a plain player head if no pet of that type has been seen yet. */
+    private static java.util.Map<String, String> bundled;
+
+    /** The heads shipped with the mod ({@code data/dofisaddons/petheads.json}), so nobody has to meet every pet type first. */
+    private static java.util.Map<String, String> bundled() {
+        if (bundled == null) {
+            bundled = new java.util.HashMap<>();
+            try (var in = PetHeads.class.getResourceAsStream("/data/dofisaddons/petheads.json")) {
+                JsonParser.parseReader(new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8))
+                        .getAsJsonObject().entrySet().forEach(e -> bundled.put(e.getKey(), e.getValue().getAsString()));
+            } catch (Exception e) {
+                dev.landofif.dofisaddons.DofisAddons.LOGGER.error("Could not read the bundled pet heads", e);
+            }
+        }
+        return bundled;
+    }
+
+    /** A player head with the pets texture, the bundled one, or a plain player head for a type that is in neither (a new pet). */
     public static ItemStack head(String type) {
         ItemStack stack = new ItemStack(Items.PLAYER_HEAD);
         String saved = DofiSettings.get().petHeads.get(key(type));
+        if (saved == null) {
+            saved = bundled().get(key(type));
+        }
         if (saved != null) {
             ProfileComponent.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString(saved)).result()
                     .ifPresent(p -> stack.set(DataComponentTypes.PROFILE, p));
