@@ -392,8 +392,8 @@ public final class ServerHud {
             default -> { // "dex normal" ... "dex fabled"
                 String name = key.substring(4);
                 int i = java.util.Arrays.asList(Power.VARIANTS).indexOf(name);
-                if (v != null && i >= 0) {
-                    out.add(item(title(name) + ": ", v[i * 2] + "/" + v[i * 2 + 1], v[i * 2] >= v[i * 2 + 1] ? Formatting.GREEN : v[i * 2] == 0 ? Formatting.RED : Formatting.YELLOW));
+                if (v != null && i >= 0 && v[i * 2] < v[i * 2 + 1]) { // a finished list hides itself here, and shows at the locations that are not
+                    out.add(item(title(name) + ": ", v[i * 2] + "/" + v[i * 2 + 1], v[i * 2] == 0 ? Formatting.RED : Formatting.YELLOW));
                 }
             }
         }
