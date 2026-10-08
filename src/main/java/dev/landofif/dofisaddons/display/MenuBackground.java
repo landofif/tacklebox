@@ -56,6 +56,13 @@ public final class MenuBackground {
         }
     }
 
+    /** Pictures are scaled by the gui, so they get linear filtering; the default is the nearest pixel, which looks blocky. */
+    public static NativeImageBackedTexture smooth(NativeImageBackedTexture tex) {
+        tex.sampler = com.mojang.blaze3d.systems.RenderSystem.getSamplerCache().get(com.mojang.blaze3d.textures.AddressMode.CLAMP_TO_EDGE,
+                com.mojang.blaze3d.textures.AddressMode.CLAMP_TO_EDGE, com.mojang.blaze3d.textures.FilterMode.LINEAR, com.mojang.blaze3d.textures.FilterMode.LINEAR, false);
+        return tex;
+    }
+
     /** False when there is no usable file; checked once a second, reloads when the file changes. */
     private static boolean load() {
         nextCheck = System.currentTimeMillis() + 1000;
@@ -74,7 +81,7 @@ public final class MenuBackground {
                 NativeImage img = NativeImage.read(in);
                 w = img.getWidth();
                 h = img.getHeight();
-                mc.getTextureManager().registerTexture(TEXTURE, new NativeImageBackedTexture(() -> "dofisaddons menu image", img));
+                mc.getTextureManager().registerTexture(TEXTURE, smooth(new NativeImageBackedTexture(() -> "dofisaddons menu image", img)));
             }
             return true;
         } catch (java.io.IOException | RuntimeException e) {

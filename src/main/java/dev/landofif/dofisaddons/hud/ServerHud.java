@@ -293,7 +293,7 @@ public final class ServerHud {
                 NativeImage img = NativeImage.read(in);
                 imageW = img.getWidth();
                 imageH = img.getHeight();
-                mc.getTextureManager().registerTexture(TEXTURE, new NativeImageBackedTexture(() -> "dofisaddons hud image", img));
+                mc.getTextureManager().registerTexture(TEXTURE, dev.landofif.dofisaddons.display.MenuBackground.smooth(new NativeImageBackedTexture(() -> "dofisaddons hud image", img)));
             }
             return true;
         } catch (java.io.IOException | RuntimeException e) {
