@@ -82,7 +82,7 @@ public final class Power {
         int[] left = new int[VARIANTS.length];
         int fish = 0;
         for (int i = 0; v != null && i < left.length; i++) {
-            left[i] = Math.max(0, v[i * 2 + 1] - v[i * 2]);
+            left[i] = VARIANTS[i].equals("fabled") ? 0 : Math.max(0, v[i * 2 + 1] - v[i * 2]); // fabled is a twice a day event at 1/3k with 100 rivals: not something to go for
             fish += left[i] * PER[i];
         }
         boolean maxed = level >= MAX_LEVEL;
