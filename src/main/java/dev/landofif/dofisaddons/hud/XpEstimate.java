@@ -103,6 +103,7 @@ public final class XpEstimate {
             if (open != null) {
                 scan(open);
                 Power.scan(open);
+                dev.landofif.dofisaddons.menu.Compendium.scan(open);
             }
         }
     }

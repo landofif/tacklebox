@@ -19,6 +19,7 @@ public final class TriggerPresets {
                 new Preset("climate shard", "rare catch! you pulled a 1x subarctic shard (one per climate)", TriggerPresets::climateShard),
                 new Preset("shard totem", "rare catch! ... climate shard as a totem pop showing the shard", TriggerPresets::shardTotem),
                 new Preset("variant catch", "albino! / melanistic! / trophy! ... you caught a ...", TriggerPresets::variant),
+                new Preset("new in compendium", "a catch of yours that was missing in the compendium (needs foecollab and one read of that species page)", TriggerPresets::compendium),
                 new Preset("fabled event", "fabled > a fabled event is active at ...", TriggerPresets::fabled),
                 new Preset("storm", "storm > a thunderstorm / supercell has formed!", TriggerPresets::storm),
                 new Preset("moon rising", "full / blue / super / blood moon has risen", TriggerPresets::moon),
@@ -132,6 +133,20 @@ public final class TriggerPresets {
         t.title.title = "&l{variant.lower}!";
         t.title.titleColor = "#55ff55";
         t.title.subtitle = "{fish.lower}";
+        t.title.animation = Trigger.Animation.POP;
+        t.sound.soundId = "minecraft:entity.player.levelup";
+        t.sound.pitch = 1.3;
+        return t;
+    }
+
+    /** The line is made by the mod (menu/Compendium) when a catch fills a missing compendium entry, it is not a server line. */
+    public static Trigger compendium() {
+        Trigger t = new Trigger();
+        t.name = "new in compendium";
+        t.pattern = "compendium > new {variant} fish: {fish} at {place}";
+        t.title.title = "&lnew in compendium!";
+        t.title.titleColor = "#55ff55";
+        t.title.subtitle = "{fish} ({variant})";
         t.title.animation = Trigger.Animation.POP;
         t.sound.soundId = "minecraft:entity.player.levelup";
         t.sound.pitch = 1.3;

@@ -31,6 +31,7 @@
     "MovableBoxWidgetMixin",
     "MoveHudScreenMixin",
     "PlayerNameLabelMixin",
+    "ProfileDataHandlerMixin",
     "PressableWidgetMixin",
     "TextRendererMixin"
   ],
