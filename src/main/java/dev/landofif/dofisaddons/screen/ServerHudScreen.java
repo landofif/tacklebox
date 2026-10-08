@@ -29,7 +29,7 @@ public class ServerHudScreen extends DofiScreen {
     private int held = -1;
     private double heldX, heldY, pressX, pressY;
     private boolean dragging;
-    private ButtonWidget shortCatches;
+    private ButtonWidget shortCatches, roundProspect;
 
     public ServerHudScreen(Screen parent) {
         super(Foe.text("dofis addons · server hud lines"));
@@ -60,24 +60,29 @@ public class ServerHudScreen extends DofiScreen {
         addDrawableChild(new ValueSlider(LEFT, y, full, 20, "picture opacity", 0, 100, 5, "%", s.serverHudImage, v -> s.serverHudImage = (int) v));
         shortCatches = addDrawableChild(ButtonWidget.builder(Text.empty(), b -> {
             s.serverHudShortCatches = !s.serverHudShortCatches;
-            shortLabel();
+            labels();
         }).dimensions(LEFT, y + 24, half, 20).build());
-        shortLabel();
+        roundProspect = addDrawableChild(ButtonWidget.builder(Text.empty(), b -> {
+            s.serverHudRoundProspect = !s.serverHudRoundProspect;
+            labels();
+        }).dimensions(LEFT + half + GAP, y + 24, half, 20).build());
+        labels();
         addDrawableChild(ButtonWidget.builder(Foe.text("reset order"), b -> {
             s.serverHudOrder = new ArrayList<>();
             order = ServerHud.order();
-        }).dimensions(LEFT + half + GAP, y + 24, half, 20).build());
+        }).dimensions(LEFT, y + 48, half, 20).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("open picture folder"), b -> {
             try {
                 java.nio.file.Files.createDirectories(ServerHud.IMAGE.getParent());
             } catch (java.io.IOException ignored) {
             }
             net.minecraft.util.Util.getOperatingSystem().open(ServerHud.IMAGE.getParent());
-        }).dimensions(LEFT, y + 48, full, 20).build());
+        }).dimensions(LEFT + half + GAP, y + 48, half, 20).build());
     }
 
-    private void shortLabel() {
+    private void labels() {
         shortCatches.setMessage(Text.literal(Foe.smallCaps("short catches 4.3k")).formatted(s.serverHudShortCatches ? Formatting.GREEN : Formatting.DARK_GRAY));
+        roundProspect.setMessage(Text.literal(Foe.smallCaps("round prospect 1/35")).formatted(s.serverHudRoundProspect ? Formatting.GREEN : Formatting.DARK_GRAY));
     }
 
     @Override

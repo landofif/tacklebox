@@ -128,63 +128,35 @@ public final class ServerHud {
         DofiSettings s = DofiSettings.get();
         TextRenderer tr = mc.textRenderer;
         List<Line> lines = lines(mc);
-        int w = MIN_WIDTH, h = 0;
+        int w = MIN_WIDTH;
         for (Line l : lines) {
-            w = Math.max(w, l.width(tr));
-            h += l.pitch();
+            w = Math.max(w, tr.getWidth(l.text));
         }
         float k = s.serverHudScale / 100f;
+        int h = lines.size() * LINE;
         int[] rect = {hx, hy, Math.round((w + 2 * PAD) * k), Math.round((h + 2 * PAD) * k)};
         image(ctx, mc, rect, s.serverHudImage);
         var m = ctx.getMatrices();
         m.pushMatrix();
         m.translate(hx, hy);
         m.scale(k, k);
-        int y = PAD;
-        for (Line l : lines) {
-            int x = PAD + (l.center ? (w - l.width(tr)) / 2 : l.indent ? tr.getWidth(DASH) : 0);
-            scaled(ctx, tr, l.text, x, y, l.scale);
-            if (l.side != null) {
-                scaled(ctx, tr, l.side, x + Math.round(tr.getWidth(l.text) * l.scale) + 4, y + 1, SMALL);
-            }
-            y += l.pitch();
+        for (int i = 0; i < lines.size(); i++) {
+            Line l = lines.get(i);
+            int x = l.center ? PAD + (w - tr.getWidth(l.text)) / 2 : PAD;
+            ctx.drawTextWithShadow(tr, l.text, x, PAD + i * LINE, 0xFFFFFFFF);
         }
         m.popMatrix();
         return rect;
     }
 
-    private static void scaled(DrawContext ctx, TextRenderer tr, Text t, int x, int y, float scale) {
-        if (scale == 1f) {
-            ctx.drawTextWithShadow(tr, t, x, y, 0xFFFFFFFF);
-            return;
-        }
-        var m = ctx.getMatrices();
-        m.pushMatrix();
-        m.translate(x, y);
-        m.scale(scale, scale);
-        ctx.drawTextWithShadow(tr, t, 0, 0, 0xFFFFFFFF);
-        m.popMatrix();
-    }
-
-    /** One line of the hud: the text (at {@code scale}), small grey text after it, centred (the title) or indented under a "- " item (the xp bar). */
-    private record Line(Text text, float scale, Text side, boolean center, boolean indent) {
-        int pitch() {
-            return Math.round(LINE * scale);
-        }
-
-        int width(TextRenderer tr) {
-            return Math.round(tr.getWidth(text) * scale) + (side == null ? 0 : 4 + Math.round(tr.getWidth(side) * SMALL)) + (indent ? tr.getWidth(DASH) : 0);
-        }
-
+    /** One line of the hud; the title is centred. */
+    private record Line(Text text, boolean center) {
         boolean blank() {
-            return side == null && text.getString().isEmpty();
+            return text.getString().isEmpty();
         }
     }
 
-    private static final float SMALL = 0.75f;
     private static final String DASH = "- ";
-    /** The xp bar is this many dashes wide. */
-    private static final int BAR = 10;
 
     /** Every line the hud can show as {key, name}, in the order they start in; a chip switches one off by its key ({@link DofiSettings#serverHudHide}). */
     private static final Map<String, String> LABEL = new LinkedHashMap<>();
@@ -194,7 +166,7 @@ public final class ServerHud {
                 {"level", "level"}, {"wallet", "wallet"}, {"credits", "credits"}, {"space 2", "blank line"},
                 {"bite speed", "bite speed"}, {"reel speed", "reel speed"}, {"luck", "luck"}, {"scale", "scale"},
                 {"prospect", "prospect value"}, {"prospect chance", "prospect chance"}, {"space 3", "blank line"},
-                {"dex location", "compendium location"}, {"dex level", "location level"}, {"dex xp", "location xp bar"}, {"dex catches", "catches"},
+                {"dex location", "compendium location"}, {"dex level", "location level"}, {"dex catches", "catches"},
                 {"dex runes", "runes"}, {"dex normal", "normal fish"}, {"dex gigantic", "gigantic fish"}, {"dex albino", "albino fish"},
                 {"dex melanistic", "melanistic fish"}, {"dex trophy", "trophy fish"}, {"dex fabled", "fabled fish"}, {"space 4", "blank line"},
                 {"shop", "tackle shop timer"}, {"moon", "moon"}, {"weather", "weather and events"}}) {
@@ -232,7 +204,7 @@ public final class ServerHud {
     }
 
     private static Line plain(Text t) {
-        return new Line(t, 1f, null, false, false);
+        return new Line(t, false);
     }
 
     private static List<Line> lines(MinecraftClient mc) {
@@ -260,7 +232,7 @@ public final class ServerHud {
     private static void add(List<Line> out, String key, MinecraftClient mc) {
         var stats = DofiSettings.get().profileStats;
         switch (key) {
-            case "title" -> out.add(new Line(Text.literal("FISHONMC").formatted(Formatting.GOLD, Formatting.BOLD), 1f, null, true, false));
+            case "title" -> out.add(new Line(Text.literal("FISHONMC").formatted(Formatting.GOLD, Formatting.BOLD), true));
             case "clock" -> {
                 String clock = (ServerInfo.time + " " + ServerInfo.ampm + " " + ServerInfo.temperature).trim();
                 if (!clock.isEmpty()) {
@@ -278,8 +250,7 @@ public final class ServerHud {
                     out.add(plain(row("Players: ", String.valueOf(tab.getPlayerList().size()), Formatting.GREEN)));
                 }
             }
-            case "level" -> out.add(new Line(row("Level: ", String.valueOf(mc.player.experienceLevel), Formatting.GREEN), 1f,
-                    Text.literal("(" + (int) (mc.player.experienceProgress * 100) + "%)").formatted(Formatting.GRAY), false, false));
+            case "level" -> out.add(plain(row("Level: ", String.valueOf(mc.player.experienceLevel), Formatting.GREEN).append(percent(mc.player.experienceProgress))));
             case "wallet" -> {
                 if (!ServerInfo.wallet.isEmpty()) {
                     out.add(plain(row("Wallet: ", "$" + ServerInfo.wallet, Formatting.GOLD)));
@@ -332,15 +303,20 @@ public final class ServerHud {
             String chance = at < 0 ? "" : prospect.substring(at + 2, prospect.length() - 1);
             boolean v = on("prospect"), c = on("prospect chance") && !chance.isEmpty();
             if (v || c) {
-                out.add(plain(row("Prospect: ", (v ? value : "") + (v && c ? " (" + chance + ")" : c ? chance : ""), Formatting.GREEN)));
+                String text = (v ? value : "") + (v && c ? " (" + chance + ")" : c ? chance : "");
+                if (DofiSettings.get().serverHudRoundProspect) { // 1/34.96 as 1/35
+                    text = Pattern.compile("/(\\d[\\d,]*(?:\\.\\d+)?)").matcher(text)
+                            .replaceAll(r -> "/" + String.format("%,d", Math.round(Double.parseDouble(r.group(1).replace(",", "")))));
+                }
+                out.add(plain(row("Prospect: ", text, Formatting.GREEN)));
             }
         }
     }
 
     /**
      * One compendium line of the location you are at, as of the last time its compendium page was open (the level also moves with
-     * the location xp in chat). The location name is the heading, the rest are list items with a "-" in front, and the xp is a
-     * bar of {@link #BAR} dashes with the percentage after it and the amounts under it, small.
+     * the location xp in chat). The location name is the heading, the rest are list items with a "-" in front, and the level
+     * has its progress in grey after it.
      */
     private static void compendium(List<Line> out, String key) {
         Locations.Location loc = Locations.byName(ServerInfo.locationName);
@@ -356,18 +332,9 @@ public final class ServerHud {
             case "dex level" -> {
                 if (at != null) {
                     int level = (int) at[0];
-                    out.add(item("Location Level: ", level >= Power.MAX_LEVEL ? level + " (max)" : String.valueOf(level), Formatting.GREEN));
-                }
-            }
-            case "dex xp" -> {
-                if (at != null && at[0] < Power.MAX_LEVEL) {
-                    double next = XpEstimate.need((int) at[0] + 1), have = next - at[1];
-                    double p = Math.max(0, Math.min(1, have / next));
-                    int filled = (int) Math.round(p * BAR);
-                    out.add(new Line(Text.literal("-".repeat(filled)).formatted(Formatting.GREEN).append(Text.literal("-".repeat(BAR - filled)).formatted(Formatting.DARK_GRAY)),
-                            1f, Text.literal((int) (p * 100) + "%").formatted(Formatting.GRAY), false, true));
-                    out.add(new Line(Text.literal(Power.fmt(have)).formatted(Formatting.GREEN).append(Text.literal("/").formatted(Formatting.GRAY))
-                            .append(Text.literal(Power.fmt(next)).formatted(Formatting.RED)), SMALL, null, false, true));
+                    double next = XpEstimate.need(level + 1);
+                    MutableText t = Text.literal(DASH).formatted(Formatting.GRAY).append(row("Location Level: ", level >= Power.MAX_LEVEL ? level + " (max)" : String.valueOf(level), Formatting.GREEN));
+                    out.add(plain(level >= Power.MAX_LEVEL ? t : t.append(percent((next - at[1]) / next))));
                 }
             }
             case "dex catches" -> {
@@ -398,6 +365,11 @@ public final class ServerHud {
         boolean m = n >= 1_000_000;
         long tenths = n / (m ? 100_000 : 100);
         return (tenths % 10 == 0 ? String.valueOf(tenths / 10) : tenths / 10 + "." + tenths % 10) + (m ? "M" : "K");
+    }
+
+    /** " (89%)" in grey, cut and not rounded so it never says 100 before the level is up. */
+    private static MutableText percent(double p) {
+        return Text.literal(" (" + (int) (Math.max(0, Math.min(1, p)) * 100) + "%)").formatted(Formatting.GRAY);
     }
 
     /** A list item: a grey "- " then the row. */

@@ -118,6 +118,8 @@ public class DofiSettings {
     public java.util.List<String> serverHudOrder = new java.util.ArrayList<>();
     /** The catches line as 4.3K instead of 4,392. */
     public boolean serverHudShortCatches;
+    /** The prospect chance as 1/35 instead of 1/34.96. */
+    public boolean serverHudRoundProspect;
     public java.util.Map<String, String> profileStats = new java.util.LinkedHashMap<>();
     /** What the quests left hud has read in game (hud/XpEstimate): xp per quest, the /menu profile, location levels, fishing xp per level. */
     public double questXp, questLxp;
