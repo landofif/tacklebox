@@ -54,7 +54,8 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
     @Unique
     private boolean dofisaddons$restyled() {
         Object self = this;
-        return DofiSettings.get().flatMenus && (self instanceof GenericContainerScreen || self instanceof ShulkerBoxScreen || self instanceof HopperScreen
+        // the auction house pages (title art U+D541-D546) keep the server's chest art
+        return DofiSettings.get().flatMenus && !title.getString().chars().anyMatch(c -> c >= 0xD541 && c <= 0xD546) && (self instanceof GenericContainerScreen || self instanceof ShulkerBoxScreen || self instanceof HopperScreen
                 || self instanceof Generic3x3ContainerScreen || self instanceof InventoryScreen);
     }
 
