@@ -91,13 +91,18 @@ public final class ServerHud {
     }
 
     public static int[] draw(DrawContext ctx, boolean preview) {
+        DofiSettings s = DofiSettings.get();
+        return draw(ctx, s.serverHudX, s.serverHudY);
+    }
+
+    public static int[] draw(DrawContext ctx, int hx, int hy) {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null) {
             return null;
         }
         DofiSettings s = DofiSettings.get();
         TextRenderer tr = mc.textRenderer;
-        List<Text> lines = lines(mc, preview);
+        List<Text> lines = lines(mc);
         int w = 0;
         for (Text t : lines) {
             w = Math.max(w, tr.getWidth(t));
@@ -105,11 +110,11 @@ public final class ServerHud {
         w = Math.max(w, MIN_WIDTH);
         float k = s.serverHudScale / 100f;
         int h = lines.size() * LINE;
-        int[] rect = {s.serverHudX, s.serverHudY, Math.round((w + 2 * PAD) * k), Math.round((h + 2 * PAD) * k)};
+        int[] rect = {hx, hy, Math.round((w + 2 * PAD) * k), Math.round((h + 2 * PAD) * k)};
         image(ctx, mc, rect, s.serverHudImage);
         var m = ctx.getMatrices();
         m.pushMatrix();
-        m.translate(s.serverHudX, s.serverHudY);
+        m.translate(hx, hy);
         m.scale(k, k);
         for (int i = 0; i < lines.size(); i++) {
             Text t = lines.get(i);
@@ -121,7 +126,7 @@ public final class ServerHud {
     }
 
     /** Every line the hud can show, by the key {@link DofiSettings#serverHudHide} switches it off with. */
-    public static final String[][] LINES = {{"title", "title"}, {"clock", "time and weather"}, {"location", "location"}, {"players", "players"},
+    public static final String[][] LINES = {{"title", "title"}, {"clock", "time"}, {"weather", "weather"}, {"location", "location"}, {"players", "players"},
             {"level", "level"}, {"wallet", "wallet"}, {"credits", "credits"}, {"bite speed", "bite speed"}, {"reel speed", "reel speed"},
             {"luck", "luck"}, {"scale", "scale"}, {"prospect", "prospect value"}, {"prospect chance", "prospect chance"},
             {"shop", "tackle shop timer"}, {"moon", "moon"}, {"events", "active events"}};
@@ -132,7 +137,7 @@ public final class ServerHud {
         return !DofiSettings.get().serverHudHide.contains(key);
     }
 
-    private static List<Text> lines(MinecraftClient mc, boolean preview) {
+    private static List<Text> lines(MinecraftClient mc) {
         List<Text> out = new ArrayList<>();
         titleShown = on("title");
         if (titleShown) {
@@ -140,7 +145,10 @@ public final class ServerHud {
         }
         String clock = (ServerInfo.time + " " + ServerInfo.ampm + " " + ServerInfo.temperature).trim();
         if (on("clock") && !clock.isEmpty()) {
-            out.add(Text.literal(clock + (ServerInfo.weather.isEmpty() ? "" : "  " + ServerInfo.weather)).formatted(Formatting.GRAY));
+            out.add(Text.literal(clock).formatted(Formatting.GRAY));
+        }
+        if (on("weather") && !ServerInfo.weather.isEmpty()) {
+            out.add(Text.literal(title(ServerInfo.weather)).formatted(Formatting.GRAY));
         }
         if (on("location") && !ServerInfo.locationName.isEmpty()) {
             out.add(Text.literal("⏣ ").formatted(Formatting.GRAY).append(Text.literal(title(ServerInfo.locationName)).formatted(Formatting.GREEN)));
