@@ -12,7 +12,7 @@ import net.minecraft.util.Identifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/** A see-through colour and an optional picture (config/dofisaddons/menu.png, cropped to cover) behind the box-less menus. */
+/** A see-through colour and an optional picture (config/dofisaddons/menu.png, cropped to cover) behind the box-less menus, with rounded corners. */
 public final class MenuBackground {
     public static final Path IMAGE = FabricLoader.getInstance().getConfigDir().resolve("dofisaddons").resolve("menu.png");
     private static final Identifier TEXTURE = Identifier.of("dofisaddons", "menu_image");
@@ -22,20 +22,38 @@ public final class MenuBackground {
 
     private MenuBackground() {}
 
+    /** Radius of the rounded corners in gui pixels. */
+    private static final int CORNER = 6;
+
     public static void draw(DrawContext ctx, int x, int y, int width, int height) {
         DofiSettings s = DofiSettings.get();
-        if (s.menuBgOpacity > 0) {
-            ctx.fill(x, y, x + width, y + height, (s.menuBgOpacity * 255 / 100) << 24 | s.menuBgColor & 0xFFFFFF);
-        }
-        if (s.menuImageOpacity <= 0 || System.currentTimeMillis() > nextCheck && !load() || stamp < 0) {
+        int fill = (s.menuBgOpacity * 255 / 100) << 24 | s.menuBgColor & 0xFFFFFF;
+        boolean picture = s.menuImageOpacity > 0 && (System.currentTimeMillis() <= nextCheck || load()) && stamp >= 0;
+        if (s.menuBgOpacity <= 0 && !picture) {
             return;
         }
-        double k = Math.max((double) width / w, (double) height / h);
-        int dw = (int) Math.round(w * k), dh = (int) Math.round(h * k);
-        ctx.enableScissor(x, y, x + width, y + height);
-        ctx.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, x + (width - dw) / 2, y + (height - dh) / 2, 0f, 0f, dw, dh, w, h, w, h,
-                (s.menuImageOpacity * 255 / 100) << 24 | 0xFFFFFF);
-        ctx.disableScissor();
+        double k = picture ? Math.max((double) width / w, (double) height / h) : 0;
+        int dw = (int) Math.round(w * k), dh = (int) Math.round(h * k), px = x + (width - dw) / 2, py = y + (height - dh) / 2;
+        int tint = (s.menuImageOpacity * 255 / 100) << 24 | 0xFFFFFF;
+        int radius = Math.min(CORNER, Math.min(width, height) / 2);
+        paint(ctx, x, y + radius, x + width, y + height - radius, s.menuBgOpacity > 0 ? fill : 0, picture, px, py, dw, dh, tint); // the middle
+        for (int i = 0; i < radius; i++) { // the corners, a row at a time
+            double up = radius - i - 0.5;
+            int inset = radius - (int) Math.round(Math.sqrt(radius * radius - up * up));
+            paint(ctx, x + inset, y + i, x + width - inset, y + i + 1, s.menuBgOpacity > 0 ? fill : 0, picture, px, py, dw, dh, tint);
+            paint(ctx, x + inset, y + height - 1 - i, x + width - inset, y + height - i, s.menuBgOpacity > 0 ? fill : 0, picture, px, py, dw, dh, tint);
+        }
+    }
+
+    private static void paint(DrawContext ctx, int x1, int y1, int x2, int y2, int fill, boolean picture, int px, int py, int dw, int dh, int tint) {
+        if (fill != 0) {
+            ctx.fill(x1, y1, x2, y2, fill);
+        }
+        if (picture) {
+            ctx.enableScissor(x1, y1, x2, y2);
+            ctx.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, px, py, 0f, 0f, dw, dh, w, h, w, h, tint);
+            ctx.disableScissor();
+        }
     }
 
     /** False when there is no usable file; checked once a second, reloads when the file changes. */
