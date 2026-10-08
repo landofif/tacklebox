@@ -18,9 +18,22 @@ public final class KeyCommands {
         public String command = "";
     }
 
+    /** Mouse buttons are stored as {@code MOUSE + glfw button} (3 is "mouse 4", 4 is "mouse 5"), keys as their glfw code. */
+    public static final int MOUSE = 1000;
+
     private static final Set<Integer> held = new HashSet<>();
 
     private KeyCommands() {}
+
+    private static boolean pressed(MinecraftClient client, int key) {
+        return key >= MOUSE ? org.lwjgl.glfw.GLFW.glfwGetMouseButton(client.getWindow().getHandle(), key - MOUSE) == org.lwjgl.glfw.GLFW.GLFW_PRESS
+                : InputUtil.isKeyPressed(client.getWindow(), key);
+    }
+
+    /** What the key is called in the editor. */
+    public static String label(int key) {
+        return key >= MOUSE ? "mouse " + (key - MOUSE + 1) : InputUtil.Type.KEYSYM.createFromCode(key).getLocalizedText().getString().toLowerCase();
+    }
 
     public static void tick(MinecraftClient client) {
         DofiSettings s = DofiSettings.get();
@@ -30,7 +43,7 @@ public final class KeyCommands {
         boolean canRun = client.currentScreen == null && client.player != null && client.getOverlay() == null;
         Set<Integer> now = new HashSet<>();
         for (Entry e : s.keyCommands) {
-            if (e.key < 0 || e.command.isBlank() || !InputUtil.isKeyPressed(client.getWindow(), e.key)) {
+            if (e.key < 0 || e.command.isBlank() || !pressed(client, e.key)) {
                 continue;
             }
             now.add(e.key);

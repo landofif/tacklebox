@@ -56,7 +56,7 @@ public class KeyCommandScreen extends DofiScreen {
             ButtonWidget key = ButtonWidget.builder(keyLabel(e), b -> {
                 listening = e;
                 rebuild();
-            }).dimensions(0, 0, KEY_W, 20).tooltip(Tooltip.of(Foe.sentence("click, then press the key. esc cancels, delete unbinds"))).build();
+            }).dimensions(0, 0, KEY_W, 20).tooltip(Tooltip.of(Foe.sentence("click, then press the key or a mouse button (middle, 4, 5...). esc cancels, delete unbinds"))).build();
 
             TextFieldWidget command = new TextFieldWidget(textRenderer, 0, 0, cmdW, 20, Foe.text("command"));
             command.setMaxLength(256);
@@ -78,7 +78,18 @@ public class KeyCommandScreen extends DofiScreen {
             return Foe.text("press a key…").formatted(Formatting.YELLOW);
         }
         return e.key < 0 ? Foe.text("not set").formatted(Formatting.DARK_GRAY)
-                : Foe.text(InputUtil.Type.KEYSYM.createFromCode(e.key).getLocalizedText().getString().toLowerCase());
+                : Foe.text(KeyCommands.label(e.key));
+    }
+
+    @Override
+    public boolean mouseClicked(net.minecraft.client.gui.Click click, boolean doubled) {
+        if (listening != null && click.button() >= 2) { // left and right still click the screen
+            listening.key = KeyCommands.MOUSE + click.button();
+            listening = null;
+            rebuild();
+            return true;
+        }
+        return super.mouseClicked(click, doubled);
     }
 
     @Override
