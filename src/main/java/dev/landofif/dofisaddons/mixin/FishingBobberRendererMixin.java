@@ -37,9 +37,6 @@ public class FishingBobberRendererMixin {
     private void dofisaddons$begin(FishingBobberEntityState state, MatrixStack matrices, OrderedRenderCommandQueue queue,
                                    CameraRenderState camera, CallbackInfo ci) {
         BobberLooks.drawingMine = ((BobberStateAccess) state).dofisaddons$isMine();
-        if (BobberLooks.drawingMine) {
-            dev.landofif.dofisaddons.display.BobberTimer.drawLabel(state.age, matrices, queue, camera);
-        }
     }
 
     @Redirect(method = RENDER, require = 0, at = @At(value = "FIELD", opcode = Opcodes.GETSTATIC,

@@ -6,16 +6,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.render.Camera;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.item.Items;
-import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.client.font.TextRenderer.TextLayerType;
 
 /**
  * Your own bobber's waiting time (a hud element and/or text over the bobber) and the bite notification.
@@ -90,6 +86,9 @@ public final class BobberTimer {
         if ((live || preview) && (s.timerMode == DofiSettings.TimerMode.HUD || s.timerMode == DofiSettings.TimerMode.BOTH)) {
             drawTimer(ctx, preview && !live);
         }
+        if (hook != null && (s.timerMode == DofiSettings.TimerMode.BOBBER || s.timerMode == DofiSettings.TimerMode.BOTH)) {
+            drawOverBobber(ctx, client, hook);
+        }
         if (s.biteOn && (biteAt != 0 || preview)) {
             drawBite(ctx, false);
         }
@@ -142,10 +141,13 @@ public final class BobberTimer {
 
     private static int[] centered(DrawContext ctx, Text text, double xPct, double yPct, float scale, float alpha,
                                   float dx, float dy, int argb, boolean shadow) {
-        TextRenderer tr = MinecraftClient.getInstance().textRenderer;
         int sw = ctx.getScaledWindowWidth(), sh = ctx.getScaledWindowHeight();
+        return drawAt(ctx, text, (float) (sw * xPct / 100) + dx, (float) (sh * yPct / 100) + dy, scale, alpha, argb, shadow);
+    }
+
+    private static int[] drawAt(DrawContext ctx, Text text, float cx, float cy, float scale, float alpha, int argb, boolean shadow) {
+        TextRenderer tr = MinecraftClient.getInstance().textRenderer;
         int w = tr.getWidth(text), h = 9;
-        float cx = (float) (sw * xPct / 100) + dx, cy = (float) (sh * yPct / 100) + dy;
         int a = Math.max(4, (int) (alpha * 255));
         ctx.getMatrices().pushMatrix();
         ctx.getMatrices().translate(cx, cy);
@@ -157,22 +159,31 @@ public final class BobberTimer {
 
     // ---------------------------------------------------------------- over the bobber
 
-    /** Called while a bobber is drawn, with the matrices at the bobber. Only yours, only with the timer on the bobber. */
-    public static void drawLabel(float ageTicks, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState camera) {
+    /**
+     * The timer over the bobber, drawn in the hud at the bobber's projected spot: text drawn in the world is
+     * flushed by layer with the models, so a player model (a hat) could cover it. The size follows the distance.
+     */
+    private static void drawOverBobber(DrawContext ctx, MinecraftClient client, FishingBobberEntity hook) {
         DofiSettings s = DofiSettings.get();
-        if (s.timerMode != DofiSettings.TimerMode.BOBBER && s.timerMode != DofiSettings.TimerMode.BOTH) {
-            return;
+        float tick = client.getRenderTickCounter().getTickProgress(false);
+        Camera camera = client.gameRenderer.getCamera();
+        Vec3d p = hook.getLerpedPos(tick).add(0, s.timerHeight, 0).subtract(camera.getCameraPos());
+        // the camera's unit vectors: horizontalPlane looks ahead, diagonalPlane is to the left, verticalPlane up
+        Vec3d forward = new Vec3d(camera.getHorizontalPlane());
+        Vec3d left = new Vec3d(camera.getDiagonalPlane());
+        Vec3d up = new Vec3d(camera.getVerticalPlane());
+        double depth = p.dotProduct(forward);
+        if (depth <= 0.05) {
+            return; // behind you
         }
-        TextRenderer tr = MinecraftClient.getInstance().textRenderer;
-        OrderedText text = Foe.bold(format(ageTicks / 20f)).asOrderedText();
-        float k = 0.025f * s.timerWorldSize / 100f;
-        matrices.push();
-        matrices.translate(0, s.timerHeight, 0);
-        matrices.multiply(camera.orientation);
-        matrices.scale(k, -k, k);
-        // a later batch than the models, or a player model (your hat) is drawn over the text
-        queue.getBatchingQueue(100).submitText(matrices, -tr.getWidth(text) / 2f, 0, text, s.timerShadow, TextLayerType.SEE_THROUGH,
-                LightmapTextureManager.MAX_LIGHT_COORDINATE, 0xFF000000 | s.timerColor, 0, 0);
-        matrices.pop();
+        double tan = Math.tan(Math.toRadians(client.options.getFov().getValue()) / 2);
+        double aspect = (double) client.getWindow().getFramebufferWidth() / client.getWindow().getFramebufferHeight();
+        double a = p.dotProduct(left) / (depth * tan * aspect); // +1 is the left edge of the screen
+        double b = p.dotProduct(up) / (depth * tan); // +1 is the top
+        int sw = ctx.getScaledWindowWidth(), sh = ctx.getScaledWindowHeight();
+        float pixelsPerBlock = (float) (sh / (2 * tan * depth));
+        float scale = Math.max(0.4f, Math.min(8f, 0.025f * s.timerWorldSize / 100f * pixelsPerBlock));
+        drawAt(ctx, Foe.bold(format((hook.age + tick) / 20f)), (float) (sw * (0.5 - a / 2)), (float) (sh * (0.5 - b / 2)),
+                scale, 1f, 0xFF000000 | s.timerColor, s.timerShadow);
     }
 }
