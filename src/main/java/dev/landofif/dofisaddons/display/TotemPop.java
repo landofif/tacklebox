@@ -12,7 +12,7 @@ import java.util.Locale;
 public final class TotemPop {
     private TotemPop() {}
 
-    /** {@code spec} is an item id or {@code pet:<type>}; anything else shows the totem. */
+    /** {@code spec} is an item id, {@code pet:<type>} or {@code shard:<climate>}; anything else shows the totem. */
     public static void show(String spec) {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null) {
@@ -22,6 +22,8 @@ public final class TotemPop {
         ItemStack stack;
         if (spec.toLowerCase(Locale.ROOT).startsWith("pet:")) {
             stack = PetHeads.head(spec.substring(4));
+        } else if (spec.toLowerCase(Locale.ROOT).startsWith("shard:")) {
+            stack = PetHeads.head(spec);
         } else {
             Identifier id = Identifier.tryParse(spec.toLowerCase(Locale.ROOT));
             stack = id != null && Registries.ITEM.containsId(id) ? new ItemStack(Registries.ITEM.get(id)) : new ItemStack(Items.TOTEM_OF_UNDYING);

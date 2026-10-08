@@ -12,7 +12,7 @@ import net.minecraft.item.Items;
 import java.util.Locale;
 
 /**
- * The head of each pet type, for the totem pop. The server gives pet items a player head with a texture per pet, and the
+ * The head of each pet type and climate shard ("shard:subarctic"), for the totem pop. The server gives pet items a player head with a texture per pet, and the
  * chat line only names the type, so the texture is remembered from any pet item that shows up in the inventory or an open
  * menu (pets menu, vaults, and the vaults saved earlier). Pets wearing a skin are skipped, their head is the skin's.
  */
@@ -24,7 +24,7 @@ public final class PetHeads {
 
     /** "Sea Turtle" and "seaturtle" are the same pet. */
     private static String key(String type) {
-        return type.toLowerCase(Locale.ROOT).replaceAll("[^a-z]", "");
+        return type.toLowerCase(Locale.ROOT).replaceAll("[^a-z:]", ""); // "shard:semi-arid" keeps its prefix
     }
 
     public static void tick(MinecraftClient client) {
@@ -57,8 +57,8 @@ public final class PetHeads {
         }
         var nbt = cd.copyNbt();
         String type = nbt.getString("type", "");
-        String pet = key(nbt.getString("pet", ""));
-        if (!type.equals("pet") || pet.isEmpty() || nbt.contains("skin")) {
+        String pet = type.equals("armorShard") ? key("shard:" + nbt.getString("name", "")) : key(nbt.getString("pet", ""));
+        if (!type.equals("pet") && !type.equals("armorShard") || pet.isEmpty() || nbt.contains("skin")) {
             return false;
         }
         var json = ProfileComponent.CODEC.encodeStart(JsonOps.INSTANCE, profile).result();
@@ -85,7 +85,7 @@ public final class PetHeads {
         return bundled;
     }
 
-    /** A player head with the pets texture, the bundled one, or a plain player head for a type that is in neither (a new pet). */
+    /** A player head with the pets (or {@code shard:<climate>}) texture, the bundled one, or a plain player head for a type that is in neither (a new pet). */
     public static ItemStack head(String type) {
         ItemStack stack = new ItemStack(Items.PLAYER_HEAD);
         String saved = DofiSettings.get().petHeads.get(key(type));

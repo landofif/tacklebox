@@ -232,7 +232,7 @@ public class TriggerEditScreen extends DofiScreen {
         addDrawableChild(toggle(left, y, width, "totem pop", () -> t.enabled, v -> t.enabled = v,
                 "the totem of undying animation with an item in it"));
         y += ROW;
-        textField(y, t.item, 256, v -> t.item = v, "minecraft:totem_of_undying or pet:{pet}")
+        textField(y, t.item, 256, v -> t.item = v, "minecraft:totem_of_undying, pet:{pet} or shard:{climate}")
                 .setTooltip(Tooltip.of(Foe.sentence("an item id, or pet:{pet} for the head of the pet the message names")));
     }
 
@@ -392,7 +392,7 @@ public class TriggerEditScreen extends DofiScreen {
 
     private void renderTotem(DrawContext context) {
         label(context, "item", FIRST_ROW + ROW);
-        hint(context, "pet:{pet} shows that pets head. open the pets menu once so it is known.", FIRST_ROW + ROW * 2 + 2);
+        hint(context, "pet:{pet} and shard:{climate} show that heads, learned from the items you open.", FIRST_ROW + ROW * 2 + 2);
         hint(context, "a pet it has not seen yet shows a plain head. no sound: use the sound tab.", FIRST_ROW + ROW * 2 + 14);
     }
 

@@ -17,6 +17,7 @@ public final class TriggerPresets {
                 new Preset("pet totem", "pet drop! ... as a totem pop showing the pets head", TriggerPresets::petTotem),
                 new Preset("rare catch", "rare catch! you pulled ... (shards, bottles, capsules)", TriggerPresets::rareCatch),
                 new Preset("climate shard", "rare catch! you pulled a 1x subarctic shard (one per climate)", TriggerPresets::climateShard),
+                new Preset("shard totem", "rare catch! ... climate shard as a totem pop showing the shard", TriggerPresets::shardTotem),
                 new Preset("variant catch", "albino! / melanistic! / trophy! ... you caught a ...", TriggerPresets::variant),
                 new Preset("fabled event", "fabled > a fabled event is active at ...", TriggerPresets::fabled),
                 new Preset("storm", "storm > a thunderstorm / supercell has formed!", TriggerPresets::storm),
@@ -91,11 +92,26 @@ public final class TriggerPresets {
     }
 
     /** One shard per climate: "RARE CATCH! You caught a 1x Subarctic Shard!". */
+    /** Anchored like {@link #PET_DROP}: other players' catches come with a "! [n] name »" prefix. */
+    private static final String SHARD = "^rare catch! you (?:pulled|caught) an? (?<n>\\d+)x (?<climate>[a-z -]+?) shard";
+
+    public static Trigger shardTotem() {
+        Trigger t = new Trigger();
+        t.name = "shard totem";
+        t.mode = Trigger.MatchMode.REGEX;
+        t.pattern = SHARD;
+        t.title.enabled = false;
+        t.totem.enabled = true;
+        t.totem.item = "shard:{climate}";
+        t.sound.soundId = "minecraft:item.totem.use";
+        return t;
+    }
+
     public static Trigger climateShard() {
         Trigger t = new Trigger();
         t.name = "climate shard";
         t.mode = Trigger.MatchMode.REGEX;
-        t.pattern = "You (?:pulled|caught) an? (?<n>\\d+)x (?<climate>[a-z -]+?) Shard";
+        t.pattern = SHARD;
         t.title.title = "&l{climate.lower} shard!";
         t.title.titleColor = "#ffaa00";
         t.title.subtitle = "{n}x";
