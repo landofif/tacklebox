@@ -17,6 +17,18 @@ public interface ChatHudAccessor {
     @Accessor("visibleMessages")
     List<ChatHudLine.Visible> dofisaddons$visibleMessages();
 
+    @Accessor("scrolledLines")
+    int dofisaddons$scrolled();
+
+    @Accessor("scrolledLines")
+    void dofisaddons$setScrolled(int lines);
+
+    @Accessor("hasUnreadNewMessages")
+    boolean dofisaddons$unread();
+
+    @Invoker("getLineHeight")
+    int dofisaddons$lineHeight();
+
     @Invoker("refresh")
     void dofisaddons$refresh();
 

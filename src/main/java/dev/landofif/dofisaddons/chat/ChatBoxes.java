@@ -52,6 +52,11 @@ public final class ChatBoxes {
         int version;
         int wrappedVersion = -1;
         int scroll;
+        /** The scroll position being drawn: eases toward {@link #scroll}. */
+        float shown;
+        long shownAt;
+        /** The scroll bar this frame: x, top, bottom, thumb height, total lines, lines shown; null when there is none. */
+        float[] bar;
         long lastAt;
     }
 
@@ -110,6 +115,7 @@ public final class ChatBoxes {
         st.lastAt = now;
         if (st.scroll > 0) {
             st.scroll++; // keep the lines you scrolled to where they are
+            st.shown++;
         }
         if (box.alsoInChat) {
             return false;
@@ -228,19 +234,49 @@ public final class ChatBoxes {
         }
         ctx.drawTextWithShadow(tr, title, x + PAD_X, y + 6, 0xFFFFFFFF);
 
-        List<OrderedText> lines = visible(box, st, tr);
+        boolean open = chatOpen();
+        List<OrderedText> all = wrapped(box, st, tr, box.width - PAD_X * 2);
+        int shownLines = lines(box, open);
+        // ease toward the scroll position; one more line is drawn while it is between two, clipped to the lines area
+        long now = System.nanoTime();
+        double dt = Math.min(0.25, (now - st.shownAt) / 1e9);
+        st.shownAt = now;
+        st.shown += (float) ((st.scroll - st.shown) * (1 - Math.exp(-dt * 18)));
+        if (dragBox == box || Math.abs(st.scroll - st.shown) < 0.01f) {
+            st.shown = st.scroll;
+        }
+        st.shown = Math.max(0, Math.min(st.shown, Math.max(0, all.size() - shownLines)));
+        int whole = (int) st.shown;
+        float frac = st.shown - whole;
+        int end = Math.max(0, all.size() - whole);
+        int start = Math.max(0, end - shownLines - (frac > 0.001f ? 1 : 0));
+        List<OrderedText> lines = all.subList(start, end);
         if (lines.isEmpty()) {
             ctx.drawTextWithShadow(tr, Foe.text("nothing here yet").withColor(Foe.DIM & 0xFFFFFF), x + PAD_X, y + h - PAD_Y - 9, 0xFFFFFFFF);
         }
-        int ty = y + h - PAD_Y - 9 - (lines.size() - 1) * LINE_H;
+        int areaTop = y + h - PAD_Y - 9 - (shownLines - 1) * LINE_H - 1;
+        int ty = y + h - PAD_Y - 9 - (lines.size() - 1) * LINE_H + Math.round(frac * LINE_H);
         // the same dark strip vanilla puts behind chat lines, at the "text background opacity" accessibility setting
         int back = (int) (client.options.getTextBackgroundOpacity().getValue() * 255) << 24;
+        ctx.enableScissor(x, areaTop, x + w, y + h);
         for (OrderedText line : lines) {
             if (back != 0) {
                 ctx.fill(x, ty - 1, x + w, ty + LINE_H - 1, back);
             }
             ctx.drawTextWithShadow(tr, line, x + PAD_X, ty, 0xFFFFFFFF);
             ty += LINE_H;
+        }
+        ctx.disableScissor();
+        st.bar = null;
+        if (open && all.size() > shownLines) {
+            float top = areaTop, bottom = y + h - PAD_Y + 1, track = bottom - top;
+            float thumb = Math.min(track, Math.max(12, track * shownLines / all.size()));
+            float fr = Math.max(0, Math.min(1, st.shown / (all.size() - shownLines)));
+            float thumbTop = top + (1 - fr) * (track - thumb);
+            int bx = x + w - 7;
+            st.bar = new float[]{bx, top, bottom, thumb, all.size(), shownLines};
+            ctx.fill(bx, (int) top, bx + 5, (int) bottom, 0x50000000);
+            ctx.fill(bx, Math.round(thumbTop), bx + 5, Math.round(thumbTop + thumb), dragBox == box ? Foe.ACCENT : 0xB0FFFFFF);
         }
         return r;
     }
@@ -262,6 +298,43 @@ public final class ChatBoxes {
             }
         }
         return null;
+    }
+
+    private static ChatBox dragBox;
+    private static float dragGrab;
+
+    /** A left click on a box's scroll bar starts dragging it. */
+    public static boolean pressBar(double mx, double my) {
+        List<ChatBox> list = boxes();
+        for (int i = list.size() - 1; i >= 0; i--) {
+            ChatBox box = list.get(i);
+            float[] b = box == null || !box.enabled ? null : state(box).bar;
+            if (b != null && mx >= b[0] - 3 && mx <= b[0] + 8 && my >= b[1] && my <= b[2]) {
+                float thumbTop = b[1] + (1 - Math.max(0, Math.min(1, state(box).shown / (b[4] - b[5])))) * (b[2] - b[1] - b[3]);
+                dragBox = box;
+                dragGrab = my >= thumbTop && my <= thumbTop + b[3] ? (float) my - thumbTop : b[3] / 2;
+                dragBar((float) my, true);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Moves the scroll with the mouse while the bar is held. */
+    public static void dragBar(double my, boolean held) {
+        if (dragBox == null) {
+            return;
+        }
+        State st = state(dragBox);
+        float[] b = st.bar;
+        if (!held || b == null) {
+            dragBox = null;
+            return;
+        }
+        float range = Math.max(1, b[2] - b[1] - b[3]);
+        float frac = Math.max(0, Math.min(1, 1 - ((float) my - dragGrab - b[1]) / range));
+        st.scroll = Math.round(frac * (b[4] - b[5]));
+        st.shown = st.scroll;
     }
 
     public static boolean scroll(double mx, double my, double amount) {

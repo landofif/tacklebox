@@ -50,6 +50,21 @@ abstract class ChatScreenMixin extends Screen {
         }
     }
 
+    /** The scroll bars (vanilla chat and the boxes) can be dragged. */
+    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
+    private void dofisaddons$bars(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
+        if (click.button() == 0 && (ChatBoxes.pressBar(click.x(), click.y()) || dev.landofif.dofisaddons.chat.ChatBar.press(click.x(), click.y()))) {
+            cir.setReturnValue(true);
+        }
+    }
+
+    @Inject(method = "render", at = @At("HEAD"))
+    private void dofisaddons$dragBars(DrawContext ctx, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        boolean held = org.lwjgl.glfw.GLFW.glfwGetMouseButton(client.getWindow().getHandle(), org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT) == org.lwjgl.glfw.GLFW.GLFW_PRESS;
+        dev.landofif.dofisaddons.chat.ChatBar.tick(mouseX, mouseY, held);
+        ChatBoxes.dragBar(mouseY, held);
+    }
+
     /** ctrl + f searches the whole chat history. */
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void dofisaddons$search(net.minecraft.client.input.KeyInput input, CallbackInfoReturnable<Boolean> cir) {
