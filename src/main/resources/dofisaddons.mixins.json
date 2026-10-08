@@ -22,6 +22,7 @@
     "InGameHudOverlayMixin",
     "ItemMarkerHandlerMixin",
     "BaitSortingHelperMixin",
+    "KeybindHandlerMixin",
     "LivingEntityMixin",
     "MinecraftClientMixin",
     "MovableBoxWidgetMixin",
