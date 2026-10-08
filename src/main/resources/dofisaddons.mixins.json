@@ -21,6 +21,7 @@
     "InGameHudHotbarMixin",
     "InGameHudOverlayMixin",
     "ItemMarkerHandlerMixin",
+    "BaitSortingHelperMixin",
     "LivingEntityMixin",
     "MinecraftClientMixin",
     "MovableBoxWidgetMixin",
