@@ -81,13 +81,29 @@ public final class Power {
         int[] v = DofiSettings.get().variants.get(loc.id());
         int[] left = new int[VARIANTS.length];
         int fish = 0;
+        boolean rare = basicsDone();
         for (int i = 0; v != null && i < left.length; i++) {
-            left[i] = VARIANTS[i].equals("fabled") ? 0 : Math.max(0, v[i * 2 + 1] - v[i * 2]); // fabled is a twice a day event at 1/3k with 100 rivals: not something to go for
+            left[i] = goal(i, rare) ? Math.max(0, v[i * 2 + 1] - v[i * 2]) : 0;
             fish += left[i] * PER[i];
         }
         boolean maxed = level >= MAX_LEVEL;
         return new Row(loc, level, at == null || maxed ? 0 : at[1], level == 0 || maxed ? 0 : gain(level + 1),
                 level == 0 ? 0 : total(MAX_LEVEL) - total(level), left, fish, v != null);
+    }
+
+    /** Only normal and gigantic fish are worth going for; the other variants count once every normal and gigantic is caught everywhere, and fabled never (a twice a day event, 1 in 3K, 100 rivals). */
+    private static boolean goal(int variant, boolean rareToo) {
+        return variant == 0 || variant == 5 || rareToo && variant != 4;
+    }
+
+    private static boolean basicsDone() {
+        for (Locations.Location loc : Locations.ALL) {
+            int[] v = DofiSettings.get().variants.get(loc.id());
+            if (v == null || v[0] < v[1] || v[10] < v[11]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static List<Row> rows() {
