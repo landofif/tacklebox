@@ -43,7 +43,7 @@ public final class BaitPicker {
             "Bucktail", "Jerkbait", "Saltwater Spoon", "Marlin Lure Blue Green", "Marlin Lure", "Frog Dark", "Spinner Bait Lime"};
     private static final int[] LURE_USE = {30, 20, 30, 50, 30, 50, 50, 30, 50, 40, 40, 25, 30, 25, 50, 30, 30, 50};
 
-    /** Climate of each location (docs/fishonmc-research.md section 7; the Nile is a guess), armour stats are "climate_luck". */
+    /** Climate of each location (docs/fishonmc-research.md section 7; the Nile is arid, from the hippo pet), armour stats are "climate_luck". */
     private static final Map<String, String> CLIMATE = Map.ofEntries(
             Map.entry("cypress", "subtropical"), Map.entry("kenai", "subarctic"), Map.entry("biwa", "subtropical"),
             Map.entry("murray", "semiarid"), Map.entry("everglades", "savanna"), Map.entry("keywest", "savanna"),

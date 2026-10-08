@@ -234,6 +234,7 @@ Player level and progress = vanilla `experienceLevel` / `experienceProgress` (Fi
 | hawaii | Hawaii | savanna | salt | gradient |
 | lofotenislands | Lofoten Islands | subarctic | salt | gradient |
 | cairns | Cairns | monsoon | salt | A1C2FB |
+| nile | Nile River | arid (from the hippo pet) | fresh | |
 | crewisland | Crew Island | — | — | |
 
 Spawn hub bounding box: x 95..145, z −58..38 (treated as Cypress Lake).
