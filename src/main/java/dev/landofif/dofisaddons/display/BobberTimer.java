@@ -170,7 +170,8 @@ public final class BobberTimer {
         matrices.translate(0, s.timerHeight, 0);
         matrices.multiply(camera.orientation);
         matrices.scale(k, -k, k);
-        queue.submitText(matrices, -tr.getWidth(text) / 2f, 0, text, s.timerShadow, TextLayerType.SEE_THROUGH,
+        // a later batch than the models, or a player model (your hat) is drawn over the text
+        queue.getBatchingQueue(100).submitText(matrices, -tr.getWidth(text) / 2f, 0, text, s.timerShadow, TextLayerType.SEE_THROUGH,
                 LightmapTextureManager.MAX_LIGHT_COORDINATE, 0xFF000000 | s.timerColor, 0, 0);
         matrices.pop();
     }
