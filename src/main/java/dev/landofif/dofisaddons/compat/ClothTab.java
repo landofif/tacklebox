@@ -220,7 +220,7 @@ public final class ClothTab {
                         }
                     });
         }
-        slider("picture opacity", "how strong the picture behind the hud is. 0 hides it. the picture is config/dofisaddons/hud.png (png only), shown grey.", 0, 100, 5, "%", PCT,
+        slider("picture opacity", "how strong the picture behind the hud is. 0 hides it. the picture is config/dofisaddons/hud.png (png only),.", 0, 100, 5, "%", PCT,
                 () -> s.serverHudImage, v -> s.serverHudImage = (int) Math.round(v));
         group.add(ButtonEntry.action(title("picture"), title("open folder"), () -> {
             try {

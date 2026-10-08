@@ -237,7 +237,7 @@ public final class ServerHud {
         }
     }
 
-    /** The picture, grey and faint, cropped to cover the hud; it reloads when the file changes. */
+    /** The picture, faint, cropped to cover the hud; it reloads when the file changes. */
     private static void image(DrawContext ctx, MinecraftClient mc, int[] r, int opacity) {
         if (opacity <= 0 || System.currentTimeMillis() > nextCheck && !load(mc) || imageStamp < 0) {
             return;
@@ -275,13 +275,6 @@ public final class ServerHud {
             }
             try (var in = Files.newInputStream(IMAGE)) {
                 NativeImage img = NativeImage.read(in);
-                for (int y = 0; y < img.getHeight(); y++) {
-                    for (int x = 0; x < img.getWidth(); x++) {
-                        int c = img.getColorArgb(x, y);
-                        int g = ((c >> 16 & 255) * 3 + (c >> 8 & 255) * 6 + (c & 255)) / 10;
-                        img.setColorArgb(x, y, c & 0xFF000000 | g << 16 | g << 8 | g);
-                    }
-                }
                 imageW = img.getWidth();
                 imageH = img.getHeight();
                 mc.getTextureManager().registerTexture(TEXTURE, new NativeImageBackedTexture(() -> "dofisaddons hud image", img));
