@@ -209,6 +209,17 @@ public final class ClothTab {
         header("server hud");
         toggle("server hud", "a sidebar styled hud: time, location, wallet and credits, the tackle shop and moon timers, and the weather events and moon that are active. move and resize it with move huds.",
                 () -> s.serverHud, v -> s.serverHud = v);
+        for (String[] line : dev.landofif.dofisaddons.hud.ServerHud.LINES) {
+            toggle("show " + line[1], "shows the " + line[1] + " line on the server hud. luck, scale, speeds and prospect are read from /menu."
+                    + (line[0].startsWith("prospect") ? " switch off one of the two to keep only the number or only the chance." : ""),
+                    () -> !s.serverHudHide.contains(line[0]), v -> {
+                        if (v) {
+                            s.serverHudHide.remove(line[0]);
+                        } else {
+                            s.serverHudHide.add(line[0]);
+                        }
+                    });
+        }
         slider("picture opacity", "how strong the picture behind the hud is. 0 hides it. the picture is config/dofisaddons/hud.png (png only), shown grey.", 0, 100, 5, "%", PCT,
                 () -> s.serverHudImage, v -> s.serverHudImage = (int) Math.round(v));
         group.add(ButtonEntry.action(title("picture"), title("open folder"), () -> {

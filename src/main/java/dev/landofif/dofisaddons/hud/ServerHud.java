@@ -113,59 +113,95 @@ public final class ServerHud {
         m.scale(k, k);
         for (int i = 0; i < lines.size(); i++) {
             Text t = lines.get(i);
-            int x = i == 0 ? PAD + (w - tr.getWidth(t)) / 2 : PAD; // the title is centred
+            int x = i == 0 && titleShown ? PAD + (w - tr.getWidth(t)) / 2 : PAD; // the title is centred
             ctx.drawTextWithShadow(tr, t, x, PAD + i * LINE, 0xFFFFFFFF);
         }
         m.popMatrix();
         return rect;
     }
 
+    /** Every line the hud can show, by the key {@link DofiSettings#serverHudHide} switches it off with. */
+    public static final String[][] LINES = {{"title", "title"}, {"clock", "time and weather"}, {"location", "location"}, {"players", "players"},
+            {"level", "level"}, {"wallet", "wallet"}, {"credits", "credits"}, {"bite speed", "bite speed"}, {"reel speed", "reel speed"},
+            {"luck", "luck"}, {"scale", "scale"}, {"prospect", "prospect value"}, {"prospect chance", "prospect chance"},
+            {"shop", "tackle shop timer"}, {"moon", "moon"}, {"events", "active events"}};
+
+    private static boolean titleShown;
+
+    private static boolean on(String key) {
+        return !DofiSettings.get().serverHudHide.contains(key);
+    }
+
     private static List<Text> lines(MinecraftClient mc, boolean preview) {
         List<Text> out = new ArrayList<>();
-        out.add(Text.literal("FISHONMC").formatted(Formatting.GOLD, Formatting.BOLD));
+        titleShown = on("title");
+        if (titleShown) {
+            out.add(Text.literal("FISHONMC").formatted(Formatting.GOLD, Formatting.BOLD));
+        }
         String clock = (ServerInfo.time + " " + ServerInfo.ampm + " " + ServerInfo.temperature).trim();
-        if (!clock.isEmpty()) {
+        if (on("clock") && !clock.isEmpty()) {
             out.add(Text.literal(clock + (ServerInfo.weather.isEmpty() ? "" : "  " + ServerInfo.weather)).formatted(Formatting.GRAY));
         }
-        if (!ServerInfo.locationName.isEmpty()) {
+        if (on("location") && !ServerInfo.locationName.isEmpty()) {
             out.add(Text.literal("⏣ ").formatted(Formatting.GRAY).append(Text.literal(title(ServerInfo.locationName)).formatted(Formatting.GREEN)));
         }
         var tab = mc.getNetworkHandler();
-        if (tab != null) {
+        if (on("players") && tab != null) {
             out.add(row("Players: ", String.valueOf(tab.getPlayerList().size()), Formatting.GREEN));
         }
         out.add(Text.empty());
-        out.add(row("Level: ", String.valueOf(mc.player.experienceLevel), Formatting.GREEN));
-        if (!ServerInfo.wallet.isEmpty()) {
+        if (on("level")) {
+            out.add(row("Level: ", String.valueOf(mc.player.experienceLevel), Formatting.GREEN));
+        }
+        if (on("wallet") && !ServerInfo.wallet.isEmpty()) {
             out.add(row("Wallet: ", "$" + ServerInfo.wallet, Formatting.GOLD));
         }
-        if (!ServerInfo.credits.isEmpty()) {
+        if (on("credits") && !ServerInfo.credits.isEmpty()) {
             out.add(row("Credits: ", ServerInfo.credits, Formatting.AQUA));
         }
         out.add(Text.empty());
-        for (String stat : new String[]{"Bite Speed", "Reel Speed", "Prospect"}) {
-            String v = DofiSettings.get().profileStats.get(stat.toLowerCase(java.util.Locale.ROOT));
-            if (v != null) {
+        var stats = DofiSettings.get().profileStats;
+        for (String stat : new String[]{"Bite Speed", "Reel Speed", "Luck", "Scale"}) {
+            String v = stats.get(stat.toLowerCase(java.util.Locale.ROOT));
+            if (on(stat.toLowerCase(java.util.Locale.ROOT)) && v != null) {
                 out.add(row(stat + ": ", v, Formatting.GREEN));
+            }
+        }
+        String prospect = stats.get("prospect");
+        if (prospect != null) { // "236 (1/42.06)": the number, the chance, or both
+            int at = prospect.indexOf(" (");
+            String value = at < 0 ? prospect : prospect.substring(0, at);
+            String chance = at < 0 ? "" : prospect.substring(at + 2, prospect.length() - 1);
+            boolean v = on("prospect"), c = on("prospect chance") && !chance.isEmpty();
+            if (v || c) {
+                out.add(row("Prospect: ", (v ? value : "") + (v && c ? " (" + chance + ")" : c ? chance : ""), Formatting.GREEN));
             }
         }
         out.add(Text.empty());
         long shop = timer("baitShopTimer");
-        if (shop >= 0) {
+        if (on("shop") && shop >= 0) {
             out.add(row("Tackle Shop: ", clock(shop), Formatting.YELLOW));
         }
-        if (!moon.isEmpty()) {
-            out.add(row("Moon: ", moon, moon.startsWith("Blood") ? Formatting.RED : Formatting.LIGHT_PURPLE));
-        } else if (timer("moonTimer") >= 0) {
-            out.add(row("Moon Cycle: ", clock(timer("moonTimer")), Formatting.YELLOW));
+        if (on("moon")) {
+            if (!moon.isEmpty()) {
+                out.add(row("Moon: ", moon, moon.startsWith("Blood") ? Formatting.RED : Formatting.LIGHT_PURPLE));
+            } else if (timer("moonTimer") >= 0) {
+                out.add(row("Moon Cycle: ", clock(timer("moonTimer")), Formatting.YELLOW));
+            }
         }
-        if (!EVENTS.isEmpty()) {
+        if (on("events") && !EVENTS.isEmpty()) {
             out.add(Text.empty());
             for (Map.Entry<String, Object[]> e : EVENTS.entrySet()) {
                 long up = System.currentTimeMillis() - (long) e.getValue()[0];
                 MutableText t = Text.literal(e.getKey()).formatted(Formatting.LIGHT_PURPLE).append(Text.literal(" " + minutes(up)).formatted(Formatting.GRAY));
                 String bonus = (String) e.getValue()[1];
                 out.add(bonus.isEmpty() ? t : t.append(Text.literal("  " + bonus).formatted(Formatting.DARK_GRAY)));
+            }
+        }
+        // switching lines off can leave gaps: no double blanks, none at the ends
+        for (int k = out.size() - 1; k >= 0; k--) {
+            if (out.get(k).getString().isEmpty() && (k == 0 || k == out.size() - 1 || out.get(k - 1).getString().isEmpty())) {
+                out.remove(k);
             }
         }
         return out;
