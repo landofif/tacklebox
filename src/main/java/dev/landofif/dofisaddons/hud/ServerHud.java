@@ -40,6 +40,8 @@ public final class ServerHud {
     private static final Map<String, Object[]> EVENTS = new LinkedHashMap<>();
     private static String moon = "";
 
+    /** Radius of the picture's rounded corners in gui pixels. */
+    private static final int CORNER = 6;
     private static long imageStamp = -1;
     private static int imageW, imageH;
     private static long nextCheck;
@@ -202,10 +204,20 @@ public final class ServerHud {
         }
         double k = Math.max((double) r[2] / imageW, (double) r[3] / imageH);
         int dw = (int) Math.round(imageW * k), dh = (int) Math.round(imageH * k);
-        ctx.enableScissor(r[0], r[1], r[0] + r[2], r[1] + r[3]);
-        ctx.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, r[0] + (r[2] - dw) / 2, r[1] + (r[3] - dh) / 2, 0f, 0f, dw, dh, imageW, imageH, imageW, imageH,
-                (opacity * 255 / 100) << 24 | 0xFFFFFF);
+        int x = r[0] + (r[2] - dw) / 2, y = r[1] + (r[3] - dh) / 2, color = (opacity * 255 / 100) << 24 | 0xFFFFFF;
+        int radius = Math.min(CORNER, Math.min(r[2], r[3]) / 2);
+        ctx.enableScissor(r[0], r[1] + radius, r[0] + r[2], r[1] + r[3] - radius); // the middle
+        ctx.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, 0f, 0f, dw, dh, imageW, imageH, imageW, imageH, color);
         ctx.disableScissor();
+        for (int i = 0; i < radius; i++) { // the corners, a row at a time
+            double up = radius - i - 0.5;
+            int inset = radius - (int) Math.round(Math.sqrt(radius * radius - up * up));
+            for (int row : new int[]{r[1] + i, r[1] + r[3] - 1 - i}) {
+                ctx.enableScissor(r[0] + inset, row, r[0] + r[2] - inset, row + 1);
+                ctx.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, x, y, 0f, 0f, dw, dh, imageW, imageH, imageW, imageH, color);
+                ctx.disableScissor();
+            }
+        }
     }
 
     /** Returns false when there is no usable file. Checked once a second. */

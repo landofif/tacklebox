@@ -209,7 +209,7 @@ public final class ClothTab {
         header("server hud");
         toggle("server hud", "a sidebar styled hud: time, location, wallet and credits, the tackle shop and moon timers, and the weather events and moon that are active. move and resize it with move huds.",
                 () -> s.serverHud, v -> s.serverHud = v);
-        slider("picture opacity", "how strong the picture behind the hud is. 0 hides it. the picture is config/dofisaddons/hud.png (any png or jpg renamed png), shown grey.", 0, 100, 5, "%", PCT,
+        slider("picture opacity", "how strong the picture behind the hud is. 0 hides it. the picture is config/dofisaddons/hud.png (png only), shown grey.", 0, 100, 5, "%", PCT,
                 () -> s.serverHudImage, v -> s.serverHudImage = (int) Math.round(v));
         group.add(ButtonEntry.action(title("picture"), title("open folder"), () -> {
             try {
