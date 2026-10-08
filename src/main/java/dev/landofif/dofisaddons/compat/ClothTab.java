@@ -77,6 +77,7 @@ public final class ClothTab {
         link("chat", dev.landofif.dofisaddons.screen.ChatFilterScreen::new);
         link("key commands", dev.landofif.dofisaddons.screen.KeyCommandScreen::new);
         link("word swaps", dev.landofif.dofisaddons.screen.WordSwapScreen::new);
+        link("bait picker", dev.landofif.dofisaddons.screen.BaitScreen::new);
         link("viewmodel", dev.landofif.dofisaddons.screen.ViewmodelScreen::new);
         link("move huds", FoeScreens::move);
     }

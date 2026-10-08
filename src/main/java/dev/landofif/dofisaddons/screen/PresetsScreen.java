@@ -196,6 +196,13 @@ public class PresetsScreen extends DofiScreen {
                 cache.put(c.filter + ":" + c.preset, new ArrayList<>(now));
                 dirty = true;
             }
+            if (c.filter.equals("armor")) { // luck and scale for the bait picker
+                var stats = dev.landofif.dofisaddons.menu.BaitPicker.armorStats(c.pieces);
+                if (!stats.equals(DofiSettings.get().presetStats.get("armor:" + c.preset))) {
+                    DofiSettings.get().presetStats.put("armor:" + c.preset, stats);
+                    dirty = true;
+                }
+            }
         }
         if (dirty) {
             DofiSettings.save();

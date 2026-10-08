@@ -111,6 +111,16 @@ public class DofiSettings {
     /** Preset rows seen on /presets, kept between sessions so the other page can be drawn: "armor:6" to its pieces as "item|color|floats|strings|model". */
     public java.util.Map<String, java.util.List<String>> presetCache = new java.util.LinkedHashMap<>();
     public boolean presetsOtherBg = false;
+    /** Luck and scale of each armour preset seen on /presets, "armor:n" to "subtropical_luck" and so on (menu/BaitPicker reads them). */
+    public java.util.Map<String, java.util.Map<String, Double>> presetStats = new java.util.LinkedHashMap<>();
+    /** The bait picker screen: location id, where luck and scale come from ("worn" or "armor:n"), extra luck and scale on top (rod, pet), bait tiers on (bit per rarity), lures, bigger sizes count. */
+    public String baitLoc = "hawaii";
+    public String baitSource = "worn";
+    public int baitLuck = 0;
+    public int baitScale = 0;
+    public int baitTiers = 0b00111;
+    public boolean baitLures = true;
+    public boolean baitBigger = false;
     /** Location levels read from the fish compendium, "level|progress" by location id, shown in /turbotravel which has none. */
     public java.util.Map<String, String> locationLevels = new java.util.LinkedHashMap<>();
     public int menuSize = 100;
@@ -301,6 +311,7 @@ public class DofiSettings {
         if (need == null) need = new java.util.LinkedHashMap<>();
         if (locationLevels == null) locationLevels = new java.util.LinkedHashMap<>();
         if (presetCache == null) presetCache = new java.util.LinkedHashMap<>();
+        if (presetStats == null) presetStats = new java.util.LinkedHashMap<>();
         menuSize = Math.max(40, Math.min(100, menuSize));
         presetsSize = Math.max(40, Math.min(100, presetsSize));
     }
