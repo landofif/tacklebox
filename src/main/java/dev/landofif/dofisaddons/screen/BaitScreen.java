@@ -27,7 +27,7 @@ import java.util.Map;
  * scale come from the armour you wear or one of the presets seen on /presets, the level from the compendium.
  */
 public class BaitScreen extends DofiScreen {
-    private static final int LEFT = 10, LW = 150, TOP = 24, ROW = 26, CARD = 46;
+    private static final int LEFT = 10, LW = 150, TOP = 24, ROW = 36, CARD = 48;
     /** Quest index of the rarity quests: rare, epic, legendary roll rarity 1, 2, 3. */
     private static final int RARE = 2;
 
@@ -216,7 +216,7 @@ public class BaitScreen extends DofiScreen {
     }
 
     private int listTop() {
-        return TOP + CARD + 34;
+        return TOP + CARD + 52;
     }
 
     private int listH() {
@@ -231,66 +231,75 @@ public class BaitScreen extends DofiScreen {
         return String.format(Locale.ROOT, x >= 0.095 || x == 0 ? "%.0f%%" : "%.1f%%", x * 100);
     }
 
+    /** Tinted greys (a little blue, never pure grey) and the bait rarity colours the server uses, common to mythical. */
+    private static final int MUTED = 0xFF9AA4B2, QUIET = 0xFF5F6877, RULE = 0x22FFFFFF, SELECTED = 0x2855FF55;
+    private static final int[] RARITY = {0xFFFFFF, 0x2B85C4, 0x1CD832, 0xD98103, 0xC93832};
+
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);
-        int dim = Foe.DIM, white = Foe.TEXT;
+        int white = Foe.TEXT;
 
-        // what feeds the numbers
+        // what feeds the numbers: label left, value right, in one column under the controls
         int y = TOP + 24 * 6 + 28;
-        ctx.drawTextWithShadow(textRenderer, Foe.text("luck " + armorLuck + " + " + s.baitLuck + " = " + luck), LEFT, y, white);
-        ctx.drawTextWithShadow(textRenderer, Foe.text("scale " + armorScale + " + " + s.baitScale + " = " + scale), LEFT, y + 12, white);
-        ctx.drawTextWithShadow(textRenderer, levelKnown ? Foe.text("level here " + level)
-                : Foe.text("level here unknown").formatted(Formatting.GOLD), LEFT, y + 24, levelKnown ? white : Foe.ACCENT);
+        stat(ctx, "luck", armorLuck + " + " + s.baitLuck + " = " + luck, y, white);
+        stat(ctx, "scale", armorScale + " + " + s.baitScale + " = " + scale, y + 12, white);
+        stat(ctx, "level here", levelKnown ? String.valueOf(level) : "unknown", y + 24, levelKnown ? white : Foe.ACCENT);
         if (!levelKnown) {
-            ctx.drawTextWithShadow(textRenderer, Foe.sentence("Open the fish compendium to read it."), LEFT, y + 36, dim);
+            ctx.drawTextWithShadow(textRenderer, Foe.sentence("Open the fish compendium to read it."), LEFT, y + 38, MUTED);
         }
 
-        // the five quests
+        // the five quests: a tint for the picked one, the casts as the number to read, a bar for how it compares
         int x0 = listX(), cw = cardW();
         double fastest = casts[top];
         for (int q = 0; q < 5; q++) {
             int x = x0 + q * (cw + 3);
             boolean hot = mouseX >= x && mouseX < x + cw && mouseY >= TOP && mouseY < TOP + CARD;
-            Foe.button(ctx, x, TOP, cw, CARD, hot);
-            if (q == quest) {
-                ctx.fill(x, TOP, x + cw, TOP + 1, Foe.ACCENT);
-                ctx.fill(x, TOP + CARD - 1, x + cw, TOP + CARD, Foe.ACCENT);
-                ctx.fill(x, TOP, x + 1, TOP + CARD, Foe.ACCENT);
-                ctx.fill(x + cw - 1, TOP, x + cw, TOP + CARD, Foe.ACCENT);
-            }
-            ctx.drawTextWithShadow(textRenderer, Foe.text(QUEST_NAMES[q]), x + 4, TOP + 4, q == top ? Foe.TITLE : dim);
-            ctx.drawTextWithShadow(textRenderer, Text.literal(Math.round(casts[q]) + " casts"), x + 4, TOP + 16, q == top ? Foe.TITLE : white);
-            ctx.drawTextWithShadow(textRenderer, Text.literal(pct(vals[q]) + " · " + need[q] + " catches"), x + 4, TOP + 30, dim);
-            int bar = (int) ((cw - 8) * Math.max(0.05, Math.min(1, fastest / casts[q])));
-            ctx.fill(x + 4, TOP + CARD - 3, x + 4 + bar, TOP + CARD - 1, q == top ? Foe.TITLE : Foe.FAINT);
+            ctx.fill(x, TOP, x + cw, TOP + CARD, q == quest ? SELECTED : hot ? 0x30FFFFFF : 0x30000000);
+            ctx.drawTextWithShadow(textRenderer, Foe.text(QUEST_NAMES[q]), x + 6, TOP + 5, q == quest ? Foe.ACCENT : MUTED);
+            var m = ctx.getMatrices();
+            m.pushMatrix();
+            m.translate(x + 6, TOP + 16);
+            m.scale(1.5f, 1.5f);
+            ctx.drawTextWithShadow(textRenderer, Text.literal(String.valueOf(Math.round(casts[q]))), 0, 0, q == top ? Foe.TITLE : white);
+            m.popMatrix();
+            ctx.drawTextWithShadow(textRenderer, Foe.text("casts"), x + 6 + (int) (textRenderer.getWidth(String.valueOf(Math.round(casts[q]))) * 1.5f) + 4, TOP + 21, QUIET);
+            ctx.drawTextWithShadow(textRenderer, Text.literal(pct(vals[q]) + " · " + need[q] + " catches"), x + 6, TOP + 33, MUTED);
+            int bar = (int) ((cw - 12) * Math.max(0.05, Math.min(1, fastest / casts[q])));
+            ctx.fill(x + 6, TOP + CARD - 3, x + cw - 6, TOP + CARD - 2, 0x22FFFFFF);
+            ctx.fill(x + 6, TOP + CARD - 3, x + 6 + bar, TOP + CARD - 2, q == top ? Foe.TITLE : QUIET);
         }
 
-        // the answer
-        int ay = TOP + CARD + 6;
+        // the answer, as a headline and a line under it
+        int ay = TOP + CARD + 8;
         int w = width - x0 - 10;
-        if (top < RARE) {
-            say(ctx, "best: " + QUEST_NAMES[top] + " quests, about " + Math.round(casts[top]) + " casts. no bait needed, a bait does not change size.", x0, ay, w);
-        } else {
-            List<Row> rows = best.get(top);
-            say(ctx, "best: " + QUEST_NAMES[top] + " quests, about " + Math.round(casts[top]) + " casts."
-                    + (vals[top] > odds[top - 1] + .0005 ? " use " + rows.get(0).bait().name() + ": " + pct(vals[top]) + " per cast against "
-                    + pct(odds[top - 1]) + " with no bait." : " no bait beats the base odds."), x0, ay, w);
-        }
+        List<Row> topRows = best.get(top);
+        boolean bait = top >= RARE && vals[top] > odds[top - 1] + .0005;
+        String head = top < RARE ? "Go for " + QUEST_NAMES[top] + " quests" : bait ? "Use " + topRows.get(0).bait().name() : "No bait beats the base odds";
+        var m = ctx.getMatrices();
+        m.pushMatrix();
+        m.translate(x0, ay);
+        m.scale(1.5f, 1.5f);
+        ctx.drawTextWithShadow(textRenderer, Foe.sentence(head), 0, 0, Foe.ACCENT);
+        m.popMatrix();
+        String why = QUEST_NAMES[top] + " quests finish fastest, about " + Math.round(casts[top]) + " casts."
+                + (bait ? " " + pct(vals[top]) + " per cast against " + pct(odds[top - 1]) + " with no bait." : top < RARE ? " Bait does not change size." : "");
+        ctx.drawTextWithShadow(textRenderer, Foe.sentence(why), x0, ay + 16, MUTED);
 
         // the ranked baits for the picked quest
         int ly = listTop();
         if (quest < RARE) {
             ctx.drawTextWithShadow(textRenderer, Foe.sentence("A " + QUEST_NAMES[quest] + " is " + pct(vals[quest]) + " of casts at scale " + scale
-                    + (s.baitBigger ? " (this size or bigger)" : "") + ". Bait does not change size, so compare this number with the other cards."), x0, ly, dim);
+                    + (s.baitBigger ? " (this size or bigger)" : "") + ". Bait does not change size, so compare this number with the other cards."), x0, ly, MUTED);
             return;
         }
-        ctx.drawTextWithShadow(textRenderer, Foe.text(QUEST_NAMES[quest] + " quest · no bait " + pct(odds[quest - 1]) + " per cast"), x0, ly - 12, Foe.TITLE);
+        ctx.drawTextWithShadow(textRenderer, Foe.text(QUEST_NAMES[quest] + " quest · no bait " + pct(odds[quest - 1]) + " per cast"), x0, ly - 14, Foe.TITLE);
         if (shown.isEmpty()) {
-            ctx.drawTextWithShadow(textRenderer, Foe.sentence("Nothing here beats the base odds by 3 points. Try a different quest or more bait tiers."), x0, ly + 2, dim);
+            ctx.drawTextWithShadow(textRenderer, Foe.sentence("Nothing here beats the base odds by 3 points. Try a different quest or more bait tiers."), x0, ly + 2, MUTED);
             return;
         }
         double base = odds[quest - 1];
+        int right = width - 14;
         ctx.enableScissor(x0, ly, width - 6, ly + listH());
         for (int i = 0; i < shown.size(); i++) {
             int ry = ly + i * ROW - scroll;
@@ -299,39 +308,46 @@ public class BaitScreen extends DofiScreen {
             }
             Row r = shown.get(i);
             var b = r.bait();
+            if (i > 0) {
+                ctx.fill(x0, ry - 4, right, ry - 3, RULE);
+            }
+            // line 1: rank, name in the baits rarity colour, the chance on the right with its bar
+            ctx.drawTextWithShadow(textRenderer, Text.literal(String.valueOf(i + 1)), x0, ry, QUIET);
+            ctx.drawTextWithShadow(textRenderer, Text.literal(b.name()), x0 + 12, ry, i == 0 ? Foe.ACCENT : white);
+            ctx.drawTextWithShadow(textRenderer, Text.literal(pct(r.chance())), right - 70 - textRenderer.getWidth(pct(r.chance())) - 6, ry, Foe.TITLE);
+            int bx = right - 70;
+            ctx.fill(bx, ry + 3, bx + 70, ry + 6, 0x22FFFFFF);
+            ctx.fill(bx, ry + 3, bx + (int) (70 * r.chance()), ry + 6, Foe.TITLE);
+            ctx.fill(bx + (int) (70 * base), ry + 1, bx + (int) (70 * base) + 1, ry + 8, Foe.ACCENT);
+            // line 2: what the bait is and how far it beats no bait
             String lure = b.lure() ? " · lure x" + BaitPicker.uses(b) : "";
-            ctx.drawTextWithShadow(textRenderer, Text.literal((i + 1) + ". " + b.name()), x0, ry, i == 0 ? Foe.ACCENT : white);
-            int nx = x0 + textRenderer.getWidth((i + 1) + ". " + b.name()) + 6;
-            ctx.drawTextWithShadow(textRenderer, Text.literal(BaitPicker.RARITY[b.rarity()].substring(0, 1).toUpperCase(Locale.ROOT) + lure
-                    + " · " + b.likelihood() + "% likelihood · pool " + pool(r.pool())), nx, ry, dim);
-            int by = ry + 12, bw = 70;
-            ctx.fill(x0, by, x0 + bw, by + 8, Foe.FAINT & 0x66FFFFFF);
-            ctx.fill(x0, by, x0 + (int) (bw * r.chance()), by + 8, Foe.TITLE);
-            ctx.fill(x0 + (int) (bw * base), by, x0 + (int) (bw * base) + 1, by + 8, Foe.ACCENT);
-            StringBuilder fish = new StringBuilder(pct(r.chance()) + " (+" + Math.round((r.chance() - base) * 100) + " pts) · ");
+            String facts = BaitPicker.RARITY[b.rarity()] + lure + " · " + b.likelihood() + "% likelihood · pool " + pool(r.pool())
+                    + " · +" + Math.round((r.chance() - base) * 100) + " pts" + (r.same().isEmpty() ? "" : " · same pool: " + String.join(", ", r.same()));
+            ctx.drawTextWithShadow(textRenderer, Text.literal(textRenderer.trimToWidth(facts, right - x0 - 12)), x0 + 12, ry + 11, MUTED);
+            // line 3: the fish, each rarity letter in its colour
+            int fx = x0 + 12;
             for (int q = 0; q < 5; q++) {
-                if (!r.fish().get(q).isEmpty()) {
-                    fish.append(Character.toUpperCase(BaitPicker.RL.charAt(q))).append(": ").append(String.join(", ", r.fish().get(q))).append("  ");
+                if (r.fish().get(q).isEmpty() || fx > right - 40) {
+                    continue;
                 }
+                String names = String.join(", ", r.fish().get(q));
+                ctx.drawTextWithShadow(textRenderer, Text.literal(String.valueOf(Character.toUpperCase(BaitPicker.RL.charAt(q)))), fx, ry + 22, 0xFF000000 | RARITY[q]);
+                String shownNames = textRenderer.trimToWidth(names, Math.max(20, right - fx - 14));
+                ctx.drawTextWithShadow(textRenderer, Text.literal(shownNames), fx + 8, ry + 22, QUIET);
+                fx += 8 + textRenderer.getWidth(shownNames) + 12;
             }
-            if (!r.same().isEmpty()) {
-                fish.append("same pool: ").append(String.join(", ", r.same()));
-            }
-            ctx.drawTextWithShadow(textRenderer, Text.literal(textRenderer.trimToWidth(fish.toString(), w - bw - 8)), x0 + bw + 6, by, dim);
         }
         ctx.disableScissor();
         ctx.drawTextWithShadow(textRenderer, Foe.sentence("A roll below a bait's whole pool gets a normal fish, so bait odds are a lower bound. Hard quest sizes are fitted estimates."),
-                x0, height - 14, Foe.FAINT);
+                x0, height - 14, QUIET);
+    }
+
+    private void stat(DrawContext ctx, String label, String value, int y, int color) {
+        ctx.drawTextWithShadow(textRenderer, Foe.text(label), LEFT, y, MUTED);
+        ctx.drawTextWithShadow(textRenderer, Text.literal(value), LEFT + LW - textRenderer.getWidth(value), y, color);
     }
 
     private static final String[] QUEST_NAMES = {"adult", "large", "rare", "epic", "legendary"};
-
-    private void say(DrawContext ctx, String line, int x, int y, int w) {
-        int i = 0;
-        for (var part : textRenderer.wrapLines(Foe.sentence(line), w)) {
-            ctx.drawTextWithShadow(textRenderer, part, x, y + 12 * i++, Foe.TEXT);
-        }
-    }
 
     private static String pool(int[] p) {
         StringBuilder b = new StringBuilder();
