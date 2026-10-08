@@ -31,11 +31,12 @@ import java.util.regex.Pattern;
 public final class ServerHud {
     public static final Path IMAGE = net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir().resolve("dofisaddons").resolve("hud.png");
     private static final Identifier TEXTURE = Identifier.of("dofisaddons", "hud_image");
-    private static final Pattern EVENT = Pattern.compile("^[^A-Za-z0-9]*(RAINBOW|STORM|RAIN|GOLD RUSH|BLOOMING OASIS) » (.*)$");
+    private static final Pattern EVENT = Pattern.compile("^[^A-Za-z0-9]*(RAINBOW|STORM|RAIN|GOLD RUSH|BLOOMING OASIS|FABLED) » (.*)$");
     private static final Pattern MOON = Pattern.compile("^[^A-Za-z0-9]*(FULL|BLUE|SUPER|BLOOD) MOON » .* has (risen|set)");
     private static final Pattern EFFECT = Pattern.compile("\\(([^)]*)\\)");
     private static final Pattern NOUN = Pattern.compile("^An? (.+?) has ");
-    private static final Pattern ENDED = Pattern.compile("dissipated|faded|retracted|has ended");
+    private static final Pattern AT = Pattern.compile(" at ([^.!(]+)");
+    private static final Pattern ENDED = Pattern.compile("dissipated|faded|retracted|has ended|caught by");
 
     /** Active events by name with the time they started and the bonus the server named. */
     private static final Map<String, Object[]> EVENTS = new LinkedHashMap<>();
@@ -66,10 +67,12 @@ public final class ServerHud {
         String body = m.group(2);
         if (ENDED.matcher(body).find()) {
             EVENTS.remove(name);
-        } else if (body.startsWith("A ") || body.startsWith("An ")) {
+        } else if (body.startsWith("A ") || body.startsWith("An ") || name.equals("Fabled")) {
             java.util.regex.Matcher e = EFFECT.matcher(body);
             java.util.regex.Matcher noun = NOUN.matcher(body);
-            EVENTS.put(name, new Object[]{System.currentTimeMillis(), e.find() ? e.group(1) : "", noun.find() ? title(noun.group(1)) : name});
+            java.util.regex.Matcher place = AT.matcher(body); // the fabled event says where
+            EVENTS.put(name, new Object[]{System.currentTimeMillis(), e.find() ? e.group(1) : place.find() ? "at " + place.group(1) : "",
+                    name.equals("Fabled") ? "Fabled Event" : noun.find() ? title(noun.group(1)) : name});
         }
     }
 
@@ -133,10 +136,8 @@ public final class ServerHud {
             {"luck", "luck"}, {"scale", "scale"}, {"prospect", "prospect value"}, {"prospect chance", "prospect chance"},
             {"shop", "tackle shop timer"}, {"moon", "moon"}};
 
-    /** The weather the boss bar names, in the colour it is, and what it does (the numbers the server announces). */
-    private static final Map<String, int[]> WEATHER = Map.of("rain", new int[]{0x3F9BFF}, "thunderstorm", new int[]{0xFFD83D},
-            "blooming oasis", new int[]{0x4CD964}, "gold rush", new int[]{0xFFAA00}, "fabled", new int[]{0xE0413A});
-    private static final Map<String, Integer> COLORS = Map.of("Rain", 0x3F9BFF, "Storm", 0xFFD83D, "Rainbow", 0xFF7BE0, "Gold Rush", 0xFFAA00, "Blooming Oasis", 0x4CD964);
+    /** The colour of each event, by the tag the server puts in front of its chat line. */
+    private static final Map<String, Integer> COLORS = Map.of("Rain", 0x3F9BFF, "Storm", 0xFFD83D, "Rainbow", 0xFF7BE0, "Gold Rush", 0xFFAA00, "Blooming Oasis", 0x4CD964, "Fabled", 0xE0413A);
     private static final Map<String, String> EFFECT_TEXT = Map.of("rain", "+50 Bite Speed", "thunderstorm", "+100 Bite Speed",
             "blooming oasis", "+100% Pet Luck", "gold rush", "Better shard chance");
 
@@ -206,10 +207,6 @@ public final class ServerHud {
         if (on("weather")) { // every active event gets its own line, in its colour, with what it does
             for (Map.Entry<String, Object[]> e : EVENTS.entrySet()) {
                 out.add(weatherLine((String) e.getValue()[2], (String) e.getValue()[1], COLORS.getOrDefault(e.getKey(), 0xFFFFFF)));
-            }
-            String weather = ServerInfo.weather; // before chat told us (just joined): what the boss bar says, unless it is nothing
-            if (EVENTS.isEmpty() && WEATHER.containsKey(weather)) {
-                out.add(weatherLine(title(weather), EFFECT_TEXT.getOrDefault(weather, ""), WEATHER.get(weather)[0]));
             }
         }
         // switching lines off can leave gaps: no double blanks, none at the ends
