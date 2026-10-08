@@ -142,6 +142,7 @@ public final class ServerHud {
         if (!ServerInfo.credits.isEmpty()) {
             out.add(row("Credits: ", ServerInfo.credits, Formatting.AQUA));
         }
+        out.add(Text.empty());
         for (String stat : new String[]{"Bite Speed", "Reel Speed", "Prospect"}) {
             String v = DofiSettings.get().profileStats.get(stat.toLowerCase(java.util.Locale.ROOT));
             if (v != null) {
