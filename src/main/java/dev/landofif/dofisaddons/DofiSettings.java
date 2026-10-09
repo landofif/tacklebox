@@ -65,6 +65,8 @@ public class DofiSettings {
     public int menuBgColor = 0x000000, menuBgOpacity = 0, menuImageOpacity = 0;
     /** Every button as a flat see-through fill (lighter while hovered) instead of the bevelled texture. */
     public boolean flatButtons = true;
+    /** The two colours of the gradient on focused tiles, hovered buttons and toggles (rgb). */
+    public int accent1 = 0x33CCFF, accent2 = 0x00FF99;
     /** A see-through circle in the rarity colour behind items in slots (foecollabs rarity, drawn by its item markers). */
     public boolean rarityCircles = false;
     /** The hotbar: moved by this many gui pixels from where vanilla puts it, and whether its slot background is drawn. */

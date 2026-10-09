@@ -88,7 +88,7 @@ public final class SettingsPages {
                 Hypr.rrect(c, cx, cy + 1, 24, 12, 6, Hypr.alpha(Hypr.OVERLAY, fade));
             }
             if (on > 0.02f) {
-                Hypr.rrect(c, cx, cy + 1, 24, 12, 6, Hypr.horizontal(Hypr.ACC1, Hypr.ACC2, cx, 24, fade * on), 8);
+                Hypr.rrect(c, cx, cy + 1, 24, 12, 6, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), cx, 24, fade * on), 8);
             }
             Hypr.rrect(c, cx + 2 + Math.round(on * 12), cy + 3, 8, 8, 4, Hypr.alpha(0xFFF5F5FF, fade));
         }
@@ -171,7 +171,7 @@ public final class SettingsPages {
             trackX = cx + 32;
             Hypr.rrect(c, trackX, cy + 5, TRACK, 4, 2, Hypr.alpha(Hypr.OVERLAY, fade));
             int knob = trackX + Math.round(Hypr.clamp01(shown) * (TRACK - 8));
-            Hypr.rrect(c, trackX, cy + 5, knob - trackX + 4, 4, 2, Hypr.horizontal(Hypr.ACC1, Hypr.ACC2, trackX, TRACK, fade), 8);
+            Hypr.rrect(c, trackX, cy + 5, knob - trackX + 4, 4, 2, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), trackX, TRACK, fade), 8);
             Hypr.rrect(c, knob, cy + 3, 8, 8, 4, Hypr.alpha(0xFFF5F5FF, fade));
         }
 
@@ -242,7 +242,7 @@ public final class SettingsPages {
         public void draw(DrawContext c, TextRenderer tr, int cx, int cy, float fade, boolean hover, float dt) {
             int w = width(tr);
             if (hover) {
-                Hypr.rrect(c, cx, cy, w, H, H / 2, Hypr.horizontal(Hypr.ACC1, Hypr.ACC2, cx, w, fade), 8);
+                Hypr.rrect(c, cx, cy, w, H, H / 2, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), cx, w, fade), 8);
             } else {
                 pill(c, cx, cy, w, fade, false);
             }
@@ -300,6 +300,11 @@ public final class SettingsPages {
     }
 
     private void screens() {
+        header("accent");
+        color("accent colour", "the first colour of the gradient on focused tiles, hovered buttons, toggles and sliders in every screen of the mod.",
+                () -> s.accent1, v -> s.accent1 = v);
+        color("accent colour 2", "the second colour of that gradient. use the same as the first for a flat accent.",
+                () -> s.accent2, v -> s.accent2 = v);
         header("screens");
         link("chat triggers", TriggerListScreen::new);
         link("chat", ChatFilterScreen::new);

@@ -8,13 +8,21 @@ import net.minecraft.client.gui.DrawContext;
  * curves. Only {@code SettingsScreen} uses it; the rest of the mod keeps {@link Foe}.
  */
 public final class Hypr {
-    public static final int ACC1 = 0xFF33CCFF, ACC2 = 0xFF00FF99;
     public static final int BASE = 0xB41E1E2E, BAR = 0xBE181825, SURFACE = 0xFF313244, OVERLAY = 0xFF45475A;
     public static final int TEXT = 0xFFCDD6F4, SUB = 0xFFA6ADC8, MUTED = 0xFF6C7086, CRUST = 0xFF11111B, RED = 0xFFF38BA8;
     /** hyprland's default inactive border, rgba(595959aa). */
     public static final int INACTIVE = 0xAA595959;
 
     private Hypr() {}
+
+    /** The accent gradient's two colours, from the settings. */
+    public static int acc1() {
+        return 0xFF000000 | dev.landofif.dofisaddons.DofiSettings.get().accent1;
+    }
+
+    public static int acc2() {
+        return 0xFF000000 | dev.landofif.dofisaddons.DofiSettings.get().accent2;
+    }
 
     /** A colour per pixel, so borders and fills can be gradients. */
     public interface Paint {

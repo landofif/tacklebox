@@ -26,8 +26,6 @@ public final class Foe {
     /** Selected and hovered text, and outlines that follow the mouse. */
     public static final int ACCENT = 0xFFFFAA00;
 
-    private static final int BUTTON = 0x66000000;
-    private static final int BUTTON_HOT = 0x80606060;
     private static final int BUTTON_OFF = 0x33000000;
 
     private static final int TEX = 15;
@@ -71,20 +69,24 @@ public final class Foe {
         slice(ctx, BOX, x, y, w, h, opacity);
     }
 
-    /** A button: a flat see-through dark fill, lighter grey while hovered, no border. */
+    /** A button: a rounded see-through fill, with the accent gradient as a thin outline while hovered. */
     public static void button(DrawContext ctx, int x, int y, int w, int h, boolean hot) {
-        ctx.fill(x, y, x + w, y + h, hot ? BUTTON_HOT : BUTTON);
+        int r = Math.min(4, h / 2);
+        Hypr.rrect(ctx, x, y, w, h, r, hot ? 0xAA313244 : 0x88181825);
+        if (hot) {
+            Hypr.ring(ctx, x, y, w, h, r, 1, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), x, w, 1), 8);
+        }
     }
 
     /** A button that cannot be clicked, or the picked one: barely there. */
     public static void buttonOff(DrawContext ctx, int x, int y, int w, int h) {
-        ctx.fill(x, y, x + w, y + h, BUTTON_OFF);
+        Hypr.rrect(ctx, x, y, w, h, Math.min(4, h / 2), BUTTON_OFF);
     }
 
     /** A title where a panel puts it, inside the top left edge. Alone it is the title of something with no box. */
     public static void title(DrawContext ctx, int x, int y, Text title) {
         if (title != null && !title.getString().isEmpty()) {
-            ctx.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, title, x + 8, y + 7, TITLE);
+            ctx.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, title, x + 8, y + 7, Hypr.acc2());
         }
     }
 

@@ -293,7 +293,7 @@ public class SettingsScreen extends Screen {
         }
         if (pillX >= 0) {
             Hypr.rrect(ctx, Math.round(pillX), py, Math.round(pillW), 14, 7,
-                    Hypr.horizontal(Hypr.ACC1, Hypr.ACC2, Math.round(pillX), Math.round(pillW), fade), 8);
+                    Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), Math.round(pillX), Math.round(pillW), fade), 8);
         }
         for (int i = 0; i < pages.size(); i++) {
             int x0 = pillBox[i * 2], w = pillBox[i * 2 + 1] - x0;
@@ -395,12 +395,12 @@ public class SettingsScreen extends Screen {
         Hypr.rrect(ctx, x, y, w, h, TILE_R, Hypr.alpha(Hypr.BASE, fade));
         if (f > 0.02f) { // the border turns slowly, like hyprland's borderangle loop
             double angle = Math.toRadians(45) + (now % 10000) / 10000.0 * Math.PI * 2;
-            Hypr.Paint grad = Hypr.angled(Hypr.ACC1, Hypr.ACC2, x, y, w, h, angle, 1);
+            Hypr.Paint grad = Hypr.angled(Hypr.acc1(), Hypr.acc2(), x, y, w, h, angle, 1);
             Hypr.ring(ctx, x, y, w, h, TILE_R, 1, (px, py) -> Hypr.alpha(Hypr.mix(Hypr.INACTIVE, grad.at(px, py), f), fade), 12);
         } else {
             Hypr.ring(ctx, x, y, w, h, TILE_R, 1, Hypr.alpha(Hypr.INACTIVE, fade));
         }
-        ctx.drawTextWithShadow(textRenderer, tile.heading(), x + PAD, y + 7, Hypr.alpha(Hypr.mix(Hypr.SUB, Hypr.ACC2, f), fade));
+        ctx.drawTextWithShadow(textRenderer, tile.heading(), x + PAD, y + 7, Hypr.alpha(Hypr.mix(Hypr.SUB, Hypr.acc2(), f), fade));
 
         int ry = y + TITLE_H;
         int clipTop = contentTop() - ROW_H, clipBottom = contentBottom();
@@ -447,7 +447,7 @@ public class SettingsScreen extends Screen {
         }
         int thumb = Math.max(16, view * view / cur.contentH);
         int y = contentTop() + Math.round((view - thumb) * (cur.scroll / (cur.contentH - view)));
-        Hypr.rrect(ctx, width - 5, y, 2, thumb, 1, Hypr.alpha(Hypr.ACC1, 0.7f * fade));
+        Hypr.rrect(ctx, width - 5, y, 2, thumb, 1, Hypr.alpha(Hypr.acc1(), 0.7f * fade));
     }
 
     /** What a setting does, as a small popup that fades in after the mouse rests on a row (like a notification). */
@@ -468,7 +468,7 @@ public class SettingsScreen extends Screen {
         int h = lines.size() * 10 + 10;
         int x = Math.min(mouseX + 12, width - w - 4), y = Math.min(mouseY + 12, height - h - 4);
         Hypr.rrect(ctx, x, y, w, h, 4, Hypr.alpha(0xF0181825, a));
-        Hypr.ring(ctx, x, y, w, h, 4, 1, Hypr.alpha(Hypr.ACC1, 0.8f * a));
+        Hypr.ring(ctx, x, y, w, h, 4, 1, Hypr.alpha(Hypr.acc1(), 0.8f * a));
         for (int i = 0; i < lines.size(); i++) {
             ctx.drawText(textRenderer, lines.get(i), x + 7, y + 6 + i * 10, Hypr.alpha(Hypr.TEXT, a), false);
         }

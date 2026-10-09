@@ -49,7 +49,7 @@ public class RowListWidget extends ElementListWidget<RowListWidget.Row> {
         int thumb = Math.max(16, height * height / (height + max));
         int top = getY() + (int) ((height - thumb) * (getScrollY() / max));
         context.fill(x, getY(), x + 2, getBottom(), Foe.FAINT);
-        context.fill(x, top, x + 2, top + thumb, Foe.DIM);
+        context.fill(x, top, x + 2, top + thumb, dev.landofif.dofisaddons.ui.Hypr.acc1());
     }
 
     public void addRow(Row row) {
