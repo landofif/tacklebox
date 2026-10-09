@@ -107,10 +107,12 @@ public class DofiSettings {
     /** The quests left hud: where it sits (gui units from the top left) and whether it shows. */
     public boolean questsHud = true;
     public int questsX = 4;
+    public int questsScale = 100;
     public int questsY = 70;
     /** The level progress hud (hud/LevelBars): fishing level and location level bars, where it sits. */
     public boolean levelBars = true;
     public int levelBarsX = 4;
+    public int levelBarsScale = 100;
     public int levelBarsY = 40;
     /** What the level progress hud shows: heading, the fishing line, the location line, the percent, the location xp, and the bar width. */
     public boolean levelBarsHeading = true;
@@ -122,10 +124,12 @@ public class DofiSettings {
     /** The active boosts hud (hud/BoostsHud): boosters, chummer, weather events and moon, where it sits. */
     public boolean boostsHud = true;
     public int boostsX = 182;
+    public int boostsScale = 100;
     public int boostsY = 70;
     /** The now playing hud (hud/NowPlaying): what Spotify, a browser tab or any other player is playing, where it sits. */
     public boolean nowPlaying = true;
     public int nowPlayingX = 4;
+    public int nowPlayingScale = 100;
     public int nowPlayingY = 4;
     /** What the now playing hud shows besides the title: its heading, the album art, the artist, a progress bar and the time. */
     public boolean nowPlayingHeading = true;

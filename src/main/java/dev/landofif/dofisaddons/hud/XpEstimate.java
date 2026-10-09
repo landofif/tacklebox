@@ -265,6 +265,11 @@ public final class XpEstimate {
 
     /** Draws the box at its saved spot and returns {x, y, w, h}; with preview it shows dashes for unknown values. */
     public static int[] draw(DrawContext ctx, boolean preview) {
+        DofiSettings s = DofiSettings.get();
+        return Foe.scaled(ctx, s.questsX, s.questsY, s.questsScale, c -> drawAt100(c, preview));
+    }
+
+    private static int[] drawAt100(DrawContext ctx, boolean preview) {
         ClientPlayerEntity p = MinecraftClient.getInstance().player;
         String level = levelQuests();
         String loc = locationQuests();

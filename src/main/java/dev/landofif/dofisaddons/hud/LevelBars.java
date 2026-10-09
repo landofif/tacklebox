@@ -29,6 +29,11 @@ public final class LevelBars {
     private LevelBars() {}
 
     public static int[] draw(DrawContext ctx, boolean preview) {
+        DofiSettings s = DofiSettings.get();
+        return Foe.scaled(ctx, s.levelBarsX, s.levelBarsY, s.levelBarsScale, c -> drawAt100(c, preview));
+    }
+
+    private static int[] drawAt100(DrawContext ctx, boolean preview) {
         ClientPlayerEntity p = MinecraftClient.getInstance().player;
         if (p == null) {
             return null;

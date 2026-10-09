@@ -83,6 +83,19 @@ public final class Foe {
         Hypr.rrect(ctx, x, y, w, h, Math.min(4, h / 2), BUTTON_OFF);
     }
 
+    /** Draws a hud scaled by {@code percent} around its top left corner (x, y) and returns its rect as it ends up on the screen. */
+    public static int[] scaled(DrawContext ctx, int x, int y, int percent, java.util.function.Function<DrawContext, int[]> draw) {
+        float k = percent / 100f;
+        var m = ctx.getMatrices();
+        m.pushMatrix();
+        m.translate(x, y);
+        m.scale(k, k);
+        m.translate(-x, -y);
+        int[] r = draw.apply(ctx);
+        m.popMatrix();
+        return r == null ? null : new int[]{r[0], r[1], Math.round(r[2] * k), Math.round(r[3] * k)};
+    }
+
     /** A title where a panel puts it, inside the top left edge. Alone it is the title of something with no box. */
     public static void title(DrawContext ctx, int x, int y, Text title) {
         if (title != null && !title.getString().isEmpty()) {

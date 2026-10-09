@@ -97,6 +97,11 @@ public final class BoostsHud {
 
     /** Draws the hud at its saved spot and returns {x, y, w, h}; with preview an empty hud still shows a line so it can be moved. */
     public static int[] draw(DrawContext ctx, boolean preview) {
+        DofiSettings s = DofiSettings.get();
+        return Foe.scaled(ctx, s.boostsX, s.boostsY, s.boostsScale, c -> drawAt100(c, preview));
+    }
+
+    private static int[] drawAt100(DrawContext ctx, boolean preview) {
         List<String[]> rows = rows();
         if (rows.isEmpty()) {
             if (!preview) {

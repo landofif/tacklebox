@@ -76,7 +76,8 @@ public final class FoeMover {
             add.add(new Box(ctx -> XpEstimate.draw(ctx, true), (x, y, r) -> {
                 s.questsX = Math.max(0, Math.min(sw() - 40, x));
                 s.questsY = Math.max(0, Math.min(sh() - 20, y));
-            }, null, () -> {
+            }, (step, shift) -> s.questsScale = Math.max(50, Math.min(300, s.questsScale + step * 5)), () -> {
+                s.questsScale = 100;
                 s.questsX = 4;
                 s.questsY = 70;
             }));
@@ -85,7 +86,8 @@ public final class FoeMover {
             add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.LevelBars.draw(ctx, true), (x, y, r) -> {
                 s.levelBarsX = Math.max(0, Math.min(sw() - 40, x));
                 s.levelBarsY = Math.max(0, Math.min(sh() - 20, y));
-            }, null, () -> {
+            }, (step, shift) -> s.levelBarsScale = Math.max(50, Math.min(300, s.levelBarsScale + step * 5)), () -> {
+                s.levelBarsScale = 100;
                 s.levelBarsX = 4;
                 s.levelBarsY = 40;
             }));
@@ -94,7 +96,8 @@ public final class FoeMover {
             add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.BoostsHud.draw(ctx, true), (x, y, r) -> {
                 s.boostsX = Math.max(0, Math.min(sw() - 40, x));
                 s.boostsY = Math.max(0, Math.min(sh() - 20, y));
-            }, null, () -> {
+            }, (step, shift) -> s.boostsScale = Math.max(50, Math.min(300, s.boostsScale + step * 5)), () -> {
+                s.boostsScale = 100;
                 s.boostsX = 182;
                 s.boostsY = 70;
             }));
@@ -103,7 +106,8 @@ public final class FoeMover {
             add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.NowPlaying.draw(ctx, true), (x, y, r) -> {
                 s.nowPlayingX = Math.max(0, Math.min(sw() - 40, x));
                 s.nowPlayingY = Math.max(0, Math.min(sh() - 20, y));
-            }, null, () -> {
+            }, (step, shift) -> s.nowPlayingScale = Math.max(50, Math.min(300, s.nowPlayingScale + step * 5)), () -> {
+                s.nowPlayingScale = 100;
                 s.nowPlayingX = 4;
                 s.nowPlayingY = 4;
             }));
