@@ -7,4 +7,5 @@ Read the doc that matches your task. Do not read them all.
 | Server hud lines, compendium lines | `server-hud.md` |
 | Active boosts, now playing | `boosts-and-now-playing.md` |
 | Quests left, xp estimate | `quests-left.md` |
+| Level progress bars, hud scaling in the mover | `level-bars.md` |
 | Bobber timer, bite notification | `bobber-timer.md` |
