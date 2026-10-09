@@ -250,7 +250,6 @@ public class SettingsScreen extends Screen {
         long now = Util.getMeasuringTimeMs();
         dt = Math.min(0.1f, (now - last) / 1000f);
         last = now;
-        super.renderBackground(ctx, mouseX, mouseY, delta);
 
         float closeP = closeAt < 0 ? 0 : Hypr.clamp01((now - closeAt) / (float) CLOSE_MS);
         float barP = Bezier.OUT_QUINT.at((now - openedAt) / 450f);
