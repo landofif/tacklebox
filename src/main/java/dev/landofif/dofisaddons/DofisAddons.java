@@ -92,6 +92,7 @@ public final class DofisAddons implements ClientModInitializer {
                 return;
             }
             XpEstimate.renderHud(context);
+            dev.landofif.dofisaddons.hud.EquipmentRow.renderHud(context);
             dev.landofif.dofisaddons.hud.ServerHud.renderHud(context);
             dev.landofif.dofisaddons.hud.BoostsHud.renderHud(context);
             dev.landofif.dofisaddons.hud.NowPlaying.renderHud(context);
@@ -117,6 +118,7 @@ public final class DofisAddons implements ClientModInitializer {
             ServerInfo.tick(client);
             XpEstimate.tick(client);
             dev.landofif.dofisaddons.display.BobberTimer.tick(client);
+            dev.landofif.dofisaddons.hud.EquipmentRow.tick(client);
             dev.landofif.dofisaddons.display.PetHeads.tick(client);
             dev.landofif.dofisaddons.input.KeyCommands.tick(client);
             TriggerEngine.tick();

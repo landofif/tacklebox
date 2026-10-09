@@ -95,6 +95,9 @@ public class DofiSettings {
     public boolean equipRecolor = false;
     public int equipColor = 0xFFFFFF;
     public int equipY = 0;
+    /** The mods own armour and rod parts row (hud/EquipmentRow) instead of foecollabs, and the look version the saved settings were last moved to. */
+    public boolean equipHud = true;
+    public int lookVersion = 0;
 
     // ---- fishonmc menu (see menu/FishMenu) ----
     /** Show the main menu and /travel as the mods own screens instead of the chest gui. */
@@ -322,7 +325,7 @@ public class DofiSettings {
 
     /** DEFAULT is the vanilla hotbar sprite / foecollabs own squares, which only fit at their own spacing. */
     public enum BoxLook {
-        OFF("off"), DEFAULT("default"), FILL("fill"), OUTLINE("outline"), BOTH("fill + outline");
+        HYPR("hyprland"), OFF("off"), DEFAULT("default"), FILL("fill"), OUTLINE("outline"), BOTH("fill + outline");
 
         public final String label;
 
@@ -332,7 +335,7 @@ public class DofiSettings {
     }
 
     public enum SelectionStyle {
-        FRAME("frame"), ROUND("round"), SIMPLE("simple"), NONE("off");
+        HYPR("hyprland"), FRAME("frame"), ROUND("round"), SIMPLE("simple"), NONE("off");
 
         public final String label;
 
@@ -369,6 +372,12 @@ public class DofiSettings {
         if (equipPlace == null) equipPlace = EquipPlace.ABOVE;
         if (hotbarLook == null) hotbarLook = hotbarBackground ? BoxLook.DEFAULT : BoxLook.OFF;
         if (equipLook == null) equipLook = hotbarBackground ? BoxLook.DEFAULT : BoxLook.OFF;
+        if (lookVersion < 1) { // the hyprland look is the new default for the hotbar and equipment row
+            hotbarLook = BoxLook.HYPR;
+            equipLook = BoxLook.HYPR;
+            hotbarSelection = SelectionStyle.HYPR;
+            lookVersion = 1;
+        }
         hotbarSpacing = Math.max(16, Math.min(24, hotbarSpacing));
         equipSpacing = Math.max(16, Math.min(26, equipSpacing));
         boxOpacity = Math.max(0, Math.min(100, boxOpacity));

@@ -406,6 +406,8 @@ public final class SettingsPages {
         toggle("offhand box", "the box next to the hotbar for your offhand item.",
                 () -> s.hotbarOffhand, v -> s.hotbarOffhand = v);
         header("equipment");
+        toggle("equipment hud", "your chestplate, leggings and boots and the reel, pole and line of your rod as two rounded groups above the hotbar. off brings back foecollabs own row.",
+                () -> s.equipHud, v -> s.equipHud = v);
         slider("equipment size", "how big foecollabs armour and rod parts row is. move it with move huds.", 50, 200, 5, "%",
                 () -> s.equipScale, v -> s.equipScale = (int) Math.round(v));
         cycle("equipment place", "where the armour and rod parts row sits: above the hotbar, or level with it on its left or right. you can still drag it from there.",

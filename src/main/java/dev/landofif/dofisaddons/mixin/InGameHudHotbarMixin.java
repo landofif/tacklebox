@@ -7,6 +7,7 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.compat.FoeRarity;
 import dev.landofif.dofisaddons.display.SlotBox;
+import dev.landofif.dofisaddons.display.HotbarSelection;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
@@ -49,6 +50,10 @@ abstract class InGameHudHotbarMixin {
             return;
         }
         if (path.startsWith("hud/hotbar_offhand") && !s.hotbarOffhand) {
+            return;
+        }
+        if (path.startsWith("hud/hotbar_selection") && s.hotbarSelection == DofiSettings.SelectionStyle.HYPR) {
+            HotbarSelection.draw(ctx, (int) Math.round((x + w / 2.0 - (mid - 80)) / 20.0), mid, pitch, y + 1);
             return;
         }
         if (path.startsWith("hud/hotbar_selection")) { // the marker follows its slot when the slots are closer
