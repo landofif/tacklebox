@@ -14,6 +14,11 @@ repositories {
     mavenCentral()
     maven { name = 'TerraformersMC'; url = 'https://maven.terraformersmc.com/releases/' }
     maven { name = 'Shedaniel'; url = 'https://maven.shedaniel.me/' }
+    exclusiveContent {
+        forRepository { maven { name = 'Modrinth'; url = 'https://api.modrinth.com/maven' } }
+        filter { includeGroup 'maven.modrinth' }
+    }
+    maven { name = 'DevAuth'; url = 'https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1' }
 }
 
 dependencies {
@@ -32,6 +37,12 @@ dependencies {
     modCompileOnly("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
         exclude group: 'net.fabricmc.fabric-api'
     }
+    // Logs the dev client in with your real Microsoft account so runClient can join fishonmc (online mode).
+    // Dev only: modLocalRuntime never ends up in the built jar.
+    modLocalRuntime 'me.djtheredstoner:DevAuth-fabric:1.2.2'
+    // Same as in the normal instance: without it chat is blocked on EU accounts.
+    modLocalRuntime 'maven.modrinth:no-chat-restrictions:Fabric-MC1.21.11-v1.0.3'
+    modLocalRuntime 'maven.modrinth:mouse-tweaks:1.21.11-2.30-fabric'
     modLocalRuntime fileTree(dir: 'run/foecollab', include: '*.jar')
     modLocalRuntime("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
         exclude group: 'net.fabricmc.fabric-api'
@@ -40,6 +51,13 @@ dependencies {
 
 loom {
     accessWidenerPath = file('src/main/resources/dofisaddons.accesswidener')
+    runs {
+        client {
+            property 'devauth.enabled', 'true'
+            property 'devauth.account', 'main'
+            programArgs '--quickPlayMultiplayer', 'play.fishonmc.net'
+        }
+    }
 }
 
 processResources {
