@@ -10,9 +10,9 @@ public final class SlotBox {
 
     public static void draw(DrawContext ctx, int x1, int y1, int x2, int y2, DofiSettings.BoxLook look) {
         DofiSettings s = DofiSettings.get();
-        if (look == DofiSettings.BoxLook.HYPR) { // a rounded translucent pill with a faint accent outline
+        if (look == DofiSettings.BoxLook.HYPR) { // a rounded pill filled with the accent gradient at the fill opacity, with the same gradient as its outline
             int w = x2 - x1, h = y2 - y1;
-            Hypr.rrect(ctx, x1, y1, w, h, 5, Hypr.alpha(0xFF181825, s.boxOpacity / 100f));
+            Hypr.rrect(ctx, x1, y1, w, h, 5, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), x1, w, s.boxOpacity / 100f), 8);
             Hypr.ring(ctx, x1, y1, w, h, 5, 1, Hypr.horizontal(Hypr.alpha(Hypr.acc1(), 0.55f), Hypr.alpha(Hypr.acc2(), 0.55f), x1, w, 1), 8);
             return;
         }

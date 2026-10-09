@@ -418,7 +418,7 @@ public final class SettingsPages {
                 () -> s.equipSpacing, v -> s.equipSpacing = (int) Math.round(v));
         color("box outline colour", "the colour of the thin outline around the hotbar and equipment boxes.",
                 () -> s.boxOutlineColor, v -> s.boxOutlineColor = v);
-        slider("box fill opacity", "how dark the see-through fill behind the hotbar and equipment is.", 0, 100, 5, "%",
+        slider("box fill opacity", "how strong the accent gradient fill behind the hotbar and equipment is. 0 is see-through.", 0, 100, 5, "%",
                 () -> s.boxOpacity, v -> s.boxOpacity = (int) Math.round(v));
         toggle("equipment circles", "a circle in the rarity colour behind each equipment item, instead of foecollabs bar under it.",
                 () -> s.equipCircle, v -> s.equipCircle = v);
