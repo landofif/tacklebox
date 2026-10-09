@@ -109,6 +109,12 @@ public class DofiSettings {
     public boolean nowPlaying = true;
     public int nowPlayingX = 4;
     public int nowPlayingY = 4;
+    /** What the now playing hud shows besides the title: its heading, the album art, the artist, a progress bar and the time. */
+    public boolean nowPlayingHeading = true;
+    public boolean nowPlayingArt = true;
+    public boolean nowPlayingArtist = true;
+    public boolean nowPlayingBar = true;
+    public boolean nowPlayingTime = true;
     /** The sidebar styled server hud (hud/ServerHud): where it sits, its size in percent and how strong the picture behind it is (percent). */
     public boolean serverHud = true;
     public int serverHudX = 4;

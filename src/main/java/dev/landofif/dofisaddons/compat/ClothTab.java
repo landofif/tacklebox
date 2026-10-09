@@ -226,6 +226,16 @@ public final class ClothTab {
         header("now playing");
         toggle("now playing hud", "shows what is playing on your computer (spotify, youtube in a browser, anything that works with playerctl): title, artist and the time. linux only, needs playerctl installed. shows only, it never controls the player. move it with move huds.",
                 () -> s.nowPlaying, v -> s.nowPlaying = v);
+        toggle("now playing heading", "the green now playing title above the track.",
+                () -> s.nowPlayingHeading, v -> s.nowPlayingHeading = v);
+        toggle("now playing album art", "the cover next to the text. it is fetched once per track from the address the player gives (spotify, youtube thumbnails).",
+                () -> s.nowPlayingArt, v -> s.nowPlayingArt = v);
+        toggle("now playing artist", "the artist or channel under the title.",
+                () -> s.nowPlayingArtist, v -> s.nowPlayingArtist = v);
+        toggle("now playing progress bar", "a thin bar showing how far into the track you are. not shown for live streams.",
+                () -> s.nowPlayingBar, v -> s.nowPlayingBar = v);
+        toggle("now playing time", "the time played and the length of the track.",
+                () -> s.nowPlayingTime, v -> s.nowPlayingTime = v);
         header("server hud");
         toggle("server hud", "a sidebar styled hud: time, location, wallet and credits, the tackle shop and moon timers, and the weather events and moon that are active. move and resize it with move huds.",
                 () -> s.serverHud, v -> s.serverHud = v);
