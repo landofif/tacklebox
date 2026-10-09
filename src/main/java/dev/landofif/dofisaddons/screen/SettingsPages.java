@@ -358,6 +358,10 @@ public final class SettingsPages {
         header("menus");
         toggle("simple menus", "chests, your inventory and fishonmc menus with no box and no slot boxes, just the items. hides the menu art from the server pack.",
                 () -> s.flatMenus, v -> s.flatMenus = v);
+        toggle("accent buttons", "fills the fishonmc menu buttons with the accent gradient instead of dark grey.",
+                () -> s.menuAccent, v -> s.menuAccent = v);
+        slider("accent strength", "how strong the accent fill of the menu buttons is.", 5, 100, 5, "%",
+                () -> s.menuAccentOpacity, v -> s.menuAccentOpacity = (int) Math.round(v));
         color("menu background", "the colour behind chests, your inventory and fishonmc menus when simple menus is on.",
                 () -> s.menuBgColor, v -> s.menuBgColor = v);
         slider("menu background opacity", "how strong that colour is. 0 is see-through.", 0, 100, 5, "%",

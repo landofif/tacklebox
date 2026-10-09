@@ -1,6 +1,7 @@
 package dev.landofif.dofisaddons.screen;
 
 import dev.landofif.dofisaddons.ui.Foe;
+import dev.landofif.dofisaddons.ui.Hypr;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.hud.BaitInfo;
 import dev.landofif.dofisaddons.menu.FishMenu;
@@ -348,7 +349,16 @@ public class FishMenuScreen extends DofiScreen {
         ctx.getMatrices().translate(x, y);
         ctx.getMatrices().scale(scale, scale);
         float w = cellW / scale, h = cellH / scale;
-        Foe.button(ctx, 2, 2, (int) w - 4, (int) h - 4, hot);
+        DofiSettings cfg = DofiSettings.get();
+        if (cfg.menuAccent) {
+            int iw = (int) w, ih = (int) h;
+            Hypr.rrect(ctx, 0, 0, iw, ih, 4, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), 0, iw, cfg.menuAccentOpacity / 100f), 8);
+            if (hot) {
+                Hypr.ring(ctx, 0, 0, iw, ih, 4, 1, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), 0, iw, 1), 8);
+            }
+        } else {
+            Foe.button(ctx, 0, 0, (int) w, (int) h, hot);
+        }
         if (t.loc != null) {
             drawLocation(ctx, t, w, h);
         } else {

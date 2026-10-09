@@ -62,6 +62,8 @@ public class DofiSettings {
     /** Chests, the inventory and fishonmc menus as one box with no slot boxes (drops the server's menu art). */
     public boolean flatMenus = true;
     /** What shows behind the box-less menus (display/MenuBackground): a colour and a picture, each in percent opacity (0 = none). */
+    public boolean menuAccent;
+    public int menuAccentOpacity = 40;
     public int menuBgColor = 0x000000, menuBgOpacity = 0, menuImageOpacity = 0;
     /** Every button as a flat see-through fill (lighter while hovered) instead of the bevelled texture. */
     public boolean flatButtons = true;
