@@ -352,9 +352,10 @@ public class FishMenuScreen extends DofiScreen {
         DofiSettings cfg = DofiSettings.get();
         if (cfg.menuAccent) {
             int iw = (int) w, ih = (int) h;
-            Hypr.rrect(ctx, 0, 0, iw, ih, 0, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), 0, iw, cfg.menuAccentOpacity / 100f), 8);
+            int gx = Math.round((gridX - x) / scale), gw = Math.round(cols * cellW / scale); // one gradient across the whole grid
+            Hypr.rrect(ctx, 0, 0, iw, ih, 0, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), gx, gw, cfg.menuAccentOpacity / 100f), 8);
             if (hot) {
-                Hypr.ring(ctx, 0, 0, iw, ih, 0, 1, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), 0, iw, 1), 8);
+                Hypr.ring(ctx, 0, 0, iw, ih, 0, 1, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), gx, gw, 1), 8);
             }
         } else {
             ctx.fill(0, 0, (int) w, (int) h, hot ? 0xAA313244 : 0x88181825); // square, so neighbours leave no holes at the corners
