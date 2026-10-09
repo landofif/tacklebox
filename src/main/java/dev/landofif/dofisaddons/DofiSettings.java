@@ -108,6 +108,10 @@ public class DofiSettings {
     public boolean questsHud = true;
     public int questsX = 4;
     public int questsY = 70;
+    /** The level progress hud (hud/LevelBars): fishing level and location level bars, where it sits. */
+    public boolean levelBars = true;
+    public int levelBarsX = 4;
+    public int levelBarsY = 40;
     /** The active boosts hud (hud/BoostsHud): boosters, chummer, weather events and moon, where it sits. */
     public boolean boostsHud = true;
     public int boostsX = 182;

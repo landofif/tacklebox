@@ -92,6 +92,7 @@ public final class DofisAddons implements ClientModInitializer {
                 return;
             }
             XpEstimate.renderHud(context);
+            dev.landofif.dofisaddons.hud.LevelBars.renderHud(context);
             dev.landofif.dofisaddons.hud.EquipmentRow.renderHud(context);
             dev.landofif.dofisaddons.hud.ServerHud.renderHud(context);
             dev.landofif.dofisaddons.hud.BoostsHud.renderHud(context);

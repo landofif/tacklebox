@@ -36,6 +36,8 @@ public final class XpEstimate {
     private static final String NUM = "([0-9][0-9.,]*)\\s*([kmb]?)";
     private static final Pattern REWARD = Pattern.compile(NUM + "(?:\\s*-\\s*" + NUM + ")?\\s*(l?)xp", Pattern.CASE_INSENSITIVE);
     private static final Pattern POPUP = Pattern.compile("\\+" + NUM + "(l?)xp", Pattern.CASE_INSENSITIVE);
+    /** The quest reward line "+ 3.35Klxp" (location xp, for the location you are at). */
+    private static final Pattern LXP_LINE = Pattern.compile("^\\s*\\+\\s*" + NUM + "\\s*lxp\\s*$");
     private static final Pattern GAINED = Pattern.compile("^location > (.+?) gained " + NUM + "\\s*xp");
 
     /** The profile item in /menu: "Fishing Level [274]" then "(1.02M/3.73M)". */
@@ -135,6 +137,12 @@ public final class XpEstimate {
         double[] at = loc == null ? null : LOCATION.get(loc.id());
         if (at != null) {
             at[1] += num(m.group(2), m.group(3));
+            return;
+        }
+        m = LXP_LINE.matcher(lower);
+        at = m.find() ? here() : null;
+        if (at != null) {
+            at[1] += num(m.group(1), m.group(2));
         }
     }
 

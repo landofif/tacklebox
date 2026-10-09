@@ -81,6 +81,15 @@ public final class FoeMover {
                 s.questsY = 70;
             }));
         }
+        if (s.levelBars) {
+            add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.LevelBars.draw(ctx, true), (x, y, r) -> {
+                s.levelBarsX = Math.max(0, Math.min(sw() - 40, x));
+                s.levelBarsY = Math.max(0, Math.min(sh() - 20, y));
+            }, null, () -> {
+                s.levelBarsX = 4;
+                s.levelBarsY = 40;
+            }));
+        }
         if (s.boostsHud) {
             add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.BoostsHud.draw(ctx, true), (x, y, r) -> {
                 s.boostsX = Math.max(0, Math.min(sw() - 40, x));

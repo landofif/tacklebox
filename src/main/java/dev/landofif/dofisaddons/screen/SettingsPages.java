@@ -439,6 +439,9 @@ public final class SettingsPages {
         header("active boosts");
         toggle("active boosts hud", "what is on right now: player boosters with a countdown, the chummer, and the weather events and moon. read from chat lines only. the server hud shows the events and moon too, switch its weather and moon lines off if you only want them here. move it with move huds.",
                 () -> s.boostsHud, v -> s.boostsHud = v);
+        header("level progress");
+        toggle("level progress hud", "two thin bars: your fishing level (from the vanilla xp bar) and the level of the location you are at. the location bar starts when you open /comp once and then follows the location xp of quest rewards and chat. move it with move huds.",
+                () -> s.levelBars, v -> s.levelBars = v);
         header("now playing");
         toggle("now playing hud", "shows what is playing on your computer (spotify, youtube in a browser, anything that works with playerctl): title, artist and the time. linux only, needs playerctl installed. shows only, it never controls the player. move it with move huds.",
                 () -> s.nowPlaying, v -> s.nowPlaying = v);
