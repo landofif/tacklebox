@@ -1,6 +1,7 @@
 package dev.landofif.dofisaddons.screen;
 
 import dev.landofif.dofisaddons.ui.Foe;
+import dev.landofif.dofisaddons.ui.Hypr;
 import dev.landofif.dofisaddons.DofiSettings;
 import dev.landofif.dofisaddons.menu.FishMenu;
 import dev.landofif.dofisaddons.ui.DofiScreen;
@@ -34,6 +35,9 @@ import java.util.Map;
  * presets equip button. Reads the real chest slots, so paging and the armor/parts switch keep working.
  */
 public class PresetsScreen extends DofiScreen {
+    private final java.util.Map<Object, Float> focus = new java.util.HashMap<>();
+    private long lastFrame;
+    private float dt;
     private static final int PAD = 14;
     private static final int TOP = 20;
     private static final int BAR = 30;
@@ -260,6 +264,9 @@ public class PresetsScreen extends DofiScreen {
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);
+        long now = net.minecraft.util.Util.getMeasuringTimeMs();
+        dt = Math.min(0.1f, (now - lastFrame) / 1000f);
+        lastFrame = now;
         collect();
         if (cards.isEmpty()) {
             ctx.drawCenteredTextWithShadow(textRenderer, Foe.text("waiting for the menu...").withColor(Foe.DIM & 0xFFFFFF), vx() + vw() / 2, vy() + vh() / 2, 0xFFFFFFFF);
@@ -286,7 +293,7 @@ public class PresetsScreen extends DofiScreen {
         for (int i = 0; i < Math.min(others.size(), n); i++) { // the other page, greyed out, click to go there
             int x = cardX + i * (cardW + gap);
             drawCard(ctx, others.get(i), x, otherY, cardW, otherH, false, -1, -1, DofiSettings.get().presetsOtherBg);
-            ctx.fill(x, otherY, x + cardW, otherY + otherH, 0x80000000);
+            Hypr.rrect(ctx, x, otherY, cardW, otherH, 5, 0x80000000);
         }
         if (!tip.isEmpty()) {
             ctx.drawItemTooltip(textRenderer, tip, mouseX, mouseY);
@@ -321,17 +328,23 @@ public class PresetsScreen extends DofiScreen {
 
     /** Draws one card and returns the item under the mouse, if any. */
     private ItemStack drawCard(DrawContext ctx, Card c, int x, int y, int w, int h, boolean hover, int mouseX, int mouseY, boolean bg) {
-        if (bg) {
-            Foe.button(ctx, x, y, w, h, hover);
-            if (worn(c)) { // the preset you have on: an orange outline
-                ctx.fill(x, y, x + w, y + 1, Foe.ACCENT);
-                ctx.fill(x, y + h - 1, x + w, y + h, Foe.ACCENT);
-                ctx.fill(x, y, x + 1, y + h, Foe.ACCENT);
-                ctx.fill(x + w - 1, y, x + w, y + h, Foe.ACCENT);
+        float f = 0;
+        if (bg) { // a tile: the card under the mouse (or the preset you have on) gets the turning gradient border
+            float fo = Hypr.approach(focus.getOrDefault(c.preset, 0f), hover ? 1 : 0, dt, 14);
+            focus.put(c.preset, fo);
+            f = fo;
+            float lit = Math.max(fo, worn(c) ? 1 : 0);
+            Hypr.rrect(ctx, x, y, w, h, 5, Hypr.BASE);
+            if (lit > 0.02f) {
+                double angle = Math.toRadians(45) + (net.minecraft.util.Util.getMeasuringTimeMs() % 10000) / 10000.0 * Math.PI * 2;
+                Hypr.Paint grad = Hypr.angled(Hypr.acc1(), Hypr.acc2(), x, y, w, h, angle, 1);
+                Hypr.ring(ctx, x, y, w, h, 5, 1, (px, py) -> Hypr.mix(Hypr.INACTIVE, grad.at(px, py), lit), 12);
+            } else {
+                Hypr.ring(ctx, x, y, w, h, 5, 1, Hypr.INACTIVE);
             }
         }
         Text label = Foe.text(c.label());
-        ctx.drawText(textRenderer, label, x + (w - textRenderer.getWidth(label)) / 2, y + 6, hover ? Foe.ACCENT : Foe.TEXT, false);
+        ctx.drawTextWithShadow(textRenderer, label, x + (w - textRenderer.getWidth(label)) / 2, y + 6, Hypr.mix(Hypr.SUB, Hypr.acc2(), f));
 
         boolean armor = c.pieces.stream().anyMatch(s -> armorSlot(s) != null);
         int iconSize = armor ? 16 : Math.max(16, Math.min(Math.min(h - 40, 56), (w - 16 - 4 * c.pieces.size()) / Math.max(1, c.pieces.size())));
@@ -359,7 +372,7 @@ public class PresetsScreen extends DofiScreen {
         int ix = x + (w - rowW) / 2;
         for (ItemStack p : c.pieces) {
             if (p.isEmpty()) { // empty part slot: just a faint box
-                ctx.drawStrokedRectangle(ix, iy, iconSize, iconSize, Foe.FAINT);
+                Hypr.ring(ctx, ix, iy, iconSize, iconSize, 3, 1, Hypr.OVERLAY);
                 ix += iconSize + 4;
                 continue;
             }
