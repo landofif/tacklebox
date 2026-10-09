@@ -41,18 +41,6 @@ public final class FoeScreens {
         }
     }
 
-    /** foecollab's cloth config screen, which carries the "dofis addons" tab (see ClothTab). */
-    public static Screen config(Screen parent) {
-        try {
-            @SuppressWarnings("unchecked")
-            Class<? extends me.shedaniel.autoconfig.ConfigData> cls = (Class<? extends me.shedaniel.autoconfig.ConfigData>) Class.forName("io.github.foecollab.config.FOEConfig");
-            return me.shedaniel.autoconfig.AutoConfig.getConfigScreen(cls, parent).get();
-        } catch (ReflectiveOperationException | LinkageError | ClassCastException e) {
-            DofisAddons.LOGGER.warn("Could not open foecollabs config", e);
-            return null;
-        }
-    }
-
     private static Screen make(String name, Screen parent) {
         try {
             return (Screen) Class.forName(name).getConstructor(MinecraftClient.class, Screen.class)

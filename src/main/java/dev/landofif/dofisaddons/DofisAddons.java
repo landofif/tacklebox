@@ -122,7 +122,7 @@ public final class DofisAddons implements ClientModInitializer {
             TriggerEngine.tick();
             while (openKey.wasPressed()) {
                 if (client.currentScreen == null) {
-                    client.setScreen(dev.landofif.dofisaddons.compat.FoeScreens.config(null));
+                    client.setScreen(new dev.landofif.dofisaddons.screen.SettingsScreen(null));
                 }
             }
             if (pendingScreen != null) {
@@ -133,7 +133,7 @@ public final class DofisAddons implements ClientModInitializer {
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("dofi")
-                    .executes(ctx -> open(() -> dev.landofif.dofisaddons.compat.FoeScreens.config(null)))
+                    .executes(ctx -> open(() -> new dev.landofif.dofisaddons.screen.SettingsScreen(null)))
                     .then(ClientCommandManager.literal("triggers").executes(ctx -> open(() -> new TriggerListScreen(null))))
                     .then(ClientCommandManager.literal("huds").executes(ctx -> open(() -> dev.landofif.dofisaddons.compat.FoeScreens.customHuds(null))))
                     .then(ClientCommandManager.literal("words").executes(ctx -> open(() -> new dev.landofif.dofisaddons.screen.WordSwapScreen(null))))

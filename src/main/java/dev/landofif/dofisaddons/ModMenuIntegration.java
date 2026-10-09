@@ -7,6 +7,6 @@ import com.terraformersmc.modmenu.api.ModMenuApi;
 public final class ModMenuIntegration implements ModMenuApi {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return dev.landofif.dofisaddons.compat.FoeScreens::config;
+        return dev.landofif.dofisaddons.screen.SettingsScreen::new;
     }
 }
