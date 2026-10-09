@@ -62,7 +62,7 @@ public final class LevelBars {
         int bar = s.levelBarsWidth, top = s.levelBarsY + (s.levelBarsHeading ? 20 : 4);
         int labelW = 0, extraW = 0;
         for (int i = 0; i < rows; i++) {
-            labelW = Math.max(labelW, tr.getWidth(Foe.text(label[i])));
+            labelW = Math.max(labelW, tr.getWidth(ServerHud.title(label[i])));
             extraW = Math.max(extraW, tr.getWidth(extra[i]));
         }
         int pctW = s.levelBarsPercent ? tr.getWidth("100%") + 6 : 0;
@@ -72,7 +72,7 @@ public final class LevelBars {
         for (int i = 0; i < rows; i++) {
             int y = top + i * 12, x = s.levelBarsX + 8;
             double f = Math.max(0, Math.min(1, fraction[i]));
-            ctx.drawTextWithShadow(tr, Foe.text(label[i]), x, y, Foe.DIM);
+            ctx.drawTextWithShadow(tr, ServerHud.title(label[i]), x, y, Foe.DIM);
             int bx = x + labelW + 6;
             ctx.fill(bx, y + 3, bx + bar, y + 5, Foe.FAINT);
             ctx.fillGradient(bx, y + 3, bx + (int) (bar * f), y + 5, Hypr.acc1(), Hypr.acc2());

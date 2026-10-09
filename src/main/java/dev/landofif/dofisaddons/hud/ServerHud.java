@@ -108,7 +108,7 @@ public final class ServerHud {
         return moon.isEmpty() ? null : new String[]{moon, moonEffect};
     }
 
-    private static String title(String caps) {
+    static String title(String caps) {
         StringBuilder b = new StringBuilder();
         for (String w : caps.toLowerCase(java.util.Locale.ROOT).split(" ")) {
             b.append(b.isEmpty() ? "" : " ").append(Character.toUpperCase(w.charAt(0))).append(w.substring(1));
