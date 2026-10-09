@@ -442,6 +442,18 @@ public final class SettingsPages {
         header("level progress");
         toggle("level progress hud", "two thin bars: your fishing level (from the vanilla xp bar) and the level of the location you are at. the location bar starts when you open /comp once and then follows the location xp of quest rewards and chat. move it with move huds.",
                 () -> s.levelBars, v -> s.levelBars = v);
+        toggle("level progress heading", "the green level progress title above the bars.",
+                () -> s.levelBarsHeading, v -> s.levelBarsHeading = v);
+        toggle("level progress fishing line", "the fishing level bar.",
+                () -> s.levelBarsFishing, v -> s.levelBarsFishing = v);
+        toggle("level progress location line", "the bar for the location you are at.",
+                () -> s.levelBarsLocation, v -> s.levelBarsLocation = v);
+        toggle("level progress percent", "the percent after each bar.",
+                () -> s.levelBarsPercent, v -> s.levelBarsPercent = v);
+        toggle("level progress location xp", "the location xp into the level over what it needs, after the location bar.",
+                () -> s.levelBarsXp, v -> s.levelBarsXp = v);
+        slider("level progress bar width", "how long the bars are, in pixels.", 40, 200, 10, "",
+                () -> s.levelBarsWidth, v -> s.levelBarsWidth = (int) v);
         header("now playing");
         toggle("now playing hud", "shows what is playing on your computer (spotify, youtube in a browser, anything that works with playerctl): title, artist and the time. linux only, needs playerctl installed. shows only, it never controls the player. move it with move huds.",
                 () -> s.nowPlaying, v -> s.nowPlaying = v);

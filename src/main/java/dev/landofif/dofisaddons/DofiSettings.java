@@ -112,6 +112,13 @@ public class DofiSettings {
     public boolean levelBars = true;
     public int levelBarsX = 4;
     public int levelBarsY = 40;
+    /** What the level progress hud shows: heading, the fishing line, the location line, the percent, the location xp, and the bar width. */
+    public boolean levelBarsHeading = true;
+    public boolean levelBarsFishing = true;
+    public boolean levelBarsLocation = true;
+    public boolean levelBarsPercent = true;
+    public boolean levelBarsXp = true;
+    public int levelBarsWidth = 80;
     /** The active boosts hud (hud/BoostsHud): boosters, chummer, weather events and moon, where it sits. */
     public boolean boostsHud = true;
     public int boostsX = 182;
