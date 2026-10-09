@@ -223,7 +223,7 @@ public class TriggerListScreen extends Screen {
         if (f > 0.02f) {
             double angle = Math.toRadians(45) + (now % 10000) / 10000.0 * Math.PI * 2;
             Hypr.Paint grad = Hypr.angled(Hypr.ACC1, Hypr.ACC2, x, y, w, ROW_H, angle, 1);
-            Hypr.ring(ctx, x, y, w, ROW_H, R, 1, (px, py) -> Hypr.alpha(Hypr.mix(Hypr.INACTIVE, grad.at(px, py), f), a), 6);
+            Hypr.ring(ctx, x, y, w, ROW_H, R, 1, (px, py) -> Hypr.alpha(Hypr.mix(Hypr.INACTIVE, grad.at(px, py), f), a), 12);
         } else {
             Hypr.ring(ctx, x, y, w, ROW_H, R, 1, Hypr.alpha(Hypr.INACTIVE, a));
         }
@@ -258,7 +258,7 @@ public class TriggerListScreen extends Screen {
         arrow(ctx, z[3], cy, "▼", i < n - 1, over && mouseX >= z[3] && mouseX < z[3] + 14, a);
         boolean shareHot = over && mouseX >= z[4] && mouseX < z[4] + z[5];
         if (shareHot) {
-            Hypr.rrect(ctx, z[4], cy, z[5], 14, 7, Hypr.horizontal(Hypr.ACC1, Hypr.ACC2, z[4], z[5], a), 4);
+            Hypr.rrect(ctx, z[4], cy, z[5], 14, 7, Hypr.horizontal(Hypr.ACC1, Hypr.ACC2, z[4], z[5], a), 8);
         } else {
             Hypr.rrect(ctx, z[4], cy, z[5], 14, 7, Hypr.alpha(Hypr.SURFACE, a));
         }
@@ -294,7 +294,7 @@ public class TriggerListScreen extends Screen {
             barBox[i * 2 + 1] = x + ws[i];
             boolean hot = mouseX >= x && mouseX < x + ws[i] && mouseY >= by && mouseY < by + 24;
             if (hot) {
-                Hypr.rrect(ctx, x, by + 5, ws[i], 14, 7, Hypr.horizontal(Hypr.ACC1, Hypr.ACC2, x, ws[i], a), 4);
+                Hypr.rrect(ctx, x, by + 5, ws[i], 14, 7, Hypr.horizontal(Hypr.ACC1, Hypr.ACC2, x, ws[i], a), 8);
             }
             ctx.drawText(textRenderer, Foe.smallCaps(BAR[i]), x + 9, by + 8, Hypr.alpha(hot ? Hypr.CRUST : Hypr.SUB, a), false);
             x += ws[i] + 2;

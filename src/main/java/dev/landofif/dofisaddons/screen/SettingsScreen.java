@@ -293,7 +293,7 @@ public class SettingsScreen extends Screen {
         }
         if (pillX >= 0) {
             Hypr.rrect(ctx, Math.round(pillX), py, Math.round(pillW), 14, 7,
-                    Hypr.horizontal(Hypr.ACC1, Hypr.ACC2, Math.round(pillX), Math.round(pillW), fade), 4);
+                    Hypr.horizontal(Hypr.ACC1, Hypr.ACC2, Math.round(pillX), Math.round(pillW), fade), 8);
         }
         for (int i = 0; i < pages.size(); i++) {
             int x0 = pillBox[i * 2], w = pillBox[i * 2 + 1] - x0;
@@ -396,14 +396,22 @@ public class SettingsScreen extends Screen {
         if (f > 0.02f) { // the border turns slowly, like hyprland's borderangle loop
             double angle = Math.toRadians(45) + (now % 10000) / 10000.0 * Math.PI * 2;
             Hypr.Paint grad = Hypr.angled(Hypr.ACC1, Hypr.ACC2, x, y, w, h, angle, 1);
-            Hypr.ring(ctx, x, y, w, h, TILE_R, 1, (px, py) -> Hypr.alpha(Hypr.mix(Hypr.INACTIVE, grad.at(px, py), f), fade), 6);
+            Hypr.ring(ctx, x, y, w, h, TILE_R, 1, (px, py) -> Hypr.alpha(Hypr.mix(Hypr.INACTIVE, grad.at(px, py), f), fade), 12);
         } else {
             Hypr.ring(ctx, x, y, w, h, TILE_R, 1, Hypr.alpha(Hypr.INACTIVE, fade));
         }
         ctx.drawTextWithShadow(textRenderer, tile.heading(), x + PAD, y + 7, Hypr.alpha(Hypr.mix(Hypr.SUB, Hypr.ACC2, f), fade));
 
         int ry = y + TITLE_H;
+        int clipTop = contentTop() - ROW_H, clipBottom = contentBottom();
         for (Row r : tile.rows()) {
+            if (ry < clipTop || ry > clipBottom) { // rows scrolled out of view cost nothing
+                if (live) {
+                    r.y = -9999;
+                }
+                ry += ROW_H;
+                continue;
+            }
             boolean hover = live && inClip && dragging == null && mouseX >= x && mouseX < x + w && mouseY >= ry && mouseY < ry + ROW_H;
             if (live) {
                 r.x = x;

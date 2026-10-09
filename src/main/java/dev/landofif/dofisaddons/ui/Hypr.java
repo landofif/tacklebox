@@ -22,10 +22,27 @@ public final class Hypr {
     }
 
     /** A cubic bezier like hyprland's {@code bezier = name, x1, y1, x2, y2}: time in, progress out (may overshoot). */
-    public record Bezier(double x1, double y1, double x2, double y2) {
+    public static final class Bezier {
         public static final Bezier OUT_QUINT = new Bezier(0.23, 1, 0.32, 1);
         /** The overshooting curve from hyprland's example config (it is what makes windows pop). */
         public static final Bezier OVERSHOOT = new Bezier(0.05, 0.9, 0.1, 1.05);
+        private static final int N = 128;
+        private final float[] table = new float[N + 1];
+
+        private Bezier(double x1, double y1, double x2, double y2) {
+            for (int i = 0; i <= N; i++) { // solved once, so a frame only looks values up
+                double t = i / (double) N, lo = 0, hi = 1, s = t;
+                for (int k = 0; k < 20; k++) {
+                    if (curve(x1, x2, s) < t) {
+                        lo = s;
+                    } else {
+                        hi = s;
+                    }
+                    s = (lo + hi) / 2;
+                }
+                table[i] = (float) curve(y1, y2, s);
+            }
+        }
 
         public float at(float t) {
             if (t <= 0) {
@@ -34,16 +51,9 @@ public final class Hypr {
             if (t >= 1) {
                 return 1;
             }
-            double lo = 0, hi = 1, s = t;
-            for (int i = 0; i < 14; i++) {
-                if (curve(x1, x2, s) < t) {
-                    lo = s;
-                } else {
-                    hi = s;
-                }
-                s = (lo + hi) / 2;
-            }
-            return (float) curve(y1, y2, s);
+            float f = t * N;
+            int i = (int) f;
+            return table[i] + (table[i + 1] - table[i]) * (f - i);
         }
 
         private static double curve(double a, double b, double s) {
@@ -123,10 +133,12 @@ public final class Hypr {
     /** A rounded rectangle, one fill per row of the corners and one for the middle. */
     public static void rrect(DrawContext c, int x, int y, int w, int h, int r, Paint p, int chunk) {
         r = Math.min(r, Math.min(w, h) / 2);
-        for (int i = 0; i < r; i++) {
+        for (int i = 0, k; i < r; i = k) { // corner rows with the same inset are one fill
             int o = cut(r, i);
-            seg(c, x + o, y + i, x + w - o, y + i + 1, p, chunk);
-            seg(c, x + o, y + h - 1 - i, x + w - o, y + h - i, p, chunk);
+            for (k = i + 1; k < r && cut(r, k) == o; k++) {
+            }
+            seg(c, x + o, y + i, x + w - o, y + k, p, chunk);
+            seg(c, x + o, y + h - k, x + w - o, y + h - i, p, chunk);
         }
         seg(c, x, y + r, x + w, y + h - r, p, chunk);
     }
