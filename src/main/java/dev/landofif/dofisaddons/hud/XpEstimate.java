@@ -204,6 +204,11 @@ public final class XpEstimate {
         s.profile = profile;
     }
 
+    /** 3350 as "3.35K", for the xp shown next to the location bar. */
+    public static String abbrevXp(double v) {
+        return v >= 1_000_000 ? String.format(Locale.ROOT, "%.2fM", v / 1_000_000) : v >= 1000 ? String.format(Locale.ROOT, "%.2fK", v / 1000) : String.valueOf((long) v);
+    }
+
     /** Quests until the next fishing level, like "~12", or null while it is not known yet. */
     public static String levelQuests() {
         ClientPlayerEntity p = MinecraftClient.getInstance().player;
