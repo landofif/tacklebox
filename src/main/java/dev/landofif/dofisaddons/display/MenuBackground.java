@@ -12,7 +12,7 @@ import net.minecraft.util.Identifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/** A see-through colour and an optional picture (config/dofisaddons/menu.png, cropped to cover) behind the box-less menus, with rounded corners. */
+/** A see-through colour and an optional picture (config/dofisaddons/menu.png, cropped to cover) behind the box-less menus, with square corners. */
 public final class MenuBackground {
     public static final Path IMAGE = FabricLoader.getInstance().getConfigDir().resolve("dofisaddons").resolve("menu.png");
     private static final Identifier TEXTURE = Identifier.of("dofisaddons", "menu_image");
@@ -22,8 +22,8 @@ public final class MenuBackground {
 
     private MenuBackground() {}
 
-    /** Radius of the rounded corners in gui pixels. */
-    private static final int CORNER = 6;
+    /** Radius of the rounded corners in gui pixels (0 = square). */
+    private static final int CORNER = 0;
 
     public static void draw(DrawContext ctx, int x, int y, int width, int height) {
         DofiSettings s = DofiSettings.get();
