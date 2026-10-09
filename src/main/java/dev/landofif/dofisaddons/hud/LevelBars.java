@@ -11,11 +11,21 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 
+import java.util.Map;
+
 /**
  * Two thin progress bars, no box like the other huds: the fishing level (the vanilla xp bar) and the level of the location you
  * are at ({@link XpEstimate#toNext}: read from the compendium, then moved along by the location xp of quest rewards and chat).
  */
 public final class LevelBars {
+    /** The one word of a location that matters; locations not listed keep their full name. */
+    private static final Map<String, String> SHORT = Map.ofEntries(
+            Map.entry("cypress", "cypress"), Map.entry("kenai", "kenai"), Map.entry("biwa", "biwa"), Map.entry("murray", "murray"),
+            Map.entry("everglades", "everglades"), Map.entry("keywest", "key"), Map.entry("toledobend", "toledo"),
+            Map.entry("greatlakes", "great lakes"), Map.entry("danube", "danube"), Map.entry("oilrig", "rig"),
+            Map.entry("amazon", "amazon"), Map.entry("mediterranean", "med"), Map.entry("capecod", "cape"),
+            Map.entry("nile", "nile"), Map.entry("hawaii", "hawaii"), Map.entry("lofoten", "lofoten"), Map.entry("cairns", "cairns"));
+
     private LevelBars() {}
 
     public static int[] draw(DrawContext ctx, boolean preview) {
@@ -40,7 +50,7 @@ public final class LevelBars {
             int level = (int) at[0];
             double next = XpEstimate.need(level + 1);
             boolean max = level >= Power.MAX_LEVEL;
-            label[rows] = loc.name() + " level [" + level + "]";
+            label[rows] = SHORT.getOrDefault(loc.id(), loc.name()) + " [" + level + "]";
             extra[rows] = !s.levelBarsXp ? "" : max ? "max" : XpEstimate.abbrevXp(next - at[1]) + "/" + XpEstimate.abbrevXp(next) + "lxp";
             fraction[rows++] = max ? 1 : (next - at[1]) / next;
         } else if (s.levelBarsLocation && preview) {
