@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 /** Foecollabs equipment hud is switched off while the mods own row (hud/EquipmentRow) is on. By name, {@code require = 0}. */
 @Mixin(targets = "io.github.foecollab.screens.hud.EquipmentHud")
 abstract class EquipmentHudMixin {
-    @WrapMethod(method = "render(Lnet/minecraft/class_332;Lnet/minecraft/class_310;)V", remap = false, require = 0)
+    @WrapMethod(method = "render", remap = false, require = 0)
     private void dofisaddons$off(DrawContext ctx, MinecraftClient client, Operation<Void> original) {
         if (!DofiSettings.get().equipHud) {
             original.call(ctx, client);

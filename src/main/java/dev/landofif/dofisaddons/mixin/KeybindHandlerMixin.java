@@ -17,7 +17,7 @@ import java.lang.reflect.Field;
 abstract class KeybindHandlerMixin {
     private static boolean dofisaddons$wasHeld, dofisaddons$on;
 
-    @Inject(method = "tick(Lnet/minecraft/class_310;)V", at = @At("TAIL"), remap = false, require = 0)
+    @Inject(method = "tick", at = @At("TAIL"), remap = false, require = 0)
     private void dofisaddons$toggle(MinecraftClient client, CallbackInfo ci) {
         if (client.currentScreen == null) { // foecollab only reads the key with a screen open
             return;
