@@ -53,6 +53,7 @@ public final class DofisAddons implements ClientModInitializer {
         dev.landofif.dofisaddons.menu.Vaults.register();
         TriggerStore.load();
         DofiSettings.load();
+        dev.landofif.dofisaddons.hud.NowPlaying.start();
         dev.landofif.dofisaddons.display.FlatLeaves.register();
 
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
@@ -93,6 +94,7 @@ public final class DofisAddons implements ClientModInitializer {
             XpEstimate.renderHud(context);
             dev.landofif.dofisaddons.hud.ServerHud.renderHud(context);
             dev.landofif.dofisaddons.hud.BoostsHud.renderHud(context);
+            dev.landofif.dofisaddons.hud.NowPlaying.renderHud(context);
             dev.landofif.dofisaddons.display.BobberTimer.renderHud(context);
         });
         HudElementRegistry.attachElementAfter(net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements.CHAT,

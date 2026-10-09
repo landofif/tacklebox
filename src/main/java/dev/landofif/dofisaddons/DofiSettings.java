@@ -105,6 +105,10 @@ public class DofiSettings {
     public boolean boostsHud = true;
     public int boostsX = 182;
     public int boostsY = 70;
+    /** The now playing hud (hud/NowPlaying): what Spotify, a browser tab or any other player is playing, where it sits. */
+    public boolean nowPlaying = true;
+    public int nowPlayingX = 4;
+    public int nowPlayingY = 4;
     /** The sidebar styled server hud (hud/ServerHud): where it sits, its size in percent and how strong the picture behind it is (percent). */
     public boolean serverHud = true;
     public int serverHudX = 4;
