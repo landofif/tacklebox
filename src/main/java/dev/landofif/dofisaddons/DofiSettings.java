@@ -448,3 +448,4 @@ public class DofiSettings {
         presetsSize = Math.max(40, Math.min(100, presetsSize));
     }
 }
+        dev.landofif.dofisaddons.chat.ChatBoxes.addCrewsRule(chatBoxes);

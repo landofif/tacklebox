@@ -5,6 +5,7 @@ import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.chat.ChatBoxes;
 import dev.landofif.dofisaddons.chat.ChatCopy;
 import dev.landofif.dofisaddons.chat.ChatFilter;
+import dev.landofif.dofisaddons.chat.ChatTimes;
 import dev.landofif.dofisaddons.screen.ChatFilterScreen;
 import dev.landofif.dofisaddons.trigger.Matcher;
 import dev.landofif.dofisaddons.trigger.Trigger;
@@ -84,7 +85,13 @@ abstract class ChatScreenMixin extends Screen {
     @Inject(method = "render", at = @At("TAIL"))
     private void dofisaddons$boxHover(DrawContext ctx, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (ChatBoxes.at(mouseX, mouseY) != null) {
-            ctx.drawHoverEvent(textRenderer, ChatBoxes.styleAt(mouseX, mouseY), mouseX, mouseY);
+            Style style = ChatBoxes.styleAt(mouseX, mouseY);
+            String time = ChatBoxes.timeAt(mouseX, mouseY);
+            if (style != null && style.getHoverEvent() != null) {
+                ctx.drawHoverEvent(textRenderer, style, mouseX, mouseY);
+            } else if (time != null) {
+                ctx.drawTooltip(textRenderer, Foe.text(time), mouseX, mouseY);
+            }
         }
     }
 
@@ -124,6 +131,11 @@ abstract class ChatScreenMixin extends Screen {
         float[] b = ChatCopy.boundsAt(mouseX, mouseY);
         if (b != null) {
             ctx.fill(Math.round(b[0]), Math.round(b[1]), Math.round(b[2]), Math.round(b[3]), 0x30FFFFFF);
+        }
+        Text message = ChatCopy.messageAt(mouseX, mouseY);
+        long at = message == null || ChatTimes.hasHover(message) ? -1 : ChatTimes.at(message);
+        if (at >= 0) {
+            ctx.drawTooltip(textRenderer, Foe.text(ChatTimes.format(at)), mouseX, mouseY);
         }
     }
 }

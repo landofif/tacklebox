@@ -6,6 +6,7 @@ import dev.landofif.dofisaddons.DofiSettings;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.landofif.dofisaddons.chat.ChatBar;
 import dev.landofif.dofisaddons.chat.ChatBoxes;
+import dev.landofif.dofisaddons.chat.ChatTimes;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
@@ -40,6 +41,7 @@ abstract class ChatHudMixin {
     @Inject(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
             at = @At("HEAD"), cancellable = true)
     private void dofisaddons$chatBoxes(Text message, @Nullable MessageSignatureData signature, @Nullable MessageIndicator indicator, CallbackInfo ci) {
+        ChatTimes.record(message);
         if (stacking) {
             return;
         }

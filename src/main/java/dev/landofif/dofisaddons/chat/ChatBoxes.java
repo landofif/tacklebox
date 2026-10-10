@@ -2,6 +2,7 @@ package dev.landofif.dofisaddons.chat;
 
 import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.DofiSettings;
+import dev.landofif.dofisaddons.trigger.Trigger;
 import dev.landofif.dofisaddons.trigger.TriggerEngine;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.DrawnTextConsumer;
@@ -48,6 +49,8 @@ public final class ChatBoxes {
         List<OrderedText> wrapped = List.of();
         /** The message each wrapped line came from. */
         List<Text> wrappedFrom = List.of();
+        /** When each wrapped line's message arrived. */
+        List<Long> wrappedAt = List.of();
         int wrappedWidth = -1;
         int version;
         int wrappedVersion = -1;
@@ -62,14 +65,31 @@ public final class ChatBoxes {
 
     private static final Map<ChatBox, State> STATE = new IdentityHashMap<>();
 
+    /** Server lines that start with the crews tag: joins, leaves, missions, teleports. */
+    public static final String CREWS_RULE = "^CREWS > "; // chat lines are normalized first: » reads as >
+
     private ChatBoxes() {}
 
     /** The boxes everyone starts with: direct messages and crew chat. */
     public static List<ChatBox> defaults() {
         List<ChatBox> out = new ArrayList<>();
         out.add(new ChatBox("dms", 60, 8, "^✉ ?(from|to) "));
-        out.add(new ChatBox("crew", 60, 42, "^\\[crew chat\\] "));
+        ChatBox crew = new ChatBox("crew", 60, 42, "^\\[crew chat\\] ");
+        crew.rules.add(new ChatFilter(CREWS_RULE, Trigger.MatchMode.REGEX));
+        out.add(crew);
         return out;
+    }
+
+    /**
+     * A saved crew box that still has only the default crew chat rule gets the crews tag rule too.
+     * One that l edited (other rules, or the crews rule already there) is left alone.
+     */
+    public static void addCrewsRule(List<ChatBox> list) {
+        for (ChatBox b : list) {
+            if ("crew".equals(b.name) && b.rules.size() == 1 && "^\\[crew chat\\] ".equals(b.rules.get(0).pattern)) {
+                b.rules.add(new ChatFilter(CREWS_RULE, Trigger.MatchMode.REGEX));
+            }
+        }
     }
 
     private static List<ChatBox> boxes() {
@@ -132,7 +152,7 @@ public final class ChatBoxes {
 
     // ------------------------------------------------------------------ layout
 
-    /** Where a box is on screen: x, y, width, height in gui units (title included). */
+    /** Where a box is on screen: x, y, width, height in gui units. */
     public static int[] rect(ChatBox box, int screenW, int screenH) {
         return rect(box, screenW, screenH, chatOpen());
     }
@@ -144,7 +164,7 @@ public final class ChatBoxes {
 
     /** The height of a box that shows {@code lines} lines, and back (the move screen resizes by height). */
     public static int heightOf(int lines) {
-        return PAD_Y * 2 + lines * LINE_H - (LINE_H - 9) + 4 + 9; // + title row
+        return PAD_Y * 2 + lines * LINE_H - (LINE_H - 9) + 4;
     }
 
     public static int linesOf(int height) {
@@ -171,14 +191,17 @@ public final class ChatBoxes {
         if (st.wrappedWidth != textW || st.wrappedVersion != st.version) {
             List<OrderedText> out = new ArrayList<>();
             List<Text> from = new ArrayList<>();
+            List<Long> at = new ArrayList<>();
             for (Line line : st.lines) {
                 for (OrderedText part : tr.wrapLines(line.text(), textW)) {
                     out.add(part);
                     from.add(line.text());
+                    at.add(line.at());
                 }
             }
             st.wrapped = out;
             st.wrappedFrom = from;
+            st.wrappedAt = at;
             st.wrappedWidth = textW;
             st.wrappedVersion = st.version;
             st.scroll = Math.max(0, Math.min(st.scroll, Math.max(0, out.size() - lines(box, chatOpen()))));
@@ -228,11 +251,11 @@ public final class ChatBoxes {
         int x = r[0], y = r[1], w = r[2], h = r[3];
         State st = state(box);
 
-        Text title = Foe.text((box.name.isBlank() ? "chat" : box.name) + (st.scroll > 0 ? " ↓" + st.scroll : "")).withColor(Foe.TITLE & 0xFFFFFF);
-        if (highlight) { // the move screen outlines the box so you can find it
+        if (highlight) { // the move screen outlines the box and names it, so you can find it
             ctx.drawStrokedRectangle(x, y, w, h, Foe.ACCENT);
+            Text title = Foe.text(box.name.isBlank() ? "chat" : box.name).withColor(Foe.TITLE & 0xFFFFFF);
+            ctx.drawTextWithShadow(tr, title, x, y >= 11 ? y - 11 : y + h + 2, 0xFFFFFFFF);
         }
-        ctx.drawTextWithShadow(tr, title, x + PAD_X, y + 6, 0xFFFFFFFF);
 
         boolean open = chatOpen();
         List<OrderedText> all = wrapped(box, st, tr, box.width - PAD_X * 2);
@@ -251,9 +274,6 @@ public final class ChatBoxes {
         int end = Math.max(0, all.size() - whole);
         int start = Math.max(0, end - shownLines - (frac > 0.001f ? 1 : 0));
         List<OrderedText> lines = all.subList(start, end);
-        if (lines.isEmpty()) {
-            ctx.drawTextWithShadow(tr, Foe.text("nothing here yet").withColor(Foe.DIM & 0xFFFFFF), x + PAD_X, y + h - PAD_Y - 9, 0xFFFFFFFF);
-        }
         int areaTop = y + h - PAD_Y - 9 - (shownLines - 1) * LINE_H - 1;
         int ty = y + h - PAD_Y - 9 - (lines.size() - 1) * LINE_H + Math.round(frac * LINE_H);
         // the same dark strip vanilla puts behind chat lines, at the "text background opacity" accessibility setting
@@ -397,5 +417,12 @@ public final class ChatBoxes {
         ChatBox[] box = new ChatBox[1];
         int i = lineAt(mx, my, box, new int[2]);
         return i < 0 ? null : state(box[0]).wrappedFrom.get(i);
+    }
+
+    /** The arrival time of the message under the mouse in a box ("HH:mm:ss"), or null. */
+    public static String timeAt(double mx, double my) {
+        ChatBox[] box = new ChatBox[1];
+        int i = lineAt(mx, my, box, new int[2]);
+        return i < 0 ? null : ChatTimes.format(state(box[0]).wrappedAt.get(i));
     }
 }
