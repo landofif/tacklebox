@@ -109,6 +109,7 @@ public class DofiSettings {
     public int questsX = 4;
     public int questsScale = 100;
     public int questsY = 70;
+    public HudAlign questsAlign = HudAlign.LEFT;
     /** The level progress hud (hud/LevelBars): fishing level and location level bars, where it sits. */
     public boolean levelBars = true;
     public int levelBarsX = 4;
@@ -121,11 +122,13 @@ public class DofiSettings {
     public boolean levelBarsPercent = true;
     public boolean levelBarsXp = true;
     public int levelBarsWidth = 80;
+    public HudAlign levelBarsAlign = HudAlign.LEFT;
     /** The active boosts hud (hud/BoostsHud): boosters, chummer, weather events and moon, where it sits. */
     public boolean boostsHud = true;
     public int boostsX = 182;
     public int boostsScale = 100;
     public int boostsY = 70;
+    public HudAlign boostsAlign = HudAlign.LEFT;
     /** The now playing hud (hud/NowPlaying): what Spotify, a browser tab or any other player is playing, where it sits. */
     public boolean nowPlaying = true;
     public int nowPlayingX = 4;
@@ -137,12 +140,14 @@ public class DofiSettings {
     public boolean nowPlayingArtist = true;
     public boolean nowPlayingBar = true;
     public boolean nowPlayingTime = true;
+    public HudAlign nowPlayingAlign = HudAlign.LEFT;
     /** The sidebar styled server hud (hud/ServerHud): where it sits, its size in percent and how strong the picture behind it is (percent). */
     public boolean serverHud = true;
     public int serverHudX = 4;
     public int serverHudY = 120;
     public int serverHudScale = 100;
     public int serverHudImage = 25;
+    public HudAlign serverHudAlign = HudAlign.LEFT;
     /** Bite speed, reel speed and prospect as /menu showed them (read by hud/XpEstimate, shown by hud/ServerHud). */
     /** Lines of the server hud that are switched off, by the keys of ServerHud.order(). */
     public java.util.Set<String> serverHudHide = new java.util.HashSet<>();
@@ -320,6 +325,26 @@ public class DofiSettings {
         }
     }
 
+    /** How the text of a hud lines up inside its box. */
+    public enum HudAlign {
+        LEFT("left"), CENTRE("centre"), RIGHT("right");
+
+        public final String label;
+
+        HudAlign(String label) {
+            this.label = label;
+        }
+
+        /** The left edge for something {@code w} wide inside the span {@code from} to {@code from + span}. */
+        public int x(int from, int span, int w) {
+            return switch (this) {
+                case LEFT -> from;
+                case CENTRE -> from + (span - w) / 2;
+                case RIGHT -> from + span - w;
+            };
+        }
+    }
+
     /** Where foecollabs equipment row sits next to the hotbar, before any dragging. */
     public enum EquipPlace {
         ABOVE("above"), LEFT("left"), RIGHT("right");
@@ -425,6 +450,7 @@ public class DofiSettings {
             b.linesOpen = Math.max(b.lines, Math.min(40, b.linesOpen));
             b.fadeSeconds = b.fadeSeconds == 0 ? 10 : Math.max(-1, Math.min(600, b.fadeSeconds));
         }
+        dev.landofif.dofisaddons.chat.ChatBoxes.addCrewsRule(chatBoxes);
         lineColor &= 0xFFFFFF;
         vmScale = Math.max(0.1, Math.min(3, vmScale));
         swingSlowness = Math.max(0.25, Math.min(4, swingSlowness));
@@ -448,4 +474,3 @@ public class DofiSettings {
         presetsSize = Math.max(40, Math.min(100, presetsSize));
     }
 }
-        dev.landofif.dofisaddons.chat.ChatBoxes.addCrewsRule(chatBoxes);

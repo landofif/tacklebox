@@ -103,6 +103,14 @@ public final class Foe {
         }
     }
 
+    /** The same title lined up inside a box {@code boxW} wide, with the same 8 pixel edge. */
+    public static void title(DrawContext ctx, int x, int y, int boxW, dev.landofif.dofisaddons.DofiSettings.HudAlign align, Text title) {
+        if (title != null && !title.getString().isEmpty()) {
+            var tr = MinecraftClient.getInstance().textRenderer;
+            ctx.drawTextWithShadow(tr, title, align.x(x + 8, boxW - 16, tr.getWidth(title)), y + 7, Hypr.acc2());
+        }
+    }
+
     /** A box with its title inside the top edge. */
     public static void panel(DrawContext ctx, int x, int y, int w, int h, Text title, int opacity) {
         box(ctx, x, y, w, h, opacity);

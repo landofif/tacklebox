@@ -45,6 +45,8 @@ public final class ServerHud {
     private static final Map<String, Object[]> EVENTS = new LinkedHashMap<>();
     private static String moon = "";
     private static String moonEffect = "";
+    /** When "FABLED FISH EVENT" was seen; the next line, a moment later, is "Visit the X to" or "Caught by Y". */
+    private static long fabledHeader;
 
     /** Radius of the picture's rounded corners in gui pixels. */
     private static final int CORNER = 6;
@@ -65,6 +67,23 @@ public final class ServerHud {
             moonEffect = !moon.isEmpty() && bonus.find() ? bonus.group(1) : "";
             return;
         }
+        if (EventLines.fabledHeader(s)) {
+            fabledHeader = System.currentTimeMillis();
+            return;
+        }
+        if (fabledHeader != 0) {
+            boolean fresh = System.currentTimeMillis() - fabledHeader < 3000;
+            fabledHeader = 0;
+            String place = fresh ? EventLines.fabledStart(s) : null;
+            if (place != null) {
+                EVENTS.put("Fabled", new Object[]{System.currentTimeMillis(), "at " + place, "Fabled Event"});
+                return;
+            }
+            if (fresh && EventLines.fabledEnded(s)) {
+                EVENTS.remove("Fabled");
+                return;
+            }
+        }
         m = EVENT.matcher(s);
         if (!m.find()) {
             return;
@@ -84,6 +103,7 @@ public final class ServerHud {
 
     public static void reset() {
         EVENTS.clear();
+        fabledHeader = 0;
         moon = "";
         moonEffect = "";
     }
@@ -149,7 +169,7 @@ public final class ServerHud {
         m.scale(k, k);
         for (int i = 0; i < lines.size(); i++) {
             Line l = lines.get(i);
-            int x = l.center ? PAD + (w - tr.getWidth(l.text)) / 2 : PAD;
+            int x = (l.center ? DofiSettings.HudAlign.CENTRE : s.serverHudAlign).x(PAD, w, tr.getWidth(l.text));
             ctx.drawTextWithShadow(tr, l.text, x, PAD + i * LINE, 0xFFFFFFFF);
         }
         m.popMatrix();

@@ -213,7 +213,7 @@ public final class NowPlaying {
         int x = s.nowPlayingX + 8, top = s.nowPlayingY + (s.nowPlayingHeading ? 20 : 4);
 
         if (s.nowPlayingHeading) {
-            Foe.title(ctx, s.nowPlayingX, s.nowPlayingY, Foe.text("now playing"));
+            Foe.title(ctx, s.nowPlayingX, s.nowPlayingY, contentW + 16, s.nowPlayingAlign, Foe.text("now playing"));
         }
         if (art && t.art().equals(shown)) {
             ctx.drawTexture(RenderPipelines.GUI_TEXTURED, ART_ID, x, top, 0f, 0f, ART, ART, ART_TEX, ART_TEX, ART_TEX, ART_TEX);
@@ -221,7 +221,7 @@ public final class NowPlaying {
         int y = top + (contentH - rows * 11) / 2;
         for (int i = 0; i < lines.length; i++) {
             if (!lines[i].isEmpty()) {
-                ctx.drawTextWithShadow(tr, lines[i], x + artW, y, i == 0 ? Foe.TEXT : Foe.DIM);
+                ctx.drawTextWithShadow(tr, lines[i], s.nowPlayingAlign.x(x + artW, contentW - artW, tr.getWidth(lines[i])), y, i == 0 ? Foe.TEXT : Foe.DIM);
                 y += 11;
             }
         }

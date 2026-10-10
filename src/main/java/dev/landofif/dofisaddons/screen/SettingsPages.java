@@ -433,12 +433,16 @@ public final class SettingsPages {
         header("quests left");
         toggle("quests left hud", "quests until your next level and the next level of your location. it learns from /menu, /quests and the compendium. move it with move huds.",
                 () -> s.questsHud, v -> s.questsHud = v);
+        cycle("quests left align", "how the text of the quests left hud lines up inside it: left, centre or right.",
+                DofiSettings.HudAlign.values(), k -> k.label, () -> s.questsAlign, v -> s.questsAlign = v);
     }
 
     private void serverHud() {
         header("active boosts");
         toggle("active boosts hud", "what is on right now: player boosters with a countdown, the chummer, and the weather events and moon. read from chat lines only. the server hud shows the events and moon too, switch its weather and moon lines off if you only want them here. move it with move huds.",
                 () -> s.boostsHud, v -> s.boostsHud = v);
+        cycle("active boosts align", "how the text of the active boosts hud lines up inside it: left, centre or right.",
+                DofiSettings.HudAlign.values(), k -> k.label, () -> s.boostsAlign, v -> s.boostsAlign = v);
         header("level progress");
         toggle("level progress hud", "two thin bars: your fishing level (from the vanilla xp bar) and the level of the location you are at. the location bar starts when you open /comp once and then follows the location xp of quest rewards and chat. move it with move huds.",
                 () -> s.levelBars, v -> s.levelBars = v);
@@ -454,6 +458,8 @@ public final class SettingsPages {
                 () -> s.levelBarsXp, v -> s.levelBarsXp = v);
         slider("level progress bar width", "how long the bars are, in pixels.", 40, 200, 10, "",
                 () -> s.levelBarsWidth, v -> s.levelBarsWidth = (int) v);
+        cycle("level progress align", "how the text of the level progress hud lines up inside it: left, centre or right.",
+                DofiSettings.HudAlign.values(), k -> k.label, () -> s.levelBarsAlign, v -> s.levelBarsAlign = v);
         header("now playing");
         toggle("now playing hud", "shows what is playing on your computer (spotify, youtube in a browser, anything that works with playerctl): title, artist and the time. linux only, needs playerctl installed. shows only, it never controls the player. move it with move huds.",
                 () -> s.nowPlaying, v -> s.nowPlaying = v);
@@ -467,9 +473,13 @@ public final class SettingsPages {
                 () -> s.nowPlayingBar, v -> s.nowPlayingBar = v);
         toggle("now playing time", "the time played and the length of the track.",
                 () -> s.nowPlayingTime, v -> s.nowPlayingTime = v);
+        cycle("now playing align", "how the text of the now playing hud lines up inside it: left, centre or right.",
+                DofiSettings.HudAlign.values(), k -> k.label, () -> s.nowPlayingAlign, v -> s.nowPlayingAlign = v);
         header("server hud");
         toggle("server hud", "a sidebar styled hud: time, location, wallet and credits, the tackle shop and moon timers, and the weather events and moon that are active. move and resize it with move huds.",
                 () -> s.serverHud, v -> s.serverHud = v);
+        cycle("server hud align", "how the text of the server hud (the title stays centred) lines up inside it: left, centre or right.",
+                DofiSettings.HudAlign.values(), k -> k.label, () -> s.serverHudAlign, v -> s.serverHudAlign = v);
         link("choose lines", "which lines the server hud shows, in what order.", ServerHudScreen::new);
     }
 

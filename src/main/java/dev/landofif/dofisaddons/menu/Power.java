@@ -41,6 +41,13 @@ public final class Power {
     private static final Pattern RUNES = Pattern.compile("runes discovered:\\W*(\\d+)\\s*/\\s*(\\d+)");
     private static final Pattern REQ = Pattern.compile("requirement: \\(([\\d.,]+)\\s*([kmb]?)\\s*/\\s*([\\d.,]+)\\s*([kmb]?)\\)");
     private static final Pattern AMOUNT = Pattern.compile("^([\\d.,]+)\\s*([kmb]?)$");
+    /** The species collections' overview item: lore "Current Level - [3]" and "(1,495/1.5K)", the progress to the next level. */
+    private static final Pattern CURRENT = Pattern.compile("^current level - \\[(\\d+)\\]$");
+    private static final Pattern PROGRESS = Pattern.compile("^\\(([\\d.,]+)\\s*([kmb]?)\\s*/\\s*([\\d.,]+)\\s*([kmb]?)\\)$");
+    /** Power for reaching species collection level 1 to 7, the same for every species collection (l's dumps 2026-10-10, 35 of them). */
+    private static final int[] SPECIES = {50, 100, 250, 400, 1000, 5000, 10000};
+    /** Collections whose levels give other power than the species table, so the overview cannot tell what their next level gives. */
+    private static final java.util.Set<String> NOT_SPECIES = java.util.Set.of("albino", "all", "common", "rare", "epic", "legendary", "mythical", "fabled");
     private static final String[] SOURCES = {"total", "leveling", "compendium", "collections", "unique"};
 
     /** One location: where its level is, what the next one gives and what fish it still has. {@code level} 0 = not read yet. */
@@ -123,6 +130,7 @@ public final class Power {
         DofiSettings s = DofiSettings.get();
         boolean changed = false;
         Map<String, String> found = new java.util.LinkedHashMap<>();
+        java.util.Set<String> finished = new java.util.HashSet<>();
         for (Slot slot : screen.getScreenHandler().slots) {
             ItemStack stack = slot.getStack();
             if (stack.isEmpty() || slot.inventory instanceof PlayerInventory) {
@@ -144,6 +152,7 @@ public final class Power {
                 }
             }
             collection(Glyphs.plain(stack.getName()), lines, found);
+            overview(Glyphs.plain(stack.getName()), lines, found, finished);
             Locations.Location loc = Locations.byName(Glyphs.plain(stack.getName()));
             int[] v = loc == null ? null : variants(lines);
             if (v != null && !Arrays.equals(v, s.variants.get(loc.id()))) {
@@ -153,6 +162,11 @@ public final class Power {
             long[] d = v == null ? null : dex(lines);
             if (d != null && !Arrays.equals(d, s.dex.get(loc.id()))) {
                 s.dex.put(loc.id(), d);
+                changed = true;
+            }
+        }
+        for (String cat : finished) {
+            if (s.collections.remove(cat) != null) {
                 changed = true;
             }
         }
@@ -179,6 +193,28 @@ public final class Power {
         if (old == null || Integer.parseInt(old.substring(0, old.indexOf('|'))) > Integer.parseInt(level.group(1))) {
             found.put(cat, level.group(1) + "|" + (long) XpEstimate.num(req.group(1), req.group(2)) + "|" + (long) XpEstimate.num(req.group(3), req.group(4))
                     + "|" + (long) XpEstimate.num(amount.group(1), amount.group(2)));
+        }
+    }
+
+    /** A species collection on the overview page ("Basses Collection", lore "Current Level - [6]", "(43,178/50K)"): the next level is the one after the current, its power comes from the species table. A finished one goes to {@code finished}. */
+    static void overview(String name, List<String> lines, Map<String, String> found, java.util.Set<String> finished) {
+        if (!name.endsWith(" collection")) {
+            return;
+        }
+        String cat = name.substring(0, name.length() - 11);
+        Matcher level = lines.stream().map(CURRENT::matcher).filter(Matcher::find).findFirst().orElse(null);
+        if (level == null || NOT_SPECIES.contains(cat)) {
+            return;
+        }
+        int current = Integer.parseInt(level.group(1));
+        if (current >= SPECIES.length) {
+            finished.add(cat);
+            return;
+        }
+        Matcher progress = lines.stream().map(PROGRESS::matcher).filter(Matcher::matches).findFirst().orElse(null);
+        if (progress != null) {
+            found.put(cat, (current + 1) + "|" + (long) XpEstimate.num(progress.group(1), progress.group(2)) + "|" + (long) XpEstimate.num(progress.group(3), progress.group(4))
+                    + "|" + SPECIES[current]);
         }
     }
 

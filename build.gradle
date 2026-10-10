@@ -31,6 +31,9 @@ dependencies {
     modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
     modLocalRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
 
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.10.2"
+
     // FOECollab is required at runtime (fabric.mod.json) but never compiled against: the mod only wraps its
     // hud element by id (compat/FoeLook). It is not on a maven, so runClient picks up a jar you drop in
     // run/foecollab/ (build it from github.com/Kimberlyow/FOECollab), plus its own requirement, cloth config.
@@ -81,4 +84,8 @@ jar {
     from('LICENSE') {
         rename { "${it}_${project.base.archivesName.get()}" }
     }
+}
+
+test {
+    useJUnitPlatform()
 }

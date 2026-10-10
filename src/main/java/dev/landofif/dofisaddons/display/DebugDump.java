@@ -89,6 +89,9 @@ public final class DebugDump {
                     continue;
                 }
                 ItemStack stack = slot.getStack();
+                if (stack.isOf(net.minecraft.item.Items.BREAD) && (stack.get(DataComponentTypes.LORE) == null || stack.get(DataComponentTypes.LORE).lines().isEmpty()) && "Bread".equals(stack.getName().getString())) {
+                    continue; // the server's placeholder for an empty slot
+                }
                 out.append("\nslot ").append(slot.id).append(' ').append(Registries.ITEM.getId(stack.getItem())).append(" x").append(stack.getCount()).append('\n');
                 out.append("  name=\"").append(escape(stack.getName().getString())).append("\"\n");
                 LoreComponent lore = stack.get(DataComponentTypes.LORE);

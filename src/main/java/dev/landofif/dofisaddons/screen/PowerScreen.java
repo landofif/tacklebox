@@ -39,6 +39,8 @@ public class PowerScreen extends DofiScreen {
     private final long opened = Util.getMeasuringTimeMs();
     private final int[][] chips = new int[SORTS.length][];
     private int sort, scroll, contentH;
+    private boolean allCollections; // the collections list shows only the nearest one until opened
+    private int[] collectionsChip;
     private List<Text> tip;
 
     public PowerScreen(Screen parent) {
@@ -62,6 +64,11 @@ public class PowerScreen extends DofiScreen {
 
     @Override
     public boolean mouseClicked(Click click, boolean doubled) {
+        int[] k = collectionsChip;
+        if (k != null && click.y() >= 26 && click.x() >= k[0] && click.x() < k[0] + k[2] && click.y() >= k[1] && click.y() < k[1] + k[3]) {
+            allCollections = !allCollections;
+            return true;
+        }
         for (int i = 0; i < chips.length; i++) {
             int[] c = chips[i];
             if (c != null && click.y() >= 26 && click.x() >= c[0] && click.x() < c[0] + c[2] && click.y() >= c[1] && click.y() < c[1] + c[3]) {
@@ -212,14 +219,20 @@ public class PowerScreen extends DofiScreen {
         // the next level of each collection, nearest first
         if (!s.collections.isEmpty()) {
             ctx.drawTextWithShadow(textRenderer, Foe.text("collections"), x0, y, Foe.TITLE);
-            y += 14;
+            Text toggle = Foe.text(allCollections ? "show less" : "show all " + s.collections.size());
+            int toggleW = textRenderer.getWidth(toggle) + 14;
+            int tx = x0 + cw - toggleW;
+            collectionsChip = new int[]{tx, y - 3, toggleW, 14};
+            Foe.button(ctx, tx, y - 3, toggleW, 14, mouseIn(mouseX, mouseY, tx, y - 3, toggleW, 14, bottom));
+            ctx.drawTextWithShadow(textRenderer, toggle, tx + 7, y, MUTED);
+            y += 18;
             List<String[]> cols = new ArrayList<>();
             s.collections.forEach((k, v) -> {
                 String[] f = v.split("\\|");
                 cols.add(new String[]{k, f[0], f[1], f[2], f[3]});
             });
             cols.sort(Comparator.comparingLong(c -> Long.parseLong(c[3]) - Long.parseLong(c[2])));
-            for (String[] c : cols) {
+            for (String[] c : allCollections ? cols : cols.subList(0, 1)) {
                 ctx.drawTextWithShadow(textRenderer, Text.literal(cap(c[0]) + " level " + c[1]), x0, y, c == cols.get(0) ? Foe.ACCENT : Foe.TEXT);
                 ctx.drawTextWithShadow(textRenderer, Text.literal(c[2] + " / " + c[3] + " · " + (Long.parseLong(c[3]) - Long.parseLong(c[2])) + " to go"), x0 + cw * 40 / 100, y, MUTED);
                 Text g = Text.literal("+" + Power.fmt(Long.parseLong(c[4])) + " \uF064");

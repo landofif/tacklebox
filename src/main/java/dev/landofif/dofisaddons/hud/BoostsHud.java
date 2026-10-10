@@ -38,12 +38,24 @@ public final class BoostsHud {
     private static final Map<String, Booster> BOOSTERS = new LinkedHashMap<>();
     private static long chummerEnd;
     private static String chummerBonus = "";
+    private static long frenzyEnd;
+    private static String frenzyPlace = "";
 
     private BoostsHud() {}
 
     public static void onChat(Text message) {
         String s = Matcher.normalize(message.getString());
         long now = System.currentTimeMillis();
+        EventLines.Frenzy frenzy = EventLines.frenzy(s);
+        if (frenzy != null) {
+            frenzyEnd = now + frenzy.remainingMs();
+            frenzyPlace = frenzy.place();
+            return;
+        }
+        if (EventLines.frenzyEnded(s)) {
+            frenzyEnd = 0;
+            return;
+        }
         java.util.regex.Matcher m = BOOSTER.matcher(s);
         if (m.find()) {
             long unit = switch (m.group(5)) {
@@ -85,6 +97,9 @@ public final class BoostsHud {
         if (chummerEnd + GRACE > now) {
             rows.add(new String[]{("chummer " + chummerBonus).trim(), ServerHud.clock(Math.max(0, chummerEnd - now))});
         }
+        if (frenzyEnd > now) {
+            rows.add(new String[]{"fish frenzy " + frenzyPlace, ServerHud.clock(frenzyEnd - now)});
+        }
         for (String[] e : ServerHud.activeEvents()) {
             rows.add(e);
         }
@@ -117,12 +132,17 @@ public final class BoostsHud {
         w += 16;
         int h = 25 + rows.size() * 11;
         DofiSettings s = DofiSettings.get();
-        Foe.title(ctx, s.boostsX, s.boostsY, Foe.text("active"));
+        Foe.title(ctx, s.boostsX, s.boostsY, w, s.boostsAlign, Foe.text("active"));
         for (int i = 0; i < rows.size(); i++) {
             int y = s.boostsY + 20 + i * 11;
-            ctx.drawTextWithShadow(tr, Foe.text(rows.get(i)[0]), s.boostsX + 8, y, Foe.DIM);
-            Text v = Foe.text(rows.get(i)[1]);
-            ctx.drawTextWithShadow(tr, v, s.boostsX + w - 8 - tr.getWidth(v), y, Foe.TEXT);
+            Text l = Foe.text(rows.get(i)[0]), v = Foe.text(rows.get(i)[1]);
+            int lx = s.boostsX + 8, vx = s.boostsX + w - 8 - tr.getWidth(v); // left keeps the values in a column on the right
+            if (s.boostsAlign != DofiSettings.HudAlign.LEFT) {
+                lx = s.boostsAlign.x(s.boostsX + 8, w - 16, tr.getWidth(l) + (v.getString().isEmpty() ? 0 : 12 + tr.getWidth(v)));
+                vx = lx + tr.getWidth(l) + 12;
+            }
+            ctx.drawTextWithShadow(tr, l, lx, y, Foe.DIM);
+            ctx.drawTextWithShadow(tr, v, vx, y, Foe.TEXT);
         }
         return new int[]{s.boostsX, s.boostsY, w, h};
     }

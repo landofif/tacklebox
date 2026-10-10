@@ -133,7 +133,8 @@ Hook via Fabric `ClientReceiveMessageEvents.ALLOW_GAME` (observe/suppress) and `
 - `SUPER MOON » A Super Moon has risen.` (+120 Bite Speed, +150 Reel Speed)
 - `BLOOD MOON » A Blood Moon has risen!` (+120 Bite Speed)
 - Moon set: contains `» The ` … ` has set.`
-- Fabled: `FABLED » A Fabled Event is active at <Location>` or `Visit the <Location> to ...`; ends with `Caught by <player>`.
+- Fabled (l's logs 2026-10-10, the old `FABLED » ...` format was wrong): separate chat lines. Start: `FABLED FISH EVENT`, `Visit the Cypress Lake to`, `try and catch it!`. End: `FABLED FISH EVENT`, `Caught by <player>`, then the fish name. No length.
+- Fish Frenzy (l's logs 2026-10-10, Kenai River both times, random start, not every 3 hours: ended 18:17:54, next alert 19:43:05): start `FISH FRENZY ALERT`, `Fish at Kenai River for 1 hour of buffed rates`, two bonus lines (+100 Bite Speed +50 Prospect +25% Pet Luck +100% Money +250 Luck +250 Scale). Reminders `FISH FRENZY » A Fish Frenzy is active at Kenai River (for 16m 56s)` give the time left (also on joining). End `FRENZY » The Fish Frenzy has ended at Kenai River`.
 
 **Boosters and chummers** (from l's logs, checked 2026-10-09)
 - `BOOSTER » <name> has activated a Global <Luck|Scale|Money|XP> Booster » 2x for 30m! (/tipall)`; lengths seen: 30m, 60m. One player can activate several at once and several players can run the same type. Ends with `BOOSTER » Global <type> Booster from <name> has expired!`, exactly the announced length after the activation line (20:09:02 to 20:39:02). Global: nothing repeats them when you join.
@@ -382,4 +383,40 @@ List of rules → editor with a **"test against text"** box (paste a chat line, 
 - **Location leveling page** (title `U+EEE4 핒`, the crew menu shares it; l's dump 2026-10-08): slot 4 gunpowder "Location Leveling Data", lore `Information for Lake Biwa`, `Level: [20]`, `(11.85M/2.32M)`. Slots 10-16, 19-25 and 28-33 are green concrete (done) "Level n" with lore `(Level n) Lake Biwa`, `Rewards:`, `(+1) Location <Species|Generic|Sell/XP> Bonus Roll`, `<power> U+F064`, sometimes a rod title, hat or rod skin, and `<n>x <Standard|Advanced> Bait Package`. Slot 46 Return, slot 48 "Leveling Bonuses" (`Bonuses Available: (20/20)`).
 - **Not known yet:** what a completed compendium location is worth (39K today) and what each collection gives (83.33K), so `/dofi power` only shows those two as read. Needs F8 dumps of the collections menu (`/collections`), a compendium species page (the "View Species" click on a location) and whatever the compendium shows for a finished location.
 - **Collections menu** (title `U+EEE4 픙`, `menuName` "menu"; l's dumps 2026-10-08, five categories seen: albino, all, common, epic, fabled, each its own page of 10 levels): every level is concrete (green done, yellow in progress, gray locked) named "Level n", lore `(Level n)`, `<category> collection` in small caps, `Requirement: (have/need)` or `Unlocked! (n/n)`, `Rewards:` with money, `<power> U+F064`, bait packages and sometimes a recipe or rod skin. Power per level differs per category, e.g. albino 100, 200, 300, 500, 1K, 2.5K, 5K, 7.5K, 10K, 20K (47,100 in all; needs 1, 2, 4, 8, 16, 32, 50, 80, 150, 500 fish), all 25, 100, 200, 500, 1K, 2K, 4K, 7.5K ... 50K (100 to 5M-ish catches), fabled 200, 500, 700, 1K, 2.4K, 5.3K, 7.8K, 10.2K, 20.5K, 50K (needs 1, 2, 3, 6, 8, 12, 16, 20, 30, 50). The first page of each category has Level 1-7 in slots 1-7 and 8-10 in slots 10-12. Not read by the mod yet.
-- **Species collections** (l's dumps 2026-10-08): thirteen more categories in the same menu and format, one per fish group (basses, billfishes, carps, catfishes, cods, flatfishes, gars, jacks, pikes, rays, salmons, sharks, trouts, matching the group names in `baitpicker.json`), 7 levels each. Power per level is the same for all of them: 50, 100, 250, 400, 1K, 5K, 10K; the counts needed differ (e.g. basses 100, 500, 2K, 5K, 10K, 20K, 50K; rays 20, 150, 700, 1.8K, 6K, 10K, 20K). The reader needs no change.
+- **Species collections** (l's dumps 2026-10-08 and 2026-10-10): 35 categories in the same menu and format, one per fish group, 7 levels each (the first 13 were basses, billfishes, carps, catfishes, cods, flatfishes, gars, jacks, pikes, rays, salmons, sharks, trouts; 22 more came with the update of 2026-10-10). Power per level is the same for all of them: 50, 100, 250, 400, 1K, 5K, 10K (16,800 per collection, 588,000 for all 35). The new ones do NOT pay more per level. Catches needed for levels 1 to 7:
+  - basses: 100,500,2K,5K,10K,20K,50K
+  - billfishes: 10,100,500,1.5K,5K,10K,20K
+  - bonytongues: 25,125,600,2K,6K,12K,25K
+  - carps: 100,500,2K,5K,10K,20K,50K
+  - catfishes: 75,250,1.5K,3K,7.5K,15K,30K
+  - characins: 50,200,1K,2.5K,5K,10K,30K
+  - cichlids: 100,500,2K,5K,10K,20K,40K
+  - cods: 75,250,1.5K,3K,7.5K,15K,30K
+  - drums: 50,200,1K,2.5K,5K,10K,30K
+  - eels: 25,125,600,2K,6K,12K,25K
+  - eurasian minnows: 100,500,2K,5K,10K,20K,40K
+  - flatfishes: 75,250,1.5K,3K,7.5K,10K,20K
+  - gars: 50,200,1K,2.5K,5K,9K,15K
+  - groupers: 50,200,1K,2.5K,5K,10K,30K
+  - jacks: 50,200,1K,2.5K,5K,15K,30K
+  - mackerels: 75,250,1.5K,3K,7.5K,15K,30K
+  - panfishes: 100,500,2K,5K,10K,20K,50K
+  - perches: 100,500,2K,5K,10K,20K,40K
+  - pikes: 50,200,1K,2.5K,5K,10K,20K
+  - rays: 20,150,700,1.8K,6K,10K,20K
+  - reeffishes: 100,500,2K,5K,10K,20K,40K
+  - reptiles: 25,125,600,2K,4K,7.5K,15K
+  - salmons: 100,500,2K,5K,10K,20K,50K
+  - seabasses: 50,200,1K,2.5K,5K,10K,30K
+  - seabreams: 75,250,1.5K,3K,7.5K,15K,30K
+  - sharks: 25,125,600,2K,7.5K,15K,30K
+  - snappers: 75,250,1.5K,3K,7.5K,15K,30K
+  - sturgeons: 25,125,600,2K,6K,12K,25K
+  - suckers: 50,200,1K,2.5K,5K,10K,30K
+  - temperate perches: 75,250,1.5K,3K,7.5K,15K,30K
+  - trevallies: 50,200,1K,2.5K,5K,10K,30K
+  - trouts: 100,500,2K,5K,10K,20K,50K
+  - tunas: 50,200,1K,2.5K,5K,10K,30K
+  - whitefishes: 75,250,1.5K,3K,7.5K,15K,30K
+  - wrasses: 50,200,1K,2.5K,5K,10K,30K
+  The overview page (title `U+EEE4 픙`, slots 1 to 35, then Return and Close) shows each as an item named `<Group> Collection` with lore `Current Level - [n]` and `(have/need)` for the next level, no power, so `Power.overview` reads all 35 from that page (next level = n + 1, power from the table above). One /collections visit is enough. Unknown: how a finished collection (level 7) looks there; the reader drops the entry for level 7 or higher.

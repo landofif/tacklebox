@@ -289,12 +289,17 @@ public final class XpEstimate {
         w += 16;
         int h = 25 + rows.length * 11;
         var s = DofiSettings.get();
-        Foe.title(ctx, s.questsX, s.questsY, Foe.text("quests left")); // no box behind it
+        Foe.title(ctx, s.questsX, s.questsY, w, s.questsAlign, Foe.text("quests left")); // no box behind it
         for (int i = 0; i < rows.length; i++) {
             int y = s.questsY + 20 + i * 11;
-            ctx.drawTextWithShadow(tr, Foe.text(rows[i][0]), s.questsX + 8, y, Foe.DIM);
-            Text v = Foe.text(rows[i][1]);
-            ctx.drawTextWithShadow(tr, v, s.questsX + w - 8 - tr.getWidth(v), y, Foe.TEXT);
+            Text l = Foe.text(rows[i][0]), v = Foe.text(rows[i][1]);
+            int lx = s.questsX + 8, vx = s.questsX + w - 8 - tr.getWidth(v); // left keeps the values in a column on the right
+            if (s.questsAlign != DofiSettings.HudAlign.LEFT) {
+                lx = s.questsAlign.x(s.questsX + 8, w - 16, tr.getWidth(l) + 12 + tr.getWidth(v));
+                vx = lx + tr.getWidth(l) + 12;
+            }
+            ctx.drawTextWithShadow(tr, l, lx, y, Foe.DIM);
+            ctx.drawTextWithShadow(tr, v, vx, y, Foe.TEXT);
         }
         return new int[]{s.questsX, s.questsY, w, h};
     }

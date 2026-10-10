@@ -71,16 +71,21 @@ public final class LevelBars {
             extraW = Math.max(extraW, tr.getWidth(extra[i]));
         }
         int pctW = s.levelBarsPercent ? tr.getWidth("100%") + 6 : 0;
+        int boxW = 8 + labelW + 6 + bar + 6 + pctW + extraW + 8;
         if (s.levelBarsHeading) {
-            Foe.title(ctx, s.levelBarsX, s.levelBarsY, Foe.text("level progress"));
+            Foe.title(ctx, s.levelBarsX, s.levelBarsY, boxW, s.levelBarsAlign, Foe.text("level progress"));
         }
         for (int i = 0; i < rows; i++) {
             int y = top + i * 12, x = s.levelBarsX + 8;
             double f = Math.max(0, Math.min(1, fraction[i]));
-            ctx.drawTextWithShadow(tr, ServerHud.title(label[i]), x, y, Foe.DIM);
+            String name = ServerHud.title(label[i]);
+            ctx.drawTextWithShadow(tr, name, s.levelBarsAlign.x(x, labelW, tr.getWidth(name)), y, Foe.DIM);
             int bx = x + labelW + 6;
             ctx.fill(bx, y + 3, bx + bar, y + 5, Foe.FAINT);
-            ctx.fillGradient(bx, y + 3, bx + (int) (bar * f), y + 5, Hypr.acc1(), Hypr.acc2());
+            int fillW = (int) (bar * f);
+            for (int c = 0; c < fillW; c++) {
+                ctx.fill(bx + c, y + 3, bx + c + 1, y + 5, Hypr.mix(Hypr.acc1(), Hypr.acc2(), bar > 1 ? c / (float) (bar - 1) : 0f));
+            }
             int px = bx + bar + 6;
             if (s.levelBarsPercent) {
                 String pct = (int) (f * 100) + "%"; // cut, so 99.9% never reads as done
@@ -88,7 +93,7 @@ public final class LevelBars {
             }
             ctx.drawTextWithShadow(tr, extra[i], px + pctW, y, Foe.DIM);
         }
-        return new int[]{s.levelBarsX, s.levelBarsY, 8 + labelW + 6 + bar + 6 + pctW + extraW + 8, top - s.levelBarsY + rows * 12 + 2};
+        return new int[]{s.levelBarsX, s.levelBarsY, boxW, top - s.levelBarsY + rows * 12 + 2};
     }
 
     public static void renderHud(DrawContext ctx) {
