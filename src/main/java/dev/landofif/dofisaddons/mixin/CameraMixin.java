@@ -7,6 +7,7 @@ import dev.landofif.dofisaddons.display.SneakHeight;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -18,6 +19,8 @@ abstract class CameraMixin {
     private float dofisaddons$sneakHeight(Entity entity, Operation<Float> original) {
         float vanilla = original.call(entity);
         if (entity != MinecraftClient.getInstance().player) return vanilla;
-        return SneakHeight.target(DofiSettings.get().sneakHeight, entity.isInSneakingPose(), vanilla);
+        // Not isInSneakingPose(): ClientPlayerEntity overrides it with an input flag one tick behind the pose and the eye
+        // height, which let vanilla's 1.27 through for one tick on every press.
+        return SneakHeight.target(DofiSettings.get().sneakHeight, entity.isInPose(EntityPose.CROUCHING), vanilla);
     }
 }
