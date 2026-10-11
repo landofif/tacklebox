@@ -8,6 +8,7 @@
     "landofif"
   ],
   "license": "MIT",
+  "icon": "assets/tacklebox/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [

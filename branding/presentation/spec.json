@@ -1,0 +1,36 @@
+{
+  "brand": "tacklebox",
+  "tagline": "Display add-on for FishOnMC",
+  "brief": "A client-side Fabric mod that shows more of what the server already tells you: huds, menus and chat tools. It sits on top of FOECollab, observes and never plays for you. The logo has to feel at home next to it: flat, minimal, rounded tiles.",
+  "adjectives": ["minimal", "flat", "practical", "game-native"],
+  "criteria": "Success: reads as a fishing hook at 16 px, works in one colour, fits the rounded-tile look of the mod's own screens.",
+  "industry": "software",
+  "nav": ["Features", "Docs", "Download"],
+  "greyscale": false,
+  "final": true,
+  "tile_color": "#14202b",
+  "brand_color": "#33ccff",
+  "designer": "tacklebox",
+  "concepts": [
+    {
+      "name": "Hook in a box",
+      "symbol": "../svg/tacklebox-symbol.svg",
+      "lockup": "../svg/tacklebox-horizontal.svg",
+      "stacked": "../svg/tacklebox-stacked.svg",
+      "avatar": "../svg/tacklebox-symbol.svg",
+      "symbol_on_tile": "../svg/tacklebox-symbol.svg",
+      "symbol_on_dark": "../svg/tacklebox-symbol.svg",
+      "lockup_on_tile": "../svg/tacklebox-horizontal-dark.svg",
+      "lockup_on_dark": "../svg/tacklebox-horizontal-dark.svg",
+      "stacked_on_tile": "../svg/tacklebox-stacked-dark.svg",
+      "stacked_on_dark": "../svg/tacklebox-stacked-dark.svg",
+      "idea": "A fish hook, with its eye, cut into a rounded tile: the tackle box is the tile.",
+      "rationale": [
+        "The tile is the same rounded square as the mod's own screens, so the icon looks like part of the mod.",
+        "Cyan to mint is the mod's accent colour; the hook carries it, the tile stays quiet.",
+        "A heavier small-size cut keeps the hook readable at 16 px for the Mod Menu list and the favicon."
+      ]
+    }
+  ],
+  "recommendation": "Use the full symbol from 64 px up and the small-size cut below that. Wordmark in lowercase, exactly tacklebox, to match the mod name."
+}

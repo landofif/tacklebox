@@ -11,5 +11,5 @@ Read the index for your area first. Do not read every doc.
 | Huds | Server hud, boosts, now playing, quests left, bobber timer | `huds/index.md` |
 | Menus | Fishonmc menu, vaults, power, compendium, bait picker, presets | `menus/index.md` |
 | Display | World tweaks ported from fishutils, totem pop | `display/index.md` |
-| Dev | Build, CI, dev run, F8 gui dump | `dev/index.md` |
+| Dev | Build, CI, dev run, F8 gui dump, rename, logo | `dev/index.md` |
 | Server knowledge | Chat lines, glyph codepoints, item NBT, scoreboard, menus | `fishonmc-research.md` (one file, read the section you need) |
