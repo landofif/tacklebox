@@ -16,10 +16,8 @@ abstract class CameraMixin {
     @WrapOperation(method = "updateEyeHeight", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/entity/Entity;getStandingEyeHeight()F"))
     private float dofisaddons$sneakHeight(Entity entity, Operation<Float> original) {
-        double height = DofiSettings.get().sneakHeight;
-        if (height < SneakHeight.STANDING && entity == MinecraftClient.getInstance().player && entity.isInSneakingPose()) {
-            return SneakHeight.eyeHeight(height);
-        }
-        return original.call(entity);
+        float vanilla = original.call(entity);
+        if (entity != MinecraftClient.getInstance().player) return vanilla;
+        return SneakHeight.target(DofiSettings.get().sneakHeight, entity.isInSneakingPose(), vanilla);
     }
 }

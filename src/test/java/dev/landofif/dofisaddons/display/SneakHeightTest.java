@@ -26,4 +26,14 @@ class SneakHeightTest {
         assertEquals(1.27f, SneakHeight.eyeHeight(1.0), 1e-4f);
         assertEquals(1.62f, SneakHeight.eyeHeight(2.5), 1e-4f);
     }
+
+    @Test
+    void standingHeightRemovesVanillasDipWhileSneaking() {
+        assertEquals(1.62f, SneakHeight.target(1.8, true, 1.27f), 1e-4f); // vanilla would give 1.27
+    }
+
+    @Test
+    void notSneakingKeepsVanillasEyes() {
+        assertEquals(1.62f, SneakHeight.target(1.5, false, 1.62f), 1e-4f);
+    }
 }
