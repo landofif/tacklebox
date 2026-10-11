@@ -10,6 +10,7 @@
     "ChatHudMixin",
     "ChatScreenMixin",
     "DailyQuestHandlerMixin",
+    "DailyQuestTrackerHudHandlerMixin",
     "EntityInterpolationMixin",
     "EquipmentHudMixin",
     "EntityRenderManagerMixin",

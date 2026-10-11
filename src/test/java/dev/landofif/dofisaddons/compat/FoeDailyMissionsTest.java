@@ -39,9 +39,9 @@ class FoeDailyMissionsTest {
     void keepsOnlyUnfinishedMissionsInOrder() {
         List<FoeDailyMissions.Mission> m = FoeDailyMissions.parse(dump());
         assertEquals(List.of(
-                new FoeDailyMissions.Mission("Anywhere", 169, 250),
-                new FoeDailyMissions.Mission("Lumpfish", 4, 14),
-                new FoeDailyMissions.Mission("Atlantic Bluefin Tuna", 0, 3)), m);
+                new FoeDailyMissions.Mission("Base Missions", "Anywhere", 169, 250),
+                new FoeDailyMissions.Mission("Lofoten Islands Missions", "Lumpfish", 4, 14),
+                new FoeDailyMissions.Mission("Lofoten Islands Missions", "Atlantic Bluefin Tuna", 0, 3)), m);
     }
 
     @Test
@@ -58,7 +58,7 @@ class FoeDailyMissionsTest {
     @Test
     void thousandsSeparatorsAreRead() {
         List<String> lore = List.of(F + "   - " + ROD + " Anywhere  ", F + "      ┗ (1,341/2,000)");
-        assertEquals(new FoeDailyMissions.Mission("Anywhere", 1341, 2000), FoeDailyMissions.parse(lore).get(0));
+        assertEquals(new FoeDailyMissions.Mission("", "Anywhere", 1341, 2000), FoeDailyMissions.parse(lore).get(0));
     }
 
     @Test

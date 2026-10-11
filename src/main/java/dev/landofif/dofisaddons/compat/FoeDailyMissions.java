@@ -2,6 +2,7 @@ package dev.landofif.dofisaddons.compat;
 
 import dev.landofif.dofisaddons.DofisAddons;
 import dev.landofif.dofisaddons.menu.Compendium;
+import dev.landofif.dofisaddons.ui.Foe;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
@@ -9,11 +10,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
+import net.minecraft.util.Formatting;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,8 +33,13 @@ public final class FoeDailyMissions {
     private static final Pattern NAME = Pattern.compile("^\\s*-\\s+\\x{1F3A3}\\s+(?<goal>.*?)\\s*(?<done>✔)?\\s*$");
     private static final Pattern PROGRESS = Pattern.compile("^\\s*┗\\s*\\((?<p>[\\d,]+)\\s*/\\s*(?<n>[\\d,]+)\\)\\s*$");
 
-    /** One unfinished mission, {@code goal} as shown (a glyph for the rarity missions). */
-    public record Mission(String goal, int progress, int needed) {}
+    private static final Pattern SECTION = Pattern.compile("^\\s*(?<name>\\S.*?)\\s+Missions\\s*$");
+
+    /** One unfinished mission, {@code goal} as shown (a glyph for the rarity missions), {@code section} the header above it ("Base Missions"...). */
+    public record Mission(String section, String goal, int progress, int needed) {}
+
+    /** Header of each mission's section as of the last read, for the hud. */
+    private static volatile Map<String, String> sections = Map.of();
 
     private static Constructor<?> questCtor;
     private static Method updateQuest;
@@ -40,6 +51,7 @@ public final class FoeDailyMissions {
     public static List<Mission> parse(List<String> lore) {
         List<Mission> out = new ArrayList<>();
         String goal = null;
+        String section = "";
         boolean done = false;
         for (String raw : lore) {
             String line = stripFrame(raw);
@@ -49,12 +61,17 @@ public final class FoeDailyMissions {
                 done = name.group("done") != null;
                 continue;
             }
+            Matcher head = SECTION.matcher(line);
+            if (head.matches() && !head.group("name").equals("Daily")) {
+                section = line.strip();
+                continue;
+            }
             Matcher prog = PROGRESS.matcher(line);
             if (goal != null && prog.matches()) {
                 int p = num(prog.group("p"));
                 int n = num(prog.group("n"));
                 if (!done && n > 0 && p < n && !goal.isBlank()) {
-                    out.add(new Mission(goal, p, n));
+                    out.add(new Mission(section, goal, p, n));
                 }
                 goal = null;
             }
@@ -112,9 +129,12 @@ public final class FoeDailyMissions {
                         .getConstructor(String.class, int.class, int.class, int.class);
             }
             int slot = 1;
+            Map<String, String> bySection = new HashMap<>();
             for (Mission m : parse(lore)) {
+                bySection.put(m.goal(), m.section());
                 quests.add(questCtor.newInstance(m.goal(), m.progress(), m.needed(), slot++));
             }
+            sections = bySection;
         } catch (ReflectiveOperationException | RuntimeException e) {
             failed = true; // a foecollab update changed Quest: stop quietly, its own parse still runs
             DofisAddons.LOGGER.warn("daily missions: cannot build foecollab's quests: {}", e.toString());
@@ -144,6 +164,74 @@ public final class FoeDailyMissions {
         } catch (ReflectiveOperationException | RuntimeException e) {
             failed = true;
             DofisAddons.LOGGER.warn("daily missions: cannot count a catch: {}", e.toString());
+        }
+    }
+
+    /** The section header a mission sits under, or null when unknown. */
+    public static String sectionOf(String goal) {
+        return sections.get(goal);
+    }
+
+    private static final TextColor NEEDED = TextColor.fromRgb(0x7FB8FF);
+    private static Field questsField, goalField, progressField, neededField, slotField, startedField;
+    private static Method instance, questDone;
+    private static boolean styleFailed;
+
+    /**
+     * Rewrites the quest lines of foecollab's daily mission hud ({@code lines}: title line(s), then one line per quest) to the colours of
+     * the tooltip (green name, yellow progress, blue goal) with a header whenever the section changes. Quests that are done or not
+     * started keep foecollab's line.
+     */
+    public static void styleLines(List<Object> lines) {
+        if (styleFailed) {
+            return;
+        }
+        try {
+            if (instance == null) {
+                Class<?> handler = Class.forName("io.github.foecollab.handler.DailyQuestHandler");
+                Class<?> quest = Class.forName("io.github.foecollab.handler.DailyQuestHandler$Quest");
+                instance = handler.getMethod("instance");
+                questsField = handler.getField("quests");
+                goalField = quest.getField("goal");
+                progressField = quest.getField("progress");
+                neededField = quest.getField("needed");
+                slotField = quest.getField("slot");
+                startedField = quest.getField("isStarted");
+                questDone = quest.getMethod("questDone");
+            }
+            List<?> quests = (List<?>) questsField.get(instance.invoke(null));
+            int title = lines.size() - quests.size();
+            if (title < 0) {
+                return;
+            }
+            List<Object> out = new ArrayList<>(lines.subList(0, title));
+            String last = null;
+            for (int i = 0; i < quests.size(); i++) {
+                Object q = quests.get(i);
+                String goal = (String) goalField.get(q);
+                String section = goal == null ? null : sectionOf(goal);
+                if (section != null && !section.equals(last)) {
+                    out.add(Foe.text(section).formatted(Formatting.GRAY));
+                    last = section;
+                }
+                if (goal == null || goal.isBlank() || !(boolean) startedField.get(q) || (boolean) questDone.invoke(q)) {
+                    out.add(lines.get(title + i)); // done / not started
+                    continue;
+                }
+                out.add(Text.empty()
+                        .append(Text.literal("#" + slotField.get(q) + ": ").formatted(Formatting.GRAY))
+                        .append(Text.literal(goal).formatted(Formatting.GREEN))
+                        .append(Text.literal(" (").formatted(Formatting.GRAY))
+                        .append(Text.literal(String.valueOf(progressField.get(q))).formatted(Formatting.YELLOW))
+                        .append(Text.literal("/").formatted(Formatting.GRAY))
+                        .append(Text.literal(String.valueOf(neededField.get(q))).setStyle(net.minecraft.text.Style.EMPTY.withColor(NEEDED)))
+                        .append(Text.literal(")").formatted(Formatting.GRAY)));
+            }
+            lines.clear();
+            lines.addAll(out);
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            styleFailed = true; // keep foecollab's own lines
+            DofisAddons.LOGGER.warn("daily missions: cannot restyle the hud: {}", e.toString());
         }
     }
 }
