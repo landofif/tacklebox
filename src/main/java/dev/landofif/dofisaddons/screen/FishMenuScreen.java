@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.screen;
 
+import dev.landofif.dofisaddons.compat.FoeMainMenu;
 import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.ui.Hypr;
 import dev.landofif.dofisaddons.DofiSettings;
@@ -89,6 +90,9 @@ public class FishMenuScreen extends DofiScreen {
 
     @Override
     protected void init() {
+        if (FoeMainMenu.TITLE.equals(original.getTitle().getString())) {
+            FoeMainMenu.open(true); // foecollab's daily mission tracker reads the menu while this is set
+        }
         int y = vy() + vh() - BAR + 4;
         int left = vx() + PAD;
         editButton = addDrawableChild(ButtonWidget.builder(Foe.text("rearrange"), b -> toggleEdit()).dimensions(left, y, 90, 20).build());
@@ -115,6 +119,12 @@ public class FishMenuScreen extends DofiScreen {
     @Override
     public void close() {
         client.player.closeHandledScreen();
+    }
+
+    @Override
+    public void removed() {
+        FoeMainMenu.open(false);
+        super.removed();
     }
 
     // ---- model ----
