@@ -159,7 +159,7 @@ public final class Compendium {
         TriggerEngine.onGameMessage(Text.literal("COMPENDIUM » New " + list + " fish: " + name(fishId) + " at " + loc.name()), false);
     }
 
-    private static String name(String fishId) {
+    public static String name(String fishId) {
         StringBuilder b = new StringBuilder();
         for (String w : fishId.replace('_', ' ').split(" ")) {
             if (!w.isEmpty()) {

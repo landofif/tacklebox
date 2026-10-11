@@ -1,6 +1,7 @@
 package dev.landofif.dofisaddons.compat;
 
 import dev.landofif.dofisaddons.DofisAddons;
+import dev.landofif.dofisaddons.menu.Compendium;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
@@ -10,6 +11,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -29,6 +31,7 @@ public final class FoeDailyMissions {
     public record Mission(String goal, int progress, int needed) {}
 
     private static Constructor<?> questCtor;
+    private static Method updateQuest;
     private static boolean failed;
 
     private FoeDailyMissions() {}
@@ -115,6 +118,32 @@ public final class FoeDailyMissions {
         } catch (ReflectiveOperationException | RuntimeException e) {
             failed = true; // a foecollab update changed Quest: stop quietly, its own parse still runs
             DofisAddons.LOGGER.warn("daily missions: cannot build foecollab's quests: {}", e.toString());
+        }
+    }
+
+    /** Foecollab's catch hook still calls {@code updateQuest} with the old goal names; the update renamed those missions. */
+    public static String renameGoal(String goal) {
+        return switch (goal) {
+            case "Total Caught" -> "Anywhere";
+            case "Mythical Caught" -> "\uF037"; // the mythical rarity glyph
+            default -> goal;
+        };
+    }
+
+    /** The species missions (Lumpfish, Opah...) are named after the fish, which foecollab no longer counts on its own. */
+    public static void onCatch(String fishId) {
+        if (failed) {
+            return;
+        }
+        try {
+            Class<?> c = Class.forName("io.github.foecollab.handler.DailyQuestHandler");
+            if (updateQuest == null) {
+                updateQuest = c.getMethod("updateQuest", String.class);
+            }
+            updateQuest.invoke(c.getMethod("instance").invoke(null), Compendium.name(fishId));
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            failed = true;
+            DofisAddons.LOGGER.warn("daily missions: cannot count a catch: {}", e.toString());
         }
     }
 }

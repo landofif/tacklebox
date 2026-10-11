@@ -31,6 +31,7 @@ public final class FoeCatch {
             }
             Compendium.onCatch((String) fishId.get(fish), (String) constantId.get(variant.get(fish)),
                     (String) constantId.get(size.get(fish)), (String) constantId.get(location.get(fish)));
+            FoeDailyMissions.onCatch((String) fishId.get(fish));
         } catch (ReflectiveOperationException | RuntimeException e) {
             failed = true; // a foecollab update changed the fish: stop quietly, the compendium pages still work
             DofisAddons.LOGGER.warn("compendium: cannot read foecollab's fish: {}", e.toString());

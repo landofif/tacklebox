@@ -60,4 +60,12 @@ class FoeDailyMissionsTest {
         List<String> lore = List.of(F + "   - " + ROD + " Anywhere  ", F + "      ┗ (1,341/2,000)");
         assertEquals(new FoeDailyMissions.Mission("Anywhere", 1341, 2000), FoeDailyMissions.parse(lore).get(0));
     }
+
+    @Test
+    void oldGoalNamesMapToTheNewMissions() {
+        assertEquals("Anywhere", FoeDailyMissions.renameGoal("Total Caught"));
+        assertEquals("\uF037", FoeDailyMissions.renameGoal("Mythical Caught"));
+        assertEquals("Shards Caught", FoeDailyMissions.renameGoal("Shards Caught"));
+        assertEquals("Contest Participation", FoeDailyMissions.renameGoal("Contest Participation"));
+    }
 }
