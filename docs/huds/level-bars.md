@@ -8,6 +8,6 @@
 
 ## Text alignment (all text huds)
 
-- Every text hud has a `*Align` setting (`questsAlign`, `boostsAlign`, `levelBarsAlign`, `nowPlayingAlign`, `serverHudAlign`), a `DofiSettings.HudAlign` (left, centre, right; default left = the old look), a cycle row under each hud's toggle. `HudAlign.x(from, span, w)` gives the left edge, `Foe.title(..., boxW, align, ...)` lines up the heading.
+- Every text hud has a `*Align` setting (`questsAlign`, `boostsAlign`, `levelBarsAlign`, `nowPlayingAlign`, `serverHudAlign`), a `TackleboxSettings.HudAlign` (left, centre, right; default left = the old look), a cycle row under each hud's toggle. `HudAlign.x(from, span, w)` gives the left edge, `Foe.title(..., boxW, align, ...)` lines up the heading.
 - Quests and boosts: left keeps labels left and values in a right column; centre and right move each `label  value` row as one piece. Level bars: heading and the labels inside their column. Now playing: heading and text next to the art. Server hud: the title line stays centred.
 - Not run in game yet.

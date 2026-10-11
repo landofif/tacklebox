@@ -1,10 +1,11 @@
-# Dofi's Addons
+# tacklebox
 
-Client-side Fabric mod for FishOnMC (`play.fishonmc.net`), MC 1.21.11. Mod id `dofisaddons`, package `dev.landofif.dofisaddons`. Repo `landofif/dofis-addons` (private), branch `main`. "l" in older notes is landofif, the owner.
+Client-side Fabric mod for FishOnMC (`play.fishonmc.net`), MC 1.21.11. Mod id `tacklebox`, package `dev.landofif.tacklebox`. Repo `landofif/tacklebox` (private), branch `main`. "l" in older notes is landofif, the owner.
+It was called dofisaddons until 2026-10-12; the local folder is still `dofis-addons`. See `docs/dev/rename-tacklebox.md`.
 
 ## Project map
 
-- `src/main/java/dev/landofif/dofisaddons/`: `chat/`, `compat/` (FOECollab by reflection), `display/`, `hud/`, `input/`, `menu/`, `mixin/`, `duck/`, `screen/`, `trigger/`, `ui/`, `util/`, plus `DofisAddons` and `DofiSettings`
+- `src/main/java/dev/landofif/tacklebox/`: `chat/`, `compat/` (FOECollab by reflection), `display/`, `hud/`, `input/`, `menu/`, `mixin/`, `duck/`, `screen/`, `trigger/`, `ui/`, `util/`, plus `Tacklebox` and `TackleboxSettings`
 - `docs/`: all project documentation (see below). Server facts: `docs/fishonmc-research.md`
 
 ## Hard rules
@@ -20,8 +21,8 @@ Client-side Fabric mod for FishOnMC (`play.fishonmc.net`), MC 1.21.11. Mod id `d
 ## Gotchas
 
 - **Keep `yarn_mappings=1.21.11+build.3`.** build.6 broke `PositionedSoundInstance.master(SoundEvent,float,float)`.
-- **Only `@Mixin`/accessor classes go in `dofisaddons.mixin`.** Anything else there causes `IllegalClassLoadError` (black screen on 2026-10-02). Duck interfaces go in `dofisaddons.duck`.
-- **Resource file names must be lowercase.** Only font definitions belong under `assets/dofisaddons/font/`.
+- **Only `@Mixin`/accessor classes go in `tacklebox.mixin`.** Anything else there causes `IllegalClassLoadError` (black screen on 2026-10-02). Duck interfaces go in `tacklebox.duck`.
+- **Resource file names must be lowercase.** Only font definitions belong under `assets/tacklebox/font/`.
 - `HudRenderCallback` is deprecated. Use `HudElementRegistry`.
 - Never `@Redirect` a call FOECollab also redirects (crash at load); use `@WrapOperation`. Dev runs keep foecollab on intermediary names, see `docs/foecollab/integration.md`.
 

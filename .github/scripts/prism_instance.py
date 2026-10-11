@@ -10,13 +10,13 @@ import zipfile
 
 MC = "1.21.11"
 LOADER = "0.19.5"
-NAME = "Dofis Addons Test"
+NAME = "tacklebox Test"
 # The mod's own dependencies, then performance mods. Required dependencies are added automatically.
 MODS = ["fabric-api", "modmenu", "cloth-config",
         "sodium", "lithium", "ferrite-core", "entityculling", "immediatelyfast", "modernfix", "dynamic-fps"]
 
 API = "https://api.modrinth.com/v2"
-HEADERS = {"User-Agent": "landofif/dofis-addons ci (prism test instance)"}
+HEADERS = {"User-Agent": "landofif/tacklebox ci (prism test instance)"}
 
 
 def get(url):
@@ -70,7 +70,7 @@ except Exception as e:  # the instance still builds; add foecollab by hand then
 for jar in glob.glob("build/libs/*.jar"):
     if not jar.endswith(("-sources.jar", "-dev.jar")):
         shutil.copy(jar, mods_dir)
-        added.append("dofisaddons " + os.path.basename(jar))
+        added.append("tacklebox " + os.path.basename(jar))
 
 with open(f"{root}/{NAME}/instance.cfg", "w") as f:
     f.write(f"[General]\nConfigVersion=1.2\nInstanceType=OneSix\nname={NAME}\niconKey=default\n")
@@ -94,7 +94,7 @@ nbt = b"\x0a" + s("") + b"\x09" + s("servers") + b"\x0a" + struct.pack(">i", 1) 
 with open(f"{root}/{NAME}/minecraft/servers.dat", "wb") as f:
     f.write(nbt)
 
-with zipfile.ZipFile("build/dofis-addons-prism.zip", "w", zipfile.ZIP_DEFLATED) as z:
+with zipfile.ZipFile("build/tacklebox-prism.zip", "w", zipfile.ZIP_DEFLATED) as z:
     for dirpath, _, files in os.walk(root):
         for name in files:
             full = os.path.join(dirpath, name)

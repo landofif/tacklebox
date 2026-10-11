@@ -1,16 +1,16 @@
-# dofis addons
+# tacklebox
 
 client side fabric mod for **fishonmc** (minecraft 1.21.11).
 
-needs: fabric api and [foecollab](https://github.com/Kimberlyow/FOECollab) (with its own requirements, cloth config and mod menu). dofis addons is an addon for foecollab: it leaves the trackers and the look to foecollab, draws its own screens and huds with foecollabs boxes and the normal game font, puts its huds in foecollabs hud mover, and its settings next to foecollabs in one settings screen.
+needs: fabric api and [foecollab](https://github.com/Kimberlyow/FOECollab) (with its own requirements, cloth config and mod menu). tacklebox is an addon for foecollab: it leaves the trackers and the look to foecollab, draws its own screens and huds with foecollabs boxes and the normal game font, puts its huds in foecollabs hud mover, and its settings next to foecollabs in one settings screen.
 
 ## getting around
 
-- `/dofi` opens the settings screen, with chat triggers, chat and key commands in its list on the left
-- `/dofi triggers`, `/dofi huds`, `/dofi chat`, `/dofi move` jump straight to one part
-- right shift opens `/dofi` too
-- `/dofi debug item` prints the held items data, f8 in any screen dumps it to a file
-- with mod menu: mods → dofis addons → configure
+- `/tacklebox` opens the settings screen, with chat triggers, chat and key commands in its list on the left (`/dofi` still works, it was the name before the rename)
+- `/tacklebox triggers`, `/tacklebox huds`, `/tacklebox chat`, `/tacklebox move` jump straight to one part
+- right shift opens `/tacklebox` too
+- `/tacklebox debug item` prints the held items data, f8 in any screen dumps it to a file
+- with mod menu: mods → tacklebox → configure
 
 ## chat triggers
 
@@ -32,7 +32,7 @@ switch triggers on and off with the dot, reorder with the arrows, **share** copi
 
 ## chat
 
-`/dofi chat`, or chat in the screens list of the settings.
+`/tacklebox chat`, or chat in the screens list of the settings.
 
 - **hide rules**: lines that match never show up in chat. type part of the line (`*` matches anything), the whole line, or a regex, and pick fishonmc only or every server. paste a line into **test with** to check which rule hides it
 - **move chat**: drag the chat box anywhere in foecollabs hud mover. right click it there to put it back
@@ -41,11 +41,11 @@ switch triggers on and off with the dot, reorder with the arrows, **share** copi
 
 ## hotkey
 
-right shift opens `/dofi` from anywhere in game. change it in options → controls → dofis addons.
+right shift opens `/tacklebox` from anywhere in game. change it in options → controls → tacklebox.
 
 ## custom huds
 
-custom huds are foecollabs: `/dofi huds` (or the custom huds button) opens foecollabs own editor. **move huds** (`/dofi move`) is foecollabs hud mover, with the dofis addons huds in it too: the quests left hud, the chat and the chat boxes. drag one to move it, right click to put it back.
+custom huds are foecollabs: `/tacklebox huds` (or the custom huds button) opens foecollabs own editor. **move huds** (`/tacklebox move`) is foecollabs hud mover, with the tacklebox huds in it too: the quests left hud, the chat and the chat boxes. drag one to move it, right click to put it back.
 
 ## bobber and world tweaks
 
@@ -79,15 +79,15 @@ all of this is in settings under bobber and viewmodel.
 
 ## files
 
-everything lives in `config/dofisaddons/`: `triggers.json` and `settings.json`.
+everything lives in `config/tacklebox/`: `triggers.json` and `settings.json`.
 
 ## look
 
-dofis addons has no look of its own. text is small capitals like foecollabs labels (tooltips keep the normal font). its screens, chests and huds use foecollabs box textures and the normal game font, widgets stay vanilla. settings → general has **simple menus**: chests, your inventory and fishonmc menus lose their box and slot boxes, you see just the items and the menu name (the art from the fishonmc pack is left out). the huds (quests left, chat boxes) have no box either, only text. **flat buttons** draws every button, the game menus too, as a flat see-through fill instead of the bevelled texture, lighter when hovered. the mods own screens have no frame either, only the title in the corner.
+tacklebox has no look of its own. text is small capitals like foecollabs labels (tooltips keep the normal font). its screens, chests and huds use foecollabs box textures and the normal game font, widgets stay vanilla. settings → general has **simple menus**: chests, your inventory and fishonmc menus lose their box and slot boxes, you see just the items and the menu name (the art from the fishonmc pack is left out). the huds (quests left, chat boxes) have no box either, only text. **flat buttons** draws every button, the game menus too, as a flat see-through fill instead of the bevelled texture, lighter when hovered. the mods own screens have no frame either, only the title in the corner.
 
 ## settings
 
-one settings screen for both mods: foecollabs categories first, then dofis addons (menus, huds, bobber, world, viewmodel), each a plain list of label and control with a hover tooltip, and a search box over everything. a long foecollab category (trackers, other, cosmetics) opens a dropdown of its sections under it when picked, and a click on one shows only that section. a grey heading folds the rows under it when clicked. opening foecollabs config from its menu or from mod menu lands here too. **foecollab menu** opens foecollabs own screens (custom huds, custom buttons, pet calculator), and **move huds** its hud mover.
+one settings screen for both mods: foecollabs categories first, then tacklebox (menus, huds, bobber, world, viewmodel), each a plain list of label and control with a hover tooltip, and a search box over everything. a long foecollab category (trackers, other, cosmetics) opens a dropdown of its sections under it when picked, and a click on one shows only that section. a grey heading folds the rows under it when clicked. opening foecollabs config from its menu or from mod menu lands here too. **foecollab menu** opens foecollabs own screens (custom huds, custom buttons, pet calculator), and **move huds** its hud mover.
 
 ## building
 

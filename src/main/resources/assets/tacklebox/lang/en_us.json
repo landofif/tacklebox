@@ -1,0 +1,5 @@
+{
+  "key.category.tacklebox.main": "tacklebox",
+  "key.tacklebox.open": "open tacklebox",
+  "key.tacklebox.dump_gui": "dump open gui to file and clipboard"
+}

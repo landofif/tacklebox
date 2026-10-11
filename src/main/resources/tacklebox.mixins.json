@@ -1,0 +1,43 @@
+{
+  "required": true,
+  "package": "dev.landofif.tacklebox.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "BobberTimerHudMixin",
+    "BossBarHudAccessor",
+    "BoxRendererMixin",
+    "CameraMixin",
+    "ChatHudAccessor",
+    "ChatHudMixin",
+    "ChatScreenMixin",
+    "EntityInterpolationMixin",
+    "EquipmentHudMixin",
+    "EntityRenderManagerMixin",
+    "FishingBobberEntityMixin",
+    "FishingBobberRendererMixin",
+    "FishingBobberStateMixin",
+    "HandledScreenMixin",
+    "HeldItemRendererMixin",
+    "InGameHudHotbarMixin",
+    "InGameHudOverlayMixin",
+    "InGameOverlayRendererMixin",
+    "ItemMarkerHandlerMixin",
+    "BaitSortingHelperMixin",
+    "KeybindHandlerMixin",
+    "InventoryScreenHandlerMixin",
+    "PetEquipHandlerMixin",
+    "LivingEntityMixin",
+    "MinecraftClientMixin",
+    "MovableBoxWidgetMixin",
+    "MoveHudScreenMixin",
+    "PlayerNameLabelMixin",
+    "ToastManagerMixin",
+    "TextFieldWidgetMixin",
+    "ProfileDataHandlerMixin",
+    "PressableWidgetMixin",
+    "TextRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "dofisaddons",
+  "id": "tacklebox",
   "version": "${version}",
-  "name": "dofis addons",
+  "name": "tacklebox",
   "description": "an addon for foecollab on fishonmc: chat triggers with your own titles and sounds, a quests left hud, chat boxes, bobber and world tweaks, and one settings screen for both mods. display only, no automation.",
   "authors": [
     "landofif"
@@ -11,16 +11,16 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "dev.landofif.dofisaddons.DofisAddons"
+      "dev.landofif.tacklebox.Tacklebox"
     ],
     "modmenu": [
-      "dev.landofif.dofisaddons.ModMenuIntegration"
+      "dev.landofif.tacklebox.ModMenuIntegration"
     ]
   },
   "mixins": [
-    "dofisaddons.mixins.json"
+    "tacklebox.mixins.json"
   ],
-  "accessWidener": "dofisaddons.accesswidener",
+  "accessWidener": "tacklebox.accesswidener",
   "depends": {
     "fabricloader": ">=0.19.0",
     "fabric-api": "*",
