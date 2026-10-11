@@ -251,7 +251,7 @@ Spawn hub bounding box: x 95..145, z −58..38 (treated as Cypress Lake).
 | Screen | Title string |
 |---|---|
 | **Stats** (`/stats`) | `U+EEE4 픲` |
-| Main menu | `U+EEE4 할` (contains `END_CRYSTAL` named "Daily Missions"; lore lines `| <goal> (<p>/<n>)`) |
+| Main menu | `U+EEE4 할` (contains `END_CRYSTAL` named "Daily Missions"; lore until 2026-10-10: `| <goal> (<p>/<n>)`; since 2026-10-11 section headers (`Base Missions`, `<Location> Missions`), then per mission `- 🎣 <goal>  [✔]` and `      ┗ (<p>/<n>)` on the next line, rarity missions use a glyph as goal (`U+F037` is the mythical one), last line `Rerolls in 22h 47m 47s`) |
 | Quests (`/quests`, 45 slots) | `U+EEE4 픹` |
 | Crew / Leveling bonuses | `U+EEE4 핒` |
 | Pet menu | `Pet Menu` + `U+EEE6 U+EEE5 U+EEE3 핑` |

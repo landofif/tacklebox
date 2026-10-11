@@ -9,6 +9,7 @@
     "ChatHudAccessor",
     "ChatHudMixin",
     "ChatScreenMixin",
+    "DailyQuestHandlerMixin",
     "EntityInterpolationMixin",
     "EquipmentHudMixin",
     "EntityRenderManagerMixin",
