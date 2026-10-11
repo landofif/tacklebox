@@ -50,6 +50,7 @@ public class ViewmodelScreen extends DofiScreen {
         });
         slider(list, w, "swing length", 0.25, 4, 0.01, "x", () -> s.swingSlowness, v -> s.swingSlowness = v);
         slider(list, w, "swing turn", 0, 100, 1, "%", () -> s.swingTurn, v -> s.swingTurn = v);
+        slider(list, w, "sneak height", 1.5, 1.8, 0.01, "", () -> s.sneakHeight, v -> s.sneakHeight = v);
         addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close()).dimensions(10, height - 28, w, 20).build());
     }
 

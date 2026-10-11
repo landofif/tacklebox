@@ -320,6 +320,8 @@ public class DofiSettings {
     public SwingStyle swingStyle = SwingStyle.NORMAL;
     /** 1 = normal, 2 = twice as slow, 0.5 = twice as fast. Only the animation changes. */
     public double swingSlowness = 1.0;
+    /** How low your own camera dips when sneaking: 1.5 = vanilla, 1.8 = no dip. */
+    public double sneakHeight = 1.5;
     /** "No swing": how far the item turns, in percent of vanilla's turn. */
     public double swingTurn = 100;
 
@@ -472,6 +474,7 @@ public class DofiSettings {
         lineColor &= 0xFFFFFF;
         vmScale = Math.max(0.1, Math.min(3, vmScale));
         swingSlowness = Math.max(0.25, Math.min(4, swingSlowness));
+        sneakHeight = dev.landofif.dofisaddons.display.SneakHeight.clamp(sneakHeight);
         swingTurn = Math.max(0, Math.min(100, swingTurn));
         if (locLevels == null) locLevels = new java.util.LinkedHashMap<>();
         if (need == null) need = new java.util.LinkedHashMap<>();

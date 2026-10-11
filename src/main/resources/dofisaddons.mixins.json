@@ -6,6 +6,7 @@
     "BobberTimerHudMixin",
     "BossBarHudAccessor",
     "BoxRendererMixin",
+    "CameraMixin",
     "ChatHudAccessor",
     "ChatHudMixin",
     "ChatScreenMixin",
