@@ -3,6 +3,7 @@ package dev.landofif.dofisaddons;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
+import dev.landofif.dofisaddons.hud.HudPos;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
@@ -104,7 +105,13 @@ public class DofiSettings {
     // ---- fishonmc menu (see menu/FishMenu) ----
     /** Show the main menu and /travel as the mods own screens instead of the chest gui. */
     public boolean fishMenu = true;
-    /** The quests left hud: where it sits (gui units from the top left) and whether it shows. */
+    /**
+     * Where the five huds below sit lives in their {@code *Pos} (distance to the nearest window sides, see hud/HudPos). The plain
+     * {@code *X} and {@code *Y} are the spot a hud is drawn at this frame, set from its pos on every draw; settings saved before
+     * pos existed have them as the spot and sanitize makes the pos from them. Edit a pos, never these.
+     */
+    public HudPos questsPos, levelBarsPos, boostsPos, nowPlayingPos, serverHudPos;
+    /** The quests left hud: whether it shows. */
     public boolean questsHud = true;
     public int questsX = 4;
     public int questsScale = 100;
@@ -203,7 +210,12 @@ public class DofiSettings {
     // ---- chat ----
     /** Lines matching one of these never show in chat. */
     public java.util.List<dev.landofif.dofisaddons.chat.ChatFilter> chatFilters = new java.util.ArrayList<>();
-    /** Where the chat box sits, as an offset from the vanilla spot in gui units (right and down are positive). */
+    /**
+     * Where the vanilla chat sits, as an offset from the vanilla spot in gui units (right and down are positive). Sideways it is
+     * {@code chatPos} (only its x is used: the gap to the left or right edge, so the chat stays on its side when the window
+     * changes size); {@code chatX} is what that was before, read once to make it. Up and down the chat is already tied to the bottom.
+     */
+    public HudPos chatPos;
     public int chatX = 0;
     public int chatY = 0;
     /** Right click a chat line (with chat open) to copy it. */
@@ -439,6 +451,12 @@ public class DofiSettings {
             if (w.from == null) w.from = "";
             if (w.to == null) w.to = "";
         }
+        if (questsPos == null) questsPos = new HudPos(questsX, questsY);
+        if (levelBarsPos == null) levelBarsPos = new HudPos(levelBarsX, levelBarsY);
+        if (boostsPos == null) boostsPos = new HudPos(boostsX, boostsY);
+        if (nowPlayingPos == null) nowPlayingPos = new HudPos(nowPlayingX, nowPlayingY);
+        if (serverHudPos == null) serverHudPos = new HudPos(serverHudX, serverHudY);
+        if (chatPos == null) chatPos = new HudPos(chatX, 0);
         if (chatBoxes == null) chatBoxes = dev.landofif.dofisaddons.chat.ChatBoxes.defaults();
         chatBoxes.removeIf(java.util.Objects::isNull);
         for (dev.landofif.dofisaddons.chat.ChatBox b : chatBoxes) {

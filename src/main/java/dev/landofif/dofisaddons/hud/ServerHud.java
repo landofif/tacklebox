@@ -144,7 +144,11 @@ public final class ServerHud {
 
     public static int[] draw(DrawContext ctx, boolean preview) {
         DofiSettings s = DofiSettings.get();
-        return draw(ctx, s.serverHudX, s.serverHudY);
+        return s.serverHudPos.draw(ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight(), (x, y) -> {
+            s.serverHudX = x;
+            s.serverHudY = y;
+            return draw(ctx, x, y);
+        });
     }
 
     public static int[] draw(DrawContext ctx, int hx, int hy) {

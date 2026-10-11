@@ -266,7 +266,11 @@ public final class XpEstimate {
     /** Draws the box at its saved spot and returns {x, y, w, h}; with preview it shows dashes for unknown values. */
     public static int[] draw(DrawContext ctx, boolean preview) {
         DofiSettings s = DofiSettings.get();
-        return Foe.scaled(ctx, s.questsX, s.questsY, s.questsScale, c -> drawAt100(c, preview));
+        return s.questsPos.draw(ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight(), (x, y) -> {
+            s.questsX = x;
+            s.questsY = y;
+            return Foe.scaled(ctx, x, y, s.questsScale, c -> drawAt100(c, preview));
+        });
     }
 
     private static int[] drawAt100(DrawContext ctx, boolean preview) {

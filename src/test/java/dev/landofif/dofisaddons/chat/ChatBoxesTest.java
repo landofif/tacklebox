@@ -49,6 +49,43 @@ class ChatBoxesTest {
         assertEquals(2, old.rules.size());
     }
 
+    /** F11 and split screen change the window size; a box 50 px from the right edge has to stay 50 px from it. */
+    @Test
+    void boxKeepsItsDistanceFromTheRightEdgeWhenTheWindowNarrows() {
+        ChatBox box = new ChatBox();
+        box.width = 180;
+        box.x = (960 - 180 - 50) * 100.0 / 960;
+        box.y = 20;
+        int[] full = ChatBoxes.rect(box, 960, 540, false);
+        assertEquals(50, 960 - (full[0] + full[2]));
+        int[] half = ChatBoxes.rect(box, 480, 540, false);
+        assertEquals(50, 480 - (half[0] + half[2]));
+    }
+
+    @Test
+    void boxAtTheBottomKeepsItsDistanceFromTheBottomEdge() {
+        ChatBox box = new ChatBox();
+        box.width = 180;
+        box.lines = 7;
+        int h = ChatBoxes.heightOf(7);
+        box.x = 5.0 / 960 * 100;
+        box.y = (540 - h - 30) * 100.0 / 540; // 30 from the bottom
+        assertEquals(30, 540 - (ChatBoxes.rect(box, 960, 540, false)[1] + h));
+        assertEquals(30, 270 - (ChatBoxes.rect(box, 960, 270, false)[1] + h));
+    }
+
+    @Test
+    void openChatGrowsAPinnedBoxUpwardFromItsBottomEdge() {
+        ChatBox box = new ChatBox();
+        box.width = 180;
+        box.x = 50;
+        box.y = 80;
+        int[] closed = ChatBoxes.rect(box, 960, 540, false);
+        int[] open = ChatBoxes.rect(box, 960, 540, true);
+        assertEquals(closed[1] + closed[3], open[1] + open[3]);
+        assertTrue(open[3] > closed[3]);
+    }
+
     @Test
     void editedCrewBoxIsLeftAlone() {
         ChatBox edited = new ChatBox();

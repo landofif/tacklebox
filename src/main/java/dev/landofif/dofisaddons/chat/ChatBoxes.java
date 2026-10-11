@@ -2,6 +2,7 @@ package dev.landofif.dofisaddons.chat;
 
 import dev.landofif.dofisaddons.ui.Foe;
 import dev.landofif.dofisaddons.DofiSettings;
+import dev.landofif.dofisaddons.hud.HudPos;
 import dev.landofif.dofisaddons.trigger.Trigger;
 import dev.landofif.dofisaddons.trigger.TriggerEngine;
 import net.minecraft.client.MinecraftClient;
@@ -175,10 +176,12 @@ public final class ChatBoxes {
     public static int[] rect(ChatBox box, int screenW, int screenH, boolean open) {
         int w = Math.max(80, Math.min(screenW, box.width));
         int h = heightOf(lines(box, false));
-        int x = (int) Math.round(box.x / 100.0 * screenW);
-        int y = (int) Math.round(box.y / 100.0 * screenH);
-        x = Math.max(0, Math.min(screenW - w, x));
-        y = Math.max(0, Math.min(screenH - h, y));
+        if (box.pos == null) {
+            box.pos = new HudPos((int) Math.round(box.x / 100.0 * screenW), (int) Math.round(box.y / 100.0 * screenH));
+        }
+        box.pos.measure(screenW, screenH, w, h);
+        int x = box.pos.left(screenW);
+        int y = box.pos.top(screenH);
         if (open) {
             int bottom = y + h;
             h = heightOf(lines(box, true));

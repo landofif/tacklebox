@@ -2,7 +2,9 @@ package dev.landofif.dofisaddons.chat;
 
 import dev.landofif.dofisaddons.mixin.ChatHudAccessor;
 import dev.landofif.dofisaddons.ui.Foe;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
+import net.minecraft.client.option.GameOptions;
 import org.joml.Matrix3x2f;
 import org.joml.Vector2f;
 
@@ -131,5 +133,12 @@ public final class ChatBar {
         ChatHudAccessor acc = (ChatHudAccessor) hud;
         hud.scroll(Math.round(frac * (count - lines)) - acc.dofisaddons$scrolled()); // clamps, and clears the unread mark at the bottom
         shown = acc.dofisaddons$scrolled();
+    }
+
+    /** How wide the default chat is, from the game's own chat options: what the hud mover draws and a right edge anchor needs. */
+    public static int width() {
+        GameOptions o = MinecraftClient.getInstance().options;
+        double scale = o.getChatScale().getValue();
+        return (int) Math.ceil((Math.ceil(ChatHud.getWidth(o.getChatWidth().getValue()) / scale) + 12) * scale);
     }
 }

@@ -125,8 +125,18 @@ abstract class ChatHudMixin {
             target = "Lnet/minecraft/client/gui/hud/ChatHud$Backend;updatePose(Ljava/util/function/Consumer;)V"))
     private void dofisaddons$moveChat(ChatHud.Backend backend, Consumer<Matrix3x2f> transformer, Operation<Void> original) {
         DofiSettings s = DofiSettings.get();
-        int dx = s == null ? 0 : s.chatX;
-        int dy = s == null ? 0 : s.chatY;
+        final int dx;
+        final int dy;
+        if (s == null) {
+            dx = 0;
+            dy = 0;
+        } else {
+            var window = net.minecraft.client.MinecraftClient.getInstance().getWindow();
+            int sw = window.getScaledWidth();
+            s.chatPos.measure(sw, window.getScaledHeight(), ChatBar.width(), 0);
+            dx = s.chatPos.left(sw);
+            dy = s.chatY;
+        }
         original.call(backend, (Consumer<Matrix3x2f>) pose -> {
             pose.translate(dx, dy);
             transformer.accept(pose);

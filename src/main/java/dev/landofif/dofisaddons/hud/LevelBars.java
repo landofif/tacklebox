@@ -30,7 +30,11 @@ public final class LevelBars {
 
     public static int[] draw(DrawContext ctx, boolean preview) {
         DofiSettings s = DofiSettings.get();
-        return Foe.scaled(ctx, s.levelBarsX, s.levelBarsY, s.levelBarsScale, c -> drawAt100(c, preview));
+        return s.levelBarsPos.draw(ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight(), (x, y) -> {
+            s.levelBarsX = x;
+            s.levelBarsY = y;
+            return Foe.scaled(ctx, x, y, s.levelBarsScale, c -> drawAt100(c, preview));
+        });
     }
 
     private static int[] drawAt100(DrawContext ctx, boolean preview) {

@@ -1,5 +1,6 @@
 package dev.landofif.dofisaddons.chat;
 
+import dev.landofif.dofisaddons.hud.HudPos;
 import dev.landofif.dofisaddons.trigger.Trigger;
 
 import java.util.ArrayList;
@@ -15,7 +16,12 @@ public class ChatBox {
     public List<ChatFilter> rules = new ArrayList<>();
     /** Keep matching lines in the main chat too. */
     public boolean alsoInChat = false;
-    /** Top left corner, in % of the screen (like custom huds). */
+    /**
+     * Where it sits: the distance to the nearest window sides (hud/HudPos), so it stays there when the window changes size.
+     * null in boxes saved before that; ChatBoxes.rect makes it from x and y below, which are then not used any more.
+     */
+    public HudPos pos;
+    /** Top left corner, in % of the screen: the first spot of a new box, and where an old one was. */
     public double x = 60;
     public double y = 40;
     /** Size in gui units: width of the box, and how many lines it shows. */

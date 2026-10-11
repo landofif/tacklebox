@@ -1,8 +1,10 @@
 package dev.landofif.dofisaddons.compat;
 
 import dev.landofif.dofisaddons.DofiSettings;
+import dev.landofif.dofisaddons.chat.ChatBar;
 import dev.landofif.dofisaddons.chat.ChatBox;
 import dev.landofif.dofisaddons.chat.ChatBoxes;
+import dev.landofif.dofisaddons.hud.HudPos;
 import dev.landofif.dofisaddons.hud.XpEstimate;
 import dev.landofif.dofisaddons.ui.Foe;
 import net.minecraft.client.MinecraftClient;
@@ -40,10 +42,10 @@ public final class FoeMover {
         DofiSettings s = DofiSettings.get();
         List<ClickableWidget> add = new ArrayList<>();
         Box chatBox = new Box(ctx -> chat(ctx), (x, y, r) -> {
-            s.chatX = Math.max(0, Math.min(sw() - r[2], x));
+            s.chatPos.moveTo(sw(), sh(), x, 0, r[2], 0); // sideways only, up and down it is an offset from the bottom
             s.chatY += Math.max(0, Math.min(sh() - r[3], y)) - r[1];
         }, null, () -> {
-            s.chatX = 0;
+            s.chatPos = new HudPos(0, 0);
             s.chatY = 0;
         });
         chatBox.edges(true, FoeMover::chatOpen, FoeMover::dragChat);
@@ -73,52 +75,32 @@ public final class FoeMover {
             s.equipScale = 100;
         }));
         if (s.questsHud) {
-            add.add(new Box(ctx -> XpEstimate.draw(ctx, true), (x, y, r) -> {
-                s.questsX = Math.max(0, Math.min(sw() - 40, x));
-                s.questsY = Math.max(0, Math.min(sh() - 20, y));
-            }, (step, shift) -> s.questsScale = Math.max(50, Math.min(300, s.questsScale + step * 5)), () -> {
+            add.add(new Box(ctx -> XpEstimate.draw(ctx, true), (x, y, r) -> s.questsPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.questsScale = Math.max(50, Math.min(300, s.questsScale + step * 5)), () -> {
                 s.questsScale = 100;
-                s.questsX = 4;
-                s.questsY = 70;
+                s.questsPos = new HudPos(4, 70);
             }));
         }
         if (s.levelBars) {
-            add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.LevelBars.draw(ctx, true), (x, y, r) -> {
-                s.levelBarsX = Math.max(0, Math.min(sw() - 40, x));
-                s.levelBarsY = Math.max(0, Math.min(sh() - 20, y));
-            }, (step, shift) -> s.levelBarsScale = Math.max(50, Math.min(300, s.levelBarsScale + step * 5)), () -> {
+            add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.LevelBars.draw(ctx, true), (x, y, r) -> s.levelBarsPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.levelBarsScale = Math.max(50, Math.min(300, s.levelBarsScale + step * 5)), () -> {
                 s.levelBarsScale = 100;
-                s.levelBarsX = 4;
-                s.levelBarsY = 40;
+                s.levelBarsPos = new HudPos(4, 40);
             }));
         }
         if (s.boostsHud) {
-            add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.BoostsHud.draw(ctx, true), (x, y, r) -> {
-                s.boostsX = Math.max(0, Math.min(sw() - 40, x));
-                s.boostsY = Math.max(0, Math.min(sh() - 20, y));
-            }, (step, shift) -> s.boostsScale = Math.max(50, Math.min(300, s.boostsScale + step * 5)), () -> {
+            add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.BoostsHud.draw(ctx, true), (x, y, r) -> s.boostsPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.boostsScale = Math.max(50, Math.min(300, s.boostsScale + step * 5)), () -> {
                 s.boostsScale = 100;
-                s.boostsX = 182;
-                s.boostsY = 70;
+                s.boostsPos = new HudPos(182, 70);
             }));
         }
         if (s.nowPlaying) {
-            add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.NowPlaying.draw(ctx, true), (x, y, r) -> {
-                s.nowPlayingX = Math.max(0, Math.min(sw() - 40, x));
-                s.nowPlayingY = Math.max(0, Math.min(sh() - 20, y));
-            }, (step, shift) -> s.nowPlayingScale = Math.max(50, Math.min(300, s.nowPlayingScale + step * 5)), () -> {
+            add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.NowPlaying.draw(ctx, true), (x, y, r) -> s.nowPlayingPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.nowPlayingScale = Math.max(50, Math.min(300, s.nowPlayingScale + step * 5)), () -> {
                 s.nowPlayingScale = 100;
-                s.nowPlayingX = 4;
-                s.nowPlayingY = 4;
+                s.nowPlayingPos = new HudPos(4, 4);
             }));
         }
         if (s.serverHud) {
-            add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.ServerHud.draw(ctx, true), (x, y, r) -> {
-                s.serverHudX = Math.max(0, Math.min(sw() - 40, x));
-                s.serverHudY = Math.max(0, Math.min(sh() - 20, y));
-            }, (step, shift) -> s.serverHudScale = Math.max(50, Math.min(200, s.serverHudScale + step * 5)), () -> {
-                s.serverHudX = 4;
-                s.serverHudY = 120;
+            add.add(new Box(ctx -> dev.landofif.dofisaddons.hud.ServerHud.draw(ctx, true), (x, y, r) -> s.serverHudPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.serverHudScale = Math.max(50, Math.min(200, s.serverHudScale + step * 5)), () -> {
+                s.serverHudPos = new HudPos(4, 120);
                 s.serverHudScale = 100;
             }));
         }
@@ -146,10 +128,7 @@ public final class FoeMover {
             if (!box.enabled) {
                 continue;
             }
-            Box b = new Box(ctx -> ChatBoxes.draw(ctx, box, false), (x, y, r) -> {
-                box.x = Math.max(0, Math.min(100, x * 100.0 / Math.max(1, sw())));
-                box.y = Math.max(0, Math.min(100, y * 100.0 / Math.max(1, sh())));
-            }, (step, shift) -> {
+            Box b = new Box(ctx -> ChatBoxes.draw(ctx, box, false), (x, y, r) -> box.pos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> {
                 if (shift) {
                     box.width = Math.max(80, Math.min(600, box.width + step * 10));
                 } else {
@@ -178,10 +157,11 @@ public final class FoeMover {
         double scale = o.getChatScale().getValue();
         int lineH = (int) (9 * (o.getChatLineSpacing().getValue() + 1.0));
         int lines = Math.max(1, ChatHud.getHeight(o.getChatHeightUnfocused().getValue()) / lineH);
-        int w = (int) Math.ceil((Math.ceil(ChatHud.getWidth(o.getChatWidth().getValue()) / scale) + 12) * scale);
+        int w = ChatBar.width();
         int h = (int) Math.ceil(lines * lineH * scale);
         int bottom = (int) (Math.floor((ctx.getScaledWindowHeight() - 40) / scale) * scale);
-        int[] r = {s.chatX, bottom - h + s.chatY, w, h};
+        s.chatPos.measure(sw(), sh(), w, 0);
+        int[] r = {s.chatPos.left(sw()), bottom - h + s.chatY, w, h};
         ctx.fill(r[0], r[1], r[0] + w, r[1] + h, 0x50000000);
         ctx.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, Foe.text("chat"), r[0] + 4, r[1] + 4, Foe.DIM);
         return r;
@@ -211,10 +191,8 @@ public final class FoeMover {
             int px = (mode == 2 ? mx - r[0] : right - mx) - (int) Math.round(12 * scale);
             double v = Math.max(0, Math.min(1, (px - 40) / 280.0));
             o.getChatWidth().setValue(v);
-            if (mode == 1) {
-                int w = (int) Math.ceil((Math.ceil(ChatHud.getWidth(v) / scale) + 12) * scale);
-                DofiSettings.get().chatX = Math.max(0, right - w);
-            }
+            int w = ChatBar.width(); // pinned again from where the left edge is now, or the right edge stays where it was dragged from
+            DofiSettings.get().chatPos.moveTo(sw(), sh(), mode == 1 ? Math.max(0, right - w) : r[0], 0, w, 0);
         } else {
             double v = Math.max(0, Math.min(1, ((bottom - my) / scale - 20) / 160.0));
             (mode == 3 ? o.getChatHeightUnfocused() : o.getChatHeightFocused()).setValue(v);
@@ -224,17 +202,22 @@ public final class FoeMover {
     /** Edge drag on a chat box. The closed height is its bottom edge; the open height grows upward from there. */
     private static void dragBox(ChatBox box, int mode, int mx, int my, int[] r) {
         int right = r[0] + r[2];
+        int left = r[0];
+        int h = r[3];
         if (mode == 2) {
             box.width = Math.max(80, Math.min(600, mx - r[0]));
         } else if (mode == 1) {
             box.width = Math.max(80, Math.min(600, right - mx));
-            box.x = Math.max(0, Math.min(100, (right - box.width) * 100.0 / Math.max(1, sw())));
+            left = right - box.width;
         } else if (mode == 3) {
             box.lines = Math.max(1, Math.min(30, ChatBoxes.linesOf(my - r[1])));
             box.linesOpen = Math.max(box.lines, box.linesOpen);
+            h = ChatBoxes.heightOf(box.lines);
         } else {
             box.linesOpen = Math.max(box.lines, Math.min(40, ChatBoxes.linesOf(r[1] + r[3] - my))); // from the top edge of the open outline down to the box's bottom
+            return;
         }
+        box.pos.moveTo(sw(), sh(), left, r[1], mode == 3 ? r[2] : box.width, h); // the size changed: stick it to the nearest sides again so the edge you drag stays under the mouse
     }
 
     private interface EdgeDrag {

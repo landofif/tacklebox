@@ -172,7 +172,11 @@ public final class NowPlaying {
     /** Draws the hud at its saved spot and returns {x, y, w, h}; with preview nothing playing still shows a line so it can be moved. */
     public static int[] draw(DrawContext ctx, boolean preview) {
         DofiSettings s = DofiSettings.get();
-        return Foe.scaled(ctx, s.nowPlayingX, s.nowPlayingY, s.nowPlayingScale, c -> drawAt100(c, preview));
+        return s.nowPlayingPos.draw(ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight(), (x, y) -> {
+            s.nowPlayingX = x;
+            s.nowPlayingY = y;
+            return Foe.scaled(ctx, x, y, s.nowPlayingScale, c -> drawAt100(c, preview));
+        });
     }
 
     private static int[] drawAt100(DrawContext ctx, boolean preview) {
