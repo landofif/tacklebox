@@ -6,7 +6,7 @@ needs: fabric api and [foecollab](https://github.com/Kimberlyow/FOECollab) (with
 
 ## getting around
 
-- `/tacklebox` opens the settings screen, with chat triggers, chat and key commands in its list on the left (`/dofi` still works, it was the name before the rename)
+- `/tacklebox` opens the settings screen, with chat triggers, chat and key commands in its list on the left
 - `/tacklebox triggers`, `/tacklebox huds`, `/tacklebox chat`, `/tacklebox move` jump straight to one part
 - right shift opens `/tacklebox` too
 - `/tacklebox debug item` prints the held items data, f8 in any screen dumps it to a file
