@@ -55,6 +55,7 @@ public final class ServerInfo {
             Map.entry("hawaii", "Hawaii"),
             Map.entry("lofotenislands", "Lofoten Islands"),
             Map.entry("cairns", "Cairns"),
+            Map.entry("nile", "Nile River"),
             Map.entry("crewisland", "Crew Island"));
 
     private static int ticks;
