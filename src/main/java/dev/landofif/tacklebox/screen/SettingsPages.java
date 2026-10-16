@@ -452,6 +452,8 @@ public final class SettingsPages {
                 () -> s.levelBarsFishing, v -> s.levelBarsFishing = v);
         toggle("level progress location line", "the bar for the location you are at.",
                 () -> s.levelBarsLocation, v -> s.levelBarsLocation = v);
+        toggle("level progress bar", "the thin bar itself. off leaves just the level, the percent and the location xp as text.",
+                () -> s.levelBarsBar, v -> s.levelBarsBar = v);
         toggle("level progress percent", "the percent after each bar.",
                 () -> s.levelBarsPercent, v -> s.levelBarsPercent = v);
         toggle("level progress location xp", "the location xp into the level over what it needs, after the location bar.",

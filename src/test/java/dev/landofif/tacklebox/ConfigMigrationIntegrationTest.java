@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * An install from before the rename (l's settings.json of 2026-10-11 in {@code config/dofisaddons}) goes through the first
+ * An install from before the rename (luna's settings.json of 2026-10-11 in {@code config/dofisaddons}) goes through the first
  * start of the renamed mod, which moves the folder, then through a second start that must not touch the moved settings.
  */
 class ConfigMigrationIntegrationTest {
@@ -41,6 +41,7 @@ class ConfigMigrationIntegrationTest {
         assertTrue(ConfigMigration.run(config, Tacklebox.MOD_ID)); // first start after the rename
         TackleboxSettings s = readSettings();
         assertTrue(s.levelBars);
+        assertTrue(s.levelBarsBar); // a setting added later is on in an old file that does not have it
         ChatBox dms = s.chatBoxes.get(0);
         assertEquals("dms", dms.name);
         assertEquals(180, dms.width);

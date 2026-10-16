@@ -122,10 +122,11 @@ public class TackleboxSettings {
     public int levelBarsX = 4;
     public int levelBarsScale = 100;
     public int levelBarsY = 40;
-    /** What the level progress hud shows: heading, the fishing line, the location line, the percent, the location xp, and the bar width. */
+    /** What the level progress hud shows: heading, the fishing line, the location line, the bar itself, the percent, the location xp, and the bar width. */
     public boolean levelBarsHeading = true;
     public boolean levelBarsFishing = true;
     public boolean levelBarsLocation = true;
+    public boolean levelBarsBar = true;
     public boolean levelBarsPercent = true;
     public boolean levelBarsXp = true;
     public int levelBarsWidth = 80;
