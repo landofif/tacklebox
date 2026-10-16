@@ -396,6 +396,8 @@ public final class SettingsPages {
         header("tooltips");
         toggle("short fish tooltips", "a caught fish with no scientific name, value or ecosystem line, no kg or cm, weight and length on one line and the rarity mark next to the name. only changes what you see.",
                 () -> s.shortFishTooltips, v -> s.shortFishTooltips = v);
+        toggle("short pet tooltips", "a pet with no line for its kind, no equipped skin, item or trail line when nothing is equipped, no right click hint, and the rarity mark next to the name. only changes what you see.",
+                () -> s.shortPetTooltips, v -> s.shortPetTooltips = v);
         toggle("pet profit marks", "in the auction house, a pet you could sell to the pet store for more than it costs gets a green tint, and every pet gets a line with what the store pays. only common and rare pets, the other rarities are not known yet. only changes what you see.",
                 () -> s.petProfitMarks, v -> s.petProfitMarks = v);
     }

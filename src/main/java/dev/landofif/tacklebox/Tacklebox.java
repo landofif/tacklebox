@@ -3,6 +3,7 @@ package dev.landofif.tacklebox;
 import dev.landofif.tacklebox.chat.ChatTweaks;
 import dev.landofif.tacklebox.display.FishTooltip;
 import dev.landofif.tacklebox.display.PetSale;
+import dev.landofif.tacklebox.display.PetTooltip;
 import dev.landofif.tacklebox.display.SoundQueue;
 import dev.landofif.tacklebox.display.TitleOverlay;
 import dev.landofif.tacklebox.hud.ServerInfo;
@@ -25,6 +26,7 @@ import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
+import net.minecraft.nbt.NbtCompound;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
@@ -87,12 +89,19 @@ public final class Tacklebox implements ClientModInitializer {
         ClientReceiveMessageEvents.ALLOW_CHAT.register((message, signed, sender, params, time) -> ChatTweaks.allow(message));
 
         // after foecollabs own tooltip handlers (default phase), which have swapped their tag fonts by then
-        Identifier shortFish = Identifier.of(MOD_ID, "short_fish_tooltips");
-        ItemTooltipCallback.EVENT.addPhaseOrdering(Event.DEFAULT_PHASE, shortFish);
-        ItemTooltipCallback.EVENT.register(shortFish, (stack, context, type, lines) -> {
+        Identifier shortTooltips = Identifier.of(MOD_ID, "short_tooltips");
+        ItemTooltipCallback.EVENT.addPhaseOrdering(Event.DEFAULT_PHASE, shortTooltips);
+        ItemTooltipCallback.EVENT.register(shortTooltips, (stack, context, type, lines) -> {
+            TackleboxSettings settings = TackleboxSettings.get();
             NbtComponent data = stack.get(DataComponentTypes.CUSTOM_DATA);
-            if (data != null && TackleboxSettings.get().shortFishTooltips && FishTooltip.isFish(data.copyNbt())) {
+            if (data == null || !(settings.shortFishTooltips || settings.shortPetTooltips)) {
+                return;
+            }
+            NbtCompound nbt = data.copyNbt();
+            if (settings.shortFishTooltips && FishTooltip.isFish(nbt)) {
                 FishTooltip.shorten(lines);
+            } else if (settings.shortPetTooltips && PetTooltip.isPet(nbt)) {
+                PetTooltip.shorten(lines);
             }
         });
 

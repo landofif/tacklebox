@@ -25,10 +25,10 @@ public final class FishTooltip {
 
     private FishTooltip() {}
 
-    private record Seg(String text, Style style) {}
+    record Seg(String text, Style style) {}
 
     /** One tooltip line. The segments are read when first needed, the text is rebuilt only for edited lines. */
-    private static final class Line {
+    static final class Line {
         private Text text;
         private List<Seg> segs;
 
@@ -95,7 +95,7 @@ public final class FishTooltip {
             return !content.isEmpty() && content.stream().allMatch(s -> s.text().isBlank() && s.style().isStrikethrough());
         }
 
-        /** The grey scientific name under the rarity mark: text without a label. */
+        /** The grey line under the rarity mark: text without a label (a fish's scientific name, a pet's kind). */
         boolean isLatinName() {
             return isWindow() && !isSeparator() && !plain().isEmpty() && !plain().contains(":");
         }
@@ -116,10 +116,28 @@ public final class FishTooltip {
      * share one line without the kg and cm.
      */
     public static void shorten(List<Text> lines) {
+        List<Line> work = lines(lines);
+        if (!moveMark(work)) {
+            return;
+        }
+        work.removeIf(l -> l.hasLabel("value:") || l.hasLabel("ecosystem:"));
+        weightAndLength(work);
+        apply(work, lines);
+    }
+
+    static List<Line> lines(List<Text> lines) {
         List<Line> work = new ArrayList<>();
         for (Text t : lines) {
             work.add(new Line(t));
         }
+        return work;
+    }
+
+    /**
+     * Moves the rarity mark up beside the name, then drops the unlabelled line under the mark and the separator
+     * under that. False when the tooltip has no window, which then is not touched at all.
+     */
+    static boolean moveMark(List<Line> work) {
         int header = -1; // the name with the window's top; line 0 is the plain item name and stays as it is
         for (int i = 1; i < work.size() && header < 0; i++) {
             if (work.get(i).isWindow()) {
@@ -127,7 +145,7 @@ public final class FishTooltip {
             }
         }
         if (header < 0) {
-            return;
+            return false;
         }
         int below = header + 1;
         if (below < work.size() && work.get(below).isIcons()) {
@@ -143,9 +161,11 @@ public final class FishTooltip {
                 work.remove(below);
             }
         }
-        work.removeIf(l -> l.hasLabel("value:") || l.hasLabel("ecosystem:"));
-        weightAndLength(work);
+        return true;
+    }
 
+    /** Writes the edited lines back, and only when something changed. */
+    static void apply(List<Line> work, List<Text> lines) {
         List<Text> out = new ArrayList<>();
         for (Line l : work) {
             out.add(l.text);
