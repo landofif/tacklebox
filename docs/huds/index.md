@@ -10,3 +10,4 @@ Read the doc that matches your task. Do not read them all.
 | Level progress bars, hud scaling in the mover | `level-bars.md` |
 | Bobber timer, bite notification | `bobber-timer.md` |
 | Where huds and chat boxes sit, window size changes (F11, split screen) | `positions.md` |
+| Chummer range ring (planned), what foecollab does with chummers | `chummer-range.md` |

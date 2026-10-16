@@ -201,7 +201,11 @@ public final class Tacklebox implements ClientModInitializer {
                 .then(ClientCommandManager.literal("power").executes(ctx -> open(() -> new dev.landofif.tacklebox.screen.PowerScreen(null))))
                 .then(ClientCommandManager.literal("chat").executes(ctx -> open(() -> new ChatFilterScreen(null))))
                 .then(ClientCommandManager.literal("debug")
-                        .then(ClientCommandManager.literal("item").executes(ctx -> dev.landofif.tacklebox.display.DebugDump.heldItem())))
+                        .then(ClientCommandManager.literal("item").executes(ctx -> dev.landofif.tacklebox.display.DebugDump.heldItem()))
+                        .then(ClientCommandManager.literal("entities").executes(ctx -> dev.landofif.tacklebox.display.DebugDump.entities(24))
+                                .then(ClientCommandManager.argument("radius", com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, 64))
+                                        .executes(ctx -> dev.landofif.tacklebox.display.DebugDump.entities(
+                                                com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "radius"))))))
                 .then(ClientCommandManager.literal("move").executes(ctx -> open(() -> dev.landofif.tacklebox.compat.FoeScreens.move(null))));
     }
 

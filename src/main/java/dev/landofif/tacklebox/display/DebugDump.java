@@ -27,6 +27,30 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Formatting;
 import com.mojang.serialization.JsonOps;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.SkullBlockEntity;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.component.type.ProfileComponent;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.DisplayEntity;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.storage.NbtWriteView;
+import net.minecraft.util.ErrorReporter;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * /tacklebox debug: prints server data to chat (and the log) for working out new features, ported from
@@ -171,6 +195,169 @@ public final class DebugDump {
         } catch (IOException e) {
             Tacklebox.LOGGER.warn("[guidump] could not save", e);
             toast(client, "gui dump copied to the clipboard (saving failed)");
+        }
+    }
+
+    /**
+     * Everything within radius blocks that a placed server thing (a chummer, say) could be: what the crosshair
+     * points at, every entity (type, position, name, held and worn items with custom_data and skull profile,
+     * display entity contents, raw nbt) and every block entity (skull profile, raw nbt). Saved to
+     * config/tacklebox/guidump/entities-<time>.txt and copied to the clipboard; chat only gets the counts.
+     */
+    public static int entities(int radius) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        ClientPlayerEntity self = client.player;
+        ClientWorld world = client.world;
+        if (self == null || world == null) {
+            return 0;
+        }
+        Vec3d me = self.getEntityPos();
+        StringBuilder out = new StringBuilder();
+        out.append(String.format(Locale.ROOT, "within %d blocks of %.3f %.3f %.3f in %s\n", radius, me.x, me.y, me.z, world.getRegistryKey().getValue()));
+
+        out.append("\ntarget (the crosshair, reach is only a few blocks)\n");
+        HitResult hit = client.crosshairTarget;
+        if (hit instanceof BlockHitResult block && block.getType() == HitResult.Type.BLOCK) {
+            BlockPos pos = block.getBlockPos();
+            out.append("block ").append(pos.toShortString()).append(' ').append(world.getBlockState(pos)).append('\n');
+            BlockEntity be = world.getBlockEntity(pos);
+            if (be != null) {
+                appendBlockEntity(out, be, world, me);
+            }
+        } else if (hit instanceof EntityHitResult entityHit) {
+            appendEntity(out, entityHit.getEntity(), world, me);
+        } else {
+            out.append("nothing\n");
+        }
+
+        List<Entity> found = world.getOtherEntities(self, self.getBoundingBox().expand(radius), e -> e.getEntityPos().distanceTo(me) <= radius);
+        found.sort(Comparator.comparingDouble(e -> e.getEntityPos().distanceTo(me)));
+        long players = found.stream().filter(e -> e instanceof PlayerEntity).count();
+        out.append("\nentities: ").append(found.size()).append(" (").append(players).append(" players)\n");
+        for (Entity entity : found) {
+            appendEntity(out, entity, world, me);
+        }
+
+        List<BlockEntity> blocks = new java.util.ArrayList<>();
+        for (int cx = (int) Math.floor(me.x - radius) >> 4; cx <= (int) Math.floor(me.x + radius) >> 4; cx++) {
+            for (int cz = (int) Math.floor(me.z - radius) >> 4; cz <= (int) Math.floor(me.z + radius) >> 4; cz++) {
+                if (world.getChunkManager().isChunkLoaded(cx, cz)) {
+                    for (BlockEntity be : world.getChunk(cx, cz).getBlockEntities().values()) {
+                        if (Vec3d.ofCenter(be.getPos()).distanceTo(me) <= radius) {
+                            blocks.add(be);
+                        }
+                    }
+                }
+            }
+        }
+        blocks.sort(Comparator.comparingDouble(be -> Vec3d.ofCenter(be.getPos()).distanceTo(me)));
+        out.append("\nblock entities: ").append(blocks.size()).append('\n');
+        for (BlockEntity be : blocks) {
+            appendBlockEntity(out, be, world, me);
+        }
+
+        Path file = saveDump(client, "entities", out.toString());
+        say("entities " + (found.size() - players) + ", players " + players + ", block entities " + blocks.size()
+                + (file == null ? ", dump copied (saving failed)" : ", saved to guidump/" + file.getFileName() + " and copied"), Formatting.AQUA);
+        return 1;
+    }
+
+    private static void appendEntity(StringBuilder out, Entity entity, ClientWorld world, Vec3d me) {
+        Vec3d pos = entity.getEntityPos();
+        out.append("\nentity ").append(Registries.ENTITY_TYPE.getId(entity.getType())).append(" (").append(entity.getClass().getSimpleName())
+                .append(String.format(Locale.ROOT, ") at %.3f %.3f %.3f, %.1f away", pos.x, pos.y, pos.z, pos.distanceTo(me))).append('\n');
+        if (entity instanceof PlayerEntity player) {
+            out.append("  player ").append(player.getGameProfile().name()).append('\n');
+            return;
+        }
+        if (entity.hasCustomName()) {
+            out.append("  name=\"").append(escape(entity.getCustomName().getString())).append("\"\n");
+        }
+        if (entity.isInvisible()) {
+            out.append("  invisible\n");
+        }
+        if (entity instanceof ItemEntity item) {
+            out.append("  item: ").append(stackLine(item.getStack())).append('\n');
+        }
+        if (entity instanceof LivingEntity living) {
+            for (EquipmentSlot slot : EquipmentSlot.values()) {
+                if (!living.getEquippedStack(slot).isEmpty()) {
+                    out.append("  ").append(slot.asString()).append(": ").append(stackLine(living.getEquippedStack(slot))).append('\n');
+                }
+            }
+        }
+        if (entity instanceof DisplayEntity.ItemDisplayEntity display && display.getData() != null) {
+            out.append("  item display: ").append(stackLine(display.getData().itemStack())).append('\n');
+        }
+        if (entity instanceof DisplayEntity.BlockDisplayEntity display && display.getData() != null) {
+            out.append("  block display: ").append(display.getData().blockState()).append('\n');
+        }
+        if (entity instanceof DisplayEntity.TextDisplayEntity display) {
+            out.append("  text display: \"").append(escape(display.getText().getString())).append("\"\n");
+        }
+        try {
+            NbtWriteView view = NbtWriteView.create(ErrorReporter.EMPTY, world.getRegistryManager());
+            entity.writeData(view);
+            out.append("  nbt=").append(escape(view.getNbt().toString())).append('\n');
+        } catch (RuntimeException e) {
+            out.append("  nbt not available: ").append(e).append('\n');
+        }
+    }
+
+    private static void appendBlockEntity(StringBuilder out, BlockEntity be, ClientWorld world, Vec3d me) {
+        out.append("\nblock entity ").append(Registries.BLOCK_ENTITY_TYPE.getId(be.getType())).append(" at ").append(be.getPos().toShortString())
+                .append(String.format(Locale.ROOT, ", %.1f away, ", Vec3d.ofCenter(be.getPos()).distanceTo(me))).append(be.getCachedState()).append('\n');
+        if (be instanceof SkullBlockEntity skull && skull.getOwner() != null) {
+            out.append("  profile: ").append(profileLine(skull.getOwner())).append('\n');
+        }
+        try {
+            NbtCompound nbt = be.createNbt(world.getRegistryManager());
+            out.append("  nbt=").append(escape(nbt.toString())).append('\n');
+        } catch (RuntimeException e) {
+            out.append("  nbt not available: ").append(e).append('\n');
+        }
+    }
+
+    /** An item as one line: id, count, name, custom_data and the skull profile (name, id, texture value). */
+    private static String stackLine(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return "(empty)";
+        }
+        StringBuilder sb = new StringBuilder(Registries.ITEM.getId(stack.getItem()).toString()).append(" x").append(stack.getCount())
+                .append(" name=\"").append(escape(stack.getName().getString())).append('"');
+        NbtComponent custom = stack.get(DataComponentTypes.CUSTOM_DATA);
+        if (custom != null && !custom.isEmpty()) {
+            sb.append(" custom_data=").append(escape(custom.copyNbt().toString()));
+        }
+        ProfileComponent profile = stack.get(DataComponentTypes.PROFILE);
+        if (profile != null) {
+            sb.append(" profile: ").append(profileLine(profile));
+        }
+        return sb.toString();
+    }
+
+    private static String profileLine(ProfileComponent component) {
+        GameProfile profile = component.getGameProfile();
+        StringBuilder sb = new StringBuilder("name=").append(profile.name()).append(" id=").append(profile.id());
+        for (Property texture : profile.properties().get("textures")) {
+            sb.append(" texture=").append(texture.value());
+        }
+        return sb.toString();
+    }
+
+    /** Copies a dump to the clipboard and saves it as config/tacklebox/guidump/<prefix>-<time>.txt; null when saving failed. */
+    private static Path saveDump(MinecraftClient client, String prefix, String text) {
+        client.keyboard.setClipboard(text);
+        try {
+            Path dir = FabricLoader.getInstance().getConfigDir().resolve(Tacklebox.MOD_ID).resolve("guidump");
+            Files.createDirectories(dir);
+            Path file = dir.resolve(prefix + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")) + ".txt");
+            Files.writeString(file, text);
+            Tacklebox.LOGGER.info("[guidump] saved {}", file);
+            return file;
+        } catch (IOException e) {
+            Tacklebox.LOGGER.warn("[guidump] could not save", e);
+            return null;
         }
     }
 
