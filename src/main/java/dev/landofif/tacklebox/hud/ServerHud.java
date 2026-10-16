@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * A sidebar styled hud (l asked for the look of a skyblock scoreboard): the server's own numbers, foecollab's tackle shop and
+ * A sidebar styled hud (luna asked for the look of a skyblock scoreboard): the server's own numbers, foecollab's tackle shop and
  * moon timers, the weather events and the moon that are active, and a faint picture behind the text (config/tacklebox/hud.png).
  * Everything is read from chat, the scoreboard and foecollab's TimerHandler, nothing is sent.
  */

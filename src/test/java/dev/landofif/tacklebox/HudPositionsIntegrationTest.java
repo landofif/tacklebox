@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Settings saved before huds were stuck to the window sides (the numbers are l's settings.json of 2026-10-11, saved in
+ * Settings saved before huds were stuck to the window sides (the numbers are luna's settings.json of 2026-10-11, saved in
  * fullscreen at gui scale 2, so 960x540) go through load, a first draw, a save and a load again, in windows of other sizes.
  */
 class HudPositionsIntegrationTest {

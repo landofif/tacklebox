@@ -83,7 +83,7 @@ public final class ChatBoxes {
 
     /**
      * A saved crew box that still has only the default crew chat rule gets the crews tag rule too.
-     * One that l edited (other rules, or the crews rule already there) is left alone.
+     * One that luna edited (other rules, or the crews rule already there) is left alone.
      */
     public static void addCrewsRule(List<ChatBox> list) {
         for (ChatBox b : list) {

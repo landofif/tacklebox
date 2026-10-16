@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * What is switched on right now, read from chat lines only (the boss bar and scoreboard are not reliable, l 2026-10-09): player
+ * What is switched on right now, read from chat lines only (the boss bar and scoreboard are not reliable, luna 2026-10-09): player
  * boosters with a countdown (the line names the length), the chummer, and the weather events and moon that {@link ServerHud}
  * already tracks. Text with a shadow and no box, like the quests left hud.
  */

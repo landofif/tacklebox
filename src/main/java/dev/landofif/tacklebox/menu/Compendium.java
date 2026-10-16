@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
 /**
  * Which species of each compendium location you have, per variant: read from the compendium species pages (a location, then
- * its filter and pages; l's dumps 2026-10-09) and kept up to date by the catches foecollab reports, so a catch that is new
+ * its filter and pages; luna's dumps 2026-10-09) and kept up to date by the catches foecollab reports, so a catch that is new
  * for the compendium can fire a trigger and the counters stay right between visits. Reading only, nothing is clicked.
  */
 public final class Compendium {

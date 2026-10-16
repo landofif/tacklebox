@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/** Lines copied from l's logs of 2026-10-10. */
+/** Lines copied from luna's logs of 2026-10-10. */
 class EventLinesTest {
     @Test
     void frenzyAlertBodyGivesHoursAndPlace() {

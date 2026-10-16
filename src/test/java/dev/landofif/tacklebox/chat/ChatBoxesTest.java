@@ -8,7 +8,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/** Lines copied from l's logs of 2026-10-09. */
+/** Lines copied from luna's logs of 2026-10-09. */
 class ChatBoxesTest {
     private static ChatBox crew() {
         return ChatBoxes.defaults().stream().filter(b -> b.name.equals("crew")).findFirst().orElseThrow();

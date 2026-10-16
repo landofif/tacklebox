@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * The bait odds model behind screen/BaitScreen, ported from l's Bait Picker artifact (rules: zeb of fishonmc staff
+ * The bait odds model behind screen/BaitScreen, ported from luna's Bait Picker artifact (rules: zeb of fishonmc staff
  * and the wiki tacklebox page). The rarity is rolled first from the luck odds, then the bait's likelihood is checked:
  * a pool fish of the rolled rarity, else the nearest lower one that has one. A roll below the whole pool gets a normal
  * fish, because the real chance of climbing is unpublished, so the bait odds are a lower bound. A bait never raises

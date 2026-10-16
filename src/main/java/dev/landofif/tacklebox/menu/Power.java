@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  */
 public final class Power {
     public static final int MAX_LEVEL = 20;
-    /** Power for reaching location level 1 to 20, the same at every location (the leveling page, l 2026-10-08). */
+    /** Power for reaching location level 1 to 20, the same at every location (the leveling page, luna 2026-10-08). */
     private static final int[] LEVEL = {50, 75, 100, 125, 150, 175, 250, 325, 500, 750, 1250, 1750, 2500, 3750, 4000, 6000, 7750, 9250, 11250, 14000};
     /** The unique fish variants in the order of the breakdown, and the power each new one gives. */
     public static final String[] VARIANTS = {"normal", "albino", "melanistic", "trophy", "fabled", "gigantic"};
@@ -44,7 +44,7 @@ public final class Power {
     /** The species collections' overview item: lore "Current Level - [3]" and "(1,495/1.5K)", the progress to the next level. */
     private static final Pattern CURRENT = Pattern.compile("^current level - \\[(\\d+)\\]$");
     private static final Pattern PROGRESS = Pattern.compile("^\\(([\\d.,]+)\\s*([kmb]?)\\s*/\\s*([\\d.,]+)\\s*([kmb]?)\\)$");
-    /** Power for reaching species collection level 1 to 7, the same for every species collection (l's dumps 2026-10-10, 35 of them). */
+    /** Power for reaching species collection level 1 to 7, the same for every species collection (luna's dumps 2026-10-10, 35 of them). */
     private static final int[] SPECIES = {50, 100, 250, 400, 1000, 5000, 10000};
     /** Collections whose levels give other power than the species table, so the overview cannot tell what their next level gives. */
     private static final java.util.Set<String> NOT_SPECIES = java.util.Set.of("albino", "all", "common", "rare", "epic", "legendary", "mythical", "fabled");

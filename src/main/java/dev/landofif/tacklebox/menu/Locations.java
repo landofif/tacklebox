@@ -6,7 +6,7 @@ import java.util.Locale;
 
 /**
  * The 17 fishing locations (docs/fishonmc-research.md section 7, minus crew island) and the bait strategies
- * l and a friend noted down. The pictures are the items the server puts in the menu.
+ * luna and a friend noted down. The pictures are the items the server puts in the menu.
  */
 public final class Locations {
     /** {@code key} is matched against a menu item's name; {@code wiki} is the wiki table's spelling. */

@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * The server hud's lines: one chip per line (green is on) to switch them, the hud itself on the right as it looks with the
- * choices, where a line is dragged up or down to move it (l found moving chips unclear), and the picture's opacity.
+ * choices, where a line is dragged up or down to move it (luna found moving chips unclear), and the picture's opacity.
  */
 public class ServerHudScreen extends TackleboxScreen {
     private static final int LEFT = 14, TOP = 34, CHIP_W = 112, CHIP_H = 16, GAP = 4, COLUMNS = 3;

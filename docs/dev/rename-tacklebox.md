@@ -1,6 +1,6 @@
 # Rename: dofisaddons to tacklebox (2026-10-12)
 
-l renamed the mod because "dofis addons" sounded like a boast; the new name is `tacklebox`, all lowercase, in every place (display name, screen titles, jar, logs).
+luna renamed the mod because "dofis addons" sounded like a boast; the new name is `tacklebox`, all lowercase, in every place (display name, screen titles, jar, logs).
 
 ## What changed
 
