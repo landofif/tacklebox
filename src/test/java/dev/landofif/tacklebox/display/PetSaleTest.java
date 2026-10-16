@@ -10,12 +10,17 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -231,5 +236,45 @@ class PetSaleTest {
         List<Text> noWindow = new ArrayList<>(List.of(Text.literal("Bullfrog Pet"), Text.literal("Price: $2K")));
         PetSale.addLine(noWindow, bullfrog());
         assertEquals(2, noWindow.size());
+    }
+
+    // --- the cache ---------------------------------------------------------------------------------------
+
+    /**
+     * A plain WeakHashMap in the cache froze the client on 2026-10-16: get() walked a bucket chain that had become
+     * a cycle, which is what unsynchronized access does to it. Slots are asked from the render thread, but the
+     * cache must not depend on that, so many threads ask at once, on their own keys and on shared ones.
+     */
+    @Test
+    void cacheSurvivesManyThreadsAskingAtOnce() {
+        Object[] shared = new Object[4096];
+        for (int i = 0; i < shared.length; i++) {
+            shared[i] = new Object();
+        }
+        ExecutorService pool = Executors.newFixedThreadPool(8, r -> {
+            Thread t = new Thread(r, "pet-sale-cache-test");
+            t.setDaemon(true); // a thread stuck in a broken map must not keep the test JVM alive
+            return t;
+        });
+        try {
+            assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
+                List<Future<?>> done = new ArrayList<>();
+                for (int t = 0; t < 8; t++) {
+                    done.add(pool.submit(() -> {
+                        Object[] own = new Object[512]; // replaced as it goes, so old keys are collected too
+                        for (int i = 0; i < 200_000; i++) {
+                            own[i % own.length] = new Object();
+                            PetSale.cached(own[i % own.length], Optional::empty);
+                            PetSale.cached(shared[i % shared.length], Optional::empty);
+                        }
+                    }));
+                }
+                for (Future<?> f : done) {
+                    f.get();
+                }
+            });
+        } finally {
+            pool.shutdownNow();
+        }
     }
 }

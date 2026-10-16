@@ -13,12 +13,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.WeakHashMap;
+import java.util.function.Supplier;
 
 /**
  * What the pet store would pay for a pet in the auction house, next to what it costs (setting petProfitMarks,
@@ -86,17 +88,25 @@ public final class PetSale {
         return sells.isEmpty() ? Optional.empty() : Optional.of(new Sale(rating.getAsDouble(), sells.getAsDouble(), money.get()));
     }
 
-    /** Slots are asked every frame and the item data is big, so each stack is read once (stacks are replaced when the page changes). */
-    private static final Map<ItemStack, Optional<Sale>> CACHE = new WeakHashMap<>();
+    /**
+     * Slots are asked every frame and the item data is big, so each stack is read once (stacks are replaced when the
+     * page changes). Synchronized: a bare WeakHashMap here froze the client in an endless get() on 2026-10-16.
+     */
+    private static final Map<Object, Optional<Sale>> CACHE = Collections.synchronizedMap(new WeakHashMap<>());
 
     public static Optional<Sale> of(ItemStack stack) {
         if (stack.isEmpty()) {
             return Optional.empty();
         }
-        return CACHE.computeIfAbsent(stack, s -> {
-            NbtComponent data = s.get(DataComponentTypes.CUSTOM_DATA);
+        return cached(stack, () -> {
+            NbtComponent data = stack.get(DataComponentTypes.CUSTOM_DATA);
             return data == null ? Optional.empty() : of(data.copyNbt());
         });
+    }
+
+    /** The cache itself, apart from ItemStack so a test can use plain keys (stacks need the game's registries). */
+    static Optional<Sale> cached(Object key, Supplier<Optional<Sale>> compute) {
+        return CACHE.computeIfAbsent(key, k -> compute.get());
     }
 
     /** 2176.4 as "$2.18K", 824.69 as "$824.69", 8500 as "$8.5K": like the server writes money. */
