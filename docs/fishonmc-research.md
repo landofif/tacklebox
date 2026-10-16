@@ -317,6 +317,8 @@ No explicit server achievement messages or menu were found in either repo. Miles
 - FOECollab `AutoTippingHandler` (auto `/pay` on REACTIONS), auto `/contest` refreshes on PB packets, `/find` sends. Show a button or hint instead and let the player type the command.
 - FOECollab `QuestMenuSquareHandler` highlights are fine (visual), but don't click for the player.
 
+Rule change 2026-10-16 (`rules/text-and-automation.md`): only automating fishing, selling and questing is barred. The autofish and `MenuRobot` items above stay out. Tipping, `/contest` and `/find` are no longer barred outright, but ask luna before adding any.
+
 ## 13. Gaps to fill with an in-game session
 
 1. Exact full text and JSON structure of catch title/subtitle and the `RARE CATCH!`/`PET DROP!` lines (only prefixes are known).

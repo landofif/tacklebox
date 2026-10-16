@@ -4,7 +4,7 @@ Read the index for your area first. Do not read every doc.
 
 | Area | Covers | Index |
 |---|---|---|
-| Rules | Full text of the text and display-only rules | `rules/index.md` |
+| Rules | Full text of the text and no-automation rules | `rules/index.md` |
 | UI | Foecollab look, screens, settings screen, hotbar | `ui/index.md` |
 | Chat | Filters, chat boxes, scrolling, copy, stacking | `chat/index.md` |
 | FOECollab | Compat layer, hud mover, hooks, lure sorting, pet memory | `foecollab/index.md` |

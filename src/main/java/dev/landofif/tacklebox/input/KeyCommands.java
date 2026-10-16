@@ -9,7 +9,7 @@ import java.util.Set;
 
 /**
  * Keys that run a command. The command is sent once per key press, only while no screen is open, so it is
- * the players own press and never anything the mod decides (see the display-only rule in CLAUDE.md).
+ * the players own press and never anything the mod decides.
  */
 public final class KeyCommands {
     /** One key and the command it runs (without the slash). */

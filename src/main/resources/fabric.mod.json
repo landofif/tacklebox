@@ -3,7 +3,7 @@
   "id": "tacklebox",
   "version": "${version}",
   "name": "tacklebox",
-  "description": "an addon for foecollab on fishonmc: chat triggers with your own titles and sounds, a quests left hud, chat boxes, bobber and world tweaks, and one settings screen for both mods. display only, no automation.",
+  "description": "an addon for foecollab on fishonmc: chat triggers with your own titles and sounds, a quests left hud, chat boxes, bobber and world tweaks, and one settings screen for both mods. it never fishes, sells or does quests for you.",
   "authors": [
     "landofif"
   ],

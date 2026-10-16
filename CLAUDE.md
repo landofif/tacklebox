@@ -10,8 +10,8 @@ It was called dofisaddons until 2026-10-12; the local folder is still `dofis-add
 
 ## Hard rules
 
-- **Text is small capitals.** `Foe.text()`/`Foe.bold()` for labels, titles, buttons; `Foe.sentence()` for long text. Details: `docs/rules/text-and-display-only.md`.
-- **Display only.** The mod observes and renders. It never sends chat or commands, clicks, casts, reels or presses keys, except the exceptions listed in `docs/rules/text-and-display-only.md`, each only on the player's own click or key.
+- **Text is small capitals.** `Foe.text()`/`Foe.bold()` for labels, titles, buttons; `Foe.sentence()` for long text. Details: `docs/rules/text-and-automation.md`.
+- **No automating the game.** The mod never fishes (casts, reels, minigame), sells or does quests for the player. Anything else is allowed, like foecollab's bait sorter. Gray areas (auto tipping, `/contest` refreshes): ask luna. Details: `docs/rules/text-and-automation.md`.
 - **Foecollab already has it, so the mod does not.** Before adding a feature, check foecollab's config for the same thing and ask luna.
 - **Addon to foecollab, not a theme.** No themes, fonts or restyling of foecollab or vanilla. Keep it minimal: luna wants less, not more.
 - **FOECollab is a runtime dependency.** Never compile against it: `compat/` reaches it by hud id, class names and reflection.
