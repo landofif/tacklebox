@@ -4,6 +4,7 @@ import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.ui.Foe;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import dev.landofif.tacklebox.display.PetSale;
 import dev.landofif.tacklebox.util.Glyphs;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -23,6 +24,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * Chests, the inventory and fishonmc menus with no box at all: the menu name where a box would put it, a
@@ -91,6 +94,14 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
             // the player preview and the crafting arrow were part of the texture
             InventoryScreen.drawEntity(ctx, x + 26, y + 8, x + 75, y + 78, 30, 0.0625F, mouseX, mouseY, client.player);
             ctx.drawCenteredTextWithShadow(textRenderer, Foe.text("→"), x + 143, y + 32, Foe.DIM);
+        }
+    }
+
+    /** A pet the store would pay more for than the auction asks: a see-through green square behind its item (setting petProfitMarks). */
+    @Inject(method = "drawSlot", at = @At("HEAD"))
+    private void tacklebox$profitTint(DrawContext ctx, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
+        if (TackleboxSettings.get().petProfitMarks && PetSale.of(slot.getStack()).filter(PetSale.Sale::profitable).isPresent()) {
+            ctx.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, 0x6655FF55);
         }
     }
 

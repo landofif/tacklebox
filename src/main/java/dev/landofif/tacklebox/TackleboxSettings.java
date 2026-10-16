@@ -72,6 +72,10 @@ public class TackleboxSettings {
     public int accent1 = 0x33CCFF, accent2 = 0x00FF99;
     /** A see-through circle in the rarity colour behind items in slots (foecollabs rarity, drawn by its item markers). */
     public boolean rarityCircles = false;
+    /** Caught fish tooltips without the scientific name, value and ecosystem, weight and length on one line (display/FishTooltip). */
+    public boolean shortFishTooltips = false;
+    /** Auction house pets you could sell to the pet store for more than they cost: a green tint and a line with the store's price (display/PetSale). */
+    public boolean petProfitMarks = false;
     /** The hotbar: moved by this many gui pixels from where vanilla puts it, and whether its slot background is drawn. */
     public int hotbarX = 0;
     public int hotbarY = 0;

@@ -393,6 +393,11 @@ public final class SettingsPages {
         header("vaults");
         toggle("vault overview", "/pv as all seven personal vaults on one screen with a search. a vault shows what it held when you last opened it. off gives the chest back.",
                 () -> s.vaultMenu, v -> s.vaultMenu = v);
+        header("tooltips");
+        toggle("short fish tooltips", "a caught fish with no scientific name, value or ecosystem line, no kg or cm, weight and length on one line and the rarity mark next to the name. only changes what you see.",
+                () -> s.shortFishTooltips, v -> s.shortFishTooltips = v);
+        toggle("pet profit marks", "in the auction house, a pet you could sell to the pet store for more than it costs gets a green tint, and every pet gets a line with what the store pays. only common and rare pets, the other rarities are not known yet. only changes what you see.",
+                () -> s.petProfitMarks, v -> s.petProfitMarks = v);
     }
 
     private void huds() {

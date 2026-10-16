@@ -19,10 +19,14 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.component.type.NbtComponent;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Formatting;
+import com.mojang.serialization.JsonOps;
 
 /**
  * /tacklebox debug: prints server data to chat (and the log) for working out new features, ported from
@@ -54,7 +58,56 @@ public final class DebugDump {
         for (int i = 0; i < snbt.length(); i += 180) {
             say("custom_data: " + snbt.substring(i, Math.min(snbt.length(), i + 180)), Formatting.GRAY);
         }
+        saveStyled(MinecraftClient.getInstance(), stack);
         return 1;
+    }
+
+    /**
+     * The held item again, but with every Text as JSON (styles, colours, fonts, siblings) and the tooltip as the
+     * client builds it, after other mods' tooltip callbacks. The chat lines above only carry plain strings.
+     * Saved to config/tacklebox/guidump and copied to the clipboard.
+     */
+    private static void saveStyled(MinecraftClient client, ItemStack stack) {
+        StringBuilder out = new StringBuilder();
+        out.append("item ").append(Registries.ITEM.getId(stack.getItem())).append(" x").append(stack.getCount()).append('\n');
+        out.append("custom_name=").append(json(client, stack.get(DataComponentTypes.CUSTOM_NAME))).append('\n');
+        out.append("item_name=").append(json(client, stack.get(DataComponentTypes.ITEM_NAME))).append('\n');
+        LoreComponent lore = stack.get(DataComponentTypes.LORE);
+        if (lore != null) {
+            for (Text line : lore.lines()) {
+                out.append("lore=").append(json(client, line)).append('\n');
+            }
+        }
+        out.append("\ntooltip (basic, as the client builds it)\n");
+        for (Text line : stack.getTooltip(Item.TooltipContext.create(client.world), client.player, TooltipType.BASIC)) {
+            out.append("tooltip=").append(json(client, line)).append('\n');
+        }
+        NbtComponent custom = stack.get(DataComponentTypes.CUSTOM_DATA);
+        if (custom != null && !custom.isEmpty()) {
+            out.append("\ncustom_data=").append(escape(custom.copyNbt().toString())).append('\n');
+        }
+        String text = out.toString();
+        client.keyboard.setClipboard(text);
+        try {
+            Path dir = FabricLoader.getInstance().getConfigDir().resolve(Tacklebox.MOD_ID).resolve("guidump");
+            Files.createDirectories(dir);
+            Path file = dir.resolve("item-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")) + ".txt");
+            Files.writeString(file, text);
+            Tacklebox.LOGGER.info("[guidump] saved {}", file);
+            say("styled dump copied, saved to guidump/" + file.getFileName(), Formatting.AQUA);
+        } catch (IOException e) {
+            Tacklebox.LOGGER.warn("[guidump] could not save", e);
+            say("styled dump copied to the clipboard (saving failed)", Formatting.RED);
+        }
+    }
+
+    /** A Text as JSON with non-ascii characters escaped, so fonts and glyphs show up in the dump. */
+    private static String json(MinecraftClient client, Text text) {
+        if (text == null) {
+            return "(none)";
+        }
+        return TextCodecs.CODEC.encodeStart(client.world.getRegistryManager().getOps(JsonOps.INSTANCE), text).result()
+                .map(json -> escape(json.toString())).orElse("(could not encode) " + escape(text.getString()));
     }
 
     /** Private-use and other non-ascii characters as \\uXXXX, so glyphs show up in a dump. */

@@ -1,6 +1,8 @@
 # Build, CI and debugging
 
 - Gui dump: F8 in any screen (`Tacklebox.dumpKey`, `DebugDump.gui`) writes the screen class, title with codepoints and every container slot's item, name, lore and custom_data (the server's bread placeholder for empty slots is skipped) to `config/tacklebox/guidump/` and the clipboard. Ask luna to send these for menus whose layout isn't in the research doc yet (travel, quests, difficulty and tier pages).
+- Item dump: `/tacklebox debug item` with the item in the main hand (`DebugDump.heldItem`) prints id, lore strings and custom_data to chat. Since 2026-10-16 it also writes `config/tacklebox/guidump/item-<time>.txt` and copies it to the clipboard: custom name, item name and every lore line as JSON (styles, colours, fonts, siblings; non-ascii as `\uXXXX`), the tooltip exactly as the client builds it (basic, after other mods' tooltip callbacks, so after foecollab's) and custom_data. Used to design the short fish tooltips; the styled part is not run in game yet.
+
 ## Git
 
 Commit and push straight to `main`. No feature branches or PRs unless luna asks for one (luna said so on 2026-10-02). Each push to `main` triggers the CI build.

@@ -1,6 +1,8 @@
 package dev.landofif.tacklebox;
 
 import dev.landofif.tacklebox.chat.ChatTweaks;
+import dev.landofif.tacklebox.display.FishTooltip;
+import dev.landofif.tacklebox.display.PetSale;
 import dev.landofif.tacklebox.display.SoundQueue;
 import dev.landofif.tacklebox.display.TitleOverlay;
 import dev.landofif.tacklebox.hud.ServerInfo;
@@ -19,6 +21,10 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
+import net.fabricmc.fabric.api.event.Event;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
@@ -79,6 +85,24 @@ public final class Tacklebox implements ClientModInitializer {
             return show && (overlay || ChatTweaks.allow(message));
         });
         ClientReceiveMessageEvents.ALLOW_CHAT.register((message, signed, sender, params, time) -> ChatTweaks.allow(message));
+
+        // after foecollabs own tooltip handlers (default phase), which have swapped their tag fonts by then
+        Identifier shortFish = Identifier.of(MOD_ID, "short_fish_tooltips");
+        ItemTooltipCallback.EVENT.addPhaseOrdering(Event.DEFAULT_PHASE, shortFish);
+        ItemTooltipCallback.EVENT.register(shortFish, (stack, context, type, lines) -> {
+            NbtComponent data = stack.get(DataComponentTypes.CUSTOM_DATA);
+            if (data != null && TackleboxSettings.get().shortFishTooltips && FishTooltip.isFish(data.copyNbt())) {
+                FishTooltip.shorten(lines);
+            }
+        });
+
+        Identifier petProfit = Identifier.of(MOD_ID, "pet_profit");
+        ItemTooltipCallback.EVENT.addPhaseOrdering(Event.DEFAULT_PHASE, petProfit);
+        ItemTooltipCallback.EVENT.register(petProfit, (stack, context, type, lines) -> {
+            if (TackleboxSettings.get().petProfitMarks) {
+                PetSale.of(stack).ifPresent(sale -> PetSale.addLine(lines, sale));
+            }
+        });
 
         KeyBinding.Category category = KeyBinding.Category.create(Identifier.of(MOD_ID, "main"));
         openKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.tacklebox.open", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_SHIFT, category));
