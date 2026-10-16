@@ -536,6 +536,11 @@ public final class SettingsPages {
                         net.minecraft.client.MinecraftClient.getInstance().reloadResources();
                     }
                 });
+        header("chummer");
+        toggle("chummer range ring", "draws a thin ring on the ground at the range of every placed chummer your client can see, 20 blocks out. read from the chummer's hologram, not from chat.",
+                () -> s.chummerRing, v -> s.chummerRing = v);
+        color("ring colour", "the colour of the chummer range ring.",
+                () -> s.chummerRingColor, v -> s.chummerRingColor = v);
     }
 
 }

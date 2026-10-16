@@ -259,6 +259,9 @@ public class TackleboxSettings {
     public boolean hideXpPopups = false;
     /** Draw leaves flat like vanilla instead of the server packs 3d leaves. */
     public boolean flatLeaves = false;
+    /** A thin flat ring on the ground at the range of every placed chummer in view of the client (display/ChummerRing), and its colour (rgb). */
+    public boolean chummerRing = true;
+    public int chummerRingColor = 0x41F55B;
 
     // ---- bobber looks (only you see these) ----
     public BobberSkin bobberSkin = BobberSkin.DEFAULT;
@@ -479,6 +482,7 @@ public class TackleboxSettings {
         }
         dev.landofif.tacklebox.chat.ChatBoxes.addCrewsRule(chatBoxes);
         lineColor &= 0xFFFFFF;
+        chummerRingColor &= 0xFFFFFF;
         vmScale = Math.max(0.1, Math.min(3, vmScale));
         swingSlowness = Math.max(0.25, Math.min(4, swingSlowness));
         sneakHeight = dev.landofif.tacklebox.display.SneakHeight.clamp(sneakHeight);

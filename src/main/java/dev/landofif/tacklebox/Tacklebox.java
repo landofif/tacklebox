@@ -76,6 +76,7 @@ public final class Tacklebox implements ClientModInitializer {
         TackleboxSettings.load();
         dev.landofif.tacklebox.hud.NowPlaying.start();
         dev.landofif.tacklebox.display.FlatLeaves.register();
+        dev.landofif.tacklebox.display.ChummerRing.register();
 
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
             if (!overlay) {
@@ -128,6 +129,7 @@ public final class Tacklebox implements ClientModInitializer {
             TackleboxSettings.save(); // what the quests left hud learned
             dev.landofif.tacklebox.hud.ServerHud.reset();
             dev.landofif.tacklebox.hud.BoostsHud.reset();
+            dev.landofif.tacklebox.display.ChummerRing.reset();
         });
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> TackleboxSettings.save());
 
@@ -167,6 +169,7 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.display.BobberTimer.tick(client);
             dev.landofif.tacklebox.hud.EquipmentRow.tick(client);
             dev.landofif.tacklebox.display.PetHeads.tick(client);
+            dev.landofif.tacklebox.display.ChummerRing.tick(client);
             dev.landofif.tacklebox.input.KeyCommands.tick(client);
             TriggerEngine.tick();
             while (openKey.wasPressed()) {
