@@ -200,7 +200,7 @@ public final class ServerHud {
                 {"dex location", "compendium location"}, {"dex level", "location level"}, {"dex catches", "catches"},
                 {"dex runes", "runes"}, {"dex normal", "normal fish"}, {"dex gigantic", "gigantic fish"}, {"dex albino", "albino fish"},
                 {"dex melanistic", "melanistic fish"}, {"dex trophy", "trophy fish"}, {"dex fabled", "fabled fish"}, {"space 4", "blank line"},
-                {"shop", "tackle shop timer"}, {"moon", "moon"}, {"weather", "weather and events"}}) {
+                {"shop", "tackle shop timer"}, {"moon", "moon"}, {"frenzy", "fish frenzy"}, {"weather", "weather and events"}}) {
             LABEL.put(l[0], l[1]);
         }
     }
@@ -352,6 +352,10 @@ public final class ServerHud {
                 } else if (timer("moonTimer") >= 0) {
                     out.add(plain(row("Moon Cycle: ", clock(timer("moonTimer")), Formatting.YELLOW)));
                 }
+            }
+            case "frenzy" -> {
+                long now = System.currentTimeMillis();
+                out.add(plain(row("Fish Frenzy: ", FrenzySchedule.describe(now, BoostsHud.frenzyLeft(now), BoostsHud.frenzyPlace(), ServerHud::clock), Formatting.YELLOW)));
             }
             case "weather" -> { // every active event gets its own line, in its colour, with what it does
                 for (Map.Entry<String, Object[]> e : EVENTS.entrySet()) {

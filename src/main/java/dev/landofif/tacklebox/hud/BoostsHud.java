@@ -1,6 +1,7 @@
 package dev.landofif.tacklebox.hud;
 
 import dev.landofif.tacklebox.TackleboxSettings;
+import dev.landofif.tacklebox.display.ChummerRing;
 import dev.landofif.tacklebox.trigger.Matcher;
 import dev.landofif.tacklebox.trigger.TriggerEngine;
 import dev.landofif.tacklebox.ui.Foe;
@@ -42,6 +43,15 @@ public final class BoostsHud {
     private static String frenzyPlace = "";
 
     private BoostsHud() {}
+
+    /** Milliseconds left of the frenzy the chat announced, 0 when none is running. */
+    static long frenzyLeft(long now) {
+        return Math.max(0, frenzyEnd - now);
+    }
+
+    static String frenzyPlace() {
+        return frenzyPlace;
+    }
 
     public static void onChat(Text message) {
         String s = Matcher.normalize(message.getString());
@@ -94,7 +104,13 @@ public final class BoostsHud {
         for (Booster b : BOOSTERS.values()) {
             rows.add(new String[]{b.label(), ServerHud.clock(b.end() - now)});
         }
-        if (chummerEnd + GRACE > now) {
+        List<ChummerRing.Detected> holograms = ChummerRing.detected();
+        for (ChummerRing.Detected d : holograms) {
+            String label = "chummer " + (d.bite() >= 0 ? "+" + d.bite() + " " : "") + d.owner();
+            rows.add(new String[]{label.trim(), d.endMs() > 0 ? ServerHud.clock(Math.max(0, d.endMs() - now)) : ""});
+        }
+        // the chat line is the fallback for a chummer whose hologram the client does not track
+        if (holograms.isEmpty() && chummerEnd + GRACE > now) {
             rows.add(new String[]{("chummer " + chummerBonus).trim(), ServerHud.clock(Math.max(0, chummerEnd - now))});
         }
         if (frenzyEnd > now) {
