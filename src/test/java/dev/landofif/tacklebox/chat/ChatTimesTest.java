@@ -36,4 +36,22 @@ class ChatTimesTest {
         }
         assertEquals(-1, ChatTimes.at(first));
     }
+
+    @Test
+    void removesTheBangBeforeAPlayerLine() {
+        Text m = Text.literal("\uE001").append(Text.literal("! [113] name \u00bb hi"));
+        assertEquals("\uE001[113] name \u00bb hi", ChatTimes.rewrite(m, 0, 0).getString());
+        Text plain = Text.literal("Great Lakes! teleported");
+        assertSame(plain, ChatTimes.rewrite(plain, 0, 0));
+    }
+
+    @Test
+    void stampGoesInFrontWhenOn() {
+        long t = LocalDateTime.of(2026, 10, 10, 21, 5, 9).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        assertEquals("[21:05:09] x", ChatTimes.rewrite(Text.literal("x"), 1, t).getString());
+        assertEquals("[21:05] [1] a", ChatTimes.rewrite(Text.literal("! [1] a"), 2, t).getString());
+        assertEquals("[1] a", ChatTimes.bare("[21:05] [1] a"));
+        assertEquals("[1] a", ChatTimes.bare("[21:05:09] [1] a"));
+        assertEquals("[1] a", ChatTimes.bare("[1] a"));
+    }
 }

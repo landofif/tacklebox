@@ -27,7 +27,12 @@ import java.util.function.Consumer;
  */
 @Mixin(ChatHud.class)
 abstract class ChatHudMixin {
-    private static boolean stacking;
+    private static boolean stacking, rewriting;
+
+    /** The line without the time stamp, so stacking compares only the words. */
+    private static String bare(String s, TackleboxSettings st) {
+        return st.chatTimeMode > 0 ? ChatTimes.bare(s) : s;
+    }
     private static String lastPlain = "", lastShown = "";
     private static int lastCount;
 
@@ -41,6 +46,20 @@ abstract class ChatHudMixin {
     @Inject(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
             at = @At("HEAD"), cancellable = true)
     private void tacklebox$chatBoxes(Text message, @Nullable MessageSignatureData signature, @Nullable MessageIndicator indicator, CallbackInfo ci) {
+        TackleboxSettings st = TackleboxSettings.get();
+        if (!rewriting) {
+            Text out = ChatTimes.rewrite(message, st == null ? 0 : st.chatTimeMode, System.currentTimeMillis());
+            if (out != message) {
+                rewriting = true;
+                try {
+                    ((ChatHud) (Object) this).addMessage(out, signature, indicator);
+                } finally {
+                    rewriting = false;
+                }
+                ci.cancel();
+                return;
+            }
+        }
         ChatTimes.record(message);
         if (stacking) {
             return;
@@ -51,13 +70,12 @@ abstract class ChatHudMixin {
         if (ci.isCancelled()) {
             return;
         }
-        TackleboxSettings st = TackleboxSettings.get();
         if (st != null && st.chatStack) {
             ChatHudAccessor acc = (ChatHudAccessor) this;
-            String plain = message.getString();
+            String plain = bare(message.getString(), st);
             var lines = acc.tacklebox$messages();
             if (!plain.isBlank() && plain.equals(lastPlain) && !lines.isEmpty()
-                    && lines.getFirst().content().getString().equals(lastShown)) {
+                    && bare(lines.getFirst().content().getString(), st).equals(lastShown)) {
                 lines.removeFirst();
                 acc.tacklebox$refresh();
                 lastCount++;

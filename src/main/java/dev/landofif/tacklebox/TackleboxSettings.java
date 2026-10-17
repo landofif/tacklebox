@@ -233,6 +233,8 @@ public class TackleboxSettings {
     public boolean hideEmptyChat = true;
     /** Repeats of the same chat line become one line with a count, like "text (x3)". */
     public boolean chatStack = true;
+    /** Every chat line starts with its arrival time: 0 off (time only on hover), 1 [HH:MM:SS], 2 [HH:MM]. */
+    public int chatTimeMode = 0;
     /** Separate chat boxes (dms, crew chat). null until sanitize fills in the defaults. */
     public java.util.List<dev.landofif.tacklebox.chat.ChatBox> chatBoxes = null;
     /** Keys that run a command when pressed in game, see input/KeyCommands. */
