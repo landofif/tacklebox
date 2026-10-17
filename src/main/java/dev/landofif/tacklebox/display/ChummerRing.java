@@ -29,7 +29,11 @@ public final class ChummerRing {
     /** A placed chummer: the hologram's x and z, and the ground under it (the hologram itself bobs up and down). */
     private record Placed(double x, double groundY, double z) {}
 
+    /** A chummer read off its hologram, for the active hud: {@code endMs} is wall clock time, 0 when the hologram has no time line. */
+    public record Detected(String owner, int bite, long endMs) {}
+
     private static List<Placed> placed = List.of();
+    private static List<Detected> detected = List.of();
     private static int countdown;
 
     private ChummerRing() {}
@@ -38,11 +42,17 @@ public final class ChummerRing {
         WorldRenderEvents.AFTER_ENTITIES.register(ChummerRing::render);
     }
 
+    /** Every chummer the last scan found, whatever the ring setting says; the active hud lists them. */
+    public static List<Detected> detected() {
+        return detected;
+    }
+
     /** Looks through the loaded entities every {@link #SCAN_TICKS} ticks. */
     public static void tick(MinecraftClient client) {
-        if (client.world == null || !TackleboxSettings.get().chummerRing) {
+        if (client.world == null) {
             placed = List.of();
-            countdown = 0; // scan at once when it is switched on or a world loads
+            detected = List.of();
+            countdown = 0; // scan at once when a world loads
             return;
         }
         if (--countdown > 0) {
@@ -50,14 +60,19 @@ public final class ChummerRing {
         }
         countdown = SCAN_TICKS;
         List<Placed> found = new ArrayList<>();
+        List<Detected> seen = new ArrayList<>();
+        long now = System.currentTimeMillis();
         for (Entity entity : client.world.getEntities()) {
             if (entity instanceof DisplayEntity.TextDisplayEntity text && !text.isRemoved()) {
-                if (ChummerText.parse(text.getText().getString()).isPresent()) {
+                ChummerText.Chummer chummer = ChummerText.parse(text.getText().getString()).orElse(null);
+                if (chummer != null) {
                     found.add(new Placed(text.getX(), groundY(client.world, text), text.getZ()));
+                    seen.add(new Detected(chummer.owner(), chummer.bite(), chummer.seconds() < 0 ? 0 : now + chummer.seconds() * 1000L));
                 }
             }
         }
         placed = found;
+        detected = seen;
     }
 
     /** The top of the first solid block under the hologram, looking down a few blocks; the hologram's own y bobs. */
@@ -75,6 +90,7 @@ public final class ChummerRing {
 
     public static void reset() {
         placed = List.of();
+        detected = List.of();
         countdown = 0;
     }
 
