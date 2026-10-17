@@ -8,12 +8,13 @@ package dev.landofif.tacklebox.display;
 public final class ChummerRingGeometry {
     /** The chummer's range, horizontal, measured from the middle of the hologram (luna measured 20.05 to the server's own circle). */
     public static final double RADIUS = 20.0;
-    /** The band is this wide, half of it inside {@link #RADIUS} and half outside. */
-    public static final double WIDTH = 0.2;
+    /** The wall is this tall, standing on the ground. */
     public static final int SEGMENTS = 128;
-    /** The text display floats this far above the ground (its head 0.5 lower); the ring sits on the ground plus {@link #LIFT}. */
-    public static final double BELOW_TEXT = 2.0;
+    public static final double HEIGHT = 1.0;
+    /** The wall starts this far above the block top, so its bottom edge does not fight the ground. */
     public static final double LIFT = 0.02;
+    /** The hologram floats about this far above the ground; only the fallback when no block is found under it. */
+    public static final double BELOW_TEXT = 2.0;
     /** Translucent: the colour setting is rgb only. */
     public static final int ALPHA = 0xA0;
 
@@ -30,14 +31,14 @@ public final class ChummerRingGeometry {
 
     private ChummerRingGeometry() {}
 
-    /** Receives the corners of the quads, four per segment, going round the band. */
+    /** Receives the corners of the quads, four per segment, going round the wall. */
     @FunctionalInterface
     public interface Sink {
         void vertex(float x, float y, float z);
     }
 
-    /** The height of the ring for a hologram at {@code textY}. */
-    public static double ringY(double textY) {
+    /** The bottom of the wall when no ground was found under a hologram at {@code textY}. */
+    public static double fallbackY(double textY) {
         return textY - BELOW_TEXT + LIFT;
     }
 
@@ -53,15 +54,15 @@ public final class ChummerRingGeometry {
         return ALPHA << 24 | (rgb & 0xFFFFFF);
     }
 
-    /** The whole band around {@code (cx, y, cz)}, as {@link #SEGMENTS} quads. */
+    /** The whole wall around {@code (cx, y, cz)}, {@code y} being its bottom: {@link #SEGMENTS} upright quads. */
     public static void emit(float cx, float y, float cz, Sink sink) {
-        float inner = (float) (RADIUS - WIDTH / 2);
-        float outer = (float) (RADIUS + WIDTH / 2);
+        float r = (float) RADIUS;
+        float top = y + (float) HEIGHT;
         for (int i = 0; i < SEGMENTS; i++) {
-            sink.vertex(cx + COS[i] * inner, y, cz + SIN[i] * inner);
-            sink.vertex(cx + COS[i] * outer, y, cz + SIN[i] * outer);
-            sink.vertex(cx + COS[i + 1] * outer, y, cz + SIN[i + 1] * outer);
-            sink.vertex(cx + COS[i + 1] * inner, y, cz + SIN[i + 1] * inner);
+            sink.vertex(cx + COS[i] * r, y, cz + SIN[i] * r);
+            sink.vertex(cx + COS[i] * r, top, cz + SIN[i] * r);
+            sink.vertex(cx + COS[i + 1] * r, top, cz + SIN[i + 1] * r);
+            sink.vertex(cx + COS[i + 1] * r, y, cz + SIN[i + 1] * r);
         }
     }
 }

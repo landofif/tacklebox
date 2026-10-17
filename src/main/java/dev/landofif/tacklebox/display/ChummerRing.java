@@ -8,21 +8,26 @@ import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.DisplayEntity;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * The chummer range ring (setting chummerRing, docs/huds/chummer-range.md): finds every placed chummer among the
- * loaded text displays and draws a thin flat ring on the ground at its range. Display only, no mixins. Every chummer
+ * loaded text displays and draws a one block high wall on the ground at its range. Display only, no mixins. Every chummer
  * the client tracks gets a ring, not only the one you stand in; display entities are tracked far beyond render distance.
  */
 public final class ChummerRing {
     private static final int SCAN_TICKS = 10;
+    private static final int GROUND_SEARCH = 6;
 
-    /** The position of a placed chummer's hologram, which the ring is built from. */
-    private record Placed(double x, double y, double z) {}
+    /** A placed chummer: the hologram's x and z, and the ground under it (the hologram itself bobs up and down). */
+    private record Placed(double x, double groundY, double z) {}
 
     private static List<Placed> placed = List.of();
     private static int countdown;
@@ -48,11 +53,24 @@ public final class ChummerRing {
         for (Entity entity : client.world.getEntities()) {
             if (entity instanceof DisplayEntity.TextDisplayEntity text && !text.isRemoved()) {
                 if (ChummerText.parse(text.getText().getString()).isPresent()) {
-                    found.add(new Placed(text.getX(), text.getY(), text.getZ()));
+                    found.add(new Placed(text.getX(), groundY(client.world, text), text.getZ()));
                 }
             }
         }
         placed = found;
+    }
+
+    /** The top of the first solid block under the hologram, looking down a few blocks; the hologram's own y bobs. */
+    private static double groundY(World world, Entity text) {
+        BlockPos.Mutable pos = new BlockPos.Mutable(text.getBlockX(), 0, text.getBlockZ());
+        for (int dy = 0; dy <= GROUND_SEARCH; dy++) {
+            pos.setY(text.getBlockY() - dy);
+            VoxelShape shape = world.getBlockState(pos).getCollisionShape(world, pos);
+            if (!shape.isEmpty()) {
+                return pos.getY() + shape.getMax(Direction.Axis.Y) + ChummerRingGeometry.LIFT;
+            }
+        }
+        return ChummerRingGeometry.fallbackY(text.getY());
     }
 
     public static void reset() {
@@ -71,7 +89,7 @@ public final class ChummerRing {
         int color = ChummerRingGeometry.argb(settings.chummerRingColor);
         VertexConsumer buffer = context.consumers().getBuffer(RenderLayers.debugQuads());
         for (Placed ring : rings) {
-            ChummerRingGeometry.emit((float) (ring.x - camera.x), (float) (ChummerRingGeometry.ringY(ring.y) - camera.y),
+            ChummerRingGeometry.emit((float) (ring.x - camera.x), (float) (ring.groundY - camera.y),
                     (float) (ring.z - camera.z), (x, y, z) -> buffer.vertex(x, y, z).color(color));
         }
     }

@@ -26,64 +26,46 @@ class ChummerRingGeometryTest {
     }
 
     @Test
-    void theRingIsFlat() {
-        for (float[] v : ring(3.5f, -1.25f, -7f)) {
-            assertEquals(-1.25f, v[1]);
+    void theWallStandsOneBlockHighOnTheGivenGround() {
+        for (int i = 0; i < ring(3.5f, -1.25f, -7f).size(); i += 4) {
+            List<float[]> v = ring(3.5f, -1.25f, -7f);
+            assertEquals(-1.25f, v.get(i)[1]);
+            assertEquals(-0.25f, v.get(i + 1)[1], 1e-6);
+            assertEquals(-0.25f, v.get(i + 2)[1], 1e-6);
+            assertEquals(-1.25f, v.get(i + 3)[1]);
         }
+        assertEquals(1.0, ChummerRingGeometry.HEIGHT);
     }
 
     @Test
-    void everyCornerIsOnTheInnerOrOuterEdgeOfTheBandAroundTheCentre() {
+    void everyCornerIsOnTheRangeAroundTheCentre() {
         float cx = -10.5f; // any centre must work
         float cz = 17.25f;
-        double inner = ChummerRingGeometry.RADIUS - ChummerRingGeometry.WIDTH / 2;
-        double outer = ChummerRingGeometry.RADIUS + ChummerRingGeometry.WIDTH / 2;
-        List<float[]> vertices = ring(cx, 0, cz);
-        for (int i = 0; i < vertices.size(); i += 4) {
-            assertEquals(inner, distance(vertices.get(i), cx, cz), 1e-3);
-            assertEquals(outer, distance(vertices.get(i + 1), cx, cz), 1e-3);
-            assertEquals(outer, distance(vertices.get(i + 2), cx, cz), 1e-3);
-            assertEquals(inner, distance(vertices.get(i + 3), cx, cz), 1e-3);
+        for (float[] v : ring(cx, 0, cz)) {
+            assertEquals(ChummerRingGeometry.RADIUS, distance(v, cx, cz), 1e-3);
         }
     }
 
     @Test
-    void theBandIsClosedAndHasNoGaps() {
+    void theWallIsClosedAndHasNoGaps() {
         List<float[]> v = ring(0, 0, 0);
         int quads = v.size() / 4;
         for (int i = 0; i < quads; i++) {
-            float[] outerEnd = v.get(i * 4 + 2);
-            float[] innerEnd = v.get(i * 4 + 3);
-            float[] nextOuterStart = v.get(((i + 1) % quads) * 4 + 1);
-            float[] nextInnerStart = v.get(((i + 1) % quads) * 4);
-            assertEquals(outerEnd[0], nextOuterStart[0], 1e-4);
-            assertEquals(outerEnd[2], nextOuterStart[2], 1e-4);
-            assertEquals(innerEnd[0], nextInnerStart[0], 1e-4);
-            assertEquals(innerEnd[2], nextInnerStart[2], 1e-4);
+            float[] topEnd = v.get(i * 4 + 2);
+            float[] bottomEnd = v.get(i * 4 + 3);
+            float[] nextTopStart = v.get(((i + 1) % quads) * 4 + 1);
+            float[] nextBottomStart = v.get(((i + 1) % quads) * 4);
+            assertEquals(topEnd[0], nextTopStart[0], 1e-4);
+            assertEquals(topEnd[2], nextTopStart[2], 1e-4);
+            assertEquals(bottomEnd[0], nextBottomStart[0], 1e-4);
+            assertEquals(bottomEnd[2], nextBottomStart[2], 1e-4);
         }
     }
 
     @Test
-    void theAreaIsThatOfAThinRing() {
-        List<float[]> v = ring(0, 0, 0);
-        double area = 0;
-        for (int i = 0; i < v.size(); i += 4) { // each quad is a trapezoid, two triangles
-            area += triangle(v.get(i), v.get(i + 1), v.get(i + 2)) + triangle(v.get(i), v.get(i + 2), v.get(i + 3));
-        }
-        double inner = ChummerRingGeometry.RADIUS - ChummerRingGeometry.WIDTH / 2;
-        double outer = ChummerRingGeometry.RADIUS + ChummerRingGeometry.WIDTH / 2;
-        assertEquals(Math.PI * (outer * outer - inner * inner), area, area * 0.002);
-    }
-
-    private static double triangle(float[] a, float[] b, float[] c) {
-        return Math.abs((b[0] - a[0]) * (c[2] - a[2]) - (c[0] - a[0]) * (b[2] - a[2])) / 2;
-    }
-
-    @Test
-    void theRingSitsAboveTheGroundTheHologramFloatsOver() {
+    void theFallbackSitsBelowTheHologramLikeInLunasDump() {
         // luna's dump: the text display at y 27.98, her feet (the ground) at 26.0
-        assertEquals(26.0, ChummerRingGeometry.ringY(27.98), 1e-9);
-        assertEquals(ChummerRingGeometry.LIFT, ChummerRingGeometry.ringY(27.98) - (27.98 - ChummerRingGeometry.BELOW_TEXT), 1e-9);
+        assertEquals(26.0, ChummerRingGeometry.fallbackY(27.98), 1e-9);
     }
 
     @Test

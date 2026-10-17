@@ -71,16 +71,17 @@ class ChummerRingIntegrationTest {
         // the ring is drawn camera relative around the hologram: a camera at luna's spot, on the ground
         double camX = X + 2.5, camY = 26.0 + 1.62, camZ = Z;
         List<float[]> corners = new ArrayList<>();
-        ChummerRingGeometry.emit((float) (X - camX), (float) (ChummerRingGeometry.ringY(Y) - camY), (float) (Z - camZ),
+        ChummerRingGeometry.emit((float) (X - camX), (float) (26.0 + ChummerRingGeometry.LIFT - camY), (float) (Z - camZ),
                 (x, y, z) -> corners.add(new float[]{x, y, z}));
         assertEquals(ChummerRingGeometry.SEGMENTS * 4, corners.size());
         for (float[] v : corners) {
-            assertEquals(26.0 - camY, v[1], 1e-3); // on the ground, 1.62 below the eyes
+            // between the ground (1.62 below the eyes) and one block above it
+            assertTrue(v[1] >= 26.0 - camY - 1e-3 && v[1] <= 27.0 + ChummerRingGeometry.LIFT - camY + 1e-3);
             double wx = v[0] + camX, wz = v[2] + camZ; // back to the world
             double d = Math.hypot(wx - X, wz - Z);
-            // the inner edge is inside the range and the outer edge outside it, all the way round
-            assertEquals(d < ChummerRingGeometry.RADIUS, ChummerRingGeometry.inRange(X, Z, wx, wz), "corner at " + d + " blocks");
-            assertEquals(ChummerRingGeometry.RADIUS, d, ChummerRingGeometry.WIDTH / 2 + 1e-3);
+            // the wall marks exactly the edge of the range, all the way round
+            assertEquals(ChummerRingGeometry.RADIUS, d, 1e-3);
+            assertTrue(ChummerRingGeometry.inRange(X, Z, wx, wz) || d - ChummerRingGeometry.RADIUS < 1e-3);
         }
     }
 }
