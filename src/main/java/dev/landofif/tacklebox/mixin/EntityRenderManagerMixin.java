@@ -46,8 +46,8 @@ abstract class EntityRenderManagerMixin {
             if (OtherBobbers.hideDisplays
                     || DisplayCull.hidden(s.hideFarDisplays, entity.squaredDistanceTo(x, y, z), s.farDisplayRange)) {
                 cir.setReturnValue(false);
+                return;
             }
-            return;
         }
 
         boolean nametags = s.hideOwnNametag || s.hideAllNametags;
