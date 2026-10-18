@@ -2,6 +2,7 @@ package dev.landofif.tacklebox.mixin;
 
 import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.display.Holograms;
+import dev.landofif.tacklebox.display.OtherBobbers;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.Frustum;
@@ -33,8 +34,8 @@ abstract class EntityRenderManagerMixin {
         TackleboxSettings s = TackleboxSettings.get();
         ClientPlayerEntity self = MinecraftClient.getInstance().player;
 
-        if (s.hideOtherBobbers && entity instanceof FishingBobberEntity bobber) {
-            if (self != null && bobber.getPlayerOwner() != self) {
+        if (entity instanceof FishingBobberEntity) {
+            if (OtherBobbers.hidden(entity)) {
                 cir.setReturnValue(false);
             }
             return;
