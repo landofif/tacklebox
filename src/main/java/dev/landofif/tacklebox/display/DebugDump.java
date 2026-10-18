@@ -262,6 +262,13 @@ public final class DebugDump {
         return 1;
     }
 
+    /** {@code /tacklebox debug displays}: session-only toggle that stops drawing display entities, a lag test. */
+    public static int toggleDisplays() {
+        OtherBobbers.hideDisplays = !OtherBobbers.hideDisplays;
+        say("item, block and text displays " + (OtherBobbers.hideDisplays ? "hidden" : "shown") + " (until restart)", Formatting.AQUA);
+        return 1;
+    }
+
     /** {@code /tacklebox debug count}: every loaded entity grouped by type, to chat only. */
     public static int count() {
         ClientWorld world = MinecraftClient.getInstance().world;

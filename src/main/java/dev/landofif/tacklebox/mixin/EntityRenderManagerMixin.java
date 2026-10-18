@@ -41,6 +41,11 @@ abstract class EntityRenderManagerMixin {
             return;
         }
 
+        if (OtherBobbers.hideDisplays && entity instanceof net.minecraft.entity.decoration.DisplayEntity) {
+            cir.setReturnValue(false);
+            return;
+        }
+
         boolean nametags = s.hideOwnNametag || s.hideAllNametags;
         if (!nametags && !s.hideXpPopups) {
             return;

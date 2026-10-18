@@ -7,6 +7,9 @@ import net.minecraft.entity.projectile.FishingBobberEntity;
 
 /** The "hide other bobbers" rule, shared by the render cull and the foecollab bait display skip. */
 public final class OtherBobbers {
+    /** Lag test from {@code /tacklebox debug displays}: not saved, off on every start. */
+    public static boolean hideDisplays;
+
     private OtherBobbers() {}
 
     /** True for a bobber that is not yours while the setting is on. */
