@@ -262,6 +262,23 @@ public final class DebugDump {
         return 1;
     }
 
+    /** {@code /tacklebox debug count}: every loaded entity grouped by type, to chat only. */
+    public static int count() {
+        ClientWorld world = MinecraftClient.getInstance().world;
+        if (world == null) {
+            return 0;
+        }
+        List<String> ids = new java.util.ArrayList<>();
+        for (Entity entity : world.getEntities()) {
+            ids.add(Registries.ENTITY_TYPE.getId(entity.getType()).toString());
+        }
+        say("loaded entities " + ids.size(), Formatting.AQUA);
+        for (String line : EntityTally.lines(ids)) {
+            say(line, Formatting.GRAY);
+        }
+        return 1;
+    }
+
     private static void appendEntity(StringBuilder out, Entity entity, ClientWorld world, Vec3d me) {
         Vec3d pos = entity.getEntityPos();
         out.append("\nentity ").append(Registries.ENTITY_TYPE.getId(entity.getType())).append(" (").append(entity.getClass().getSimpleName())

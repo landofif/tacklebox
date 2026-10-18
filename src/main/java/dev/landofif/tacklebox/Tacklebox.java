@@ -204,6 +204,7 @@ public final class Tacklebox implements ClientModInitializer {
                 .then(ClientCommandManager.literal("power").executes(ctx -> open(() -> new dev.landofif.tacklebox.screen.PowerScreen(null))))
                 .then(ClientCommandManager.literal("chat").executes(ctx -> open(() -> new ChatFilterScreen(null))))
                 .then(ClientCommandManager.literal("debug")
+                        .then(ClientCommandManager.literal("count").executes(ctx -> dev.landofif.tacklebox.display.DebugDump.count()))
                         .then(ClientCommandManager.literal("item").executes(ctx -> dev.landofif.tacklebox.display.DebugDump.heldItem()))
                         .then(ClientCommandManager.literal("entities").executes(ctx -> dev.landofif.tacklebox.display.DebugDump.entities(24))
                                 .then(ClientCommandManager.argument("radius", com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, 64))
