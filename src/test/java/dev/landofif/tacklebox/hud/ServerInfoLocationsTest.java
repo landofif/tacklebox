@@ -17,4 +17,20 @@ class ServerInfoLocationsTest {
             assertTrue(readable, loc.id() + " is missing from ServerInfo.LOCATIONS");
         }
     }
+
+    /** A bar holding both the time/location and the community goal must still give the location. */
+    @Test
+    void barWithTimeAndGoalStillGivesTheLocation() {
+        ServerInfo.locationName = "";
+        assertTrue(ServerInfo.readBar("\uF039 12:30 PM 21\u00b0 Cairns  Community Goal: 21.28K/100k Catches"));
+        org.junit.jupiter.api.Assertions.assertEquals("cairns", ServerInfo.locationName);
+        org.junit.jupiter.api.Assertions.assertEquals(21280, CommunityGoal.current());
+    }
+
+    @Test
+    void goalOnlyBarIsNotTheTimeBar() {
+        ServerInfo.locationName = "kenai river";
+        org.junit.jupiter.api.Assertions.assertFalse(ServerInfo.readBar("Community Goal: 21.28K/100k Catches"));
+        org.junit.jupiter.api.Assertions.assertEquals("kenai river", ServerInfo.locationName);
+    }
 }

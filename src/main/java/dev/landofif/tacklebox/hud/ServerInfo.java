@@ -105,30 +105,34 @@ public final class ServerInfo {
     private static void readBossBar(MinecraftClient client) {
         Map<?, ClientBossBar> bars = ((BossBarHudAccessor) client.inGameHud.getBossBarHud()).tacklebox$getBossBars();
         for (ClientBossBar bar : bars.values()) {
-            String s = bar.getName().getString();
-            if (CommunityGoal.onBar(dev.landofif.tacklebox.trigger.Matcher.normalize(s), System.currentTimeMillis())) {
-                continue;
+            if (readBar(bar.getName().getString())) {
+                return;
             }
-            Matcher t = TIME.matcher(s);
-            if (!t.find()) {
-                continue;
-            }
-            time = t.group(1);
-            ampm = t.group(2);
-            Matcher temp = TEMP.matcher(s);
-            temperature = temp.find() ? temp.group(1) + "°" : "";
-            weather = weatherOf(s);
-            locationId = "";
-            locationName = "";
-            for (Map.Entry<String, String> e : LOCATIONS.entrySet()) {
-                if (s.contains(e.getValue())) {
-                    locationId = e.getKey();
-                    locationName = e.getValue().toLowerCase(java.util.Locale.ROOT); // matched as sent, shown lowercase
-                    break;
-                }
-            }
-            return;
         }
+    }
+
+    /** One boss bar title; true when it was the time bar. A bar can hold the community goal too, so the goal is read first and the time after. */
+    static boolean readBar(String s) {
+        CommunityGoal.onBar(dev.landofif.tacklebox.trigger.Matcher.normalize(s), System.currentTimeMillis());
+        Matcher t = TIME.matcher(s);
+        if (!t.find()) {
+            return false;
+        }
+        time = t.group(1);
+        ampm = t.group(2);
+        Matcher temp = TEMP.matcher(s);
+        temperature = temp.find() ? temp.group(1) + "°" : "";
+        weather = weatherOf(s);
+        locationId = "";
+        locationName = "";
+        for (Map.Entry<String, String> e : LOCATIONS.entrySet()) {
+            if (s.contains(e.getValue())) {
+                locationId = e.getKey();
+                locationName = e.getValue().toLowerCase(java.util.Locale.ROOT); // matched as sent, shown lowercase
+                break;
+            }
+        }
+        return true;
     }
 
     private static String weatherOf(String s) {
