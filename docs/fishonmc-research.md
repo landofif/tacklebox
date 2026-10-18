@@ -428,3 +428,15 @@ List of rules → editor with a **"test against text"** box (paste a chat line, 
   - whitefishes: 75,250,1.5K,3K,7.5K,15K,30K
   - wrasses: 50,200,1K,2.5K,5K,10K,30K
   The overview page (title `U+EEE4 픙`, slots 1 to 35, then Return and Close) shows each as an item named `<Group> Collection` with lore `Current Level - [n]` and `(have/need)` for the next level, no power, so `Power.overview` reads all 35 from that page (next level = n + 1, power from the table above). One /collections visit is enough. Unknown: how a finished collection (level 7) looks there; the reader drops the entry for level 7 or higher.
+
+## fishing stats formulas (wiki "Fishing Stats" page, pasted by luna 2026-10-18)
+
+The wiki is behind a Cloudflare check (403 for curl, WebFetch and headless Chromium), so luna pastes pages.
+
+- **Bite Speed:** wait from the bobber hitting the water to the fish particles. Max wait = 20 s - 0.02 s x Bite Speed, floor 3 s (at 850). Min wait = max / 4 = 5 s - 0.005 s x Bite Speed, floor 1.5 s (at 700). The max wait is shown in the stats profile. How the wait is drawn between min and max is not stated.
+- **Reel Speed:** progress per successful minigame tick, base 0.6 units, 1 Reel Speed = 0.001 units (+600 doubles it).
+- **Line Strength:** lowers the total progress the bar needs (no formula given).
+- **Luck / Scale:** the tables in `docs/menus/bait-picker.md` and the bait picker page (`odds`, `sizeOdds`) match the wiki.
+- **Prospect:** shard chance = 1 / (50 / (1 + Prospect x 0.0008)), base 1/50.
+- **Pet Luck:** per rarity 1 / (N / (1 + PetLuck / 100)) with N = 750, 4000, 10000, 30000, 80000 (common to mythic).
+- **Bonus XP / Bonus Money:** multipliers on top of the 2x boosters; money bonus applies at catch, not at sale.
