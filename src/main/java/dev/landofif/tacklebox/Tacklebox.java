@@ -162,6 +162,7 @@ public final class Tacklebox implements ClientModInitializer {
             TitleOverlay.render(context);
         });
 
+        dev.landofif.tacklebox.input.CommandAliases.register();
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             SoundQueue.tick();
             ServerInfo.tick(client);

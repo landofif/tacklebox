@@ -240,6 +240,9 @@ public class TackleboxSettings {
     /** Keys that run a command when pressed in game, see input/KeyCommands. */
     public java.util.List<dev.landofif.tacklebox.input.KeyCommands.Entry> keyCommands = new java.util.ArrayList<>();
 
+    /** Command aliases, see input/CommandAliases. */
+    public java.util.List<dev.landofif.tacklebox.input.CommandAliases.Entry> aliases = new java.util.ArrayList<>();
+
     // ---- word swaps (see display/WordSwap) ----
     public boolean wordSwap = true;
     public java.util.List<dev.landofif.tacklebox.display.WordSwap.Entry> words = new java.util.ArrayList<>();
@@ -461,6 +464,12 @@ public class TackleboxSettings {
         keyCommands.removeIf(java.util.Objects::isNull);
         for (var k : keyCommands) {
             if (k.command == null) k.command = "";
+        }
+        if (aliases == null) aliases = new java.util.ArrayList<>();
+        aliases.removeIf(java.util.Objects::isNull);
+        for (var a : aliases) {
+            if (a.name == null) a.name = "";
+            if (a.command == null) a.command = "";
         }
         if (words == null) words = new java.util.ArrayList<>();
         words.removeIf(java.util.Objects::isNull);

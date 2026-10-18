@@ -310,6 +310,7 @@ public final class SettingsPages {
         link("chat triggers", TriggerListScreen::new);
         link("chat", ChatFilterScreen::new);
         link("key commands", KeyCommandScreen::new);
+        link("command aliases", AliasScreen::new);
         link("word swaps", WordSwapScreen::new);
         link("bait picker", BaitScreen::new);
         link("power", PowerScreen::new);
