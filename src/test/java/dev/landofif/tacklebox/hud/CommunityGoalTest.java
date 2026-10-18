@@ -16,7 +16,7 @@ class CommunityGoalTest {
     }
 
     @Test
-    void barCountingResetAndChatSync() {
+    void barCountingAndChatSync() {
         CommunityGoal.restore(-1, -1, 0);
         assertFalse(CommunityGoal.up(1000));
         CommunityGoal.onCatch(1000);
@@ -32,13 +32,10 @@ class CommunityGoalTest {
         CommunityGoal.onChat(Matcher.normalize("Community Catches: 21.21K/100k"));
         CommunityGoal.onChat(Matcher.normalize("Your Catches Contribution: 304"));
         assertEquals(304, CommunityGoal.mine());
-
-        assertTrue(CommunityGoal.onBar("Community Goal: 150/100k Catches", 6000));
-        assertEquals(0, CommunityGoal.mine(), "goal went down: new goal");
     }
 
     @Test
-    void roundingBetweenChatAndBarIsNotAReset() {
+    void chatThenBarKeepsTheCount() {
         CommunityGoal.restore(22400, 100000, 0);
         CommunityGoal.onChat(Matcher.normalize("Community Catches: 22.41K/100k"));
         CommunityGoal.onChat(Matcher.normalize("Your Catches Contribution: 319"));

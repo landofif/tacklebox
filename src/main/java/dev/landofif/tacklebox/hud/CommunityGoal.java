@@ -5,8 +5,7 @@ import java.util.regex.Pattern;
 
 /**
  * The server's community goal: all players' catches towards a goal (boss bar {@code Community Goal: 21.28K/100k Catches}) and
- * how many of them the player made. The mod counts the player's own catches while the bar is up, drops them when the goal
- * went down (a new goal) and takes the server's number from the {@code /communityevent} reply:
+ * how many of them the player made. The mod counts the player's own catches while the bar is up, and takes the server's number from the {@code /communityevent} reply:
  * {@code Community Catches: 21.21K/100k} then {@code Your Catches Contribution: 304}. Pure, so it is unit tested.
  */
 public final class CommunityGoal {
@@ -16,9 +15,6 @@ public final class CommunityGoal {
     private static final Pattern MINE = Pattern.compile("your catches contribution:\\s*([\\d,]+)", Pattern.CASE_INSENSITIVE);
     /** The bar is read every half second; it counts as up while it was seen this recently. */
     private static final long BAR_MS = 3000;
-
-    /** The bar and the chat round to 10 or 100 catches (22.4K and 22.41K); a drop this small is not a new goal. */
-    private static final long ROUNDING = 200;
 
     private static long current = -1, goal = -1, mine, seenAt;
 
@@ -49,9 +45,6 @@ public final class CommunityGoal {
         if (c < 0 || g < 0) {
             return false;
         }
-        if (c < current - ROUNDING) {
-            mine = 0;
-        }
         current = c;
         goal = g;
         seenAt = now;
@@ -68,10 +61,7 @@ public final class CommunityGoal {
         m = CATCHES.matcher(line);
         if (m.find()) {
             long c = parse(m.group(1));
-            if (c >= 0 && c < current - ROUNDING) {
-                mine = 0; // the goal was reset; the contribution line that follows sets the real number
-                current = c;
-            } else if (c > current) {
+            if (c > current) {
                 current = c;
             }
             long g = parse(m.group(2));
