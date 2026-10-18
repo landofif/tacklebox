@@ -46,6 +46,16 @@ import java.util.function.Supplier;
 public final class Tacklebox implements ClientModInitializer {
     public static final String MOD_ID = "tacklebox";
     public static final Logger LOGGER = LoggerFactory.getLogger("tacklebox");
+    /** When to send /communityevent after joining (0 = not pending); sent once per game start. */
+    private static long communityAskAt;
+    private static boolean communityAsked;
+
+    private static void saveCommunity() {
+        TackleboxSettings s = TackleboxSettings.get();
+        s.communityCurrent = dev.landofif.tacklebox.hud.CommunityGoal.current();
+        s.communityGoal = dev.landofif.tacklebox.hud.CommunityGoal.goal();
+        s.communityMine = dev.landofif.tacklebox.hud.CommunityGoal.mine();
+    }
 
     /** Screen to open on the next tick (a chat command can't open one directly: chat closes after it). */
     private static Screen pendingScreen;
@@ -74,6 +84,8 @@ public final class Tacklebox implements ClientModInitializer {
         dev.landofif.tacklebox.menu.Vaults.register();
         TriggerStore.load();
         TackleboxSettings.load();
+        TackleboxSettings cs = TackleboxSettings.get();
+        dev.landofif.tacklebox.hud.CommunityGoal.restore(cs.communityCurrent, cs.communityGoal, cs.communityMine);
         dev.landofif.tacklebox.hud.NowPlaying.start();
         dev.landofif.tacklebox.display.FlatLeaves.register();
         dev.landofif.tacklebox.display.ChummerRing.register();
@@ -83,6 +95,7 @@ public final class Tacklebox implements ClientModInitializer {
                 XpEstimate.onChat(message);
                 dev.landofif.tacklebox.hud.ServerHud.onChat(message);
                 dev.landofif.tacklebox.hud.BoostsHud.onChat(message);
+                dev.landofif.tacklebox.hud.CommunityGoal.onChat(dev.landofif.tacklebox.trigger.Matcher.normalize(message.getString()));
             }
             boolean show = TriggerEngine.onGameMessage(message, overlay);
             return show && (overlay || ChatTweaks.allow(message));
@@ -125,13 +138,23 @@ public final class Tacklebox implements ClientModInitializer {
                     }
                 }));
 
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            if (!communityAsked) {
+                communityAskAt = System.currentTimeMillis() + 5000; // luna 2026-10-18: ask the server once per game start
+            }
+        });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            communityAskAt = 0;
+            saveCommunity();
             TackleboxSettings.save(); // what the quests left hud learned
             dev.landofif.tacklebox.hud.ServerHud.reset();
             dev.landofif.tacklebox.hud.BoostsHud.reset();
             dev.landofif.tacklebox.display.ChummerRing.reset();
         });
-        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> TackleboxSettings.save());
+        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
+            saveCommunity();
+            TackleboxSettings.save();
+        });
 
         HudElementRegistry.addLast(Identifier.of(MOD_ID, "custom_huds"), (context, tickCounter) -> {
             MinecraftClient client = MinecraftClient.getInstance();
@@ -165,6 +188,13 @@ public final class Tacklebox implements ClientModInitializer {
         dev.landofif.tacklebox.input.CommandAliases.register();
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             SoundQueue.tick();
+            if (communityAskAt > 0 && System.currentTimeMillis() >= communityAskAt && client.player != null) {
+                communityAskAt = 0;
+                if (TriggerEngine.isOnFishOnMc()) {
+                    communityAsked = true;
+                    client.player.networkHandler.sendChatCommand("communityevent");
+                }
+            }
             ServerInfo.tick(client);
             XpEstimate.tick(client);
             dev.landofif.tacklebox.display.BobberTimer.tick(client);

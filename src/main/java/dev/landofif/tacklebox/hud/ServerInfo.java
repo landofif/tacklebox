@@ -106,6 +106,9 @@ public final class ServerInfo {
         Map<?, ClientBossBar> bars = ((BossBarHudAccessor) client.inGameHud.getBossBarHud()).tacklebox$getBossBars();
         for (ClientBossBar bar : bars.values()) {
             String s = bar.getName().getString();
+            if (CommunityGoal.onBar(dev.landofif.tacklebox.trigger.Matcher.normalize(s), System.currentTimeMillis())) {
+                continue;
+            }
             Matcher t = TIME.matcher(s);
             if (!t.find()) {
                 continue;

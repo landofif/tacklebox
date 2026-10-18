@@ -29,6 +29,7 @@ public final class FoeCatch {
                 constantId = Class.forName("io.github.foecollab.FOMC.Constant").getField("ID");
                 fishId = c.getField("fishId");
             }
+            dev.landofif.tacklebox.hud.CommunityGoal.onCatch(System.currentTimeMillis());
             Compendium.onCatch((String) fishId.get(fish), (String) constantId.get(variant.get(fish)),
                     (String) constantId.get(size.get(fish)), (String) constantId.get(location.get(fish)));
         } catch (ReflectiveOperationException | RuntimeException e) {

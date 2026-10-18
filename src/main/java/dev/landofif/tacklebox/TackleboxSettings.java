@@ -171,6 +171,8 @@ public class TackleboxSettings {
     public java.util.List<String> serverHudOrder = new java.util.ArrayList<>();
     /** The catches line as 4.3K instead of 4,392. */
     public boolean serverHudShortCatches;
+    /** The community goal as last seen and the player's own catches towards it (hud/CommunityGoal); -1 = never seen. */
+    public long communityCurrent = -1, communityGoal = -1, communityMine;
     /** The prospect chance as 1/35 instead of 1/34.96. */
     public boolean serverHudRoundProspect;
     public java.util.Map<String, String> profileStats = new java.util.LinkedHashMap<>();

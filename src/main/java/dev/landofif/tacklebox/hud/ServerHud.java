@@ -200,7 +200,7 @@ public final class ServerHud {
                 {"dex location", "compendium location"}, {"dex level", "location level"}, {"dex catches", "catches"},
                 {"dex runes", "runes"}, {"dex normal", "normal fish"}, {"dex gigantic", "gigantic fish"}, {"dex albino", "albino fish"},
                 {"dex melanistic", "melanistic fish"}, {"dex trophy", "trophy fish"}, {"dex fabled", "fabled fish"}, {"space 4", "blank line"},
-                {"shop", "tackle shop timer"}, {"moon", "moon"}, {"frenzy", "fish frenzy"}, {"weather", "weather and events"}}) {
+                {"shop", "tackle shop timer"}, {"moon", "moon"}, {"frenzy", "fish frenzy"}, {"community", "community goal"}, {"community mine", "your community catches"}, {"weather", "weather and events"}}) {
             LABEL.put(l[0], l[1]);
         }
     }
@@ -356,6 +356,19 @@ public final class ServerHud {
             case "frenzy" -> {
                 long now = System.currentTimeMillis();
                 out.add(plain(row("Frenzy: ", FrenzySchedule.describe(now, BoostsHud.frenzyLeft(now), BoostsHud.frenzyPlace(), BoostsHud.frenzySeen(), ServerHud::clock), Formatting.YELLOW)));
+            }
+            case "community" -> {
+                long now = System.currentTimeMillis();
+                if (CommunityGoal.up(now)) {
+                    boolean shortNum = TackleboxSettings.get().serverHudShortCatches;
+                    out.add(plain(row("Community Goal: ", (shortNum ? abbrev(CommunityGoal.current()) : String.format("%,d", CommunityGoal.current()))
+                            + "/" + (shortNum ? abbrev(CommunityGoal.goal()) : String.format("%,d", CommunityGoal.goal())), Formatting.GREEN)));
+                }
+            }
+            case "community mine" -> {
+                if (CommunityGoal.up(System.currentTimeMillis())) {
+                    out.add(plain(row("Your Catches: ", TackleboxSettings.get().serverHudShortCatches ? abbrev(CommunityGoal.mine()) : String.format("%,d", CommunityGoal.mine()), Formatting.YELLOW)));
+                }
             }
             case "weather" -> { // every active event gets its own line, in its colour, with what it does
                 for (Map.Entry<String, Object[]> e : EVENTS.entrySet()) {
