@@ -264,6 +264,9 @@ public class TackleboxSettings {
     /** A thin flat ring on the ground at the range of every placed chummer in view of the client (display/ChummerRing), and its colour (rgb). */
     public boolean chummerRing = true;
     public int chummerRingColor = 0x41F55B;
+    /** Stop drawing the servers item, block and text displays farther than this many blocks (8 to 64), a fps help at spawn (display/DisplayCull). */
+    public boolean hideFarDisplays = false;
+    public int farDisplayRange = 24;
 
     // ---- bobber looks (only you see these) ----
     public BobberSkin bobberSkin = BobberSkin.DEFAULT;
@@ -485,6 +488,7 @@ public class TackleboxSettings {
         dev.landofif.tacklebox.chat.ChatBoxes.addCrewsRule(chatBoxes);
         lineColor &= 0xFFFFFF;
         chummerRingColor &= 0xFFFFFF;
+        farDisplayRange = dev.landofif.tacklebox.display.DisplayCull.clampRange(farDisplayRange);
         vmScale = Math.max(0.1, Math.min(3, vmScale));
         swingSlowness = Math.max(0.25, Math.min(4, swingSlowness));
         sneakHeight = dev.landofif.tacklebox.display.SneakHeight.clamp(sneakHeight);

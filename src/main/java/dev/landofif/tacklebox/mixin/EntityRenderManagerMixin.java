@@ -1,6 +1,7 @@
 package dev.landofif.tacklebox.mixin;
 
 import dev.landofif.tacklebox.TackleboxSettings;
+import dev.landofif.tacklebox.display.DisplayCull;
 import dev.landofif.tacklebox.display.Holograms;
 import dev.landofif.tacklebox.display.OtherBobbers;
 import net.minecraft.client.MinecraftClient;
@@ -41,8 +42,11 @@ abstract class EntityRenderManagerMixin {
             return;
         }
 
-        if (OtherBobbers.hideDisplays && entity instanceof net.minecraft.entity.decoration.DisplayEntity) {
-            cir.setReturnValue(false);
+        if (entity instanceof net.minecraft.entity.decoration.DisplayEntity) {
+            if (OtherBobbers.hideDisplays
+                    || DisplayCull.hidden(s.hideFarDisplays, entity.squaredDistanceTo(x, y, z), s.farDisplayRange)) {
+                cir.setReturnValue(false);
+            }
             return;
         }
 

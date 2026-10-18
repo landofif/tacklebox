@@ -1,5 +1,6 @@
 package dev.landofif.tacklebox.screen;
 
+import dev.landofif.tacklebox.display.DisplayCull;
 import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.compat.FoeScreens;
 import dev.landofif.tacklebox.ui.Foe;
@@ -536,6 +537,11 @@ public final class SettingsPages {
                         net.minecraft.client.MinecraftClient.getInstance().reloadResources();
                     }
                 });
+        header("lag");
+        toggle("hide far displays", "stops drawing the servers item, block and text displays (spawn decor, shop signs, holograms) beyond the range below. at spawn this can double your fps. nearby ones stay.",
+                () -> s.hideFarDisplays, v -> s.hideFarDisplays = v);
+        slider("display range", "how far away displays still get drawn, in blocks.", DisplayCull.MIN_RANGE, DisplayCull.MAX_RANGE, 2, " blocks",
+                () -> s.farDisplayRange, v -> s.farDisplayRange = (int) v);
         header("chummer");
         toggle("chummer range ring", "draws a thin ring on the ground at the range of every placed chummer your client can see, 20 blocks out. read from the chummer's hologram, not from chat.",
                 () -> s.chummerRing, v -> s.chummerRing = v);
