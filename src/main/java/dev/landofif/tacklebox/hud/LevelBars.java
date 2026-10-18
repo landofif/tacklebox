@@ -58,6 +58,10 @@ public final class LevelBars {
         if (s.levelBarsFishing) {
             label[rows] = "level [" + p.experienceLevel + "]";
             number[rows] = LevelColor.of(p.experienceLevel);
+            Double need = s.levelBarsMainXp ? XpEstimate.levelNeed() : null;
+            if (need != null) {
+                extra[rows] = XpEstimate.abbrevXp(p.experienceProgress * need, s.levelBarsDecimals) + "/" + XpEstimate.abbrevXp(need, s.levelBarsDecimals) + "xp";
+            }
             fraction[rows++] = p.experienceProgress;
         }
         if (s.levelBarsLocation && at != null) {
@@ -66,7 +70,7 @@ public final class LevelBars {
             boolean max = level >= Power.MAX_LEVEL;
             label[rows] = SHORT.getOrDefault(loc.id(), loc.name()) + " [" + level + "]";
             number[rows] = LOCATION_LEVEL;
-            extra[rows] = !s.levelBarsXp ? "" : max ? "max" : XpEstimate.abbrevXp(next - at[1]) + "/" + XpEstimate.abbrevXp(next) + "lxp";
+            extra[rows] = !s.levelBarsXp ? "" : max ? "max" : XpEstimate.abbrevXp(next - at[1], s.levelBarsDecimals) + "/" + XpEstimate.abbrevXp(next, s.levelBarsDecimals) + "lxp";
             fraction[rows++] = max ? 1 : (next - at[1]) / next;
         } else if (s.levelBarsLocation && preview) {
             label[rows++] = "open /comp";

@@ -135,6 +135,8 @@ public class TackleboxSettings {
     public boolean levelBarsBar = true;
     public boolean levelBarsPercent = true;
     public boolean levelBarsXp = true;
+    public boolean levelBarsDecimals = true;
+    public boolean levelBarsMainXp = false;
     public int levelBarsWidth = 80;
     public HudAlign levelBarsAlign = HudAlign.LEFT;
     /** The active boosts hud (hud/BoostsHud): boosters, chummer, weather events and moon, where it sits. */

@@ -206,7 +206,25 @@ public final class XpEstimate {
 
     /** 3350 as "3.35K", for the xp shown next to the location bar. */
     public static String abbrevXp(double v) {
-        return v >= 1_000_000 ? String.format(Locale.ROOT, "%.2fM", v / 1_000_000) : v >= 1000 ? String.format(Locale.ROOT, "%.2fK", v / 1000) : String.valueOf((long) v);
+        return abbrevXp(v, true);
+    }
+
+    /** Like {@link #abbrevXp(double)}; without decimals 367270 reads "367K", millions keep one place ("1.5M"). */
+    public static String abbrevXp(double v, boolean decimals) {
+        return v >= 1_000_000 ? String.format(Locale.ROOT, decimals ? "%.2fM" : "%.1fM", v / 1_000_000)
+                : v >= 1000 ? String.format(Locale.ROOT, decimals ? "%.2fK" : "%.0fK", v / 1000) : String.valueOf((long) v);
+    }
+
+    /** Xp the current fishing level takes, from the /menu profile or the learned table, or null while unknown. */
+    public static Double levelNeed() {
+        ClientPlayerEntity p = MinecraftClient.getInstance().player;
+        if (p == null) {
+            return null;
+        }
+        if (profile != null && p.experienceLevel == (int) profile[0]) {
+            return profile[1];
+        }
+        return TackleboxSettings.get().need.get(String.valueOf(p.experienceLevel));
     }
 
     /** Quests until the next fishing level, like "~12", or null while it is not known yet. */

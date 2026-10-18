@@ -467,6 +467,10 @@ public final class SettingsPages {
                 () -> s.levelBarsPercent, v -> s.levelBarsPercent = v);
         toggle("level progress location xp", "the location xp into the level over what it needs, after the location bar.",
                 () -> s.levelBarsXp, v -> s.levelBarsXp = v);
+        toggle("level progress main xp", "the xp into the fishing level over what it needs, after the fishing bar.",
+                () -> s.levelBarsMainXp, v -> s.levelBarsMainXp = v);
+        toggle("level progress decimals", "decimal places in the location xp, 367K instead of 367.27K.",
+                () -> s.levelBarsDecimals, v -> s.levelBarsDecimals = v);
         slider("level progress bar width", "how long the bars are, in pixels.", 40, 200, 10, "",
                 () -> s.levelBarsWidth, v -> s.levelBarsWidth = (int) v);
         cycle("level progress align", "how the text of the level progress hud lines up inside it: left, centre or right.",
