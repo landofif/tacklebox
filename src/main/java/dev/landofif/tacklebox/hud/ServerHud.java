@@ -355,7 +355,7 @@ public final class ServerHud {
             }
             case "frenzy" -> {
                 long now = System.currentTimeMillis();
-                out.add(plain(row("Fish Frenzy: ", FrenzySchedule.describe(now, BoostsHud.frenzyLeft(now), BoostsHud.frenzyPlace(), ServerHud::clock), Formatting.YELLOW)));
+                out.add(plain(row("Frenzy: ", FrenzySchedule.describe(now, BoostsHud.frenzyLeft(now), BoostsHud.frenzyPlace(), BoostsHud.frenzySeen(), ServerHud::clock), Formatting.YELLOW)));
             }
             case "weather" -> { // every active event gets its own line, in its colour, with what it does
                 for (Map.Entry<String, Object[]> e : EVENTS.entrySet()) {

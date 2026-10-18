@@ -41,12 +41,18 @@ public final class BoostsHud {
     private static String chummerBonus = "";
     private static long frenzyEnd;
     private static String frenzyPlace = "";
+    private static long frenzySeen;
 
     private BoostsHud() {}
 
     /** Milliseconds left of the frenzy the chat announced, 0 when none is running. */
     static long frenzyLeft(long now) {
         return Math.max(0, frenzyEnd - now);
+    }
+
+    /** When the chat last announced a frenzy, 0 if never. */
+    static long frenzySeen() {
+        return frenzySeen;
     }
 
     static String frenzyPlace() {
@@ -59,6 +65,7 @@ public final class BoostsHud {
         EventLines.Frenzy frenzy = EventLines.frenzy(s);
         if (frenzy != null) {
             frenzyEnd = now + frenzy.remainingMs();
+            frenzySeen = now;
             frenzyPlace = frenzy.place();
             return;
         }

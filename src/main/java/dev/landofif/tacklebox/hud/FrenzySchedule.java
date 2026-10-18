@@ -14,8 +14,11 @@ final class FrenzySchedule {
     static final ZoneId ZONE = ZoneId.of("Europe/Berlin");
     private static final int WINDOW_HOURS = 2, CYCLE_HOURS = 3;
 
-    /** {@code open}: inside the spawn window, {@code ms} is the time until it closes; else until the next window opens. */
-    record State(boolean open, long ms) {}
+    /**
+     * {@code open}: inside the spawn window, {@code ms} is the time until it closes; else until the next window opens.
+     * {@code startMs} is when the current cycle began, {@code nextMs} the time until the next one begins.
+     */
+    record State(boolean open, long ms, long startMs, long nextMs) {}
 
     private FrenzySchedule() {}
 
@@ -24,18 +27,26 @@ final class FrenzySchedule {
         LocalDateTime hour = local.truncatedTo(ChronoUnit.HOURS);
         LocalDateTime start = hour.minusHours((hour.getHour() + 2) % CYCLE_HOURS); // hours 1, 4, 7 ... are cycle starts
         Instant windowEnd = start.plusHours(WINDOW_HOURS).atZone(ZONE).toInstant();
+        long startMs = start.atZone(ZONE).toInstant().toEpochMilli();
+        long nextMs = start.plusHours(CYCLE_HOURS).atZone(ZONE).toInstant().toEpochMilli() - now.toEpochMilli();
         if (now.isBefore(windowEnd)) {
-            return new State(true, windowEnd.toEpochMilli() - now.toEpochMilli());
+            return new State(true, windowEnd.toEpochMilli() - now.toEpochMilli(), startMs, nextMs);
         }
-        return new State(false, start.plusHours(CYCLE_HOURS).atZone(ZONE).toInstant().toEpochMilli() - now.toEpochMilli());
+        return new State(false, nextMs, startMs, nextMs);
     }
 
-    /** The value of the server hud line: the frenzy the chat announced, else the window state. {@code clock} writes a duration. */
-    static String describe(long now, long activeLeft, String place, LongFunction<String> clock) {
+    /**
+     * The value of the server hud line: the frenzy the chat announced, else the window state. A window that already had its
+     * frenzy ({@code seenAt} falls inside it) counts down to the next one instead. {@code clock} writes a duration.
+     */
+    static String describe(long now, long activeLeft, String place, long seenAt, LongFunction<String> clock) {
         if (activeLeft > 0) {
             return place + " " + clock.apply(activeLeft);
         }
         State s = at(Instant.ofEpochMilli(now));
-        return s.open() ? "may spawn, " + clock.apply(s.ms()) + " left" : "next window in " + clock.apply(s.ms());
+        if (s.open() && seenAt < s.startMs()) {
+            return "spawn? " + clock.apply(s.ms());
+        }
+        return "in " + clock.apply(s.nextMs());
     }
 }
