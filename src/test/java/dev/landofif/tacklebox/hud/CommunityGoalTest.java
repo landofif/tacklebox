@@ -38,6 +38,15 @@ class CommunityGoalTest {
     }
 
     @Test
+    void roundingBetweenChatAndBarIsNotAReset() {
+        CommunityGoal.restore(22400, 100000, 0);
+        CommunityGoal.onChat(Matcher.normalize("Community Catches: 22.41K/100k"));
+        CommunityGoal.onChat(Matcher.normalize("Your Catches Contribution: 319"));
+        assertTrue(CommunityGoal.onBar("Community Goal: 22.4K/100K Catches", 1000));
+        assertEquals(319, CommunityGoal.mine());
+    }
+
+    @Test
     void ignoresOtherBars() {
         assertFalse(CommunityGoal.onBar("12:30 PM 21° Kenai River", 0));
     }

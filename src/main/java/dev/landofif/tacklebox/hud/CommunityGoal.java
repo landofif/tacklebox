@@ -17,6 +17,9 @@ public final class CommunityGoal {
     /** The bar is read every half second; it counts as up while it was seen this recently. */
     private static final long BAR_MS = 3000;
 
+    /** The bar and the chat round to 10 or 100 catches (22.4K and 22.41K); a drop this small is not a new goal. */
+    private static final long ROUNDING = 200;
+
     private static long current = -1, goal = -1, mine, seenAt;
 
     private CommunityGoal() {}
@@ -46,7 +49,7 @@ public final class CommunityGoal {
         if (c < 0 || g < 0) {
             return false;
         }
-        if (c < current) {
+        if (c < current - ROUNDING) {
             mine = 0;
         }
         current = c;
@@ -65,10 +68,10 @@ public final class CommunityGoal {
         m = CATCHES.matcher(line);
         if (m.find()) {
             long c = parse(m.group(1));
-            if (c >= 0 && c < current) {
+            if (c >= 0 && c < current - ROUNDING) {
                 mine = 0; // the goal was reset; the contribution line that follows sets the real number
-            }
-            if (c >= 0) {
+                current = c;
+            } else if (c > current) {
                 current = c;
             }
             long g = parse(m.group(2));
