@@ -41,6 +41,7 @@ abstract class InGameHudOverlayMixin {
 
     @Inject(method = "setTitle", at = @At("HEAD"), cancellable = true)
     private void tacklebox$title(Text title, CallbackInfo ci) {
+        dev.landofif.tacklebox.display.BiteFocus.onTitle(title);
         if (dev.landofif.tacklebox.display.BobberTimer.onTitle(title)) {
             ci.cancel();
         }

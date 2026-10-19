@@ -309,6 +309,8 @@ public class TackleboxSettings {
     public BiteAnim biteAnim = BiteAnim.POP;
     /** Hide the servers own BITE! title while the notification is on. */
     public boolean biteHideTitle = true;
+    /** Focus the game window through hyprctl on a bite (display/BiteFocus). Hyprland only. */
+    public boolean biteFocus = false;
 
     public enum TimerMode {
         OFF("off"), HUD("hud"), BOBBER("on the bobber"), BOTH("both");

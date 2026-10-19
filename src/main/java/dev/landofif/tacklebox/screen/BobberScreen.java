@@ -65,6 +65,7 @@ public class BobberScreen extends TackleboxScreen {
         toggle(list, rw, "text shadow", () -> s.biteShadow, v -> s.biteShadow = v);
         color(list, rw, "colour", "bite colour", () -> s.biteColor, v -> s.biteColor = v);
         toggle(list, rw, "hide server title", () -> s.biteHideTitle, v -> s.biteHideTitle = v);
+        toggle(list, rw, "focus window on bite", () -> s.biteFocus, v -> s.biteFocus = v);
 
         int half = (w - 4) / 2;
         addDrawableChild(ButtonWidget.builder(Foe.text("test bite"), b -> BobberTimer.testBite()).dimensions(10, height - 52, half, 20).build());
