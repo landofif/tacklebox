@@ -524,6 +524,8 @@ public final class SettingsPages {
                 () -> s.hideLoginChat, v -> s.hideLoginChat = v);
         toggle("hide empty lines", "hides chat lines with nothing in them, the blank gaps the server sends around some messages. announcements lose their spacing lines too.",
                 () -> s.hideEmptyChat, v -> s.hideEmptyChat = v);
+        toggle("hide huds behind chat", "huds that would sit under the chat, a chat box or the player list are hidden while they overlap. off by default.",
+                () -> s.hideBehindChat, v -> s.hideBehindChat = v);
     }
 
     private void world() {

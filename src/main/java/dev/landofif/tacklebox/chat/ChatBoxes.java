@@ -225,7 +225,7 @@ public final class ChatBoxes {
 
     // ------------------------------------------------------------------ drawing
 
-    private static boolean chatOpen() {
+    public static boolean chatOpen() {
         return MinecraftClient.getInstance().currentScreen instanceof ChatScreen;
     }
 
@@ -235,18 +235,21 @@ public final class ChatBoxes {
         if (client.options.hudHidden || client.options.getChatVisibility().getValue() == ChatVisibility.HIDDEN) {
             return;
         }
-        boolean open = chatOpen();
-        long now = System.currentTimeMillis();
         for (ChatBox box : boxes()) {
             if (box == null || !box.enabled) {
                 continue;
             }
-            State st = state(box);
-            if (!open && (st.lines.isEmpty() || (box.fadeSeconds > 0 && now - st.lastAt > box.fadeSeconds * 1000L))) {
+            if (!shows(box)) {
                 continue;
             }
             draw(ctx, box, false);
         }
+    }
+
+    /** True when the box draws something right now: it has lines that have not faded, or chat is open. */
+    public static boolean shows(ChatBox box) {
+        State st = state(box);
+        return chatOpen() || !(st.lines.isEmpty() || (box.fadeSeconds > 0 && System.currentTimeMillis() - st.lastAt > box.fadeSeconds * 1000L));
     }
 
     /** Draws one box and returns its rectangle. {@code highlight} outlines it (the move screen). */

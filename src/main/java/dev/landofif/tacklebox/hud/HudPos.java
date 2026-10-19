@@ -65,6 +65,9 @@ public final class HudPos {
 
     /** Draws a hud where this puts it: {@code draw} gets the top left corner and returns the hud's {x, y, w, h}, or null when nothing shows. */
     public int[] draw(int sw, int sh, BiFunction<Integer, Integer, int[]> draw) {
+        if (HudCover.covered(left(sw), top(sh), w, h)) {
+            return null;
+        }
         int[] r = draw.apply(left(sw), top(sh));
         if (r != null) {
             measure(sw, sh, r[2], r[3]);
