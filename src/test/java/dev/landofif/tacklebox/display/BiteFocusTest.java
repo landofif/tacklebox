@@ -26,6 +26,6 @@ class BiteFocusTest {
 
     @Test
     void focusesByTitleOnly() {
-        assertEquals(List.of("hyprctl", "dispatch", "focuswindow", "title:^Minecraft"), BiteFocus.COMMAND);
+        assertEquals(List.of("hyprctl", "dispatch", "hl.dsp.focus({ window = 'title:^(Minecraft).*' })"), BiteFocus.COMMAND);
     }
 }

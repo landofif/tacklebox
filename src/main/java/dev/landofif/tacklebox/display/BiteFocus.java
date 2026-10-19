@@ -8,12 +8,12 @@ import java.util.List;
 
 /**
  * Asks Hyprland to focus the game window when the server's BITE! title arrives, so the player can
- * switch back in time. Only focuses; every fishing input stays with the player. The window has no
+ * switch back in time. Hyprland 0.56 reads dispatch as Lua and matches the whole title. Only focuses; every fishing input stays with the player. The window has no
  * class under Prism, so it is matched by title.
  */
 public final class BiteFocus {
     static final long COOLDOWN_MS = 2000;
-    static final List<String> COMMAND = List.of("hyprctl", "dispatch", "focuswindow", "title:^Minecraft");
+    static final List<String> COMMAND = List.of("hyprctl", "dispatch", "hl.dsp.focus({ window = 'title:^(Minecraft).*' })");
 
     private static long lastFocus;
 
