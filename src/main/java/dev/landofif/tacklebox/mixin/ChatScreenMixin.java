@@ -75,6 +75,13 @@ abstract class ChatScreenMixin extends Screen {
         }
     }
 
+    /** Vanilla chat resets its own scroll when the screen closes; the boxes (and a send that keeps the screen open) follow here. */
+    @Inject(method = {"removed", "sendMessage"}, at = @At("HEAD"))
+    private void tacklebox$toBottom(CallbackInfo ci) {
+        ChatBoxes.scrollToBottom();
+        client.inGameHud.getChatHud().resetScroll();
+    }
+
     @Inject(method = "mouseScrolled", at = @At("HEAD"), cancellable = true)
     private void tacklebox$boxScroll(double mouseX, double mouseY, double horizontal, double vertical, CallbackInfoReturnable<Boolean> cir) {
         if (ChatBoxes.scroll(mouseX, mouseY, vertical)) {

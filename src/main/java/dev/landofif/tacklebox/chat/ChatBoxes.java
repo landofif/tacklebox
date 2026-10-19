@@ -360,6 +360,13 @@ public final class ChatBoxes {
         st.shown = st.scroll;
     }
 
+    /** Closing the chat or sending a message brings every box back to its newest line. */
+    public static void scrollToBottom() {
+        for (State st : STATE.values()) {
+            st.scroll = 0;
+        }
+    }
+
     public static boolean scroll(double mx, double my, double amount) {
         ChatBox box = at(mx, my);
         if (box == null || amount == 0) {
