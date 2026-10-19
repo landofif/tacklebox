@@ -196,6 +196,9 @@ public final class ChatBoxes {
             List<Text> from = new ArrayList<>();
             List<Long> at = new ArrayList<>();
             for (Line line : st.lines) {
+                if (ChatSearch.hides(line.text())) {
+                    continue;
+                }
                 for (OrderedText part : tr.wrapLines(line.text(), textW)) {
                     out.add(part);
                     from.add(line.text());
@@ -358,6 +361,14 @@ public final class ChatBoxes {
         float frac = Math.max(0, Math.min(1, 1 - ((float) my - dragGrab - b[1]) / range));
         st.scroll = Math.round(frac * (b[4] - b[5]));
         st.shown = st.scroll;
+    }
+
+    /** The search text changed: every box wraps again with only the lines that match. */
+    public static void refilter() {
+        for (State st : STATE.values()) {
+            st.version++;
+            st.scroll = 0;
+        }
     }
 
     /** Closing the chat or sending a message brings every box back to its newest line. */

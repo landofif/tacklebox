@@ -5,6 +5,7 @@ import dev.landofif.tacklebox.ui.Foe;
 import dev.landofif.tacklebox.chat.ChatBoxes;
 import dev.landofif.tacklebox.chat.ChatCopy;
 import dev.landofif.tacklebox.chat.ChatFilter;
+import dev.landofif.tacklebox.chat.ChatSearch;
 import dev.landofif.tacklebox.chat.ChatTimes;
 import dev.landofif.tacklebox.screen.ChatFilterScreen;
 import dev.landofif.tacklebox.trigger.Matcher;
@@ -66,12 +67,36 @@ abstract class ChatScreenMixin extends Screen {
         ChatBoxes.dragBar(mouseY, held);
     }
 
-    /** ctrl + f searches the whole chat history. */
+    @Shadow
+    protected net.minecraft.client.gui.widget.TextFieldWidget chatField;
+
+    /** ctrl + f turns the chat box into a search: only messages containing what you type stay visible. */
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void tacklebox$search(net.minecraft.client.input.KeyInput input, CallbackInfoReturnable<Boolean> cir) {
         if (input.key() == org.lwjgl.glfw.GLFW.GLFW_KEY_F && input.hasCtrl()) {
-            client.setScreen(new dev.landofif.tacklebox.screen.ChatSearchScreen(this));
+            if (!ChatSearch.toggle(chatField.getText())) {
+                chatField.setText("");
+            }
             cir.setReturnValue(true);
+        } else if (ChatSearch.active() && (input.key() == org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER || input.key() == org.lwjgl.glfw.GLFW.GLFW_KEY_KP_ENTER)) {
+            cir.setReturnValue(true);
+        }
+    }
+
+    @Inject(method = "onChatFieldUpdate", at = @At("HEAD"))
+    private void tacklebox$searchTyped(String text, CallbackInfo ci) {
+        ChatSearch.typed(text);
+    }
+
+    @Inject(method = "removed", at = @At("HEAD"))
+    private void tacklebox$searchLeave(CallbackInfo ci) {
+        ChatSearch.leave();
+    }
+
+    @Inject(method = "render", at = @At("TAIL"))
+    private void tacklebox$searchHint(DrawContext ctx, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (ChatSearch.active()) {
+            ctx.drawText(textRenderer, Foe.text("search · ctrl f to leave").withColor(Foe.DIM & 0xFFFFFF), 4, height - 26, 0xFFFFFFFF, false);
         }
     }
 

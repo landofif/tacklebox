@@ -125,6 +125,14 @@ abstract class ChatHudMixin {
     private void tacklebox$noThumb(ChatHud.Backend backend, int x1, int y1, int x2, int y2, int color, Operation<Void> original) {
     }
 
+    /** ctrl + f search: messages that do not match never become visible lines (refresh() rebuilds them when it ends). */
+    @Inject(method = "addVisibleMessage", at = @At("HEAD"), cancellable = true)
+    private void tacklebox$searchHide(net.minecraft.client.gui.hud.ChatHudLine line, CallbackInfo ci) {
+        if (dev.landofif.tacklebox.chat.ChatSearch.hides(line.content())) {
+            ci.cancel();
+        }
+    }
+
     @org.spongepowered.asm.mixin.Unique
     private int tacklebox$before;
 
