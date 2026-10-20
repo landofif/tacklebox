@@ -44,14 +44,14 @@ abstract class EntityRenderManagerMixin {
 
         if (entity instanceof net.minecraft.entity.decoration.DisplayEntity) {
             if (OtherBobbers.hideDisplays
-                    || DisplayCull.hidden(TackleboxSettings.World.hideFarDisplays, entity.squaredDistanceTo(x, y, z), TackleboxSettings.World.farDisplayRange)) {
+                    || DisplayCull.hidden(s.hideFarDisplays, entity.squaredDistanceTo(x, y, z), s.farDisplayRange)) {
                 cir.setReturnValue(false);
                 return;
             }
         }
 
-        boolean nametags = TackleboxSettings.World.hideOwnNametag || TackleboxSettings.World.hideAllNametags;
-        if (!nametags && !TackleboxSettings.World.hideXpPopups) {
+        boolean nametags = s.hideOwnNametag || s.hideAllNametags;
+        if (!nametags && !s.hideXpPopups) {
             return;
         }
         Holograms.Cached c = Holograms.classify(entity);
@@ -59,7 +59,7 @@ abstract class EntityRenderManagerMixin {
             return;
         }
         if (c.xpPopup) {
-            if (TackleboxSettings.World.hideXpPopups) {
+            if (s.hideXpPopups) {
                 cir.setReturnValue(false);
             }
             return;
@@ -67,11 +67,11 @@ abstract class EntityRenderManagerMixin {
         if (!nametags || c.xpSegment || self == null) {
             return; // a catch summary that mentions xp stays
         }
-        if (TackleboxSettings.World.hideAllNametags && isAboveAnyPlayer(entity, self)) {
+        if (s.hideAllNametags && isAboveAnyPlayer(entity, self)) {
             cir.setReturnValue(false);
             return;
         }
-        if (!TackleboxSettings.World.hideOwnNametag) {
+        if (!s.hideOwnNametag) {
             return;
         }
         if (Holograms.isKnownOwnNametag(entity)) {

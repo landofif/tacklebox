@@ -26,7 +26,7 @@ abstract class InGameHudHotbarMixin {
     private void tacklebox$move(DrawContext ctx, RenderTickCounter tick, Operation<Void> original) {
         TackleboxSettings s = TackleboxSettings.get();
         ctx.getMatrices().pushMatrix();
-        float k = TackleboxSettings.Huds.hotbarScale / 100f;
+        float k = s.hotbarScale / 100f;
         int cx = ctx.getScaledWindowWidth() / 2;
         int bottom = ctx.getScaledWindowHeight();
         ctx.getMatrices().translate(cx + s.hotbarX, bottom + s.hotbarY); // grows from the bottom middle
@@ -43,16 +43,16 @@ abstract class InGameHudHotbarMixin {
         String path = id.getPath();
         int mid = ctx.getScaledWindowWidth() / 2;
         int pitch = s.hotbarPitch();
-        if (path.equals("hud/hotbar") && TackleboxSettings.Huds.hotbarLook != TackleboxSettings.BoxLook.DEFAULT) {
-            if (TackleboxSettings.Huds.hotbarLook != TackleboxSettings.BoxLook.OFF) { // our own box, as wide as the slots are spaced
-                SlotBox.draw(ctx, mid - 4 * pitch - 11, y, mid + 4 * pitch + 11, y + h, TackleboxSettings.Huds.hotbarLook);
+        if (path.equals("hud/hotbar") && s.hotbarLook != TackleboxSettings.BoxLook.DEFAULT) {
+            if (s.hotbarLook != TackleboxSettings.BoxLook.OFF) { // our own box, as wide as the slots are spaced
+                SlotBox.draw(ctx, mid - 4 * pitch - 11, y, mid + 4 * pitch + 11, y + h, s.hotbarLook);
             }
             return;
         }
-        if (path.startsWith("hud/hotbar_offhand") && !TackleboxSettings.Huds.hotbarOffhand) {
+        if (path.startsWith("hud/hotbar_offhand") && !s.hotbarOffhand) {
             return;
         }
-        if (path.startsWith("hud/hotbar_selection") && TackleboxSettings.Huds.hotbarSelection == TackleboxSettings.SelectionStyle.HYPR) {
+        if (path.startsWith("hud/hotbar_selection") && s.hotbarSelection == TackleboxSettings.SelectionStyle.HYPR) {
             HotbarSelection.draw(ctx, (int) Math.round((x + w / 2.0 - (mid - 80)) / 20.0), mid, pitch, y + 1);
             return;
         }
@@ -60,10 +60,10 @@ abstract class InGameHudHotbarMixin {
             int slot = (int) Math.round((x + w / 2.0 - (mid - 80)) / 20.0);
             x += (slot - 4) * (pitch - 20);
         }
-        if (path.startsWith("hud/hotbar_selection") && TackleboxSettings.Huds.hotbarSelection != TackleboxSettings.SelectionStyle.FRAME) {
-            int color = 0xFF000000 | TackleboxSettings.Huds.hotbarSelectColor;
+        if (path.startsWith("hud/hotbar_selection") && s.hotbarSelection != TackleboxSettings.SelectionStyle.FRAME) {
+            int color = 0xFF000000 | s.hotbarSelectColor;
             double cx = x + w / 2.0, cy = y + h / 2.0;
-            if (TackleboxSettings.Huds.hotbarSelection == TackleboxSettings.SelectionStyle.ROUND) {
+            if (s.hotbarSelection == TackleboxSettings.SelectionStyle.ROUND) {
                 double outer = 9.5, inner = 8;
                 for (int row = (int) -outer; row <= outer; row++) {
                     double dy = row + 0.5;
@@ -77,7 +77,7 @@ abstract class InGameHudHotbarMixin {
                         ctx.fill((int) Math.round(cx + hi), py, (int) Math.round(cx + ho), py + 1, color);
                     }
                 }
-            } else if (TackleboxSettings.Huds.hotbarSelection == TackleboxSettings.SelectionStyle.SIMPLE) {
+            } else if (s.hotbarSelection == TackleboxSettings.SelectionStyle.SIMPLE) {
                 ctx.fill((int) cx - 8, y + h - 3, (int) cx + 8, y + h - 1, color);
             }
             return;
@@ -103,7 +103,7 @@ abstract class InGameHudHotbarMixin {
     @Inject(method = "renderHotbarItem", at = @At("HEAD"))
     private void tacklebox$circle(DrawContext ctx, int x, int y, RenderTickCounter tick, PlayerEntity player, ItemStack stack, int seed, CallbackInfo ci) {
         // the first and last slot are always full, nothing special
-        if (TackleboxSettings.Menus.rarityCircles && stack != player.getInventory().getStack(0) && stack != player.getInventory().getStack(8)) {
+        if (TackleboxSettings.get().rarityCircles && stack != player.getInventory().getStack(0) && stack != player.getInventory().getStack(8)) {
             FoeRarity.circle(ctx, x, y, stack);
         }
     }

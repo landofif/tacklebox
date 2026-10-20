@@ -27,7 +27,7 @@ public final class FlatLeaves {
 
     public static void register() {
         ModelLoadingPlugin.register(plugin -> plugin.modifyBlockModelOnLoad().register((model, context) -> {
-            if (!TackleboxSettings.World.flatLeaves) {
+            if (!TackleboxSettings.get().flatLeaves) {
                 return model;
             }
             // no BlockTags.LEAVES: tags arent loaded yet during the startup model bake

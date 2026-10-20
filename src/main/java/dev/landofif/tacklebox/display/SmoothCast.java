@@ -20,7 +20,7 @@ public final class SmoothCast {
     private SmoothCast() {}
 
     public static boolean suppress(Entity entity) {
-        if (entity == null || !(entity instanceof FishingBobberEntity) || !TackleboxSettings.Bobber.smoothCast) {
+        if (entity == null || !(entity instanceof FishingBobberEntity) || !TackleboxSettings.get().smoothCast) {
             return false;
         }
         ClientPlayerEntity player = MinecraftClient.getInstance().player;

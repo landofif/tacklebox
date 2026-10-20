@@ -22,7 +22,7 @@ abstract class TextFieldWidgetMixin extends ClickableWidget {
 
     @WrapOperation(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawGuiTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIII)V"), require = 0)
     private void tacklebox$roundedField(DrawContext ctx, RenderPipeline pipeline, Identifier id, int x, int y, int w, int h, Operation<Void> original) {
-        if (!TackleboxSettings.Menus.flatButtons) {
+        if (!TackleboxSettings.get().flatButtons) {
             original.call(ctx, pipeline, id, x, y, w, h);
             return;
         }

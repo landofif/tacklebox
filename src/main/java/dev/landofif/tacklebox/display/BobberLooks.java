@@ -24,7 +24,7 @@ public final class BobberLooks {
     /** The layer (texture) for the bobber being drawn right now. */
     public static RenderLayer bobberLayer() {
         TackleboxSettings s = TackleboxSettings.get();
-        TackleboxSettings.BobberSkin skin = drawingMine || TackleboxSettings.Bobber.skinEveryone ? TackleboxSettings.Bobber.bobberSkin : TackleboxSettings.BobberSkin.DEFAULT;
+        TackleboxSettings.BobberSkin skin = drawingMine || s.skinEveryone ? s.bobberSkin : TackleboxSettings.BobberSkin.DEFAULT;
         RenderLayer layer = LAYERS.computeIfAbsent(skin, k -> RenderLayers.entityCutout(k.texture == null
                 ? VANILLA
                 : Identifier.of("tacklebox", "textures/entity/bobber/" + k.texture + ".png")));
@@ -35,10 +35,10 @@ public final class BobberLooks {
     /** Wraps the fishing line drawing so your line uses your colour. The bobber itself is left alone. */
     public static OrderedRenderCommandQueue.Custom wrap(RenderLayer layer, OrderedRenderCommandQueue.Custom custom) {
         TackleboxSettings s = TackleboxSettings.get();
-        if (!drawingMine || !TackleboxSettings.Bobber.customLineColor || layer == lastBobberLayer) {
+        if (!drawingMine || !s.customLineColor || layer == lastBobberLayer) {
             return custom;
         }
-        int argb = 0xFF000000 | TackleboxSettings.Bobber.lineColor;
+        int argb = 0xFF000000 | s.lineColor;
         return (entry, consumer) -> custom.render(entry, new Recolor(consumer, argb));
     }
 

@@ -360,10 +360,10 @@ public class FishMenuScreen extends TackleboxScreen {
         ctx.getMatrices().scale(scale, scale);
         float w = cellW / scale, h = cellH / scale;
         TackleboxSettings cfg = TackleboxSettings.get();
-        if (TackleboxSettings.Menus.menuAccent) {
+        if (cfg.menuAccent) {
             int iw = (int) w, ih = (int) h;
             int gx = Math.round((gridX - x) / scale), gw = Math.round(cols * cellW / scale); // one gradient across the whole grid
-            Hypr.rrect(ctx, 0, 0, iw, ih, 0, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), gx, gw, TackleboxSettings.Menus.menuAccentOpacity / 100f), 8);
+            Hypr.rrect(ctx, 0, 0, iw, ih, 0, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), gx, gw, cfg.menuAccentOpacity / 100f), 8);
             if (hot) {
                 Hypr.ring(ctx, 0, 0, iw, ih, 0, 1, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), gx, gw, 1), 8);
             }
@@ -513,6 +513,6 @@ public class FishMenuScreen extends TackleboxScreen {
 
     @Override
     protected int sizePct() {
-        return TackleboxSettings.Menus.menuSize;
+        return TackleboxSettings.get().menuSize;
     }
 }

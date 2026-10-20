@@ -17,7 +17,7 @@ abstract class PlayerNameLabelMixin {
     @Inject(method = "renderLabelIfPresent", at = @At("HEAD"), cancellable = true)
     private void tacklebox$hideLabel(PlayerEntityRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue,
                                        CameraRenderState camera, CallbackInfo ci) {
-        if (TackleboxSettings.World.hideAllNametags) {
+        if (TackleboxSettings.get().hideAllNametags) {
             ci.cancel();
         }
     }

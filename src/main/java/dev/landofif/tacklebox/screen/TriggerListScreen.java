@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Every trigger as a tile (the settings screen look, now only the mod screens carry it). Click the dot to switch one on or off, the name to edit
+ * Every trigger as a tile (the look of {@link SettingsScreen}). Click the dot to switch one on or off, the name to edit
  * it, the arrows to reorder, share to copy a code, the red dot to delete. New, import, reload and done are in the bar below.
  */
 public class TriggerListScreen extends Screen {

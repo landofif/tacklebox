@@ -15,7 +15,7 @@ public final class OtherBobbers {
     /** True for a bobber that is not yours while the setting is on. */
     public static boolean hidden(Entity entity) {
         return entity instanceof FishingBobberEntity bobber
-                && hides(TackleboxSettings.Bobber.hideOtherBobbers, bobber.getPlayerOwner(), MinecraftClient.getInstance().player);
+                && hides(TackleboxSettings.get().hideOtherBobbers, bobber.getPlayerOwner(), MinecraftClient.getInstance().player);
     }
 
     static boolean hides(boolean setting, Object owner, Object self) {

@@ -55,48 +55,48 @@ public final class LevelBars {
         String[] extra = {"", ""};
         int[] number = new int[2]; // colour of the level inside the brackets, 0 = same as the label
         int rows = 0;
-        if (TackleboxSettings.Huds.levelBarsFishing) {
+        if (s.levelBarsFishing) {
             label[rows] = "level [" + p.experienceLevel + "]";
             number[rows] = LevelColor.of(p.experienceLevel);
-            Double need = TackleboxSettings.Huds.levelBarsMainXp ? XpEstimate.levelNeed() : null;
+            Double need = s.levelBarsMainXp ? XpEstimate.levelNeed() : null;
             if (need != null) {
-                extra[rows] = XpEstimate.abbrevXp(p.experienceProgress * need, TackleboxSettings.Huds.levelBarsDecimals) + "/" + XpEstimate.abbrevXp(need, TackleboxSettings.Huds.levelBarsDecimals) + "xp";
+                extra[rows] = XpEstimate.abbrevXp(p.experienceProgress * need, s.levelBarsDecimals) + "/" + XpEstimate.abbrevXp(need, s.levelBarsDecimals) + "xp";
             }
             fraction[rows++] = p.experienceProgress;
         }
-        if (TackleboxSettings.Huds.levelBarsLocation && at != null) {
+        if (s.levelBarsLocation && at != null) {
             int level = (int) at[0];
             double next = XpEstimate.need(level + 1);
             boolean max = level >= Power.MAX_LEVEL;
             label[rows] = SHORT.getOrDefault(loc.id(), loc.name()) + " [" + level + "]";
             number[rows] = LOCATION_LEVEL;
-            extra[rows] = !TackleboxSettings.Huds.levelBarsXp ? "" : max ? "max" : XpEstimate.abbrevXp(next - at[1], TackleboxSettings.Huds.levelBarsDecimals) + "/" + XpEstimate.abbrevXp(next, TackleboxSettings.Huds.levelBarsDecimals) + "lxp";
+            extra[rows] = !s.levelBarsXp ? "" : max ? "max" : XpEstimate.abbrevXp(next - at[1], s.levelBarsDecimals) + "/" + XpEstimate.abbrevXp(next, s.levelBarsDecimals) + "lxp";
             fraction[rows++] = max ? 1 : (next - at[1]) / next;
-        } else if (TackleboxSettings.Huds.levelBarsLocation && preview) {
+        } else if (s.levelBarsLocation && preview) {
             label[rows++] = "open /comp";
         }
         if (rows == 0) {
             return preview ? new int[]{s.levelBarsX, s.levelBarsY, 100, 20} : null;
         }
-        int bar = TackleboxSettings.Huds.levelBarsBar ? TackleboxSettings.Huds.levelBarsWidth : 0, top = s.levelBarsY + (TackleboxSettings.Huds.levelBarsHeading ? 20 : 4);
-        int barSpan = TackleboxSettings.Huds.levelBarsBar ? bar + 6 : 0;
+        int bar = s.levelBarsBar ? s.levelBarsWidth : 0, top = s.levelBarsY + (s.levelBarsHeading ? 20 : 4);
+        int barSpan = s.levelBarsBar ? bar + 6 : 0;
         int labelW = 0, extraW = 0;
         for (int i = 0; i < rows; i++) {
             labelW = Math.max(labelW, tr.getWidth(ServerHud.title(label[i])));
             extraW = Math.max(extraW, tr.getWidth(extra[i]));
         }
-        int pctW = TackleboxSettings.Huds.levelBarsPercent ? tr.getWidth("100%") + 6 : 0;
+        int pctW = s.levelBarsPercent ? tr.getWidth("100%") + 6 : 0;
         int boxW = 8 + labelW + 6 + barSpan + pctW + extraW + 8;
-        if (TackleboxSettings.Huds.levelBarsHeading) {
-            Foe.title(ctx, s.levelBarsX, s.levelBarsY, boxW, TackleboxSettings.Huds.levelBarsAlign, Foe.text("level progress"));
+        if (s.levelBarsHeading) {
+            Foe.title(ctx, s.levelBarsX, s.levelBarsY, boxW, s.levelBarsAlign, Foe.text("level progress"));
         }
         for (int i = 0; i < rows; i++) {
             int y = top + i * 12, x = s.levelBarsX + 8;
             double f = Math.max(0, Math.min(1, fraction[i]));
             String name = ServerHud.title(label[i]);
-            drawLabel(ctx, tr, name, TackleboxSettings.Huds.levelBarsAlign.x(x, labelW, tr.getWidth(name)), y, number[i]);
+            drawLabel(ctx, tr, name, s.levelBarsAlign.x(x, labelW, tr.getWidth(name)), y, number[i]);
             int bx = x + labelW + 6;
-            if (TackleboxSettings.Huds.levelBarsBar) {
+            if (s.levelBarsBar) {
                 ctx.fill(bx, y + 3, bx + bar, y + 5, Foe.FAINT);
                 int fillW = (int) (bar * f);
                 for (int c = 0; c < fillW; c++) {
@@ -104,7 +104,7 @@ public final class LevelBars {
                 }
             }
             int px = bx + barSpan;
-            if (TackleboxSettings.Huds.levelBarsPercent) {
+            if (s.levelBarsPercent) {
                 String pct = (int) (f * 100) + "%"; // cut, so 99.9% never reads as done
                 ctx.drawTextWithShadow(tr, pct, px + pctW - 6 - tr.getWidth(pct), y, Foe.TEXT);
             }
@@ -128,7 +128,7 @@ public final class LevelBars {
     }
 
     public static void renderHud(DrawContext ctx) {
-        if (TackleboxSettings.Huds.levelBars && TriggerEngine.isOnFishOnMc()) {
+        if (TackleboxSettings.get().levelBars && TriggerEngine.isOnFishOnMc()) {
             draw(ctx, false);
         }
     }

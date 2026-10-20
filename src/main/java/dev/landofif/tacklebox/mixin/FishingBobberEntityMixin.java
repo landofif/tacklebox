@@ -29,7 +29,7 @@ abstract class FishingBobberEntityMixin {
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void tacklebox$holdStill(CallbackInfo ci) {
-        if (caughtFish || hookedEntity != null || !TackleboxSettings.Bobber.stillBobber) {
+        if (caughtFish || hookedEntity != null || !TackleboxSettings.get().stillBobber) {
             return;
         }
         FishingBobberEntity self = (FishingBobberEntity) (Object) this;

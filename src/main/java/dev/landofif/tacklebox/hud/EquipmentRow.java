@@ -62,7 +62,7 @@ public final class EquipmentRow {
         TackleboxSettings s = TackleboxSettings.get();
         MinecraftClient mc = MinecraftClient.getInstance();
         ClientPlayerEntity player = mc.player;
-        if (!TackleboxSettings.Huds.equipHud || player == null) {
+        if (!s.equipHud || player == null) {
             return;
         }
         ItemStack[] items = {player.getEquippedStack(EquipmentSlot.CHEST), player.getEquippedStack(EquipmentSlot.LEGS),
@@ -76,14 +76,14 @@ public final class EquipmentRow {
         }
         int cx = ctx.getScaledWindowWidth() / 2, base = ctx.getScaledWindowHeight() - 28;
         int[] off = s.equipOffset();
-        float k = TackleboxSettings.Huds.equipScale / 100f;
+        float k = s.equipScale / 100f;
         var m = ctx.getMatrices();
         m.pushMatrix();
         m.translate(cx + s.hotbarX + s.equipX + off[0], base + s.hotbarY + s.equipY + off[1]);
         m.scale(k, k);
         m.translate(-cx, -base);
         int p = s.equipPitch();
-        TackleboxSettings.BoxLook look = TackleboxSettings.Huds.equipLook == TackleboxSettings.BoxLook.DEFAULT ? TackleboxSettings.BoxLook.HYPR : TackleboxSettings.Huds.equipLook;
+        TackleboxSettings.BoxLook look = s.equipLook == TackleboxSettings.BoxLook.DEFAULT ? TackleboxSettings.BoxLook.HYPR : s.equipLook;
         if (look != TackleboxSettings.BoxLook.OFF) {
             SlotBox.draw(ctx, cx - 3 * p + 1, base - 22, cx - 1, base + 2, look);
             SlotBox.draw(ctx, cx + 1, base - 22, cx + 3 * p - 1, base + 2, look);
@@ -96,10 +96,10 @@ public final class EquipmentRow {
                 continue;
             }
             int rgb = color(st);
-            if (TackleboxSettings.Huds.equipRecolor) {
-                rgb = TackleboxSettings.Huds.equipColor;
+            if (s.equipRecolor) {
+                rgb = s.equipColor;
             }
-            if (TackleboxSettings.Huds.equipCircle && rgb >= 0) {
+            if (s.equipCircle && rgb >= 0) {
                 FoeRarity.disc(ctx, x, y, 0x66000000 | rgb);
             } else if (rgb >= 0) { // a bar under the item in the rarity colour
                 ctx.fill(x + 1, y + 18, x + 15, y + 19, 0xFF000000 | rgb);

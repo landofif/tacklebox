@@ -20,7 +20,7 @@ abstract class PressableWidgetMixin extends ClickableWidget {
 
     @Inject(method = "drawButton", at = @At("HEAD"), cancellable = true)
     private void tacklebox$flatButton(DrawContext ctx, CallbackInfo ci) {
-        if (!TackleboxSettings.Menus.flatButtons) {
+        if (!TackleboxSettings.get().flatButtons) {
             return;
         }
         ci.cancel();

@@ -23,33 +23,36 @@ class ChummerRingIntegrationTest {
 
     private static TackleboxSettings load(String json) {
         TackleboxSettings s = new Gson().fromJson(json, TackleboxSettings.class);
-        TackleboxSettings.importLegacy(com.google.gson.JsonParser.parseString(json).getAsJsonObject()); // the options are no longer in the gson file
         s.sanitize();
         return s;
     }
 
     @Test
-    void oldSettingsGetTheRingOffInGreen() {
+    void oldSettingsGetTheRingOnInGreen() {
         TackleboxSettings s = load("{\"swingSlowness\": 2.0, \"hideXpPopups\": true}");
-        assertFalse(TackleboxSettings.World.chummerRing); // opt in
-        assertEquals(0x41F55B, TackleboxSettings.World.chummerRingColor);
-        assertFalse(after(load("{}"), TackleboxSettings.World.chummerRing));
+        assertTrue(s.chummerRing);
+        assertEquals(0x41F55B, s.chummerRingColor);
+        assertTrue(load("{}").chummerRing);
     }
 
     @Test
     void savedChoiceRoundTrips() {
-        TackleboxSettings s = load("{\"chummerRing\": true, \"chummerRingColor\": 16711680}");
-        assertTrue(TackleboxSettings.World.chummerRing);
-        assertEquals(0xFF0000, TackleboxSettings.World.chummerRingColor);
+        TackleboxSettings s = load("{\"chummerRing\": false, \"chummerRingColor\": 16711680}");
+        assertFalse(s.chummerRing);
+        assertEquals(0xFF0000, s.chummerRingColor);
 
-        TackleboxSettings fresh = load("{}");
-        assertFalse(TackleboxSettings.World.chummerRing);
-        assertEquals(0x41F55B, TackleboxSettings.World.chummerRingColor);
+        TackleboxSettings again = load(new Gson().toJson(s));
+        assertFalse(again.chummerRing);
+        assertEquals(0xFF0000, again.chummerRingColor);
+
+        TackleboxSettings fresh = load(new Gson().toJson(new TackleboxSettings()));
+        assertTrue(fresh.chummerRing);
+        assertEquals(0x41F55B, fresh.chummerRingColor);
     }
 
     @Test
     void theColourKeepsOnlyRgb() {
-        assertEquals(0xFFFFFF, after(load("{\"chummerRingColor\": -1}"), TackleboxSettings.World.chummerRingColor));
+        assertEquals(0xFFFFFF, load("{\"chummerRingColor\": -1}").chummerRingColor);
     }
 
     @Test
@@ -80,10 +83,5 @@ class ChummerRingIntegrationTest {
             assertEquals(ChummerRingGeometry.RADIUS, d, 1e-3);
             assertTrue(ChummerRingGeometry.inRange(X, Z, wx, wz) || d - ChummerRingGeometry.RADIUS < 1e-3);
         }
-    }
-
-    /** Evaluates {@code first} (the load) before reading the static option. */
-    private static <T> T after(Object first, T value) {
-        return value;
     }
 }

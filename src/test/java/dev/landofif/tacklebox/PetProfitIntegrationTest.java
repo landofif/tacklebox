@@ -21,21 +21,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PetProfitIntegrationTest {
     private static TackleboxSettings load(String json) {
         TackleboxSettings s = new Gson().fromJson(json, TackleboxSettings.class);
-        TackleboxSettings.importLegacy(com.google.gson.JsonParser.parseString(json).getAsJsonObject()); // the options are no longer in the gson file
         s.sanitize();
         return s;
     }
 
     @Test
     void oldSettingsKeepPetMarksOff() {
-        assertFalse(after(load("{\"swingSlowness\": 2.0}"), TackleboxSettings.Menus.petProfitMarks));
+        assertFalse(load("{\"swingSlowness\": 2.0}").petProfitMarks);
     }
 
     @Test
     void savedSwitchRoundTrips() {
         TackleboxSettings s = load("{\"petProfitMarks\": true}");
-        assertTrue(TackleboxSettings.Menus.petProfitMarks);
-        assertFalse(after(load("{}"), TackleboxSettings.Menus.petProfitMarks));
+        assertTrue(s.petProfitMarks);
+        assertTrue(load(new Gson().toJson(s)).petProfitMarks);
     }
 
     /** The Bullfrog Pet of the 2026-10-16 auction dump (slot 2, $2K) from its item data to the line under its price. */
@@ -60,10 +59,5 @@ class PetProfitIntegrationTest {
         assertEquals(4, lines.size());
         assertEquals("sells for: $2.18k (+$176.38)", Glyphs.plain(lines.get(2)));
         assertEquals("time: 23h 29m 26s", Glyphs.plain(lines.get(3)));
-    }
-
-    /** Evaluates {@code first} (the load) before reading the static option. */
-    private static <T> T after(Object first, T value) {
-        return value;
     }
 }
