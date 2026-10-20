@@ -7,6 +7,7 @@ import com.teamresourceful.resourcefulconfig.api.annotations.Category;
 import com.teamresourceful.resourcefulconfig.api.annotations.Config;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigButton;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
+import com.teamresourceful.resourcefulconfig.api.annotations.ConfigInfo;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigOption;
 import dev.landofif.tacklebox.hud.HudPos;
 import net.fabricmc.loader.api.FabricLoader;
@@ -34,7 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 /** The mods settings, one {@code config/tacklebox/settings.json}. Read them with {@link #get()}. */
-@Config("tacklebox")
+@Config(value = "tacklebox", categories = {TackleboxSettings.Menus.class, TackleboxSettings.Huds.class, TackleboxSettings.Bobber.class, TackleboxSettings.World.class, TackleboxSettings.Screens.class})
 public class TackleboxSettings {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static Configurator configurator;
@@ -87,9 +88,21 @@ public class TackleboxSettings {
             }
             current.configMoved = true;
             configurator().saveConfig(TackleboxSettings.class);
+        } else if (!current.categoriesMoved) { // the options were flat in config/tacklebox.json before they got tabs
+            Path flat = FabricLoader.getInstance().getConfigDir().resolve(Tacklebox.MOD_ID + ".json");
+            try {
+                if (Files.isRegularFile(flat)) {
+                    importLegacy(JsonParser.parseString(Files.readString(flat, StandardCharsets.UTF_8)).getAsJsonObject());
+                }
+            } catch (IOException | RuntimeException e) {
+                Tacklebox.LOGGER.error("Could not move the options out of {}", flat, e);
+            }
+            current.categoriesMoved = true;
+            configurator().saveConfig(TackleboxSettings.class);
         } else {
             configurator().loadConfig(TackleboxSettings.class);
         }
+        current.categoriesMoved = true;
         current.sanitize();
     }
 
@@ -98,9 +111,11 @@ public class TackleboxSettings {
 
     private static List<Field> options() {
         List<Field> out = new ArrayList<>();
-        for (Field f : TackleboxSettings.class.getDeclaredFields()) {
-            if (Modifier.isStatic(f.getModifiers()) && f.isAnnotationPresent(ConfigEntry.class)) {
-                out.add(f);
+        for (Class<?> tab : new Class<?>[] {Screens.class, Menus.class, Huds.class, Bobber.class, World.class}) {
+            for (Field f : tab.getDeclaredFields()) {
+                if (Modifier.isStatic(f.getModifiers()) && f.isAnnotationPresent(ConfigEntry.class)) {
+                    out.add(f);
+                }
             }
         }
         return out;
@@ -145,12 +160,12 @@ public class TackleboxSettings {
                     return;
                 }
                 pending = null;
-                boolean leaves = flatLeaves;
+                boolean leaves = World.flatLeaves;
                 // the remove event only works on a screen that setScreen has already initialised
                 ScreenEvents.remove(opened).register(closed -> {
                     current.sanitize();
                     save();
-                    if (leaves != flatLeaves) {
+                    if (leaves != World.flatLeaves) {
                         MinecraftClient.getInstance().reloadResources();
                     }
                 });
@@ -200,6 +215,7 @@ public class TackleboxSettings {
     // ---- buttons that open the mods other screens (first in the settings screen) ----
     /** The tab with the buttons that open the mods own screens. */
     @Category("screens")
+    @ConfigInfo(title = "ꜱᴄʀᴇᴇɴꜱ")
     public static class Screens {
         @ConfigButton(title = "ᴄʜᴀᴛ ᴛʀɪɢɢᴇʀꜱ", text = "ᴏᴘᴇɴ")
         public static final Runnable openChatTriggers = () -> openLinked(dev.landofif.tacklebox.screen.TriggerListScreen::new);
@@ -225,252 +241,271 @@ public class TackleboxSettings {
         public static final Runnable openMoveHuds = () -> openLinked(dev.landofif.tacklebox.compat.FoeScreens::move);
         @ConfigButton(title = "ᴍᴇɴᴜ ᴘɪᴄᴛᴜʀᴇ ꜰᴏʟᴅᴇʀ", text = "ᴏᴘᴇɴ ꜰᴏʟᴅᴇʀ")
         public static final Runnable openMenuPicture = TackleboxSettings::openMenuPictureFolder;
+        /** The two colours of the gradient on focused tiles, hovered buttons and toggles (rgb). */
+        @ConfigOption.Separator(value = "ᴀᴄᴄᴇɴᴛ")
+        @ConfigEntry(id = "accent1", translation = "tacklebox.config.accent1")
+        @ConfigOption.Color
+        public static int accent1 = 0x33CCFF;
+        @ConfigEntry(id = "accent2", translation = "tacklebox.config.accent2")
+        @ConfigOption.Color
+        public static int accent2 = 0x00FF99;
     }
 
 
     // ---- options shown in the settings screen (Resourceful Config reads these static fields) ----
-    /** The two colours of the gradient on focused tiles, hovered buttons and toggles (rgb). */
-    @ConfigOption.Separator(value = "ᴀᴄᴄᴇɴᴛ")
-    @ConfigEntry(id = "accent1", translation = "tacklebox.config.accent1")
-    @ConfigOption.Color
-    public static int accent1 = 0x33CCFF;
-    @ConfigEntry(id = "accent2", translation = "tacklebox.config.accent2")
-    @ConfigOption.Color
-    public static int accent2 = 0x00FF99;
-    /** Chests, the inventory and fishonmc menus as one box with no slot boxes (drops the server's menu art). */
-    @ConfigOption.Separator(value = "ᴍᴇɴᴜꜱ")
-    @ConfigEntry(id = "flatMenus", translation = "tacklebox.config.flatMenus")
-    public static boolean flatMenus = true;
-    /** What shows behind the box-less menus (display/MenuBackground): a colour and a picture, each in percent opacity (0 = none). */
-    @ConfigEntry(id = "menuAccent", translation = "tacklebox.config.menuAccent")
-    public static boolean menuAccent;
-    @ConfigEntry(id = "menuAccentOpacity", translation = "tacklebox.config.menuAccentOpacity")
-    @ConfigOption.Range(min = 5, max = 100)
-    @ConfigOption.Slider
-    public static int menuAccentOpacity = 40;
-    @ConfigEntry(id = "menuBgColor", translation = "tacklebox.config.menuBgColor")
-    @ConfigOption.Color
-    public static int menuBgColor = 0x000000;
-    @ConfigEntry(id = "menuBgOpacity", translation = "tacklebox.config.menuBgOpacity")
-    @ConfigOption.Range(min = 0, max = 100)
-    @ConfigOption.Slider
-    public static int menuBgOpacity = 0;
-    @ConfigEntry(id = "menuImageOpacity", translation = "tacklebox.config.menuImageOpacity")
-    @ConfigOption.Range(min = 0, max = 100)
-    @ConfigOption.Slider
-    public static int menuImageOpacity = 0;
-    /** Every button as a flat see-through fill (lighter while hovered) instead of the bevelled texture. */
-    @ConfigEntry(id = "flatButtons", translation = "tacklebox.config.flatButtons")
-    public static boolean flatButtons = true;
-    /** A see-through circle in the rarity colour behind items in slots (foecollabs rarity, drawn by its item markers). */
-    @ConfigEntry(id = "rarityCircles", translation = "tacklebox.config.rarityCircles")
-    public static boolean rarityCircles = false;
-    /** Show the main menu and /travel as the mods own screens instead of the chest gui. */
-    @ConfigEntry(id = "fishMenu", translation = "tacklebox.config.fishMenu")
-    public static boolean fishMenu = true;
-    @ConfigEntry(id = "menuSize", translation = "tacklebox.config.menuSize")
-    @ConfigOption.Range(min = 40, max = 100)
-    @ConfigOption.Slider
-    public static int menuSize = 100;
-    /** The /presets wardrobe screen, and for both custom guis: size in percent of the screen. */
-    @ConfigOption.Separator(value = "ᴘʀᴇꜱᴇᴛꜱ")
-    @ConfigEntry(id = "presetsMenu", translation = "tacklebox.config.presetsMenu")
-    public static boolean presetsMenu = true;
-    @ConfigEntry(id = "presetsSize", translation = "tacklebox.config.presetsSize")
-    @ConfigOption.Range(min = 40, max = 100)
-    @ConfigOption.Slider
-    public static int presetsSize = 100;
-    @ConfigEntry(id = "presetsOtherBg", translation = "tacklebox.config.presetsOtherBg")
-    public static boolean presetsOtherBg = false;
-    /** /pv as all seven personal vaults on one screen with a search (screen/VaultScreen). */
-    @ConfigOption.Separator(value = "ᴠᴀᴜʟᴛꜱ")
-    @ConfigEntry(id = "vaultMenu", translation = "tacklebox.config.vaultMenu")
-    public static boolean vaultMenu = true;
-    /** Caught fish tooltips without the scientific name, value and ecosystem, weight and length on one line (display/FishTooltip). */
-    @ConfigOption.Separator(value = "ᴛᴏᴏʟᴛɪᴘꜱ")
-    @ConfigEntry(id = "shortFishTooltips", translation = "tacklebox.config.shortFishTooltips")
-    public static boolean shortFishTooltips = false;
-    /** Pet tooltips without the kind line, empty equipment lines and the right click hint (display/PetTooltip). */
-    @ConfigEntry(id = "shortPetTooltips", translation = "tacklebox.config.shortPetTooltips")
-    public static boolean shortPetTooltips = false;
-    /** Auction house pets you could sell to the pet store for more than they cost: a green tint and a line with the store's price (display/PetSale). */
-    @ConfigEntry(id = "petProfitMarks", translation = "tacklebox.config.petProfitMarks")
-    public static boolean petProfitMarks = false;
-    /** What sits behind the hotbar and foecollabs equipment slots, the distance between slots in pixels (20 and 22 are the defaults), and the shared box colours. */
-    @ConfigOption.Separator(value = "ʜᴏᴛʙᴀʀ")
-    @ConfigEntry(id = "hotbarLook", translation = "tacklebox.config.hotbarLook")
-    public static BoxLook hotbarLook = BoxLook.HYPR;
-    @ConfigEntry(id = "hotbarSpacing", translation = "tacklebox.config.hotbarSpacing")
-    @ConfigOption.Range(min = 16, max = 24)
-    @ConfigOption.Slider
-    public static int hotbarSpacing = 20;
-    @ConfigEntry(id = "hotbarScale", translation = "tacklebox.config.hotbarScale")
-    @ConfigOption.Range(min = 50, max = 200)
-    @ConfigOption.Slider
-    public static int hotbarScale = 100;
-    /** How the held hotbar slot is marked, and in what colour; and whether the offhand box shows. */
-    @ConfigEntry(id = "hotbarSelection", translation = "tacklebox.config.hotbarSelection")
-    public static SelectionStyle hotbarSelection = SelectionStyle.FRAME;
-    @ConfigEntry(id = "hotbarSelectColor", translation = "tacklebox.config.hotbarSelectColor")
-    @ConfigOption.Color
-    public static int hotbarSelectColor = 0xFFFFFF;
-    @ConfigEntry(id = "hotbarOffhand", translation = "tacklebox.config.hotbarOffhand")
-    public static boolean hotbarOffhand = true;
-    /** The mods own armour and rod parts row (hud/EquipmentRow) instead of foecollabs, and the look version the saved settings were last moved to. */
-    @ConfigOption.Separator(value = "ᴇǫᴜɪᴘᴍᴇɴᴛ")
-    @ConfigEntry(id = "equipHud", translation = "tacklebox.config.equipHud")
-    public static boolean equipHud = true;
-    @ConfigEntry(id = "equipScale", translation = "tacklebox.config.equipScale")
-    @ConfigOption.Range(min = 50, max = 200)
-    @ConfigOption.Slider
-    public static int equipScale = 100;
-    @ConfigEntry(id = "equipPlace", translation = "tacklebox.config.equipPlace")
-    public static EquipPlace equipPlace = EquipPlace.ABOVE;
-    @ConfigEntry(id = "equipLook", translation = "tacklebox.config.equipLook")
-    public static BoxLook equipLook = BoxLook.HYPR;
-    @ConfigEntry(id = "equipSpacing", translation = "tacklebox.config.equipSpacing")
-    @ConfigOption.Range(min = 16, max = 26)
-    @ConfigOption.Slider
-    public static int equipSpacing = 22;
-    @ConfigEntry(id = "boxOutlineColor", translation = "tacklebox.config.boxOutlineColor")
-    @ConfigOption.Color
-    public static int boxOutlineColor = 0x808080;
-    @ConfigEntry(id = "boxOpacity", translation = "tacklebox.config.boxOpacity")
-    @ConfigOption.Range(min = 0, max = 100)
-    @ConfigOption.Slider
-    public static int boxOpacity = 50;
-    /** Foecollabs rarity bar under each equipment slot as a circle behind the item, and a colour to use instead of the rarity's. */
-    @ConfigEntry(id = "equipCircle", translation = "tacklebox.config.equipCircle")
-    public static boolean equipCircle = true;
-    @ConfigEntry(id = "equipRecolor", translation = "tacklebox.config.equipRecolor")
-    public static boolean equipRecolor = false;
-    @ConfigEntry(id = "equipColor", translation = "tacklebox.config.equipColor")
-    @ConfigOption.Color
-    public static int equipColor = 0xFFFFFF;
-    /** The quests left hud: whether it shows. */
-    @ConfigOption.Separator(value = "ǫᴜᴇꜱᴛꜱ ʟᴇꜰᴛ")
-    @ConfigEntry(id = "questsHud", translation = "tacklebox.config.questsHud")
-    public static boolean questsHud = true;
-    @ConfigEntry(id = "questsAlign", translation = "tacklebox.config.questsAlign")
-    public static HudAlign questsAlign = HudAlign.LEFT;
-    /** The active boosts hud (hud/BoostsHud): boosters, chummer, weather events and moon, where it sits. */
-    @ConfigOption.Separator(value = "ᴀᴄᴛɪᴠᴇ ʙᴏᴏꜱᴛꜱ")
-    @ConfigEntry(id = "boostsHud", translation = "tacklebox.config.boostsHud")
-    public static boolean boostsHud = true;
-    @ConfigEntry(id = "boostsAlign", translation = "tacklebox.config.boostsAlign")
-    public static HudAlign boostsAlign = HudAlign.LEFT;
-    /** The level progress hud (hud/LevelBars): fishing level and location level bars, where it sits. */
-    @ConfigOption.Separator(value = "ʟᴇᴠᴇʟ ᴘʀᴏɢʀᴇꜱꜱ")
-    @ConfigEntry(id = "levelBars", translation = "tacklebox.config.levelBars")
-    public static boolean levelBars = true;
-    /** What the level progress hud shows: heading, the fishing line, the location line, the bar itself, the percent, the location xp, and the bar width. */
-    @ConfigEntry(id = "levelBarsHeading", translation = "tacklebox.config.levelBarsHeading")
-    public static boolean levelBarsHeading = true;
-    @ConfigEntry(id = "levelBarsFishing", translation = "tacklebox.config.levelBarsFishing")
-    public static boolean levelBarsFishing = true;
-    @ConfigEntry(id = "levelBarsLocation", translation = "tacklebox.config.levelBarsLocation")
-    public static boolean levelBarsLocation = true;
-    @ConfigEntry(id = "levelBarsBar", translation = "tacklebox.config.levelBarsBar")
-    public static boolean levelBarsBar = true;
-    @ConfigEntry(id = "levelBarsPercent", translation = "tacklebox.config.levelBarsPercent")
-    public static boolean levelBarsPercent = true;
-    @ConfigEntry(id = "levelBarsXp", translation = "tacklebox.config.levelBarsXp")
-    public static boolean levelBarsXp = true;
-    @ConfigEntry(id = "levelBarsMainXp", translation = "tacklebox.config.levelBarsMainXp")
-    public static boolean levelBarsMainXp = false;
-    @ConfigEntry(id = "levelBarsDecimals", translation = "tacklebox.config.levelBarsDecimals")
-    public static boolean levelBarsDecimals = true;
-    @ConfigEntry(id = "levelBarsWidth", translation = "tacklebox.config.levelBarsWidth")
-    @ConfigOption.Range(min = 40, max = 200)
-    @ConfigOption.Slider
-    public static int levelBarsWidth = 80;
-    @ConfigEntry(id = "levelBarsAlign", translation = "tacklebox.config.levelBarsAlign")
-    public static HudAlign levelBarsAlign = HudAlign.LEFT;
-    /** The now playing hud (hud/NowPlaying): what Spotify, a browser tab or any other player is playing, where it sits. */
-    @ConfigOption.Separator(value = "ɴᴏᴡ ᴘʟᴀʏɪɴɢ")
-    @ConfigEntry(id = "nowPlaying", translation = "tacklebox.config.nowPlaying")
-    public static boolean nowPlaying = true;
-    /** What the now playing hud shows besides the title: its heading, the album art, the artist, a progress bar and the time. */
-    @ConfigEntry(id = "nowPlayingHeading", translation = "tacklebox.config.nowPlayingHeading")
-    public static boolean nowPlayingHeading = true;
-    @ConfigEntry(id = "nowPlayingArt", translation = "tacklebox.config.nowPlayingArt")
-    public static boolean nowPlayingArt = true;
-    @ConfigEntry(id = "nowPlayingArtist", translation = "tacklebox.config.nowPlayingArtist")
-    public static boolean nowPlayingArtist = true;
-    @ConfigEntry(id = "nowPlayingBar", translation = "tacklebox.config.nowPlayingBar")
-    public static boolean nowPlayingBar = true;
-    @ConfigEntry(id = "nowPlayingTime", translation = "tacklebox.config.nowPlayingTime")
-    public static boolean nowPlayingTime = true;
-    @ConfigEntry(id = "nowPlayingAlign", translation = "tacklebox.config.nowPlayingAlign")
-    public static HudAlign nowPlayingAlign = HudAlign.LEFT;
-    /** The sidebar styled server hud (hud/ServerHud): where it sits, its size in percent and how strong the picture behind it is (percent). */
-    @ConfigOption.Separator(value = "ꜱᴇʀᴠᴇʀ ʜᴜᴅ")
-    @ConfigEntry(id = "serverHud", translation = "tacklebox.config.serverHud")
-    public static boolean serverHud = true;
-    @ConfigEntry(id = "serverHudAlign", translation = "tacklebox.config.serverHudAlign")
-    public static HudAlign serverHudAlign = HudAlign.LEFT;
-    /** Hold the bobber still on the water instead of bobbing (it still dips on a bite). */
-    @ConfigOption.Separator(value = "ʙᴏʙʙᴇʀ")
-    @ConfigEntry(id = "stillBobber", translation = "tacklebox.config.stillBobber")
-    public static boolean stillBobber = true;
-    /** Show your own cast flying smoothly instead of snapping back on a laggy server. */
-    @ConfigEntry(id = "smoothCast", translation = "tacklebox.config.smoothCast")
-    public static boolean smoothCast = true;
-    /** Hide other players bobbers and their lines. */
-    @ConfigEntry(id = "hideOtherBobbers", translation = "tacklebox.config.hideOtherBobbers")
-    public static boolean hideOtherBobbers = false;
-    @ConfigOption.Separator(value = "ꜱᴋɪɴ")
-    @ConfigEntry(id = "bobberSkin", translation = "tacklebox.config.bobberSkin")
-    public static BobberSkin bobberSkin = BobberSkin.DEFAULT;
-    /** Also show your skin on other players' bobbers. */
-    @ConfigEntry(id = "skinEveryone", translation = "tacklebox.config.skinEveryone")
-    public static boolean skinEveryone = false;
-    @ConfigOption.Separator(value = "ʟɪɴᴇ")
-    @ConfigEntry(id = "customLineColor", translation = "tacklebox.config.customLineColor")
-    public static boolean customLineColor = false;
-    /** RGB of your own fishing line. */
-    @ConfigEntry(id = "lineColor", translation = "tacklebox.config.lineColor")
-    @ConfigOption.Color
-    public static int lineColor = 0x3FA9F5;
-    /** The welcome lines fishonmc prints at every login (instance, packs, welcome, help, rules, discord). */
-    @ConfigOption.Separator(value = "ᴄʜᴀᴛ")
-    @ConfigEntry(id = "hideLoginChat", translation = "tacklebox.config.hideLoginChat")
-    public static boolean hideLoginChat = true;
-    /** Lines with nothing in them (the server sends them as spacing) never reach the chat. */
-    @ConfigEntry(id = "hideEmptyChat", translation = "tacklebox.config.hideEmptyChat")
-    public static boolean hideEmptyChat = true;
-    /** Huds that would sit under a chat window or the player list are not drawn. */
-    @ConfigEntry(id = "hideBehindChat", translation = "tacklebox.config.hideBehindChat")
-    public static boolean hideBehindChat = false;
-    /** Hide the rank / name / power tag the server puts over your own head. */
-    @ConfigOption.Separator(value = "ɴᴀᴍᴇᴛᴀɢꜱ")
-    @ConfigEntry(id = "hideOwnNametag", translation = "tacklebox.config.hideOwnNametag")
-    public static boolean hideOwnNametag = false;
-    /** Hide every players nametag, the servers and the vanilla one. */
-    @ConfigEntry(id = "hideAllNametags", translation = "tacklebox.config.hideAllNametags")
-    public static boolean hideAllNametags = false;
-    /** Hide the +66xp reward line in the action bar after a catch. */
-    @ConfigOption.Separator(value = "ᴄʟᴜᴛᴛᴇʀ")
-    @ConfigEntry(id = "hideXpPopups", translation = "tacklebox.config.hideXpPopups")
-    public static boolean hideXpPopups = false;
-    /** Draw leaves flat like vanilla instead of the server packs 3d leaves. */
-    @ConfigEntry(id = "flatLeaves", translation = "tacklebox.config.flatLeaves")
-    public static boolean flatLeaves = false;
-    /** Stop drawing the servers item, block and text displays farther than this many blocks (8 to 64), a fps help at spawn (display/DisplayCull). */
-    @ConfigOption.Separator(value = "ʟᴀɢ")
-    @ConfigEntry(id = "hideFarDisplays", translation = "tacklebox.config.hideFarDisplays")
-    public static boolean hideFarDisplays = false;
-    @ConfigEntry(id = "farDisplayRange", translation = "tacklebox.config.farDisplayRange")
-    @ConfigOption.Range(min = 8, max = 64)
-    @ConfigOption.Slider
-    public static int farDisplayRange = 24;
-    /** A thin flat ring on the ground at the range of every placed chummer in view of the client (display/ChummerRing), and its colour (rgb). */
-    @ConfigOption.Separator(value = "ᴄʜᴜᴍᴍᴇʀ")
-    @ConfigEntry(id = "chummerRing", translation = "tacklebox.config.chummerRing")
-    public static boolean chummerRing = true;
-    @ConfigEntry(id = "chummerRingColor", translation = "tacklebox.config.chummerRingColor")
-    @ConfigOption.Color
-    public static int chummerRingColor = 0x41F55B;
+    @Category("menus")
+    @ConfigInfo(title = "ᴍᴇɴᴜꜱ")
+    public static class Menus {
+        /** Chests, the inventory and fishonmc menus as one box with no slot boxes (drops the server's menu art). */
+        @ConfigOption.Separator(value = "ᴍᴇɴᴜꜱ")
+        @ConfigEntry(id = "flatMenus", translation = "tacklebox.config.flatMenus")
+        public static boolean flatMenus;
+        /** What shows behind the box-less menus (display/MenuBackground): a colour and a picture, each in percent opacity (0 = none). */
+        @ConfigEntry(id = "menuAccent", translation = "tacklebox.config.menuAccent")
+        public static boolean menuAccent;
+        @ConfigEntry(id = "menuAccentOpacity", translation = "tacklebox.config.menuAccentOpacity")
+        @ConfigOption.Range(min = 5, max = 100)
+        @ConfigOption.Slider
+        public static int menuAccentOpacity = 40;
+        @ConfigEntry(id = "menuBgColor", translation = "tacklebox.config.menuBgColor")
+        @ConfigOption.Color
+        public static int menuBgColor = 0x000000;
+        @ConfigEntry(id = "menuBgOpacity", translation = "tacklebox.config.menuBgOpacity")
+        @ConfigOption.Range(min = 0, max = 100)
+        @ConfigOption.Slider
+        public static int menuBgOpacity = 0;
+        @ConfigEntry(id = "menuImageOpacity", translation = "tacklebox.config.menuImageOpacity")
+        @ConfigOption.Range(min = 0, max = 100)
+        @ConfigOption.Slider
+        public static int menuImageOpacity = 0;
+        /** Every button as a flat see-through fill (lighter while hovered) instead of the bevelled texture. */
+        @ConfigEntry(id = "flatButtons", translation = "tacklebox.config.flatButtons")
+        public static boolean flatButtons;
+        /** A see-through circle in the rarity colour behind items in slots (foecollabs rarity, drawn by its item markers). */
+        @ConfigEntry(id = "rarityCircles", translation = "tacklebox.config.rarityCircles")
+        public static boolean rarityCircles = false;
+        /** Show the main menu and /travel as the mods own screens instead of the chest gui. */
+        @ConfigEntry(id = "fishMenu", translation = "tacklebox.config.fishMenu")
+        public static boolean fishMenu;
+        @ConfigEntry(id = "menuSize", translation = "tacklebox.config.menuSize")
+        @ConfigOption.Range(min = 40, max = 100)
+        @ConfigOption.Slider
+        public static int menuSize = 100;
+        /** The /presets wardrobe screen, and for both custom guis: size in percent of the screen. */
+        @ConfigOption.Separator(value = "ᴘʀᴇꜱᴇᴛꜱ")
+        @ConfigEntry(id = "presetsMenu", translation = "tacklebox.config.presetsMenu")
+        public static boolean presetsMenu;
+        @ConfigEntry(id = "presetsSize", translation = "tacklebox.config.presetsSize")
+        @ConfigOption.Range(min = 40, max = 100)
+        @ConfigOption.Slider
+        public static int presetsSize = 100;
+        @ConfigEntry(id = "presetsOtherBg", translation = "tacklebox.config.presetsOtherBg")
+        public static boolean presetsOtherBg = false;
+        /** /pv as all seven personal vaults on one screen with a search (screen/VaultScreen). */
+        @ConfigOption.Separator(value = "ᴠᴀᴜʟᴛꜱ")
+        @ConfigEntry(id = "vaultMenu", translation = "tacklebox.config.vaultMenu")
+        public static boolean vaultMenu;
+        /** Caught fish tooltips without the scientific name, value and ecosystem, weight and length on one line (display/FishTooltip). */
+        @ConfigOption.Separator(value = "ᴛᴏᴏʟᴛɪᴘꜱ")
+        @ConfigEntry(id = "shortFishTooltips", translation = "tacklebox.config.shortFishTooltips")
+        public static boolean shortFishTooltips = false;
+        /** Pet tooltips without the kind line, empty equipment lines and the right click hint (display/PetTooltip). */
+        @ConfigEntry(id = "shortPetTooltips", translation = "tacklebox.config.shortPetTooltips")
+        public static boolean shortPetTooltips = false;
+        /** Auction house pets you could sell to the pet store for more than they cost: a green tint and a line with the store's price (display/PetSale). */
+        @ConfigEntry(id = "petProfitMarks", translation = "tacklebox.config.petProfitMarks")
+        public static boolean petProfitMarks = false;
+    }
+
+    @Category("huds")
+    @ConfigInfo(title = "ʜᴜᴅꜱ")
+    public static class Huds {
+        /** What sits behind the hotbar and foecollabs equipment slots, the distance between slots in pixels (20 and 22 are the defaults), and the shared box colours. */
+        @ConfigOption.Separator(value = "ʜᴏᴛʙᴀʀ")
+        @ConfigEntry(id = "hotbarLook", translation = "tacklebox.config.hotbarLook")
+        public static BoxLook hotbarLook = BoxLook.DEFAULT;
+        @ConfigEntry(id = "hotbarSpacing", translation = "tacklebox.config.hotbarSpacing")
+        @ConfigOption.Range(min = 16, max = 24)
+        @ConfigOption.Slider
+        public static int hotbarSpacing = 20;
+        @ConfigEntry(id = "hotbarScale", translation = "tacklebox.config.hotbarScale")
+        @ConfigOption.Range(min = 50, max = 200)
+        @ConfigOption.Slider
+        public static int hotbarScale = 100;
+        /** How the held hotbar slot is marked, and in what colour; and whether the offhand box shows. */
+        @ConfigEntry(id = "hotbarSelection", translation = "tacklebox.config.hotbarSelection")
+        public static SelectionStyle hotbarSelection = SelectionStyle.FRAME;
+        @ConfigEntry(id = "hotbarSelectColor", translation = "tacklebox.config.hotbarSelectColor")
+        @ConfigOption.Color
+        public static int hotbarSelectColor = 0xFFFFFF;
+        @ConfigEntry(id = "hotbarOffhand", translation = "tacklebox.config.hotbarOffhand")
+        public static boolean hotbarOffhand = true;
+        /** The mods own armour and rod parts row (hud/EquipmentRow) instead of foecollabs, and the look version the saved settings were last moved to. */
+        @ConfigOption.Separator(value = "ᴇǫᴜɪᴘᴍᴇɴᴛ")
+        @ConfigEntry(id = "equipHud", translation = "tacklebox.config.equipHud")
+        public static boolean equipHud;
+        @ConfigEntry(id = "equipScale", translation = "tacklebox.config.equipScale")
+        @ConfigOption.Range(min = 50, max = 200)
+        @ConfigOption.Slider
+        public static int equipScale = 100;
+        @ConfigEntry(id = "equipPlace", translation = "tacklebox.config.equipPlace")
+        public static EquipPlace equipPlace = EquipPlace.ABOVE;
+        @ConfigEntry(id = "equipLook", translation = "tacklebox.config.equipLook")
+        public static BoxLook equipLook = BoxLook.DEFAULT;
+        @ConfigEntry(id = "equipSpacing", translation = "tacklebox.config.equipSpacing")
+        @ConfigOption.Range(min = 16, max = 26)
+        @ConfigOption.Slider
+        public static int equipSpacing = 22;
+        @ConfigEntry(id = "boxOutlineColor", translation = "tacklebox.config.boxOutlineColor")
+        @ConfigOption.Color
+        public static int boxOutlineColor = 0x808080;
+        @ConfigEntry(id = "boxOpacity", translation = "tacklebox.config.boxOpacity")
+        @ConfigOption.Range(min = 0, max = 100)
+        @ConfigOption.Slider
+        public static int boxOpacity = 50;
+        /** Foecollabs rarity bar under each equipment slot as a circle behind the item, and a colour to use instead of the rarity's. */
+        @ConfigEntry(id = "equipCircle", translation = "tacklebox.config.equipCircle")
+        public static boolean equipCircle = true;
+        @ConfigEntry(id = "equipRecolor", translation = "tacklebox.config.equipRecolor")
+        public static boolean equipRecolor = false;
+        @ConfigEntry(id = "equipColor", translation = "tacklebox.config.equipColor")
+        @ConfigOption.Color
+        public static int equipColor = 0xFFFFFF;
+        /** The quests left hud: whether it shows. */
+        @ConfigOption.Separator(value = "ǫᴜᴇꜱᴛꜱ ʟᴇꜰᴛ")
+        @ConfigEntry(id = "questsHud", translation = "tacklebox.config.questsHud")
+        public static boolean questsHud;
+        @ConfigEntry(id = "questsAlign", translation = "tacklebox.config.questsAlign")
+        public static HudAlign questsAlign = HudAlign.LEFT;
+        /** The active boosts hud (hud/BoostsHud): boosters, chummer, weather events and moon, where it sits. */
+        @ConfigOption.Separator(value = "ᴀᴄᴛɪᴠᴇ ʙᴏᴏꜱᴛꜱ")
+        @ConfigEntry(id = "boostsHud", translation = "tacklebox.config.boostsHud")
+        public static boolean boostsHud;
+        @ConfigEntry(id = "boostsAlign", translation = "tacklebox.config.boostsAlign")
+        public static HudAlign boostsAlign = HudAlign.LEFT;
+        /** The level progress hud (hud/LevelBars): fishing level and location level bars, where it sits. */
+        @ConfigOption.Separator(value = "ʟᴇᴠᴇʟ ᴘʀᴏɢʀᴇꜱꜱ")
+        @ConfigEntry(id = "levelBars", translation = "tacklebox.config.levelBars")
+        public static boolean levelBars;
+        /** What the level progress hud shows: heading, the fishing line, the location line, the bar itself, the percent, the location xp, and the bar width. */
+        @ConfigEntry(id = "levelBarsHeading", translation = "tacklebox.config.levelBarsHeading")
+        public static boolean levelBarsHeading = true;
+        @ConfigEntry(id = "levelBarsFishing", translation = "tacklebox.config.levelBarsFishing")
+        public static boolean levelBarsFishing = true;
+        @ConfigEntry(id = "levelBarsLocation", translation = "tacklebox.config.levelBarsLocation")
+        public static boolean levelBarsLocation = true;
+        @ConfigEntry(id = "levelBarsBar", translation = "tacklebox.config.levelBarsBar")
+        public static boolean levelBarsBar = true;
+        @ConfigEntry(id = "levelBarsPercent", translation = "tacklebox.config.levelBarsPercent")
+        public static boolean levelBarsPercent = true;
+        @ConfigEntry(id = "levelBarsXp", translation = "tacklebox.config.levelBarsXp")
+        public static boolean levelBarsXp = true;
+        @ConfigEntry(id = "levelBarsMainXp", translation = "tacklebox.config.levelBarsMainXp")
+        public static boolean levelBarsMainXp = false;
+        @ConfigEntry(id = "levelBarsDecimals", translation = "tacklebox.config.levelBarsDecimals")
+        public static boolean levelBarsDecimals = true;
+        @ConfigEntry(id = "levelBarsWidth", translation = "tacklebox.config.levelBarsWidth")
+        @ConfigOption.Range(min = 40, max = 200)
+        @ConfigOption.Slider
+        public static int levelBarsWidth = 80;
+        @ConfigEntry(id = "levelBarsAlign", translation = "tacklebox.config.levelBarsAlign")
+        public static HudAlign levelBarsAlign = HudAlign.LEFT;
+        /** The now playing hud (hud/NowPlaying): what Spotify, a browser tab or any other player is playing, where it sits. */
+        @ConfigOption.Separator(value = "ɴᴏᴡ ᴘʟᴀʏɪɴɢ")
+        @ConfigEntry(id = "nowPlaying", translation = "tacklebox.config.nowPlaying")
+        public static boolean nowPlaying;
+        /** What the now playing hud shows besides the title: its heading, the album art, the artist, a progress bar and the time. */
+        @ConfigEntry(id = "nowPlayingHeading", translation = "tacklebox.config.nowPlayingHeading")
+        public static boolean nowPlayingHeading = true;
+        @ConfigEntry(id = "nowPlayingArt", translation = "tacklebox.config.nowPlayingArt")
+        public static boolean nowPlayingArt = true;
+        @ConfigEntry(id = "nowPlayingArtist", translation = "tacklebox.config.nowPlayingArtist")
+        public static boolean nowPlayingArtist = true;
+        @ConfigEntry(id = "nowPlayingBar", translation = "tacklebox.config.nowPlayingBar")
+        public static boolean nowPlayingBar = true;
+        @ConfigEntry(id = "nowPlayingTime", translation = "tacklebox.config.nowPlayingTime")
+        public static boolean nowPlayingTime = true;
+        @ConfigEntry(id = "nowPlayingAlign", translation = "tacklebox.config.nowPlayingAlign")
+        public static HudAlign nowPlayingAlign = HudAlign.LEFT;
+        /** The sidebar styled server hud (hud/ServerHud): where it sits, its size in percent and how strong the picture behind it is (percent). */
+        @ConfigOption.Separator(value = "ꜱᴇʀᴠᴇʀ ʜᴜᴅ")
+        @ConfigEntry(id = "serverHud", translation = "tacklebox.config.serverHud")
+        public static boolean serverHud;
+        @ConfigEntry(id = "serverHudAlign", translation = "tacklebox.config.serverHudAlign")
+        public static HudAlign serverHudAlign = HudAlign.LEFT;
+    }
+
+    @Category("bobber")
+    @ConfigInfo(title = "ʙᴏʙʙᴇʀ")
+    public static class Bobber {
+        /** Hold the bobber still on the water instead of bobbing (it still dips on a bite). */
+        @ConfigOption.Separator(value = "ʙᴏʙʙᴇʀ")
+        @ConfigEntry(id = "stillBobber", translation = "tacklebox.config.stillBobber")
+        public static boolean stillBobber;
+        /** Show your own cast flying smoothly instead of snapping back on a laggy server. */
+        @ConfigEntry(id = "smoothCast", translation = "tacklebox.config.smoothCast")
+        public static boolean smoothCast;
+        /** Hide other players bobbers and their lines. */
+        @ConfigEntry(id = "hideOtherBobbers", translation = "tacklebox.config.hideOtherBobbers")
+        public static boolean hideOtherBobbers = false;
+        @ConfigOption.Separator(value = "ꜱᴋɪɴ")
+        @ConfigEntry(id = "bobberSkin", translation = "tacklebox.config.bobberSkin")
+        public static BobberSkin bobberSkin = BobberSkin.DEFAULT;
+        /** Also show your skin on other players' bobbers. */
+        @ConfigEntry(id = "skinEveryone", translation = "tacklebox.config.skinEveryone")
+        public static boolean skinEveryone = false;
+        @ConfigOption.Separator(value = "ʟɪɴᴇ")
+        @ConfigEntry(id = "customLineColor", translation = "tacklebox.config.customLineColor")
+        public static boolean customLineColor = false;
+        /** RGB of your own fishing line. */
+        @ConfigEntry(id = "lineColor", translation = "tacklebox.config.lineColor")
+        @ConfigOption.Color
+        public static int lineColor = 0x3FA9F5;
+    }
+
+    @Category("world")
+    @ConfigInfo(title = "ᴡᴏʀʟᴅ")
+    public static class World {
+        /** The welcome lines fishonmc prints at every login (instance, packs, welcome, help, rules, discord). */
+        @ConfigOption.Separator(value = "ᴄʜᴀᴛ")
+        @ConfigEntry(id = "hideLoginChat", translation = "tacklebox.config.hideLoginChat")
+        public static boolean hideLoginChat;
+        /** Lines with nothing in them (the server sends them as spacing) never reach the chat. */
+        @ConfigEntry(id = "hideEmptyChat", translation = "tacklebox.config.hideEmptyChat")
+        public static boolean hideEmptyChat;
+        /** Huds that would sit under a chat window or the player list are not drawn. */
+        @ConfigEntry(id = "hideBehindChat", translation = "tacklebox.config.hideBehindChat")
+        public static boolean hideBehindChat = false;
+        /** Hide the rank / name / power tag the server puts over your own head. */
+        @ConfigOption.Separator(value = "ɴᴀᴍᴇᴛᴀɢꜱ")
+        @ConfigEntry(id = "hideOwnNametag", translation = "tacklebox.config.hideOwnNametag")
+        public static boolean hideOwnNametag = false;
+        /** Hide every players nametag, the servers and the vanilla one. */
+        @ConfigEntry(id = "hideAllNametags", translation = "tacklebox.config.hideAllNametags")
+        public static boolean hideAllNametags = false;
+        /** Hide the +66xp reward line in the action bar after a catch. */
+        @ConfigOption.Separator(value = "ᴄʟᴜᴛᴛᴇʀ")
+        @ConfigEntry(id = "hideXpPopups", translation = "tacklebox.config.hideXpPopups")
+        public static boolean hideXpPopups = false;
+        /** Draw leaves flat like vanilla instead of the server packs 3d leaves. */
+        @ConfigEntry(id = "flatLeaves", translation = "tacklebox.config.flatLeaves")
+        public static boolean flatLeaves = false;
+        /** Stop drawing the servers item, block and text displays farther than this many blocks (8 to 64), a fps help at spawn (display/DisplayCull). */
+        @ConfigOption.Separator(value = "ʟᴀɢ")
+        @ConfigEntry(id = "hideFarDisplays", translation = "tacklebox.config.hideFarDisplays")
+        public static boolean hideFarDisplays = false;
+        @ConfigEntry(id = "farDisplayRange", translation = "tacklebox.config.farDisplayRange")
+        @ConfigOption.Range(min = 8, max = 64)
+        @ConfigOption.Slider
+        public static int farDisplayRange = 24;
+        /** A thin flat ring on the ground at the range of every placed chummer in view of the client (display/ChummerRing), and its colour (rgb). */
+        @ConfigOption.Separator(value = "ᴄʜᴜᴍᴍᴇʀ")
+        @ConfigEntry(id = "chummerRing", translation = "tacklebox.config.chummerRing")
+        public static boolean chummerRing;
+        @ConfigEntry(id = "chummerRingColor", translation = "tacklebox.config.chummerRingColor")
+        @ConfigOption.Color
+        public static int chummerRingColor = 0x41F55B;
+    }
 
     // ---- state and the rest of the look ----
     /** The hotbar: moved by this many gui pixels from where vanilla puts it, and whether its slot background is drawn. */
@@ -481,9 +516,11 @@ public class TackleboxSettings {
     /** Foecollabs equipment hud (armour and rod parts), moved by this much on top of the hotbar's offset. */
     public int equipX = 0;
     public int equipY = 0;
-    public int lookVersion = 0;
+    public int lookVersion = 1;
     /** The options moved to Resourceful Config's own file (see {@link #load()}). */
     public boolean configMoved = false;
+    /** Set once the options moved from the flat tacklebox.json into its tabs. */
+    public boolean categoriesMoved = false;
 
     // ---- fishonmc menu (see menu/FishMenu) ----
     /**
@@ -718,11 +755,11 @@ public class TackleboxSettings {
 
     /** How far the equipment row is from its default place above the hotbar for {@link #equipPlace}: {dx, dy} in gui pixels. */
     public int[] equipOffset() {
-        if (equipPlace == EquipPlace.ABOVE) {
+        if (Huds.equipPlace == EquipPlace.ABOVE) {
             return new int[]{0, 0};
         }
-        int side = 91 * hotbarScale / 100 + 6 + 65 * equipScale / 100; // from the hotbar's middle to the rows middle
-        return new int[]{equipPlace == EquipPlace.LEFT ? -side : side, 27}; // level with the hotbar
+        int side = 91 * Huds.hotbarScale / 100 + 6 + 65 * Huds.equipScale / 100; // from the hotbar's middle to the rows middle
+        return new int[]{Huds.equipPlace == EquipPlace.LEFT ? -side : side, 27}; // level with the hotbar
     }
 
     /** DEFAULT is the vanilla hotbar sprite / foecollabs own squares, which only fit at their own spacing. */
@@ -768,34 +805,34 @@ public class TackleboxSettings {
 
     /** The pitch of the hotbar slots: the vanilla 20 when the vanilla sprite is drawn, since it only fits that. */
     public int hotbarPitch() {
-        return hotbarLook == BoxLook.DEFAULT ? 20 : hotbarSpacing;
+        return Huds.hotbarLook == BoxLook.DEFAULT ? 20 : Huds.hotbarSpacing;
     }
 
     public int equipPitch() {
-        return equipLook == BoxLook.DEFAULT ? 22 : equipSpacing;
+        return Huds.equipLook == BoxLook.DEFAULT ? 22 : Huds.equipSpacing;
     }
 
     public void sanitize() {
-        if (bobberSkin == null) bobberSkin = BobberSkin.DEFAULT;
+        if (Bobber.bobberSkin == null) Bobber.bobberSkin = BobberSkin.DEFAULT;
         if (timerMode == null) timerMode = TimerMode.HUD;
         if (biteAnim == null) biteAnim = BiteAnim.POP;
         if (biteText == null) biteText = "bite!";
         if (swingStyle == null) swingStyle = SwingStyle.NORMAL;
-        if (equipPlace == null) equipPlace = EquipPlace.ABOVE;
-        if (hotbarLook == null) hotbarLook = hotbarBackground ? BoxLook.DEFAULT : BoxLook.OFF;
-        if (equipLook == null) equipLook = hotbarBackground ? BoxLook.DEFAULT : BoxLook.OFF;
+        if (Huds.equipPlace == null) Huds.equipPlace = EquipPlace.ABOVE;
+        if (Huds.hotbarLook == null) Huds.hotbarLook = hotbarBackground ? BoxLook.DEFAULT : BoxLook.OFF;
+        if (Huds.equipLook == null) Huds.equipLook = hotbarBackground ? BoxLook.DEFAULT : BoxLook.OFF;
         if (lookVersion < 1) { // the hyprland look is the new default for the hotbar and equipment row
-            hotbarLook = BoxLook.HYPR;
-            equipLook = BoxLook.HYPR;
-            hotbarSelection = SelectionStyle.HYPR;
+            Huds.hotbarLook = BoxLook.HYPR;
+            Huds.equipLook = BoxLook.HYPR;
+            Huds.hotbarSelection = SelectionStyle.HYPR;
             lookVersion = 1;
         }
-        hotbarSpacing = Math.max(16, Math.min(24, hotbarSpacing));
-        equipSpacing = Math.max(16, Math.min(26, equipSpacing));
-        boxOpacity = Math.max(0, Math.min(100, boxOpacity));
-        boxOutlineColor &= 0xFFFFFF;
-        menuBgColor &= 0xFFFFFF;
-        if (hotbarSelection == null) hotbarSelection = SelectionStyle.FRAME;
+        Huds.hotbarSpacing = Math.max(16, Math.min(24, Huds.hotbarSpacing));
+        Huds.equipSpacing = Math.max(16, Math.min(26, Huds.equipSpacing));
+        Huds.boxOpacity = Math.max(0, Math.min(100, Huds.boxOpacity));
+        Huds.boxOutlineColor &= 0xFFFFFF;
+        Menus.menuBgColor &= 0xFFFFFF;
+        if (Huds.hotbarSelection == null) Huds.hotbarSelection = SelectionStyle.FRAME;
         if (chatFilters == null) chatFilters = new java.util.ArrayList<>();
         chatFilters.removeIf(java.util.Objects::isNull);
         if (keyCommands == null) keyCommands = new java.util.ArrayList<>();
@@ -833,9 +870,9 @@ public class TackleboxSettings {
             b.fadeSeconds = b.fadeSeconds == 0 ? 10 : Math.max(-1, Math.min(600, b.fadeSeconds));
         }
         dev.landofif.tacklebox.chat.ChatBoxes.addCrewsRule(chatBoxes);
-        lineColor &= 0xFFFFFF;
-        chummerRingColor &= 0xFFFFFF;
-        farDisplayRange = dev.landofif.tacklebox.display.DisplayCull.clampRange(farDisplayRange);
+        Bobber.lineColor &= 0xFFFFFF;
+        World.chummerRingColor &= 0xFFFFFF;
+        World.farDisplayRange = dev.landofif.tacklebox.display.DisplayCull.clampRange(World.farDisplayRange);
         vmScale = Math.max(0.1, Math.min(3, vmScale));
         swingSlowness = Math.max(0.25, Math.min(4, swingSlowness));
         sneakHeight = dev.landofif.tacklebox.display.SneakHeight.clamp(sneakHeight);
@@ -855,8 +892,8 @@ public class TackleboxSettings {
         if (presetCache == null) presetCache = new java.util.LinkedHashMap<>();
         if (petHeads == null) petHeads = new java.util.LinkedHashMap<>();
         if (presetStats == null) presetStats = new java.util.LinkedHashMap<>();
-        menuSize = Math.max(40, Math.min(100, menuSize));
-        presetsSize = Math.max(40, Math.min(100, presetsSize));
+        Menus.menuSize = Math.max(40, Math.min(100, Menus.menuSize));
+        Menus.presetsSize = Math.max(40, Math.min(100, Menus.presetsSize));
     }
 
     // must stay below every option field: it reads their initial values

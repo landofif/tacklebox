@@ -28,7 +28,7 @@ abstract class ItemMarkerHandlerMixin {
 
     @Inject(method = "renderItemMarkerBackground(Lnet/minecraft/class_332;Lnet/minecraft/class_1799;II)V", at = @At("HEAD"), remap = false, require = 0)
     private void tacklebox$circle(DrawContext ctx, ItemStack stack, int x, int y, CallbackInfo ci) {
-        if (!TackleboxSettings.get().rarityCircles || tacklebox$skip) {
+        if (!TackleboxSettings.Menus.rarityCircles || tacklebox$skip) {
             return;
         }
         FoeRarity.circle(ctx, x, y, stack);

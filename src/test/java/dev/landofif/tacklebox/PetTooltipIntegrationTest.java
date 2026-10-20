@@ -17,16 +17,21 @@ class PetTooltipIntegrationTest {
 
     @Test
     void oldSettingsKeepPetTooltipsOff() {
-        assertFalse(load("{\"shortFishTooltips\": true}").shortPetTooltips);
+        assertFalse(after(load("{\"shortFishTooltips\": true}"), TackleboxSettings.Menus.shortPetTooltips));
     }
 
     @Test
     void petSwitchRoundTripsWithoutTouchingTheFishSwitch() {
         TackleboxSettings s = load("{\"shortPetTooltips\": true}");
-        assertTrue(s.shortPetTooltips);
-        assertFalse(s.shortFishTooltips);
+        assertTrue(TackleboxSettings.Menus.shortPetTooltips);
+        assertFalse(TackleboxSettings.Menus.shortFishTooltips);
         TackleboxSettings fresh = load("{}");
-        assertFalse(fresh.shortPetTooltips);
-        assertFalse(fresh.shortFishTooltips);
+        assertFalse(TackleboxSettings.Menus.shortPetTooltips);
+        assertFalse(TackleboxSettings.Menus.shortFishTooltips);
+    }
+
+    /** Evaluates {@code first} (the load) before reading the static option. */
+    private static <T> T after(Object first, T value) {
+        return value;
     }
 }

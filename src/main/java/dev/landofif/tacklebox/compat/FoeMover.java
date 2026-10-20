@@ -51,54 +51,54 @@ public final class FoeMover {
         chatBox.edges(true, FoeMover::chatOpen, FoeMover::dragChat);
         add.add(chatBox);
         add.add(new Box(ctx -> {
-            int w = 182 * s.hotbarScale / 100, h = 22 * s.hotbarScale / 100;
+            int w = 182 * TackleboxSettings.Huds.hotbarScale / 100, h = 22 * TackleboxSettings.Huds.hotbarScale / 100;
             return new int[]{sw() / 2 - w / 2 + s.hotbarX, sh() - h + s.hotbarY, w, h};
         }, (x, y, r) -> {
             s.hotbarX = Math.max(-sw() / 2 + r[2] / 2, Math.min(sw() / 2 - r[2] / 2, x - (sw() / 2 - r[2] / 2)));
             s.hotbarY = Math.max(-sh() + r[3], Math.min(0, y - (sh() - r[3])));
-        }, (step, shift) -> s.hotbarScale = Math.max(50, Math.min(200, s.hotbarScale + step * 5)), () -> {
+        }, (step, shift) -> TackleboxSettings.Huds.hotbarScale = Math.max(50, Math.min(200, TackleboxSettings.Huds.hotbarScale + step * 5)), () -> {
             s.hotbarX = 0;
             s.hotbarY = 0;
-            s.hotbarScale = 100;
+            TackleboxSettings.Huds.hotbarScale = 100;
         }));
         add.add(new Box(ctx -> {
-            int w = 131 * s.equipScale / 100, h = 20 * s.equipScale / 100; // foecollabs default place: the row above the hotbar
+            int w = 131 * TackleboxSettings.Huds.equipScale / 100, h = 20 * TackleboxSettings.Huds.equipScale / 100; // foecollabs default place: the row above the hotbar
             int[] off = s.equipOffset();
             return new int[]{sw() / 2 - w / 2 + s.hotbarX + s.equipX + off[0], sh() - 28 - h + s.hotbarY + s.equipY + off[1], w, h};
         }, (x, y, r) -> {
             int[] off = s.equipOffset();
             s.equipX = x - (sw() / 2 - r[2] / 2 + s.hotbarX + off[0]);
             s.equipY = y - (sh() - 28 - r[3] + s.hotbarY + off[1]);
-        }, (step, shift) -> s.equipScale = Math.max(50, Math.min(200, s.equipScale + step * 5)), () -> {
+        }, (step, shift) -> TackleboxSettings.Huds.equipScale = Math.max(50, Math.min(200, TackleboxSettings.Huds.equipScale + step * 5)), () -> {
             s.equipX = 0;
             s.equipY = 0;
-            s.equipScale = 100;
+            TackleboxSettings.Huds.equipScale = 100;
         }));
-        if (s.questsHud) {
+        if (TackleboxSettings.Huds.questsHud) {
             add.add(new Box(ctx -> XpEstimate.draw(ctx, true), (x, y, r) -> s.questsPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.questsScale = Math.max(50, Math.min(300, s.questsScale + step * 5)), () -> {
                 s.questsScale = 100;
                 s.questsPos = new HudPos(4, 70);
             }));
         }
-        if (s.levelBars) {
+        if (TackleboxSettings.Huds.levelBars) {
             add.add(new Box(ctx -> dev.landofif.tacklebox.hud.LevelBars.draw(ctx, true), (x, y, r) -> s.levelBarsPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.levelBarsScale = Math.max(50, Math.min(300, s.levelBarsScale + step * 5)), () -> {
                 s.levelBarsScale = 100;
                 s.levelBarsPos = new HudPos(4, 40);
             }));
         }
-        if (s.boostsHud) {
+        if (TackleboxSettings.Huds.boostsHud) {
             add.add(new Box(ctx -> dev.landofif.tacklebox.hud.BoostsHud.draw(ctx, true), (x, y, r) -> s.boostsPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.boostsScale = Math.max(50, Math.min(300, s.boostsScale + step * 5)), () -> {
                 s.boostsScale = 100;
                 s.boostsPos = new HudPos(182, 70);
             }));
         }
-        if (s.nowPlaying) {
+        if (TackleboxSettings.Huds.nowPlaying) {
             add.add(new Box(ctx -> dev.landofif.tacklebox.hud.NowPlaying.draw(ctx, true), (x, y, r) -> s.nowPlayingPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.nowPlayingScale = Math.max(50, Math.min(300, s.nowPlayingScale + step * 5)), () -> {
                 s.nowPlayingScale = 100;
                 s.nowPlayingPos = new HudPos(4, 4);
             }));
         }
-        if (s.serverHud) {
+        if (TackleboxSettings.Huds.serverHud) {
             add.add(new Box(ctx -> dev.landofif.tacklebox.hud.ServerHud.draw(ctx, true), (x, y, r) -> s.serverHudPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.serverHudScale = Math.max(50, Math.min(200, s.serverHudScale + step * 5)), () -> {
                 s.serverHudPos = new HudPos(4, 120);
                 s.serverHudScale = 100;

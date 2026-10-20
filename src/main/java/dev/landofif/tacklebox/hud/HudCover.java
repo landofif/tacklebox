@@ -24,7 +24,7 @@ public final class HudCover {
     /** True when the hud at this spot would sit under a chat window or the player list and the option is on. */
     public static boolean covered(int x, int y, int w, int h) {
         TackleboxSettings s = TackleboxSettings.get();
-        if (s == null || !s.hideBehindChat || w <= 0 || h <= 0) {
+        if (s == null || !TackleboxSettings.World.hideBehindChat || w <= 0 || h <= 0) {
             return false;
         }
         MinecraftClient client = MinecraftClient.getInstance();
@@ -46,7 +46,7 @@ public final class HudCover {
         List<int[]> pieces = new ArrayList<>();
         pieces.add(new int[]{x, y, w, h});
         TackleboxSettings s = TackleboxSettings.get();
-        if (s == null || !s.hideBehindChat || w <= 0 || h <= 0) {
+        if (s == null || !TackleboxSettings.World.hideBehindChat || w <= 0 || h <= 0) {
             return pieces;
         }
         MinecraftClient client = MinecraftClient.getInstance();

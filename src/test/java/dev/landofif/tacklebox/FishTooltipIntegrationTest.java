@@ -17,13 +17,18 @@ class FishTooltipIntegrationTest {
 
     @Test
     void oldSettingsKeepFishTooltipsOff() {
-        assertFalse(load("{\"swingSlowness\": 2.0}").shortFishTooltips);
+        assertFalse(after(load("{\"swingSlowness\": 2.0}"), TackleboxSettings.Menus.shortFishTooltips));
     }
 
     @Test
     void savedSwitchRoundTrips() {
         TackleboxSettings s = load("{\"shortFishTooltips\": true}");
-        assertTrue(s.shortFishTooltips);
-        assertFalse(load("{}").shortFishTooltips);
+        assertTrue(TackleboxSettings.Menus.shortFishTooltips);
+        assertFalse(after(load("{}"), TackleboxSettings.Menus.shortFishTooltips));
+    }
+
+    /** Evaluates {@code first} (the load) before reading the static option. */
+    private static <T> T after(Object first, T value) {
+        return value;
     }
 }

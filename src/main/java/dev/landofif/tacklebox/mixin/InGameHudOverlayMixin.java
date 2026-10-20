@@ -32,7 +32,7 @@ abstract class InGameHudOverlayMixin {
             return;
         }
         dev.landofif.tacklebox.hud.XpEstimate.onPopup(raw);
-        if (TackleboxSettings.get().hideXpPopups && Holograms.isXpPopup(raw)) {
+        if (TackleboxSettings.World.hideXpPopups && Holograms.isXpPopup(raw)) {
             this.overlayMessage = Text.empty();
             this.overlayRemaining = 0;
             ci.cancel();

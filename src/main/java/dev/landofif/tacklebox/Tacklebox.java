@@ -108,13 +108,13 @@ public final class Tacklebox implements ClientModInitializer {
         ItemTooltipCallback.EVENT.register(shortTooltips, (stack, context, type, lines) -> {
             TackleboxSettings settings = TackleboxSettings.get();
             NbtComponent data = stack.get(DataComponentTypes.CUSTOM_DATA);
-            if (data == null || !(settings.shortFishTooltips || settings.shortPetTooltips)) {
+            if (data == null || !(TackleboxSettings.Menus.shortFishTooltips || TackleboxSettings.Menus.shortPetTooltips)) {
                 return;
             }
             NbtCompound nbt = data.copyNbt();
-            if (settings.shortFishTooltips && FishTooltip.isFish(nbt)) {
+            if (TackleboxSettings.Menus.shortFishTooltips && FishTooltip.isFish(nbt)) {
                 FishTooltip.shorten(lines);
-            } else if (settings.shortPetTooltips && PetTooltip.isPet(nbt)) {
+            } else if (TackleboxSettings.Menus.shortPetTooltips && PetTooltip.isPet(nbt)) {
                 PetTooltip.shorten(lines);
             }
         });
@@ -122,7 +122,7 @@ public final class Tacklebox implements ClientModInitializer {
         Identifier petProfit = Identifier.of(MOD_ID, "pet_profit");
         ItemTooltipCallback.EVENT.addPhaseOrdering(Event.DEFAULT_PHASE, petProfit);
         ItemTooltipCallback.EVENT.register(petProfit, (stack, context, type, lines) -> {
-            if (TackleboxSettings.get().petProfitMarks) {
+            if (TackleboxSettings.Menus.petProfitMarks) {
                 PetSale.of(stack).ifPresent(sale -> PetSale.addLine(lines, sale));
             }
         });

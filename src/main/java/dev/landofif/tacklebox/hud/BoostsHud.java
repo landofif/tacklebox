@@ -159,13 +159,13 @@ public final class BoostsHud {
         w += 16;
         int h = 25 + rows.size() * 11;
         TackleboxSettings s = TackleboxSettings.get();
-        Foe.title(ctx, s.boostsX, s.boostsY, w, s.boostsAlign, Foe.text("active"));
+        Foe.title(ctx, s.boostsX, s.boostsY, w, TackleboxSettings.Huds.boostsAlign, Foe.text("active"));
         for (int i = 0; i < rows.size(); i++) {
             int y = s.boostsY + 20 + i * 11;
             Text l = Foe.text(rows.get(i)[0]), v = Foe.text(rows.get(i)[1]);
             int lx = s.boostsX + 8, vx = s.boostsX + w - 8 - tr.getWidth(v); // left keeps the values in a column on the right
-            if (s.boostsAlign != TackleboxSettings.HudAlign.LEFT) {
-                lx = s.boostsAlign.x(s.boostsX + 8, w - 16, tr.getWidth(l) + (v.getString().isEmpty() ? 0 : 12 + tr.getWidth(v)));
+            if (TackleboxSettings.Huds.boostsAlign != TackleboxSettings.HudAlign.LEFT) {
+                lx = TackleboxSettings.Huds.boostsAlign.x(s.boostsX + 8, w - 16, tr.getWidth(l) + (v.getString().isEmpty() ? 0 : 12 + tr.getWidth(v)));
                 vx = lx + tr.getWidth(l) + 12;
             }
             ctx.drawTextWithShadow(tr, l, lx, y, Foe.DIM);
@@ -175,7 +175,7 @@ public final class BoostsHud {
     }
 
     public static void renderHud(DrawContext ctx) {
-        if (TackleboxSettings.get().boostsHud && TriggerEngine.isOnFishOnMc()) {
+        if (TackleboxSettings.Huds.boostsHud && TriggerEngine.isOnFishOnMc()) {
             draw(ctx, false);
         }
     }

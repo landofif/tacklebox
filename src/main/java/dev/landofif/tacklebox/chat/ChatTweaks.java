@@ -32,10 +32,10 @@ public final class ChatTweaks {
     /** @return false to hide the message */
     public static boolean allow(Text message) {
         TackleboxSettings st = TackleboxSettings.get();
-        if (st != null && st.hideLoginChat && LOGIN.matcher(message.getString().strip()).matches()) {
+        if (st != null && TackleboxSettings.World.hideLoginChat && LOGIN.matcher(message.getString().strip()).matches()) {
             return false;
         }
-        if (st != null && st.hideEmptyChat && isEmpty(message.getString())) {
+        if (st != null && TackleboxSettings.World.hideEmptyChat && isEmpty(message.getString())) {
             return false;
         }
         return hiddenBy(message.getString(), TriggerEngine.isOnFishOnMc(), true) == null;

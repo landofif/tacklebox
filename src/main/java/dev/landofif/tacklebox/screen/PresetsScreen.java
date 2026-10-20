@@ -292,7 +292,7 @@ public class PresetsScreen extends TackleboxScreen {
         }
         for (int i = 0; i < Math.min(others.size(), n); i++) { // the other page, greyed out, click to go there
             int x = cardX + i * (cardW + gap);
-            drawCard(ctx, others.get(i), x, otherY, cardW, otherH, false, -1, -1, TackleboxSettings.get().presetsOtherBg);
+            drawCard(ctx, others.get(i), x, otherY, cardW, otherH, false, -1, -1, TackleboxSettings.Menus.presetsOtherBg);
             Hypr.rrect(ctx, x, otherY, cardW, otherH, 5, 0x80000000);
         }
         if (!tip.isEmpty()) {
@@ -400,6 +400,6 @@ public class PresetsScreen extends TackleboxScreen {
 
     @Override
     protected int sizePct() {
-        return TackleboxSettings.get().presetsSize;
+        return TackleboxSettings.Menus.presetsSize;
     }
 }

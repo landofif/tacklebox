@@ -137,7 +137,7 @@ public final class ServerHud {
     }
 
     public static void renderHud(DrawContext ctx) {
-        if (TackleboxSettings.get().serverHud && TriggerEngine.isOnFishOnMc()) {
+        if (TackleboxSettings.Huds.serverHud && TriggerEngine.isOnFishOnMc()) {
             draw(ctx, false);
         }
     }
@@ -173,7 +173,7 @@ public final class ServerHud {
         m.scale(k, k);
         for (int i = 0; i < lines.size(); i++) {
             Line l = lines.get(i);
-            int x = (l.center ? TackleboxSettings.HudAlign.CENTRE : s.serverHudAlign).x(PAD, w, tr.getWidth(l.text));
+            int x = (l.center ? TackleboxSettings.HudAlign.CENTRE : TackleboxSettings.Huds.serverHudAlign).x(PAD, w, tr.getWidth(l.text));
             ctx.drawTextWithShadow(tr, l.text, x, PAD + i * LINE, 0xFFFFFFFF);
         }
         m.popMatrix();

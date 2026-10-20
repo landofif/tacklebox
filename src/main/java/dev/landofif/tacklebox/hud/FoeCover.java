@@ -24,7 +24,7 @@ public final class FoeCover {
     /** Draws a foecollab hud through {@code draw}, cut off where it sat under a chat window last time. */
     public static void run(Object hud, DrawContext ctx, Runnable draw) {
         TackleboxSettings s = TackleboxSettings.get();
-        if (s == null || !s.hideBehindChat || cur != null) {
+        if (s == null || !TackleboxSettings.World.hideBehindChat || cur != null) {
             draw.run();
             return;
         }

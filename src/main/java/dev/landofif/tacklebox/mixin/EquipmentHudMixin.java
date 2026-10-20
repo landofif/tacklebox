@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 abstract class EquipmentHudMixin {
     @WrapMethod(method = "render", remap = false, require = 0)
     private void tacklebox$off(DrawContext ctx, MinecraftClient client, Operation<Void> original) {
-        if (!TackleboxSettings.get().equipHud) {
+        if (!TackleboxSettings.Huds.equipHud) {
             original.call(ctx, client);
         }
     }

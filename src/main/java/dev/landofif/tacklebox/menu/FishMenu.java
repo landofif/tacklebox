@@ -63,7 +63,7 @@ public final class FishMenu {
         }
         TackleboxSettings s = TackleboxSettings.get();
         var server = MinecraftClient.getInstance().getCurrentServerEntry();
-        if (s == null || !(Vaults.number(screen) > 0 ? s.vaultMenu : isPresets(screen) ? s.presetsMenu : s.fishMenu) || server == null || !server.address.toLowerCase(Locale.ROOT).contains("fishonmc")) {
+        if (s == null || !(Vaults.number(screen) > 0 ? TackleboxSettings.Menus.vaultMenu : isPresets(screen) ? TackleboxSettings.Menus.presetsMenu : TackleboxSettings.Menus.fishMenu) || server == null || !server.address.toLowerCase(Locale.ROOT).contains("fishonmc")) {
             return false;
         }
         if (Vaults.number(screen) > 0) {

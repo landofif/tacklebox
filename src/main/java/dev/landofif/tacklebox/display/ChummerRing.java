@@ -98,11 +98,11 @@ public final class ChummerRing {
     private static void render(WorldRenderContext context) {
         List<Placed> rings = placed;
         TackleboxSettings settings = TackleboxSettings.get();
-        if (rings.isEmpty() || !settings.chummerRing) {
+        if (rings.isEmpty() || !TackleboxSettings.World.chummerRing) {
             return;
         }
         Vec3d camera = context.worldState().cameraRenderState.pos;
-        int color = ChummerRingGeometry.argb(settings.chummerRingColor);
+        int color = ChummerRingGeometry.argb(TackleboxSettings.World.chummerRingColor);
         VertexConsumer buffer = context.consumers().getBuffer(RenderLayers.debugQuads());
         for (Placed ring : rings) {
             ChummerRingGeometry.emit((float) (ring.x - camera.x), (float) (ring.groundY - camera.y),

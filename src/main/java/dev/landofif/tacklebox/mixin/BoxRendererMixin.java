@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 abstract class BoxRendererMixin {
     @Inject(method = "draw(Lnet/minecraft/class_332;Lnet/minecraft/class_2960;IIIII)V", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private static void tacklebox$ourLook(DrawContext ctx, Identifier texture, int x, int y, int w, int h, int color, CallbackInfo ci) {
-        if (!TackleboxSettings.get().flatMenus) {
+        if (!TackleboxSettings.Menus.flatMenus) {
             return;
         }
         ci.cancel();

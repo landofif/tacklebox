@@ -29,27 +29,27 @@ class ChummerRingIntegrationTest {
     }
 
     @Test
-    void oldSettingsGetTheRingOnInGreen() {
+    void oldSettingsGetTheRingOffInGreen() {
         TackleboxSettings s = load("{\"swingSlowness\": 2.0, \"hideXpPopups\": true}");
-        assertTrue(s.chummerRing);
-        assertEquals(0x41F55B, s.chummerRingColor);
-        assertTrue(load("{}").chummerRing);
+        assertFalse(TackleboxSettings.World.chummerRing); // opt in
+        assertEquals(0x41F55B, TackleboxSettings.World.chummerRingColor);
+        assertFalse(after(load("{}"), TackleboxSettings.World.chummerRing));
     }
 
     @Test
     void savedChoiceRoundTrips() {
-        TackleboxSettings s = load("{\"chummerRing\": false, \"chummerRingColor\": 16711680}");
-        assertFalse(s.chummerRing);
-        assertEquals(0xFF0000, s.chummerRingColor);
+        TackleboxSettings s = load("{\"chummerRing\": true, \"chummerRingColor\": 16711680}");
+        assertTrue(TackleboxSettings.World.chummerRing);
+        assertEquals(0xFF0000, TackleboxSettings.World.chummerRingColor);
 
         TackleboxSettings fresh = load("{}");
-        assertTrue(fresh.chummerRing);
-        assertEquals(0x41F55B, fresh.chummerRingColor);
+        assertFalse(TackleboxSettings.World.chummerRing);
+        assertEquals(0x41F55B, TackleboxSettings.World.chummerRingColor);
     }
 
     @Test
     void theColourKeepsOnlyRgb() {
-        assertEquals(0xFFFFFF, load("{\"chummerRingColor\": -1}").chummerRingColor);
+        assertEquals(0xFFFFFF, after(load("{\"chummerRingColor\": -1}"), TackleboxSettings.World.chummerRingColor));
     }
 
     @Test
@@ -80,5 +80,10 @@ class ChummerRingIntegrationTest {
             assertEquals(ChummerRingGeometry.RADIUS, d, 1e-3);
             assertTrue(ChummerRingGeometry.inRange(X, Z, wx, wz) || d - ChummerRingGeometry.RADIUS < 1e-3);
         }
+    }
+
+    /** Evaluates {@code first} (the load) before reading the static option. */
+    private static <T> T after(Object first, T value) {
+        return value;
     }
 }

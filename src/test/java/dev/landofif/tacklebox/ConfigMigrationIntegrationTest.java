@@ -42,8 +42,8 @@ class ConfigMigrationIntegrationTest {
 
         assertTrue(ConfigMigration.run(config, Tacklebox.MOD_ID)); // first start after the rename
         TackleboxSettings s = readSettings();
-        assertTrue(s.levelBars);
-        assertTrue(s.levelBarsBar); // a setting added later is on in an old file that does not have it
+        assertTrue(TackleboxSettings.Huds.levelBars);
+        assertTrue(TackleboxSettings.Huds.levelBarsBar); // a setting added later is on in an old file that does not have it
         ChatBox dms = s.chatBoxes.get(0);
         assertEquals("dms", dms.name);
         assertEquals(180, dms.width);
@@ -51,6 +51,7 @@ class ConfigMigrationIntegrationTest {
 
         Files.writeString(config.resolve(Tacklebox.MOD_ID).resolve("settings.json"), "{\"levelBars\": false}"); // changed in the new version
         assertFalse(ConfigMigration.run(config, Tacklebox.MOD_ID)); // second start
-        assertFalse(readSettings().levelBars);
+        readSettings();
+        assertFalse(TackleboxSettings.Huds.levelBars);
     }
 }

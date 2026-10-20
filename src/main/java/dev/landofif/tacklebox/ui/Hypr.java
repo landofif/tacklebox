@@ -17,11 +17,11 @@ public final class Hypr {
 
     /** The accent gradient's two colours, from the settings. */
     public static int acc1() {
-        return 0xFF000000 | dev.landofif.tacklebox.TackleboxSettings.get().accent1;
+        return 0xFF000000 | dev.landofif.tacklebox.TackleboxSettings.Screens.accent1;
     }
 
     public static int acc2() {
-        return 0xFF000000 | dev.landofif.tacklebox.TackleboxSettings.get().accent2;
+        return 0xFF000000 | dev.landofif.tacklebox.TackleboxSettings.Screens.accent2;
     }
 
     /** A colour per pixel, so borders and fills can be gradients. */

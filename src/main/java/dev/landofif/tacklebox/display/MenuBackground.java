@@ -26,21 +26,21 @@ public final class MenuBackground {
 
     public static void draw(DrawContext ctx, int x, int y, int width, int height) {
         TackleboxSettings s = TackleboxSettings.get();
-        int fill = (s.menuBgOpacity * 255 / 100) << 24 | s.menuBgColor & 0xFFFFFF;
-        boolean picture = s.menuImageOpacity > 0 && (System.currentTimeMillis() <= nextCheck || load()) && stamp >= 0;
-        if (s.menuBgOpacity <= 0 && !picture) {
+        int fill = (TackleboxSettings.Menus.menuBgOpacity * 255 / 100) << 24 | TackleboxSettings.Menus.menuBgColor & 0xFFFFFF;
+        boolean picture = TackleboxSettings.Menus.menuImageOpacity > 0 && (System.currentTimeMillis() <= nextCheck || load()) && stamp >= 0;
+        if (TackleboxSettings.Menus.menuBgOpacity <= 0 && !picture) {
             return;
         }
         double k = picture ? Math.max((double) width / w, (double) height / h) : 0;
         int dw = (int) Math.round(w * k), dh = (int) Math.round(h * k), px = x + (width - dw) / 2, py = y + (height - dh) / 2;
-        int tint = (s.menuImageOpacity * 255 / 100) << 24 | 0xFFFFFF;
+        int tint = (TackleboxSettings.Menus.menuImageOpacity * 255 / 100) << 24 | 0xFFFFFF;
         int radius = Math.min(CORNER, Math.min(width, height) / 2);
-        paint(ctx, x, y + radius, x + width, y + height - radius, s.menuBgOpacity > 0 ? fill : 0, picture, px, py, dw, dh, tint); // the middle
+        paint(ctx, x, y + radius, x + width, y + height - radius, TackleboxSettings.Menus.menuBgOpacity > 0 ? fill : 0, picture, px, py, dw, dh, tint); // the middle
         for (int i = 0; i < radius; i++) { // the corners, a row at a time
             double up = radius - i - 0.5;
             int inset = radius - (int) Math.round(Math.sqrt(radius * radius - up * up));
-            paint(ctx, x + inset, y + i, x + width - inset, y + i + 1, s.menuBgOpacity > 0 ? fill : 0, picture, px, py, dw, dh, tint);
-            paint(ctx, x + inset, y + height - 1 - i, x + width - inset, y + height - i, s.menuBgOpacity > 0 ? fill : 0, picture, px, py, dw, dh, tint);
+            paint(ctx, x + inset, y + i, x + width - inset, y + i + 1, TackleboxSettings.Menus.menuBgOpacity > 0 ? fill : 0, picture, px, py, dw, dh, tint);
+            paint(ctx, x + inset, y + height - 1 - i, x + width - inset, y + height - i, TackleboxSettings.Menus.menuBgOpacity > 0 ? fill : 0, picture, px, py, dw, dh, tint);
         }
     }
 

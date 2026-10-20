@@ -66,9 +66,9 @@ public final class NowPlaying {
             try {
                 while (true) {
                     TackleboxSettings s = TackleboxSettings.get();
-                    Track now = s.nowPlaying ? poll() : null;
+                    Track now = TackleboxSettings.Huds.nowPlaying ? poll() : null;
                     track = now;
-                    if (now != null && s.nowPlayingArt && !now.art().isEmpty() && !now.art().equals(requested)) {
+                    if (now != null && TackleboxSettings.Huds.nowPlayingArt && !now.art().isEmpty() && !now.art().equals(requested)) {
                         requested = now.art();
                         loadCover(requested);
                     }
@@ -196,14 +196,14 @@ public final class NowPlaying {
             mc.getTextureManager().registerTexture(ART_ID, MenuBackground.smooth(new NativeImageBackedTexture(() -> "tacklebox now playing", cover.image())));
             shown = cover.url();
         }
-        boolean art = s.nowPlayingArt && !t.art().isEmpty() && !t.art().equals(failed); // the room is kept while it loads
+        boolean art = TackleboxSettings.Huds.nowPlayingArt && !t.art().isEmpty() && !t.art().equals(failed); // the room is kept while it loads
 
         String time = t.length() <= 0 && t.position() <= 0 ? "" : ServerHud.clock(t.position()) + (t.length() > 0 ? " / " + ServerHud.clock(t.length()) : "");
         if (!t.playing() && !time.isEmpty()) {
             time = "paused " + time;
         }
-        String[] lines = {tr.trimToWidth(t.title(), MAX_TEXT), s.nowPlayingArtist ? tr.trimToWidth(t.artist(), MAX_TEXT) : "",
-                s.nowPlayingTime ? Foe.text(time).getString() : ""};
+        String[] lines = {tr.trimToWidth(t.title(), MAX_TEXT), TackleboxSettings.Huds.nowPlayingArtist ? tr.trimToWidth(t.artist(), MAX_TEXT) : "",
+                TackleboxSettings.Huds.nowPlayingTime ? Foe.text(time).getString() : ""};
         int textW = 0, rows = 0;
         for (String l : lines) {
             if (!l.isEmpty()) {
@@ -211,13 +211,13 @@ public final class NowPlaying {
                 rows++;
             }
         }
-        boolean bar = s.nowPlayingBar && t.length() > 0;
+        boolean bar = TackleboxSettings.Huds.nowPlayingBar && t.length() > 0;
         int artW = art ? ART + 6 : 0;
         int contentW = Math.max(artW + textW, bar ? 100 : 0), contentH = Math.max(art ? ART : 0, rows * 11);
-        int x = s.nowPlayingX + 8, top = s.nowPlayingY + (s.nowPlayingHeading ? 20 : 4);
+        int x = s.nowPlayingX + 8, top = s.nowPlayingY + (TackleboxSettings.Huds.nowPlayingHeading ? 20 : 4);
 
-        if (s.nowPlayingHeading) {
-            Foe.title(ctx, s.nowPlayingX, s.nowPlayingY, contentW + 16, s.nowPlayingAlign, Foe.text("now playing"));
+        if (TackleboxSettings.Huds.nowPlayingHeading) {
+            Foe.title(ctx, s.nowPlayingX, s.nowPlayingY, contentW + 16, TackleboxSettings.Huds.nowPlayingAlign, Foe.text("now playing"));
         }
         if (art && t.art().equals(shown)) {
             ctx.drawTexture(RenderPipelines.GUI_TEXTURED, ART_ID, x, top, 0f, 0f, ART, ART, ART_TEX, ART_TEX, ART_TEX, ART_TEX);
@@ -225,7 +225,7 @@ public final class NowPlaying {
         int y = top + (contentH - rows * 11) / 2;
         for (int i = 0; i < lines.length; i++) {
             if (!lines[i].isEmpty()) {
-                ctx.drawTextWithShadow(tr, lines[i], s.nowPlayingAlign.x(x + artW, contentW - artW, tr.getWidth(lines[i])), y, i == 0 ? Foe.TEXT : Foe.DIM);
+                ctx.drawTextWithShadow(tr, lines[i], TackleboxSettings.Huds.nowPlayingAlign.x(x + artW, contentW - artW, tr.getWidth(lines[i])), y, i == 0 ? Foe.TEXT : Foe.DIM);
                 y += 11;
             }
         }
@@ -238,7 +238,7 @@ public final class NowPlaying {
     }
 
     public static void renderHud(DrawContext ctx) {
-        if (TackleboxSettings.get().nowPlaying) {
+        if (TackleboxSettings.Huds.nowPlaying) {
             draw(ctx, false);
         }
     }

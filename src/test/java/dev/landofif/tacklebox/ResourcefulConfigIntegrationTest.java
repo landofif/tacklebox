@@ -13,6 +13,8 @@ import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,14 +35,25 @@ class ResourcefulConfigIntegrationTest {
     void theParserAcceptsTheClass() {
         var config = ConfigParser.tryParse(TackleboxSettings.class); // Configurator needs a running Fabric loader, its parser does not
         assertNotNull(config);
-        assertTrue(config.elements().size() > 80, "found " + config.elements().size());
+        assertEquals(5, config.categories().size()); // menus, huds, bobber, world, screens
+        int found = config.elements().size();
+        for (var tab : config.categories().values()) {
+            found += tab.elements().size();
+        }
+        assertTrue(found > 80, "found " + found);
     }
 
     @Test
     void everyOptionAndButtonIsStaticAndHasItsTexts() throws IOException {
         JsonObject lang = lang();
         int entries = 0;
-        for (Field f : TackleboxSettings.class.getDeclaredFields()) {
+        List<Field> fields = new ArrayList<>(List.of(TackleboxSettings.class.getDeclaredFields()));
+        for (Class<?> tab : TackleboxSettings.class.getDeclaredClasses()) {
+            if (tab.isAnnotationPresent(com.teamresourceful.resourcefulconfig.api.annotations.Category.class)) {
+                fields.addAll(List.of(tab.getDeclaredFields()));
+            }
+        }
+        for (Field f : fields) {
             ConfigEntry e = f.getAnnotation(ConfigEntry.class);
             if (e != null) {
                 entries++;
@@ -67,17 +80,17 @@ class ResourcefulConfigIntegrationTest {
         TackleboxSettings.importLegacy(JsonParser.parseString(
                 "{\"flatMenus\": false, \"hotbarLook\": \"FILL\", \"questsAlign\": \"CENTRE\", \"accent1\": 255, \"hotbarSpacing\": 18,"
                         + " \"equipPlace\": \"NOT_A_PLACE\", \"levelBars\": null}").getAsJsonObject());
-        assertFalse(TackleboxSettings.flatMenus);
-        assertEquals(TackleboxSettings.BoxLook.FILL, TackleboxSettings.hotbarLook);
-        assertEquals(TackleboxSettings.HudAlign.CENTRE, TackleboxSettings.questsAlign);
-        assertEquals(255, TackleboxSettings.accent1);
-        assertEquals(18, TackleboxSettings.hotbarSpacing);
-        assertEquals(TackleboxSettings.EquipPlace.ABOVE, TackleboxSettings.equipPlace); // an unknown value falls back
-        assertTrue(TackleboxSettings.levelBars); // null keeps the default
-        assertEquals(0x00FF99, TackleboxSettings.accent2);
+        assertFalse(TackleboxSettings.Menus.flatMenus);
+        assertEquals(TackleboxSettings.BoxLook.FILL, TackleboxSettings.Huds.hotbarLook);
+        assertEquals(TackleboxSettings.HudAlign.CENTRE, TackleboxSettings.Huds.questsAlign);
+        assertEquals(255, TackleboxSettings.Screens.accent1);
+        assertEquals(18, TackleboxSettings.Huds.hotbarSpacing);
+        assertEquals(TackleboxSettings.EquipPlace.ABOVE, TackleboxSettings.Huds.equipPlace); // an unknown value falls back
+        assertFalse(TackleboxSettings.Huds.levelBars); // null keeps the default (off)
+        assertEquals(0x00FF99, TackleboxSettings.Screens.accent2);
 
         TackleboxSettings.importLegacy(new JsonObject()); // a second import starts from the defaults again
-        assertTrue(TackleboxSettings.flatMenus);
-        assertEquals(TackleboxSettings.BoxLook.HYPR, TackleboxSettings.hotbarLook);
+        assertFalse(TackleboxSettings.Menus.flatMenus);
+        assertEquals(TackleboxSettings.BoxLook.DEFAULT, TackleboxSettings.Huds.hotbarLook);
     }
 }

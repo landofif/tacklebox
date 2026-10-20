@@ -28,14 +28,14 @@ class PetProfitIntegrationTest {
 
     @Test
     void oldSettingsKeepPetMarksOff() {
-        assertFalse(load("{\"swingSlowness\": 2.0}").petProfitMarks);
+        assertFalse(after(load("{\"swingSlowness\": 2.0}"), TackleboxSettings.Menus.petProfitMarks));
     }
 
     @Test
     void savedSwitchRoundTrips() {
         TackleboxSettings s = load("{\"petProfitMarks\": true}");
-        assertTrue(s.petProfitMarks);
-        assertFalse(load("{}").petProfitMarks);
+        assertTrue(TackleboxSettings.Menus.petProfitMarks);
+        assertFalse(after(load("{}"), TackleboxSettings.Menus.petProfitMarks));
     }
 
     /** The Bullfrog Pet of the 2026-10-16 auction dump (slot 2, $2K) from its item data to the line under its price. */
@@ -60,5 +60,10 @@ class PetProfitIntegrationTest {
         assertEquals(4, lines.size());
         assertEquals("sells for: $2.18k (+$176.38)", Glyphs.plain(lines.get(2)));
         assertEquals("time: 23h 29m 26s", Glyphs.plain(lines.get(3)));
+    }
+
+    /** Evaluates {@code first} (the load) before reading the static option. */
+    private static <T> T after(Object first, T value) {
+        return value;
     }
 }

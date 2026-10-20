@@ -58,7 +58,7 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
     private boolean tacklebox$restyled() {
         Object self = this;
         // the auction house pages (title art U+D541-D546) keep the server's chest art
-        return TackleboxSettings.get().flatMenus && !title.getString().chars().anyMatch(c -> c >= 0xD541 && c <= 0xD546) && (self instanceof GenericContainerScreen || self instanceof ShulkerBoxScreen || self instanceof HopperScreen
+        return TackleboxSettings.Menus.flatMenus && !title.getString().chars().anyMatch(c -> c >= 0xD541 && c <= 0xD546) && (self instanceof GenericContainerScreen || self instanceof ShulkerBoxScreen || self instanceof HopperScreen
                 || self instanceof Generic3x3ContainerScreen || self instanceof InventoryScreen);
     }
 
@@ -100,7 +100,7 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
     /** A pet the store would pay more for than the auction asks: a see-through green square behind its item (setting petProfitMarks). */
     @Inject(method = "drawSlot", at = @At("HEAD"))
     private void tacklebox$profitTint(DrawContext ctx, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
-        if (TackleboxSettings.get().petProfitMarks && PetSale.of(slot.getStack()).filter(PetSale.Sale::profitable).isPresent()) {
+        if (TackleboxSettings.Menus.petProfitMarks && PetSale.of(slot.getStack()).filter(PetSale.Sale::profitable).isPresent()) {
             ctx.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, 0x6655FF55);
         }
     }

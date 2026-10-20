@@ -311,13 +311,13 @@ public final class XpEstimate {
         w += 16;
         int h = 25 + rows.length * 11;
         var s = TackleboxSettings.get();
-        Foe.title(ctx, s.questsX, s.questsY, w, s.questsAlign, Foe.text("quests left")); // no box behind it
+        Foe.title(ctx, s.questsX, s.questsY, w, TackleboxSettings.Huds.questsAlign, Foe.text("quests left")); // no box behind it
         for (int i = 0; i < rows.length; i++) {
             int y = s.questsY + 20 + i * 11;
             Text l = Foe.text(rows[i][0]), v = Foe.text(rows[i][1]);
             int lx = s.questsX + 8, vx = s.questsX + w - 8 - tr.getWidth(v); // left keeps the values in a column on the right
-            if (s.questsAlign != TackleboxSettings.HudAlign.LEFT) {
-                lx = s.questsAlign.x(s.questsX + 8, w - 16, tr.getWidth(l) + 12 + tr.getWidth(v));
+            if (TackleboxSettings.Huds.questsAlign != TackleboxSettings.HudAlign.LEFT) {
+                lx = TackleboxSettings.Huds.questsAlign.x(s.questsX + 8, w - 16, tr.getWidth(l) + 12 + tr.getWidth(v));
                 vx = lx + tr.getWidth(l) + 12;
             }
             ctx.drawTextWithShadow(tr, l, lx, y, Foe.DIM);
@@ -327,7 +327,7 @@ public final class XpEstimate {
     }
 
     public static void renderHud(DrawContext ctx) {
-        if (TackleboxSettings.get().questsHud && TriggerEngine.isOnFishOnMc()) {
+        if (TackleboxSettings.Huds.questsHud && TriggerEngine.isOnFishOnMc()) {
             draw(ctx, true); // dashes until /quests, /travel and some catches have taught it the numbers
         }
     }
