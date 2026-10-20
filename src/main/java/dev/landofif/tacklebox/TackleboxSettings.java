@@ -3,6 +3,7 @@ package dev.landofif.tacklebox;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
+import com.teamresourceful.resourcefulconfig.api.annotations.Category;
 import com.teamresourceful.resourcefulconfig.api.annotations.Config;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigButton;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
@@ -197,30 +198,35 @@ public class TackleboxSettings {
 
     // ---- look (foecollabs, see ui/Foe) ----
     // ---- buttons that open the mods other screens (first in the settings screen) ----
-    @ConfigButton(title = "ᴄʜᴀᴛ ᴛʀɪɢɢᴇʀꜱ", text = "ᴏᴘᴇɴ")
-    public static final Runnable openChatTriggers = () -> openLinked(dev.landofif.tacklebox.screen.TriggerListScreen::new);
-    @ConfigButton(title = "ᴄʜᴀᴛ", text = "ᴏᴘᴇɴ")
-    public static final Runnable openChat = () -> openLinked(dev.landofif.tacklebox.screen.ChatFilterScreen::new);
-    @ConfigButton(title = "ᴋᴇʏ ᴄᴏᴍᴍᴀɴᴅꜱ", text = "ᴏᴘᴇɴ")
-    public static final Runnable openKeyCommands = () -> openLinked(dev.landofif.tacklebox.screen.KeyCommandScreen::new);
-    @ConfigButton(title = "ᴄᴏᴍᴍᴀɴᴅ ᴀʟɪᴀꜱᴇꜱ", text = "ᴏᴘᴇɴ")
-    public static final Runnable openCommandAliases = () -> openLinked(dev.landofif.tacklebox.screen.AliasScreen::new);
-    @ConfigButton(title = "ᴡᴏʀᴅ ꜱᴡᴀᴘꜱ", text = "ᴏᴘᴇɴ")
-    public static final Runnable openWordSwaps = () -> openLinked(dev.landofif.tacklebox.screen.WordSwapScreen::new);
-    @ConfigButton(title = "ʙᴀɪᴛ ᴘɪᴄᴋᴇʀ", text = "ᴏᴘᴇɴ")
-    public static final Runnable openBaitPicker = () -> openLinked(dev.landofif.tacklebox.screen.BaitScreen::new);
-    @ConfigButton(title = "ᴘᴏᴡᴇʀ", text = "ᴏᴘᴇɴ")
-    public static final Runnable openPower = () -> openLinked(dev.landofif.tacklebox.screen.PowerScreen::new);
-    @ConfigButton(title = "ʙᴏʙʙᴇʀ ᴛɪᴍᴇʀ", text = "ᴏᴘᴇɴ")
-    public static final Runnable openBobberTimer = () -> openLinked(dev.landofif.tacklebox.screen.BobberScreen::new);
-    @ConfigButton(title = "ᴠɪᴇᴡᴍᴏᴅᴇʟ", text = "ᴏᴘᴇɴ")
-    public static final Runnable openViewmodel = () -> openLinked(dev.landofif.tacklebox.screen.ViewmodelScreen::new);
-    @ConfigButton(title = "ꜱᴇʀᴠᴇʀ ʜᴜᴅ ʟɪɴᴇꜱ", text = "ᴏᴘᴇɴ")
-    public static final Runnable openServerHudLines = () -> openLinked(dev.landofif.tacklebox.screen.ServerHudScreen::new);
-    @ConfigButton(title = "ᴍᴏᴠᴇ ʜᴜᴅꜱ", text = "ᴏᴘᴇɴ")
-    public static final Runnable openMoveHuds = () -> openLinked(dev.landofif.tacklebox.compat.FoeScreens::move);
-    @ConfigButton(title = "ᴍᴇɴᴜ ᴘɪᴄᴛᴜʀᴇ ꜰᴏʟᴅᴇʀ", text = "ᴏᴘᴇɴ ꜰᴏʟᴅᴇʀ")
-    public static final Runnable openMenuPicture = TackleboxSettings::openMenuPictureFolder;
+    /** The tab with the buttons that open the mods own screens. */
+    @Category("screens")
+    public static class Screens {
+        @ConfigButton(title = "ᴄʜᴀᴛ ᴛʀɪɢɢᴇʀꜱ", text = "ᴏᴘᴇɴ")
+        public static final Runnable openChatTriggers = () -> openLinked(dev.landofif.tacklebox.screen.TriggerListScreen::new);
+        @ConfigButton(title = "ᴄʜᴀᴛ", text = "ᴏᴘᴇɴ")
+        public static final Runnable openChat = () -> openLinked(dev.landofif.tacklebox.screen.ChatFilterScreen::new);
+        @ConfigButton(title = "ᴋᴇʏ ᴄᴏᴍᴍᴀɴᴅꜱ", text = "ᴏᴘᴇɴ")
+        public static final Runnable openKeyCommands = () -> openLinked(dev.landofif.tacklebox.screen.KeyCommandScreen::new);
+        @ConfigButton(title = "ᴄᴏᴍᴍᴀɴᴅ ᴀʟɪᴀꜱᴇꜱ", text = "ᴏᴘᴇɴ")
+        public static final Runnable openCommandAliases = () -> openLinked(dev.landofif.tacklebox.screen.AliasScreen::new);
+        @ConfigButton(title = "ᴡᴏʀᴅ ꜱᴡᴀᴘꜱ", text = "ᴏᴘᴇɴ")
+        public static final Runnable openWordSwaps = () -> openLinked(dev.landofif.tacklebox.screen.WordSwapScreen::new);
+        @ConfigButton(title = "ʙᴀɪᴛ ᴘɪᴄᴋᴇʀ", text = "ᴏᴘᴇɴ")
+        public static final Runnable openBaitPicker = () -> openLinked(dev.landofif.tacklebox.screen.BaitScreen::new);
+        @ConfigButton(title = "ᴘᴏᴡᴇʀ", text = "ᴏᴘᴇɴ")
+        public static final Runnable openPower = () -> openLinked(dev.landofif.tacklebox.screen.PowerScreen::new);
+        @ConfigButton(title = "ʙᴏʙʙᴇʀ ᴛɪᴍᴇʀ", text = "ᴏᴘᴇɴ")
+        public static final Runnable openBobberTimer = () -> openLinked(dev.landofif.tacklebox.screen.BobberScreen::new);
+        @ConfigButton(title = "ᴠɪᴇᴡᴍᴏᴅᴇʟ", text = "ᴏᴘᴇɴ")
+        public static final Runnable openViewmodel = () -> openLinked(dev.landofif.tacklebox.screen.ViewmodelScreen::new);
+        @ConfigButton(title = "ꜱᴇʀᴠᴇʀ ʜᴜᴅ ʟɪɴᴇꜱ", text = "ᴏᴘᴇɴ")
+        public static final Runnable openServerHudLines = () -> openLinked(dev.landofif.tacklebox.screen.ServerHudScreen::new);
+        @ConfigButton(title = "ᴍᴏᴠᴇ ʜᴜᴅꜱ", text = "ᴏᴘᴇɴ")
+        public static final Runnable openMoveHuds = () -> openLinked(dev.landofif.tacklebox.compat.FoeScreens::move);
+        @ConfigButton(title = "ᴍᴇɴᴜ ᴘɪᴄᴛᴜʀᴇ ꜰᴏʟᴅᴇʀ", text = "ᴏᴘᴇɴ ꜰᴏʟᴅᴇʀ")
+        public static final Runnable openMenuPicture = TackleboxSettings::openMenuPictureFolder;
+    }
+
 
     // ---- options shown in the settings screen (Resourceful Config reads these static fields) ----
     /** The two colours of the gradient on focused tiles, hovered buttons and toggles (rgb). */
