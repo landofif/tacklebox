@@ -89,7 +89,7 @@ public class TackleboxSettings {
             current.configMoved = true;
             configurator().saveConfig(TackleboxSettings.class);
         } else if (!current.categoriesMoved) { // the options were flat in config/tacklebox.json before they got tabs
-            Path flat = FabricLoader.getInstance().getConfigDir().resolve(Tacklebox.MOD_ID + ".json");
+            Path flat = FabricLoader.getInstance().getConfigDir().resolve(Tacklebox.MOD_ID + ".jsonc");
             try {
                 if (Files.isRegularFile(flat)) {
                     importLegacy(JsonParser.parseString(Files.readString(flat, StandardCharsets.UTF_8)).getAsJsonObject());
