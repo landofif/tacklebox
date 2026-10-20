@@ -28,25 +28,25 @@ class ChummerRingIntegrationTest {
     }
 
     @Test
-    void oldSettingsGetTheRingOnInGreen() {
+    void oldSettingsGetTheRingOffInGreen() {
         TackleboxSettings s = load("{\"swingSlowness\": 2.0, \"hideXpPopups\": true}");
-        assertTrue(s.chummerRing);
+        assertFalse(s.chummerRing); // opt in
         assertEquals(0x41F55B, s.chummerRingColor);
-        assertTrue(load("{}").chummerRing);
+        assertFalse(load("{}").chummerRing);
     }
 
     @Test
     void savedChoiceRoundTrips() {
-        TackleboxSettings s = load("{\"chummerRing\": false, \"chummerRingColor\": 16711680}");
-        assertFalse(s.chummerRing);
+        TackleboxSettings s = load("{\"chummerRing\": true, \"chummerRingColor\": 16711680}");
+        assertTrue(s.chummerRing);
         assertEquals(0xFF0000, s.chummerRingColor);
 
         TackleboxSettings again = load(new Gson().toJson(s));
-        assertFalse(again.chummerRing);
+        assertTrue(again.chummerRing);
         assertEquals(0xFF0000, again.chummerRingColor);
 
         TackleboxSettings fresh = load(new Gson().toJson(new TackleboxSettings()));
-        assertTrue(fresh.chummerRing);
+        assertFalse(fresh.chummerRing);
         assertEquals(0x41F55B, fresh.chummerRingColor);
     }
 

@@ -61,13 +61,13 @@ public class TackleboxSettings {
 
     // ---- look (foecollabs, see ui/Foe) ----
     /** Chests, the inventory and fishonmc menus as one box with no slot boxes (drops the server's menu art). */
-    public boolean flatMenus = true;
+    public boolean flatMenus;
     /** What shows behind the box-less menus (display/MenuBackground): a colour and a picture, each in percent opacity (0 = none). */
     public boolean menuAccent;
     public int menuAccentOpacity = 40;
     public int menuBgColor = 0x000000, menuBgOpacity = 0, menuImageOpacity = 0;
     /** Every button as a flat see-through fill (lighter while hovered) instead of the bevelled texture. */
-    public boolean flatButtons = true;
+    public boolean flatButtons;
     /** The two colours of the gradient on focused tiles, hovered buttons and toggles (rgb). */
     public int accent1 = 0x33CCFF, accent2 = 0x00FF99;
     /** A see-through circle in the rarity colour behind items in slots (foecollabs rarity, drawn by its item markers). */
@@ -84,8 +84,8 @@ public class TackleboxSettings {
     /** The old on/off for the hotbar background; only read once to fill {@link #hotbarLook} and {@link #equipLook}. */
     public boolean hotbarBackground = false;
     /** What sits behind the hotbar and foecollabs equipment slots, the distance between slots in pixels (20 and 22 are the defaults), and the shared box colours. */
-    public BoxLook hotbarLook = null;
-    public BoxLook equipLook = null;
+    public BoxLook hotbarLook = BoxLook.DEFAULT;
+    public BoxLook equipLook = BoxLook.DEFAULT;
     public int hotbarSpacing = 20;
     public int equipSpacing = 22;
     public int boxOutlineColor = 0x808080;
@@ -105,12 +105,12 @@ public class TackleboxSettings {
     public int equipColor = 0xFFFFFF;
     public int equipY = 0;
     /** The mods own armour and rod parts row (hud/EquipmentRow) instead of foecollabs, and the look version the saved settings were last moved to. */
-    public boolean equipHud = true;
-    public int lookVersion = 0;
+    public boolean equipHud;
+    public int lookVersion = 1;
 
     // ---- fishonmc menu (see menu/FishMenu) ----
     /** Show the main menu and /travel as the mods own screens instead of the chest gui. */
-    public boolean fishMenu = true;
+    public boolean fishMenu;
     /**
      * Where the five huds below sit lives in their {@code *Pos} (distance to the nearest window sides, see hud/HudPos). The plain
      * {@code *X} and {@code *Y} are the spot a hud is drawn at this frame, set from its pos on every draw; settings saved before
@@ -118,13 +118,13 @@ public class TackleboxSettings {
      */
     public HudPos questsPos, levelBarsPos, boostsPos, nowPlayingPos, serverHudPos;
     /** The quests left hud: whether it shows. */
-    public boolean questsHud = true;
+    public boolean questsHud;
     public int questsX = 4;
     public int questsScale = 100;
     public int questsY = 70;
     public HudAlign questsAlign = HudAlign.LEFT;
     /** The level progress hud (hud/LevelBars): fishing level and location level bars, where it sits. */
-    public boolean levelBars = true;
+    public boolean levelBars;
     public int levelBarsX = 4;
     public int levelBarsScale = 100;
     public int levelBarsY = 40;
@@ -140,13 +140,13 @@ public class TackleboxSettings {
     public int levelBarsWidth = 80;
     public HudAlign levelBarsAlign = HudAlign.LEFT;
     /** The active boosts hud (hud/BoostsHud): boosters, chummer, weather events and moon, where it sits. */
-    public boolean boostsHud = true;
+    public boolean boostsHud;
     public int boostsX = 182;
     public int boostsScale = 100;
     public int boostsY = 70;
     public HudAlign boostsAlign = HudAlign.LEFT;
     /** The now playing hud (hud/NowPlaying): what Spotify, a browser tab or any other player is playing, where it sits. */
-    public boolean nowPlaying = true;
+    public boolean nowPlaying;
     public int nowPlayingX = 4;
     public int nowPlayingScale = 100;
     public int nowPlayingY = 4;
@@ -158,7 +158,7 @@ public class TackleboxSettings {
     public boolean nowPlayingTime = true;
     public HudAlign nowPlayingAlign = HudAlign.LEFT;
     /** The sidebar styled server hud (hud/ServerHud): where it sits, its size in percent and how strong the picture behind it is (percent). */
-    public boolean serverHud = true;
+    public boolean serverHud;
     public int serverHudX = 4;
     public int serverHudY = 120;
     public int serverHudScale = 100;
@@ -182,9 +182,9 @@ public class TackleboxSettings {
     public java.util.Map<String, double[]> locLevels = new java.util.LinkedHashMap<>();
     public java.util.Map<String, Double> need = new java.util.LinkedHashMap<>();
     /** The /presets wardrobe screen, and for both custom guis: size in percent of the screen. */
-    public boolean presetsMenu = true;
+    public boolean presetsMenu;
     /** /pv as all seven personal vaults on one screen with a search (screen/VaultScreen). */
-    public boolean vaultMenu = true;
+    public boolean vaultMenu;
     /** Preset rows seen on /presets, kept between sessions so the other page can be drawn: "armor:6" to its pieces as "item|color|floats|strings|model". */
     public java.util.Map<String, java.util.List<String>> presetCache = new java.util.LinkedHashMap<>();
     public boolean presetsOtherBg = false;
@@ -232,9 +232,9 @@ public class TackleboxSettings {
     /** Right click a chat line (with chat open) to copy it. */
     public boolean chatCopy = true;
     /** The welcome lines fishonmc prints at every login (instance, packs, welcome, help, rules, discord). */
-    public boolean hideLoginChat = true;
+    public boolean hideLoginChat;
     /** Lines with nothing in them (the server sends them as spacing) never reach the chat. */
-    public boolean hideEmptyChat = true;
+    public boolean hideEmptyChat;
     /** Repeats of the same chat line become one line with a count, like "text (x3)". */
     public boolean chatStack = true;
     /** Huds that would sit under a chat window or the player list are not drawn. */
@@ -255,9 +255,9 @@ public class TackleboxSettings {
 
     // ---- bobber behaviour (only you see these) ----
     /** Hold the bobber still on the water instead of bobbing (it still dips on a bite). */
-    public boolean stillBobber = true;
+    public boolean stillBobber;
     /** Show your own cast flying smoothly instead of snapping back on a laggy server. */
-    public boolean smoothCast = true;
+    public boolean smoothCast;
     /** Hide other players bobbers and their lines. */
     public boolean hideOtherBobbers = false;
 
@@ -271,7 +271,7 @@ public class TackleboxSettings {
     /** Draw leaves flat like vanilla instead of the server packs 3d leaves. */
     public boolean flatLeaves = false;
     /** A thin flat ring on the ground at the range of every placed chummer in view of the client (display/ChummerRing), and its colour (rgb). */
-    public boolean chummerRing = true;
+    public boolean chummerRing;
     public int chummerRingColor = 0x41F55B;
     /** Stop drawing the servers item, block and text displays farther than this many blocks (8 to 64), a fps help at spawn (display/DisplayCull). */
     public boolean hideFarDisplays = false;
