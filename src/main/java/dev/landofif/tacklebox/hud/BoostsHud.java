@@ -136,7 +136,7 @@ public final class BoostsHud {
     /** Draws the hud at its saved spot and returns {x, y, w, h}; with preview an empty hud still shows a line so it can be moved. */
     public static int[] draw(DrawContext ctx, boolean preview) {
         TackleboxSettings s = TackleboxSettings.get();
-        return s.boostsPos.draw(ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight(), (x, y) -> {
+        return s.boostsPos.draw(ctx, ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight(), (x, y) -> {
             s.boostsX = x;
             s.boostsY = y;
             return Foe.scaled(ctx, x, y, s.boostsScale, c -> drawAt100(c, preview));

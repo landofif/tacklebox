@@ -144,7 +144,7 @@ public final class ServerHud {
 
     public static int[] draw(DrawContext ctx, boolean preview) {
         TackleboxSettings s = TackleboxSettings.get();
-        return s.serverHudPos.draw(ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight(), (x, y) -> {
+        return s.serverHudPos.draw(ctx, ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight(), (x, y) -> {
             s.serverHudX = x;
             s.serverHudY = y;
             return draw(ctx, x, y);

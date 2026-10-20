@@ -6,6 +6,7 @@ import dev.landofif.tacklebox.chat.ChatBox;
 import dev.landofif.tacklebox.chat.ChatBoxes;
 import dev.landofif.tacklebox.mixin.ChatHudAccessor;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.network.PlayerListEntry;
 
@@ -35,6 +36,65 @@ public final class HudCover {
             }
         }
         return false;
+    }
+
+    /**
+     * The parts of the rectangle that are not under a chat window or the player list (the whole rectangle when
+     * the option is off or nothing overlaps, none when it is all covered).
+     */
+    public static List<int[]> free(int x, int y, int w, int h) {
+        List<int[]> pieces = new ArrayList<>();
+        pieces.add(new int[]{x, y, w, h});
+        TackleboxSettings s = TackleboxSettings.get();
+        if (s == null || !s.hideBehindChat || w <= 0 || h <= 0) {
+            return pieces;
+        }
+        MinecraftClient client = MinecraftClient.getInstance();
+        for (int[] c : covers(client, s, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight())) {
+            pieces = subtract(pieces, c);
+        }
+        return pieces;
+    }
+
+    static List<int[]> subtract(List<int[]> pieces, int[] c) {
+        List<int[]> out = new ArrayList<>();
+        for (int[] p : pieces) {
+            if (!overlaps(p[0], p[1], p[2], p[3], c)) {
+                out.add(p);
+                continue;
+            }
+            int pr = p[0] + p[2], pb = p[1] + p[3];
+            int cl = Math.max(p[0], c[0]), cr = Math.min(pr, c[0] + c[2]);
+            int ct = Math.max(p[1], c[1]), cb = Math.min(pb, c[1] + c[3]);
+            if (ct > p[1]) out.add(new int[]{p[0], p[1], p[2], ct - p[1]});
+            if (cb < pb) out.add(new int[]{p[0], cb, p[2], pb - cb});
+            if (cl > p[0]) out.add(new int[]{p[0], ct, cl - p[0], cb - ct});
+            if (cr < pr) out.add(new int[]{cr, ct, pr - cr, cb - ct});
+        }
+        return out;
+    }
+
+    /**
+     * Runs {@code draw} so that only the part of the hud at {@code x, y, w, h} outside the chat windows shows:
+     * once per free piece, cut to it. Once, uncut, when nothing overlaps; once cut to nothing when all of it is covered.
+     */
+    public static void clipped(DrawContext ctx, int x, int y, int w, int h, Runnable draw) {
+        List<int[]> pieces = free(x, y, w, h);
+        if (pieces.size() == 1 && pieces.get(0)[2] == w && pieces.get(0)[3] == h) {
+            draw.run();
+            return;
+        }
+        if (pieces.isEmpty()) {
+            pieces.add(new int[]{0, 0, 0, 0});
+        }
+        for (int[] p : pieces) {
+            ctx.enableScissor(p[0], p[1], p[0] + p[2], p[1] + p[3]);
+            try {
+                draw.run();
+            } finally {
+                ctx.disableScissor();
+            }
+        }
     }
 
     static boolean overlaps(int x, int y, int w, int h, int[] r) {

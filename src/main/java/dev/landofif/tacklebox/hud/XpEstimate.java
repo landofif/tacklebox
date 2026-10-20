@@ -284,7 +284,7 @@ public final class XpEstimate {
     /** Draws the box at its saved spot and returns {x, y, w, h}; with preview it shows dashes for unknown values. */
     public static int[] draw(DrawContext ctx, boolean preview) {
         TackleboxSettings s = TackleboxSettings.get();
-        return s.questsPos.draw(ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight(), (x, y) -> {
+        return s.questsPos.draw(ctx, ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight(), (x, y) -> {
             s.questsX = x;
             s.questsY = y;
             return Foe.scaled(ctx, x, y, s.questsScale, c -> drawAt100(c, preview));

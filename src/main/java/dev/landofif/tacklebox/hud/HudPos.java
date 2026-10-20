@@ -65,10 +65,24 @@ public final class HudPos {
 
     /** Draws a hud where this puts it: {@code draw} gets the top left corner and returns the hud's {x, y, w, h}, or null when nothing shows. */
     public int[] draw(int sw, int sh, BiFunction<Integer, Integer, int[]> draw) {
-        if (HudCover.covered(left(sw), top(sh), w, h)) {
-            return null;
+        return draw(null, sw, sh, draw);
+    }
+
+    /** Like {@link #draw(int, int, BiFunction)}, and with a context the parts under a chat window are cut off (see {@link HudCover}). */
+    public int[] draw(net.minecraft.client.gui.DrawContext ctx, int sw, int sh, BiFunction<Integer, Integer, int[]> draw) {
+        int[][] out = new int[1][];
+        int x = left(sw), y = top(sh);
+        if (ctx == null) {
+            out[0] = draw.apply(x, y);
+        } else {
+            HudCover.clipped(ctx, x, y, w, h, () -> {
+                int[] r = draw.apply(x, y);
+                if (out[0] == null) {
+                    out[0] = r;
+                }
+            });
         }
-        int[] r = draw.apply(left(sw), top(sh));
+        int[] r = out[0];
         if (r != null) {
             measure(sw, sh, r[2], r[3]);
         }

@@ -30,6 +30,6 @@ abstract class FoeHudsMixin {
             @At(value = "INVOKE", target = P + "DailyQuestHud;render", remap = false),
             @At(value = "INVOKE", target = P + "LevelHud;render", remap = false)})
     private void tacklebox$stepAside(@Coerce Object hud, DrawContext ctx, MinecraftClient client, Operation<Void> original) {
-        FoeCover.run(hud, () -> original.call(hud, ctx, client));
+        FoeCover.run(hud, ctx, () -> original.call(hud, ctx, client));
     }
 }

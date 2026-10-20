@@ -12,8 +12,7 @@ import java.util.Map;
 /**
  * Lets foecollab's huds step aside for chat windows (setting {@code hideBehindChat}). A foecollab hud does not say
  * where it is, so while one draws, every text it draws is added up into a rectangle ({@link #text}); next frame the
- * hud is skipped when that rectangle overlaps a chat window or the player list ({@link HudCover}). A skipped hud
- * keeps its old rectangle, so it comes back as soon as the chat moves away. See {@code FoeHudsMixin}.
+ * hud is cut off where that rectangle overlaps a chat window or the player list ({@link HudCover}). See {@code FoeHudsMixin}.
  */
 public final class FoeCover {
     private static final int PAD = 3;
@@ -22,20 +21,21 @@ public final class FoeCover {
 
     private FoeCover() {}
 
-    /** Draws a foecollab hud through {@code draw}, or skips it when it sat under a chat window last time. */
-    public static void run(Object hud, Runnable draw) {
+    /** Draws a foecollab hud through {@code draw}, cut off where it sat under a chat window last time. */
+    public static void run(Object hud, DrawContext ctx, Runnable draw) {
         TackleboxSettings s = TackleboxSettings.get();
         if (s == null || !s.hideBehindChat || cur != null) {
             draw.run();
             return;
         }
-        int[] b = BOUNDS.get(hud);
-        if (b != null && HudCover.covered(b[0], b[1], b[2], b[3])) {
-            return;
-        }
         cur = new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
         try {
-            draw.run();
+            int[] b = BOUNDS.get(hud);
+            if (b == null) {
+                draw.run();
+            } else {
+                HudCover.clipped(ctx, b[0], b[1], b[2], b[3], draw);
+            }
         } finally {
             int[] c = cur;
             cur = null;

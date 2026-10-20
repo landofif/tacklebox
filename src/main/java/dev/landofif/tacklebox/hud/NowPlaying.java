@@ -172,7 +172,7 @@ public final class NowPlaying {
     /** Draws the hud at its saved spot and returns {x, y, w, h}; with preview nothing playing still shows a line so it can be moved. */
     public static int[] draw(DrawContext ctx, boolean preview) {
         TackleboxSettings s = TackleboxSettings.get();
-        return s.nowPlayingPos.draw(ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight(), (x, y) -> {
+        return s.nowPlayingPos.draw(ctx, ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight(), (x, y) -> {
             s.nowPlayingX = x;
             s.nowPlayingY = y;
             return Foe.scaled(ctx, x, y, s.nowPlayingScale, c -> drawAt100(c, preview));

@@ -33,7 +33,7 @@ public final class LevelBars {
 
     public static int[] draw(DrawContext ctx, boolean preview) {
         TackleboxSettings s = TackleboxSettings.get();
-        return s.levelBarsPos.draw(ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight(), (x, y) -> {
+        return s.levelBarsPos.draw(ctx, ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight(), (x, y) -> {
             s.levelBarsX = x;
             s.levelBarsY = y;
             return Foe.scaled(ctx, x, y, s.levelBarsScale, c -> drawAt100(c, preview));

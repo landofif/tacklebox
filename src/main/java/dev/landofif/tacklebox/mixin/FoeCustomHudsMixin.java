@@ -19,6 +19,6 @@ abstract class FoeCustomHudsMixin {
             at = @At(value = "INVOKE", target = "Lio/github/foecollab/screens/hud/CustomHudRenderer;renderHud", remap = false))
     private void tacklebox$stepAside(@Coerce Object self, DrawContext ctx, MinecraftClient client,
                                      @Coerce Object hud, List<Text> lines, Operation<Void> original) {
-        FoeCover.run(hud, () -> original.call(self, ctx, client, hud, lines));
+        FoeCover.run(hud, ctx, () -> original.call(self, ctx, client, hud, lines));
     }
 }
