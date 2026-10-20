@@ -49,11 +49,19 @@ public final class HudCover {
             }
         }
         ChatHud hud = client.inGameHud.getChatHud();
-        if (!((ChatHudAccessor) hud).tacklebox$visibleMessages().isEmpty()) {
+        ChatHudAccessor acc = (ChatHudAccessor) hud;
+        boolean open = ChatBoxes.chatOpen();
+        int tick = client.inGameHud.getTicks();
+        int shown = 0; // lines on screen: all of them with chat open, else only the ones that have not faded yet
+        for (var line : acc.tacklebox$visibleMessages()) {
+            if (open || tick - line.addedTime() < 200) {
+                shown++;
+            }
+        }
+        shown = Math.min(shown, hud.getVisibleLineCount());
+        if (shown > 0) {
             double scale = client.options.getChatScale().getValue();
-            boolean open = ChatBoxes.chatOpen();
-            int h = (int) Math.ceil(ChatHud.getHeight(open ? client.options.getChatHeightFocused().getValue()
-                    : client.options.getChatHeightUnfocused().getValue()) * scale) + 4;
+            int h = (int) Math.ceil(shown * acc.tacklebox$lineHeight() * scale) + 4;
             int bottom = sh - 40 + s.chatY;
             s.chatPos.measure(sw, sh, ChatBar.width(), 0);
             out.add(new int[]{s.chatPos.left(sw), bottom - h, ChatBar.width(), h});
