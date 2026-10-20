@@ -137,17 +137,31 @@ public class TackleboxSettings {
 
     /** The settings screen (Resourceful Config's); leaving it keeps the values in range and saves. */
     public static Screen openScreen(Screen parent) {
-        boolean leaves = flatLeaves;
+        if (!closeHooked) {
+            closeHooked = true;
+            ScreenEvents.AFTER_INIT.register((client, opened, w, h) -> {
+                if (opened != pending) {
+                    return;
+                }
+                pending = null;
+                boolean leaves = flatLeaves;
+                // the remove event only works on a screen that setScreen has already initialised
+                ScreenEvents.remove(opened).register(closed -> {
+                    current.sanitize();
+                    save();
+                    if (leaves != flatLeaves) {
+                        MinecraftClient.getInstance().reloadResources();
+                    }
+                });
+            });
+        }
         Screen screen = ResourcefulConfigScreen.make(configurator(), TackleboxSettings.class).withParent(parent).build();
-        ScreenEvents.remove(screen).register(closed -> {
-            current.sanitize();
-            save();
-            if (leaves != flatLeaves) {
-                MinecraftClient.getInstance().reloadResources();
-            }
-        });
+        pending = screen;
         return screen;
     }
+
+    private static boolean closeHooked;
+    private static Screen pending;
 
     /** A button of the settings screen: opens one of the mods own screens, which returns to the settings screen when closed. */
     public static void openLinked(java.util.function.Function<Screen, Screen> screen) {
