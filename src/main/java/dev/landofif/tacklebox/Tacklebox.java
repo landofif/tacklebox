@@ -205,7 +205,7 @@ public final class Tacklebox implements ClientModInitializer {
             TriggerEngine.tick();
             while (openKey.wasPressed()) {
                 if (client.currentScreen == null) {
-                    client.setScreen(new dev.landofif.tacklebox.screen.SettingsScreen(null));
+                    client.setScreen(TackleboxSettings.openScreen(null));
                 }
             }
             if (pendingScreen != null) {
@@ -223,7 +223,7 @@ public final class Tacklebox implements ClientModInitializer {
 
     private static LiteralArgumentBuilder<FabricClientCommandSource> settingsCommand(String name) {
         return ClientCommandManager.literal(name)
-                .executes(ctx -> open(() -> new dev.landofif.tacklebox.screen.SettingsScreen(null)))
+                .executes(ctx -> open(() -> TackleboxSettings.openScreen(null)))
                 .then(ClientCommandManager.literal("triggers").executes(ctx -> open(() -> new TriggerListScreen(null))))
                 .then(ClientCommandManager.literal("huds").executes(ctx -> open(() -> dev.landofif.tacklebox.compat.FoeScreens.customHuds(null))))
                 .then(ClientCommandManager.literal("words").executes(ctx -> open(() -> new dev.landofif.tacklebox.screen.WordSwapScreen(null))))

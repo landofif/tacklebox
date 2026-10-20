@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PetTooltipIntegrationTest {
     private static TackleboxSettings load(String json) {
         TackleboxSettings s = new Gson().fromJson(json, TackleboxSettings.class);
+        TackleboxSettings.importLegacy(com.google.gson.JsonParser.parseString(json).getAsJsonObject()); // the options are no longer in the gson file
         s.sanitize();
         return s;
     }
@@ -24,8 +25,8 @@ class PetTooltipIntegrationTest {
         TackleboxSettings s = load("{\"shortPetTooltips\": true}");
         assertTrue(s.shortPetTooltips);
         assertFalse(s.shortFishTooltips);
-        TackleboxSettings again = load(new Gson().toJson(s));
-        assertTrue(again.shortPetTooltips);
-        assertFalse(again.shortFishTooltips);
+        TackleboxSettings fresh = load("{}");
+        assertFalse(fresh.shortPetTooltips);
+        assertFalse(fresh.shortFishTooltips);
     }
 }

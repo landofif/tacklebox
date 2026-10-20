@@ -31,6 +31,10 @@ dependencies {
     modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
     modLocalRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
 
+    // The settings screen and config file. Bundled in our jar, so nothing extra to install. 3.11.3 for 1.21.11.
+    modImplementation "maven.modrinth:M1953qlQ:8bR7M6K7"
+    include "maven.modrinth:M1953qlQ:8bR7M6K7"
+
     testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.10.2"
 

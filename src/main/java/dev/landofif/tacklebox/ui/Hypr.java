@@ -5,7 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 /**
  * The look of the settings screen, borrowed from a hyprland desktop: rounded tiles with gaps, a 2 colour gradient on
  * the focused one's border (hyprland's default cyan to green), a catppuccin style dark palette, and its animation
- * curves. Only {@code SettingsScreen} uses it; the rest of the mod keeps {@link Foe}.
+ * curves. The old settings screen was its main user; the rest of the mod keeps {@link Foe}.
  */
 public final class Hypr {
     public static final int BASE = 0xB41E1E2E, BAR = 0xBE181825, SURFACE = 0xFF313244, OVERLAY = 0xFF45475A;

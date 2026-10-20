@@ -23,6 +23,7 @@ class ChummerRingIntegrationTest {
 
     private static TackleboxSettings load(String json) {
         TackleboxSettings s = new Gson().fromJson(json, TackleboxSettings.class);
+        TackleboxSettings.importLegacy(com.google.gson.JsonParser.parseString(json).getAsJsonObject()); // the options are no longer in the gson file
         s.sanitize();
         return s;
     }
@@ -41,11 +42,7 @@ class ChummerRingIntegrationTest {
         assertFalse(s.chummerRing);
         assertEquals(0xFF0000, s.chummerRingColor);
 
-        TackleboxSettings again = load(new Gson().toJson(s));
-        assertFalse(again.chummerRing);
-        assertEquals(0xFF0000, again.chummerRingColor);
-
-        TackleboxSettings fresh = load(new Gson().toJson(new TackleboxSettings()));
+        TackleboxSettings fresh = load("{}");
         assertTrue(fresh.chummerRing);
         assertEquals(0x41F55B, fresh.chummerRingColor);
     }

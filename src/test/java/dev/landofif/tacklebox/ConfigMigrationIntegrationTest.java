@@ -27,7 +27,9 @@ class ConfigMigrationIntegrationTest {
     Path config;
 
     private TackleboxSettings readSettings() throws IOException {
-        TackleboxSettings s = new Gson().fromJson(Files.readString(config.resolve(Tacklebox.MOD_ID).resolve("settings.json")), TackleboxSettings.class);
+        String raw = Files.readString(config.resolve(Tacklebox.MOD_ID).resolve("settings.json"));
+        TackleboxSettings s = new Gson().fromJson(raw, TackleboxSettings.class);
+        TackleboxSettings.importLegacy(com.google.gson.JsonParser.parseString(raw).getAsJsonObject());
         s.sanitize();
         return s;
     }

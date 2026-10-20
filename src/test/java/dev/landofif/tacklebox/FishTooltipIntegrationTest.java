@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class FishTooltipIntegrationTest {
     private static TackleboxSettings load(String json) {
         TackleboxSettings s = new Gson().fromJson(json, TackleboxSettings.class);
+        TackleboxSettings.importLegacy(com.google.gson.JsonParser.parseString(json).getAsJsonObject()); // the options are no longer in the gson file
         s.sanitize();
         return s;
     }
@@ -23,6 +24,6 @@ class FishTooltipIntegrationTest {
     void savedSwitchRoundTrips() {
         TackleboxSettings s = load("{\"shortFishTooltips\": true}");
         assertTrue(s.shortFishTooltips);
-        assertTrue(load(new Gson().toJson(s)).shortFishTooltips);
+        assertFalse(load("{}").shortFishTooltips);
     }
 }

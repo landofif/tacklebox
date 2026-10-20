@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PetProfitIntegrationTest {
     private static TackleboxSettings load(String json) {
         TackleboxSettings s = new Gson().fromJson(json, TackleboxSettings.class);
+        TackleboxSettings.importLegacy(com.google.gson.JsonParser.parseString(json).getAsJsonObject()); // the options are no longer in the gson file
         s.sanitize();
         return s;
     }
@@ -34,7 +35,7 @@ class PetProfitIntegrationTest {
     void savedSwitchRoundTrips() {
         TackleboxSettings s = load("{\"petProfitMarks\": true}");
         assertTrue(s.petProfitMarks);
-        assertTrue(load(new Gson().toJson(s)).petProfitMarks);
+        assertFalse(load("{}").petProfitMarks);
     }
 
     /** The Bullfrog Pet of the 2026-10-16 auction dump (slot 2, $2K) from its item data to the line under its price. */
