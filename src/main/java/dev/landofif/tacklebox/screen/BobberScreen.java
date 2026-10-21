@@ -43,6 +43,7 @@ public class BobberScreen extends TackleboxScreen {
         header(list, rw, "timer");
         TackleboxSettings.TimerMode[] modes = TackleboxSettings.TimerMode.values();
         cycle(list, rw, "show", modes, m -> m.label, () -> s.timerMode, v -> s.timerMode = v);
+        cycle(list, rw, "style", TackleboxSettings.TimerStyle.values(), m -> m.label, () -> s.timerStyle, v -> s.timerStyle = v);
         islider(list, rw, "hud size", 50, 500, 5, "%", () -> s.timerSize, v -> s.timerSize = v);
         islider(list, rw, "bobber size", 25, 400, 5, "%", () -> s.timerWorldSize, v -> s.timerWorldSize = v);
         slider(list, rw, "blocks above bobber", 0, 3, 0.05, "", () -> s.timerHeight, v -> s.timerHeight = v);

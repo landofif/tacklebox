@@ -7,6 +7,9 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.Camera;
+import net.minecraft.entity.Entity;
+import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.item.Items;
@@ -41,19 +44,59 @@ public final class BobberTimer {
         if (p != null && p.fishHook != null && (p.getMainHandStack().isOf(Items.FISHING_ROD) || p.getOffHandStack().isOf(Items.FISHING_ROD))) {
             reeledId = p.fishHook.getId();
             biteAt = 0;
+            BiteCountdown.reset();
         }
     }
 
     public static void tick(MinecraftClient client) {
         if (own(client) == null) {
             biteAt = 0;
+            BiteCountdown.reset();
+        }
+    }
+
+    /**
+     * Every particle packet. Feeds the bite countdown with the fish's approach particles of your own bobber:
+     * the bobber whose line to the particle is most perpendicular to its sideways speed is the one that sent it.
+     */
+    public static void onParticle(ParticleS2CPacket packet) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (TackleboxSettings.get().timerStyle != TackleboxSettings.TimerStyle.COUNTDOWN || !client.isOnThread() || client.world == null) {
+            return; // the handler also runs on the network thread first
+        }
+        FishingBobberEntity mine = own(client);
+        if (mine == null || packet.getCount() != 0 || packet.getParameters().getType() != ParticleTypes.FISHING) {
+            return;
+        }
+        double px = packet.getX(), pz = packet.getZ();
+        double dx = px - mine.getX(), dz = pz - mine.getZ();
+        if (dx * dx + dz * dz > BiteCountdown.CAPTURE_RANGE * BiteCountdown.CAPTURE_RANGE) {
+            return;
+        }
+        FishingBobberEntity best = null;
+        double bestErr = BiteCountdown.PERP_TOLERANCE;
+        for (Entity e : client.world.getEntities()) {
+            if (e instanceof FishingBobberEntity b) {
+                double err = BiteCountdown.perpendicularError(px - b.getX(), pz - b.getZ(), packet.getOffsetX(), packet.getOffsetZ());
+                if (err < bestErr) {
+                    bestErr = err;
+                    best = b;
+                }
+            }
+        }
+        if (best == mine) {
+            BiteCountdown.onApproach(Math.sqrt(dx * dx + dz * dz), System.currentTimeMillis());
         }
     }
 
     /** The server's title. Returns true if it is the BITE! title and should be hidden. */
     public static boolean onTitle(Text title) {
         TackleboxSettings s = TackleboxSettings.get();
-        if (title == null || !s.biteOn || !"BITE!".equals(title.getString())) {
+        if (title == null || !"BITE!".equals(title.getString())) {
+            return false;
+        }
+        BiteCountdown.onBite(System.currentTimeMillis());
+        if (!s.biteOn) {
             return false;
         }
         MinecraftClient client = MinecraftClient.getInstance();
@@ -71,6 +114,15 @@ public final class BobberTimer {
         biteAt = System.currentTimeMillis();
     }
 
+    /** The countdown style shows only while a fish approaches; counting up always shows. */
+    private static boolean shows(TackleboxSettings s) {
+        return s.timerStyle == TackleboxSettings.TimerStyle.UP || BiteCountdown.active(System.currentTimeMillis());
+    }
+
+    private static float seconds(TackleboxSettings s, float upSeconds) {
+        return s.timerStyle == TackleboxSettings.TimerStyle.UP ? upSeconds : BiteCountdown.seconds(System.currentTimeMillis());
+    }
+
     private static String format(float seconds) {
         TackleboxSettings s = TackleboxSettings.get();
         return String.format(java.util.Locale.ROOT, "%." + s.timerDecimals + "f", seconds) + (s.timerSuffix ? "ꜱ" : "");
@@ -83,10 +135,10 @@ public final class BobberTimer {
         TackleboxSettings s = TackleboxSettings.get();
         FishingBobberEntity hook = own(client);
         boolean live = hook != null && hook.getId() != reeledId;
-        if ((live || preview) && (s.timerMode == TackleboxSettings.TimerMode.HUD || s.timerMode == TackleboxSettings.TimerMode.BOTH)) {
+        if ((live && shows(s) || preview) && (s.timerMode == TackleboxSettings.TimerMode.HUD || s.timerMode == TackleboxSettings.TimerMode.BOTH)) {
             drawTimer(ctx, preview && !live);
         }
-        if (hook != null && (s.timerMode == TackleboxSettings.TimerMode.BOBBER || s.timerMode == TackleboxSettings.TimerMode.BOTH)) {
+        if (hook != null && shows(s) && (s.timerMode == TackleboxSettings.TimerMode.BOBBER || s.timerMode == TackleboxSettings.TimerMode.BOTH)) {
             drawOverBobber(ctx, client, hook);
         }
         if (s.biteOn && (biteAt != 0 || preview)) {
@@ -98,7 +150,7 @@ public final class BobberTimer {
     public static int[] drawTimer(DrawContext ctx, boolean sample) {
         MinecraftClient client = MinecraftClient.getInstance();
         TackleboxSettings s = TackleboxSettings.get();
-        float seconds = sample ? System.currentTimeMillis() % 10000 / 1000f : client.player.fishHook.age / 20f + client.getRenderTickCounter().getTickProgress(false) / 20f;
+        float seconds = sample ? System.currentTimeMillis() % 10000 / 1000f : seconds(s, client.player.fishHook.age / 20f + client.getRenderTickCounter().getTickProgress(false) / 20f);
         return centered(ctx, Foe.bold(format(seconds)), s.timerX, s.timerY, s.timerSize / 100f, 1f, 0, 0, 0xFF000000 | s.timerColor, s.timerShadow);
     }
 
@@ -183,7 +235,7 @@ public final class BobberTimer {
         int sw = ctx.getScaledWindowWidth(), sh = ctx.getScaledWindowHeight();
         float pixelsPerBlock = (float) (sh / (2 * tan * depth));
         float scale = Math.max(0.4f, Math.min(8f, 0.025f * s.timerWorldSize / 100f * pixelsPerBlock));
-        drawAt(ctx, Foe.bold(format((hook.age + tick) / 20f)), (float) (sw * (0.5 - a / 2)), (float) (sh * (0.5 - b / 2)),
+        drawAt(ctx, Foe.bold(format(seconds(s, (hook.age + tick) / 20f))), (float) (sw * (0.5 - a / 2)), (float) (sh * (0.5 - b / 2)),
                 scale, 1f, 0xFF000000 | s.timerColor, s.timerShadow);
     }
 }

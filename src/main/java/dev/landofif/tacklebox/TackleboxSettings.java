@@ -287,6 +287,8 @@ public class TackleboxSettings {
 
     // ---- bobber timer and bite notification (display/BobberTimer, screen/BobberScreen) ----
     public TimerMode timerMode = TimerMode.HUD;
+    /** Count up from the cast, or count down to the predicted bite (display/BiteCountdown). */
+    public TimerStyle timerStyle = TimerStyle.UP;
     /** Hud position, percent of the screen; the text is centred on it. */
     public double timerX = 50;
     public double timerY = 58;
@@ -313,6 +315,15 @@ public class TackleboxSettings {
     public boolean biteHideTitle = true;
     /** Focus the game window through hyprctl on a bite (display/BiteFocus). Hyprland only. */
     public boolean biteFocus = false;
+
+    public enum TimerStyle {
+        UP("counts up"), COUNTDOWN("bite countdown");
+        public final String label;
+
+        TimerStyle(String label) {
+            this.label = label;
+        }
+    }
 
     public enum TimerMode {
         OFF("off"), HUD("hud"), BOBBER("on the bobber"), BOTH("both");
@@ -448,6 +459,7 @@ public class TackleboxSettings {
     public void sanitize() {
         if (bobberSkin == null) bobberSkin = BobberSkin.DEFAULT;
         if (timerMode == null) timerMode = TimerMode.HUD;
+        if (timerStyle == null) timerStyle = TimerStyle.UP;
         if (biteAnim == null) biteAnim = BiteAnim.POP;
         if (biteText == null) biteText = "bite!";
         if (swingStyle == null) swingStyle = SwingStyle.NORMAL;

@@ -10,6 +10,7 @@
     "ChatHudAccessor",
     "ChatHudMixin",
     "ChatScreenMixin",
+    "ClientPlayNetworkHandlerParticleMixin",
     "EntityInterpolationMixin",
     "EquipmentHudMixin",
     "EntityRenderManagerMixin",

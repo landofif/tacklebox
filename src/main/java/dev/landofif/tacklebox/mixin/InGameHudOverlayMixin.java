@@ -24,10 +24,8 @@ abstract class InGameHudOverlayMixin {
 
     @Inject(method = "setOverlayMessage", at = @At("HEAD"), cancellable = true)
     private void tacklebox$overlay(Text message, boolean tinted, CallbackInfo ci) {
-        if (message == null) {
-            return;
-        }
-        String raw = message.getString();
+        String raw = message == null ? "" : message.getString();
+        dev.landofif.tacklebox.display.BiteCountdown.noteActionBar(!raw.isEmpty(), System.currentTimeMillis());
         if (raw.isEmpty()) {
             return;
         }
