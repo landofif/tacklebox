@@ -12,7 +12,7 @@ public final class CommunityGoal {
     private static final String NUM = "([\\d.,]+\\s*[kKmM]?)";
     private static final Pattern BAR = Pattern.compile("community goal:\\s*" + NUM + "\\s*/\\s*" + NUM, Pattern.CASE_INSENSITIVE);
     private static final Pattern CATCHES = Pattern.compile("community catches:\\s*" + NUM + "\\s*/\\s*" + NUM, Pattern.CASE_INSENSITIVE);
-    private static final Pattern MINE = Pattern.compile("your catches contribution:\\s*([\\d,]+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern MINE = Pattern.compile("your catches contribution:\\s*" + NUM, Pattern.CASE_INSENSITIVE);
     /** The bar is read every half second; it counts as up while it was seen this recently. */
     private static final long BAR_MS = 3000;
 

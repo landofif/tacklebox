@@ -44,6 +44,13 @@ class CommunityGoalTest {
     }
 
     @Test
+    void contributionAboveAThousandIsAbbreviated() {
+        CommunityGoal.restore(75480, 100000, 0);
+        CommunityGoal.onChat(Matcher.normalize("Your Catches Contribution: 1.01K"));
+        assertEquals(1010, CommunityGoal.mine());
+    }
+
+    @Test
     void ignoresOtherBars() {
         assertFalse(CommunityGoal.onBar("12:30 PM 21° Kenai River", 0));
     }
