@@ -13,7 +13,7 @@ import java.util.List;
  */
 public final class BiteFocus {
     static final long COOLDOWN_MS = 2000;
-    static final List<String> COMMAND = List.of("hyprctl", "dispatch", "hl.dsp.focus({ window = 'title:^(Minecraft).*' })");
+    static final List<String> COMMAND = List.of("hyprctl", "dispatch", "hl.dsp.focus({ window = 'initialtitle:^Minecraft.*' })");
 
     private static long lastFocus;
 
