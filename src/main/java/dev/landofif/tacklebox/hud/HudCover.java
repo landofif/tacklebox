@@ -105,7 +105,7 @@ public final class HudCover {
         List<int[]> out = new ArrayList<>();
         for (ChatBox box : s.chatBoxes) {
             if (box != null && box.enabled && ChatBoxes.shows(box)) {
-                out.add(ChatBoxes.rect(box, sw, sh));
+                out.add(ChatBoxes.contentRect(box, sw, sh));
             }
         }
         ChatHud hud = client.inGameHud.getChatHud();

@@ -190,6 +190,27 @@ public final class ChatBoxes {
         return new int[]{x, y, w, h};
     }
 
+    /**
+     * The part of a box its lines take up. Lines sit at the bottom, so the empty top of a box that is not full
+     * is left out (width and height 0 when it has no line to show).
+     */
+    public static int[] contentRect(ChatBox box, int screenW, int screenH) {
+        int[] r = rect(box, screenW, screenH);
+        TextRenderer tr = MinecraftClient.getInstance().textRenderer;
+        State st = state(box);
+        int n = Math.min(lines(box, chatOpen()), Math.max(0, wrapped(box, st, tr, box.width - PAD_X * 2).size() - st.scroll));
+        return fitToLines(r, n);
+    }
+
+    /** The bottom {@code n} lines of a box rectangle (the whole rectangle when they fill it). */
+    static int[] fitToLines(int[] r, int n) {
+        if (n <= 0) {
+            return new int[]{r[0], r[1], 0, 0};
+        }
+        int h = Math.min(r[3], heightOf(n));
+        return new int[]{r[0], r[1] + r[3] - h, r[2], h};
+    }
+
     private static List<OrderedText> wrapped(ChatBox box, State st, TextRenderer tr, int textW) {
         if (st.wrappedWidth != textW || st.wrappedVersion != st.version) {
             List<OrderedText> out = new ArrayList<>();
