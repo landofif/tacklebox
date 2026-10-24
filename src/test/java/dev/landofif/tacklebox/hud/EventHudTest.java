@@ -85,6 +85,7 @@ class EventHudTest {
 
     private static final List<String> BOOK = List.of("event missions → 2.61k pts", "",
             "- 🎣 river monsters", "┗ (1/10) [24 pts|2 pts] ∞",
+            "- 🎣 freshwater", "┗ (6/100) [10 pts|2 pts] ∞",
             "- 🎣 amazon", "┗ (40/1500) [0 pts|400 pts]",
             "- 🎣 heaviest arapaima", "┗ (pts = weight) 50.86 pts",
             "- 🎣 tiger muskellunge ≥ 18lb ✔", "┗ (1/1) [500 pts|500 pts]",
@@ -95,8 +96,8 @@ class EventHudTest {
     private static List<EventHud.Item> bookMenu() {
         List<Integer> colors = new java.util.ArrayList<>(java.util.Collections.nCopies(BOOK.size(), -1));
         colors.set(2, 0x55FFAA);
-        colors.set(4, 0xFFAA00);
-        colors.set(6, 0x55AAFF);
+        colors.set(4, 0x55AAFF);
+        colors.set(6, 0xFFAA00);
         return List.of(new EventHud.Item("event missions → 2.61k pts", BOOK, colors));
     }
 
@@ -120,8 +121,9 @@ class EventHudTest {
         EventHud.read(bookMenu());
         assertTrue(EventHud.onCatch("amazon"));
         assertEquals("41/1500 400pts", value(EventHud.rows(false, true), "amazon"));
-        assertFalse(EventHud.onCatch("kenai"), "no mission for that location");
-        assertFalse(EventHud.onCatch("danube"), "not in the book");
+        assertTrue(EventHud.onCatch("kenai"), "fresh water: the Freshwater mission counts it");
+        assertFalse(EventHud.onCatch("keywest"), "salt water, and no mission for the location");
+        assertEquals("8/100 10pts/2pts", value(EventHud.rows(false, true), "freshwater"), "amazon and kenai are fresh water");
     }
 
     @Test

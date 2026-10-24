@@ -298,12 +298,24 @@ public final class EventHud {
         return true;
     }
 
+    /** Locations with fresh water (research doc section 7, foecollab's ids); the `Freshwater` mission counts catches there. */
+    private static final java.util.Set<String> FRESH = java.util.Set.of("spawn", "cypress", "kenai", "biwa", "murray", "everglades",
+            "toledobend", "greatlakes", "danube", "amazon", "nile");
+
     /**
      * A catch at a location ({@code FoeCatch}, foecollab's location id): the server sends no chat line for the count of a location mission
-     * ({@code Amazon (40/1500)}), so it is counted here, +1 per catch; the book sets it right when /event is opened. True when it changed.
+     * ({@code Amazon (40/1500)}) or of {@code Freshwater (48/100)}, so it is counted here, +1 per catch there; the book sets it right when
+     * /event is opened. True when it changed.
      */
     public static boolean onCatch(String location) {
-        String key = LevelBars.SHORT.get(location);
+        boolean changed = bump(LevelBars.SHORT.get(location));
+        if (FRESH.contains(location)) {
+            changed |= bump("freshwater");
+        }
+        return changed;
+    }
+
+    private static boolean bump(String key) {
         Mission m = key == null ? null : state.missions.get(key);
         if (m == null || m.kind().equals("weight") || m.done() && !m.kind().equals("repeat")) {
             return false;
