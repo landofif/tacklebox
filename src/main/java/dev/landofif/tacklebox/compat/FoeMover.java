@@ -92,6 +92,12 @@ public final class FoeMover {
                 s.boostsPos = new HudPos(182, 70);
             }));
         }
+        if (s.eventHud) {
+            add.add(new Box(ctx -> dev.landofif.tacklebox.hud.EventHud.draw(ctx, true), (x, y, r) -> s.eventPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.eventScale = Math.max(50, Math.min(300, s.eventScale + step * 5)), () -> {
+                s.eventScale = 100;
+                s.eventPos = new HudPos(360, 70);
+            }));
+        }
         if (s.nowPlaying) {
             add.add(new Box(ctx -> dev.landofif.tacklebox.hud.NowPlaying.draw(ctx, true), (x, y, r) -> s.nowPlayingPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.nowPlayingScale = Math.max(50, Math.min(300, s.nowPlayingScale + step * 5)), () -> {
                 s.nowPlayingScale = 100;

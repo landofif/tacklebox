@@ -116,7 +116,7 @@ public class TackleboxSettings {
      * {@code *X} and {@code *Y} are the spot a hud is drawn at this frame, set from its pos on every draw; settings saved before
      * pos existed have them as the spot and sanitize makes the pos from them. Edit a pos, never these.
      */
-    public HudPos questsPos, levelBarsPos, boostsPos, nowPlayingPos, serverHudPos;
+    public HudPos questsPos, levelBarsPos, boostsPos, nowPlayingPos, serverHudPos, eventPos;
     /** The quests left hud: whether it shows. */
     public boolean questsHud;
     public int questsX = 4;
@@ -145,6 +145,12 @@ public class TackleboxSettings {
     public int boostsScale = 100;
     public int boostsY = 70;
     public HudAlign boostsAlign = HudAlign.LEFT;
+    /** The event hud (hud/EventHud): points, next threshold and its rewards, placement, read from /event. */
+    public boolean eventHud;
+    public int eventX = 360;
+    public int eventScale = 100;
+    public int eventY = 70;
+    public HudAlign eventAlign = HudAlign.LEFT;
     /** The now playing hud (hud/NowPlaying): what Spotify, a browser tab or any other player is playing, where it sits. */
     public boolean nowPlaying;
     public int nowPlayingX = 4;
@@ -500,6 +506,7 @@ public class TackleboxSettings {
         if (questsPos == null) questsPos = new HudPos(questsX, questsY);
         if (levelBarsPos == null) levelBarsPos = new HudPos(levelBarsX, levelBarsY);
         if (boostsPos == null) boostsPos = new HudPos(boostsX, boostsY);
+        if (eventPos == null) eventPos = new HudPos(eventX, eventY);
         if (nowPlayingPos == null) nowPlayingPos = new HudPos(nowPlayingX, nowPlayingY);
         if (serverHudPos == null) serverHudPos = new HudPos(serverHudX, serverHudY);
         if (chatPos == null) chatPos = new HudPos(chatX, 0);

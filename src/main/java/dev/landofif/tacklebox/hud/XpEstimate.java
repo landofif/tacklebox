@@ -107,6 +107,7 @@ public final class XpEstimate {
         if (++ticks % 10 == 0 && open != null) {
             scan(open);
             Power.scan(open);
+            EventHud.scan(open);
         }
     }
 
