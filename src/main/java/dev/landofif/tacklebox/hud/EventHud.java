@@ -276,7 +276,7 @@ public final class EventHud {
             return false;
         }
         double gained = num(m.group(2), m.group(3));
-        String name = m.group(4).trim();
+        String name = Glyphs.fromSmallCaps(m.group(4).trim()); // a variant is in small caps here and plain in the book: one mission
         boolean done = m.group(5) != null;
         Mission mission;
         if (m.group(6) != null) {

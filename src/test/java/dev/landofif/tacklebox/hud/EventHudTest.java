@@ -187,6 +187,15 @@ class EventHudTest {
     }
 
     @Test
+    void aChatLineSpellsAVariantInSmallCapsAndStaysTheBooksHiddenMission() {
+        EventHud.read(bookMenu());
+        chat(mission(10, "River Monsters \u0262\u026a\u0262\u1d00\u0274\u1d1b\u026a\u1d04", "", "(0/1) [40 pts|10 pts] \u221E"), 10_000);
+        List<String[]> rows = EventHud.rows(false, true);
+        assertEquals(1, rows.stream().filter(r -> r[0].contains("monsters")).count(), "only the plain monsters row: " + rows.stream().map(r -> r[0]).toList());
+        assertNull(value(rows, "monsters gigantic"));
+    }
+
+    @Test
     void theArtInFrontOfALoreLineIsNotTheNamesColour() {
         net.minecraft.text.MutableText line = net.minecraft.text.Text.literal("\uEEE4\uEEE1 \uD003 \uEEE8")
                 .setStyle(net.minecraft.text.Style.EMPTY.withColor(0x5C4B34));

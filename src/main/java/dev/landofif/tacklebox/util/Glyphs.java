@@ -40,6 +40,16 @@ public final class Glyphs {
         return plain;
     }
 
+    /** Small capitals as plain letters: the server writes a River Monsters variant as {@code ɢɪɢᴀɴᴛɪᴄ}, the menu as {@code gigantic}. */
+    public static String fromSmallCaps(String s) {
+        StringBuilder out = new StringBuilder(s.length());
+        s.codePoints().forEach(cp -> {
+            int caps = SMALL_CAPS.indexOf(cp);
+            out.appendCodePoint(caps >= 0 ? PLAIN.charAt(caps) : cp);
+        });
+        return out.toString();
+    }
+
     /** Text in the default font with glyphs, formatting codes and small caps cleaned out. */
     public static String plain(Text text) {
         StringBuilder in = new StringBuilder();
