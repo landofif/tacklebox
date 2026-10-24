@@ -55,6 +55,7 @@ public final class EventHud {
 
     /** The River Monsters variants of the book: the tag is a pack glyph (U+F041..43, in the order of the menu), plain text drops it. */
     private static final Map<Character, String> TAGS = Map.of('\uF041', "albino", '\uF042', "melanistic", '\uF043', "trophy");
+    private static final int GREEN = 0xFF55FF55;
     private static final Pattern MISSION_NAME = Pattern.compile("^- (?:[^\\p{L}\\p{N}\\s]+ )?(.+?)( ✔)?$");
     // ┗ (1/10) [24 pts|2 pts] ∞     or     ┗ (pts = Weight) 50.86 pts
     private static final Pattern MISSION_LINE = Pattern.compile("^┗ (?:\\((\\d+)/(\\d+)\\) \\[" + NUM + " pts\\|" + NUM + " pts\\] ?(.*)|\\(pts = (.+?)\\) " + NUM + " pts)", CI);
@@ -353,8 +354,8 @@ public final class EventHud {
         }
         if (missions) {
             for (Mission m : state.missions.values()) {
-                if (m.done() && !m.kind().equals("repeat")) {
-                    continue;
+                if (m.done() && !m.kind().equals("repeat") || m.kind().equals("weight") || TAGS.values().stream().anyMatch(m.name()::endsWith)) {
+                    continue; // done, the heaviest arapaima and the albino, melanistic and trophy River Monsters are left out
                 }
                 String value = switch (m.kind()) {
                     case "repeat" -> fmt(m.earned()) + "pts/" + fmt(m.per()) + "pts";
@@ -362,14 +363,20 @@ public final class EventHud {
                     case "partial" -> m.cur() + "/" + m.max() + " " + fmt(m.earned()) + "pts/" + fmt(m.per()) + "pts";
                     default -> m.cur() + "/" + m.max() + " " + fmt(m.per()) + "pts";
                 };
-                rows.add(colored(m.name().toLowerCase(Locale.ROOT), value, m.color(), Foe.ACCENT));
+                rows.add(colored(m.name().toLowerCase(Locale.ROOT), value, m.color(), GREEN));
             }
         }
         return rows;
     }
 
+    /** A name in the menu's gold or brown reads dark on the hud, so it is drawn in bright green. */
+    private static boolean brown(int rgb) {
+        int r = rgb >> 16 & 0xFF, g = rgb >> 8 & 0xFF, b = rgb & 0xFF;
+        return r >= 0x80 && r > g && b < 0x40;
+    }
+
     private static String[] colored(String label, String value, int labelRgb, int valueArgb) {
-        return new String[]{label, value, Integer.toString(labelRgb < 0 ? Foe.TEXT : 0xFF000000 | labelRgb), Integer.toString(valueArgb == 0 ? Foe.TEXT : valueArgb)};
+        return new String[]{label, value, Integer.toString(labelRgb < 0 ? Foe.TEXT : brown(labelRgb) ? GREEN : 0xFF000000 | labelRgb), Integer.toString(valueArgb == 0 ? Foe.TEXT : valueArgb)};
     }
 
     /** Draws the hud at its saved spot and returns {x, y, w, h}; with preview an empty hud still shows a line so it can be moved. */

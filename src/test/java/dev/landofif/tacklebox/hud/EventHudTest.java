@@ -94,8 +94,9 @@ class EventHudTest {
 
     private static List<EventHud.Item> bookMenu() {
         List<Integer> colors = new java.util.ArrayList<>(java.util.Collections.nCopies(BOOK.size(), -1));
-        colors.set(2, 0x55FF55);
+        colors.set(2, 0x55FFAA);
         colors.set(4, 0xFFAA00);
+        colors.set(6, 0x55AAFF);
         return List.of(new EventHud.Item("event missions → 2.61k pts", BOOK, colors));
     }
 
@@ -105,9 +106,9 @@ class EventHudTest {
         List<String[]> rows = EventHud.rows(false, true);
         assertEquals("24pts/2pts", value(rows, "river monsters"));
         assertEquals("40/1500 400pts", value(rows, "amazon"));
-        assertEquals("50.86 pts", value(rows, "heaviest arapaima"));
+        assertNull(value(rows, "heaviest arapaima"), "left out");
         assertEquals("3/10 150pts/50pts", value(rows, "wels catfish"));
-        assertEquals("0pts/10pts", value(rows, "river monsters albino"));
+        assertNull(value(rows, "river monsters albino"), "left out");
         assertNull(value(rows, "tiger muskellunge ≥ 18lb"), "done ones are hidden");
         assertNull(value(rows, "murray cod"));
         assertNull(value(EventHud.rows(false, false), "amazon"), "missions switched off");
@@ -119,8 +120,9 @@ class EventHudTest {
         EventHud.read(bookMenu());
         List<String[]> rows = EventHud.rows(false, true);
         String[] river = rows.stream().filter(r -> r[0].equals("river monsters")).findFirst().orElseThrow();
-        assertEquals(Integer.toString(0xFF55FF55), river[2]);
-        assertEquals(Integer.toString(0xFFFFAA00), river[3]);
+        assertEquals(Integer.toString(0xFF55FFAA), river[2]);
+        assertEquals(Integer.toString(0xFF55FF55), river[3]);
+        assertEquals(Integer.toString(0xFF55FF55), EventHud.rows(false, true).stream().filter(r -> r[0].equals("amazon")).findFirst().orElseThrow()[2], "gold becomes bright green");
         String[] unknown = rows.stream().filter(r -> r[0].equals("wels catfish")).findFirst().orElseThrow();
         assertEquals(Integer.toString(0xFFFFFFFF), unknown[2]);
     }
@@ -133,7 +135,7 @@ class EventHudTest {
         assertEquals("4/10 200pts/50pts", value(EventHud.rows(false, true), "wels catfish"));
         chat(mission(2, "River Monsters", "", "(1/10) [26 pts|2 pts] ∞"), 20_000);
         assertEquals("26pts/2pts", value(EventHud.rows(false, true), "river monsters"));
-        assertEquals(Integer.toString(0xFF55FF55), EventHud.rows(false, true).stream().filter(r -> r[0].equals("river monsters")).findFirst().orElseThrow()[2]);
+        assertEquals(Integer.toString(0xFF55FFAA), EventHud.rows(false, true).stream().filter(r -> r[0].equals("river monsters")).findFirst().orElseThrow()[2]);
         chat(mission(50, "Wels Catfish", "✔", "(10/10) [500 pts|50 pts] Partial"), 30_000);
         assertNull(value(EventHud.rows(false, true), "wels catfish"), "done: gone");
     }
@@ -154,7 +156,6 @@ class EventHudTest {
         chat("\nHALLOWEEN 2026 EVENT MISSION [+50.86 pts]\n  🎣 Heaviest Arapaima \n    ┗ (pts = Weight) 50.86 pts \n", 20_000);
         List<String[]> rows = EventHud.rows(false, true);
         assertNull(value(rows, "tiger muskellunge ≥ 18lb"));
-        assertEquals("50.86 pts", value(rows, "heaviest arapaima"));
         assertEquals("550.86", value(rows, "points"));
     }
 
