@@ -91,7 +91,12 @@ class EventHudTest {
             "- 🎣 tiger muskellunge ≥ 18lb ✔", "┗ (1/1) [500 pts|500 pts]",
             "- 🎣 murray cod ✔", "┗ (10/10) [500 pts|50 pts] partial",
             "- 🎣 wels catfish", "┗ (3/10) [150 pts|50 pts] partial",
-            "- 🎣 river monsters albino", "┗ (0/1) [0 pts|10 pts] ∞");
+            "- 🎣 river monsters albino", "┗ (0/1) [0 pts|10 pts] ∞",
+            "- 🎣 danube river", "┗ (15/750) [0 pts|400 pts]",
+            "- 🎣 toledo bend reservoir", "┗ (493/750) [0 pts|400 pts]",
+            "- 🎣 great lakes", "┗ (32/750) [0 pts|400 pts]",
+            "- 🎣 murray river", "┗ (31/500) [0 pts|400 pts]",
+            "- 🎣 river monsters gigantic", "┗ (0/1) [0 pts|10 pts] ∞");
 
     private static List<EventHud.Item> bookMenu() {
         List<Integer> colors = new java.util.ArrayList<>(java.util.Collections.nCopies(BOOK.size(), -1));
@@ -105,25 +110,79 @@ class EventHudTest {
     void theBookListsEveryMissionAndTheHudKeepsTheOpenAndTheRepeatableOnes() {
         assertTrue(EventHud.read(bookMenu()));
         List<String[]> rows = EventHud.rows(false, true);
-        assertEquals("1/10 24pts/2pts", value(rows, "river monsters"));
-        assertEquals("40/1500 400pts", value(rows, "amazon river"));
+        assertEquals("1/10 24pts/2pts", value(rows, "monsters"));
+        assertEquals("40/1500 400pts", value(rows, "amazon"));
         assertNull(value(rows, "heaviest arapaima"), "left out");
         assertEquals("3/10 150pts/50pts", value(rows, "wels catfish"));
-        assertNull(value(rows, "river monsters albino"), "left out");
+        assertNull(value(rows, "monsters albino"), "left out");
         assertNull(value(rows, "tiger muskellunge ≥ 18lb"), "done ones are hidden");
         assertNull(value(rows, "murray cod"));
-        assertNull(value(EventHud.rows(false, false), "amazon river"), "missions switched off");
+        assertNull(value(EventHud.rows(false, false), "amazon"), "missions switched off");
         assertFalse(EventHud.read(bookMenu()), "reading the same book again is no change");
     }
 
     @Test
     void aCatchAtALocationCountsItsMission() {
         EventHud.read(bookMenu());
-        assertTrue(EventHud.onCatch("amazon"));
-        assertEquals("41/1500 400pts", value(EventHud.rows(false, true), "amazon river"));
-        assertTrue(EventHud.onCatch("kenai"), "fresh water: the Freshwater mission counts it");
-        assertFalse(EventHud.onCatch("keywest"), "salt water, and no mission for the location");
-        assertEquals("8/100 10pts/2pts", value(EventHud.rows(false, true), "freshwater"), "amazon and kenai are fresh water");
+        assertTrue(EventHud.onCatch("amazon", "blue_catfish", 1_000));
+        assertEquals("41/1500 400pts", value(EventHud.rows(false, true), "amazon"));
+        assertTrue(EventHud.onCatch("kenai", "blue_catfish", 20_000), "fresh water: the Freshwater mission counts it");
+        assertFalse(EventHud.onCatch("keywest", "blue_catfish", 40_000), "salt water, and no mission for the location");
+        assertEquals("8/100 10pts/2pts", value(EventHud.rows(false, true), "fresh"), "amazon and kenai are fresh water");
+    }
+
+    @Test
+    void aFullCycleStartsAgainAtZeroWhicheverComesFirstTheCatchOrTheChatLine() {
+        EventHud.read(bookMenu());
+        chat(mission(2, "Freshwater", "", "(0/100) [12 pts|2 pts] \u221E"), 10_000);
+        assertEquals("0/100 12pts/2pts", value(EventHud.rows(false, true), "fresh"), "the line is sent when 100 are full");
+        assertFalse(EventHud.onCatch("kenai", "blue_catfish", 10_300), "the catch of that line: nothing to count");
+        assertEquals("0/100 12pts/2pts", value(EventHud.rows(false, true), "fresh"), "is not counted again");
+        EventHud.onCatch("kenai", "blue_catfish", 30_000);
+        assertEquals("1/100 12pts/2pts", value(EventHud.rows(false, true), "fresh"));
+
+        for (int i = 2; i < 100; i++) {
+            EventHud.onCatch("kenai", "blue_catfish", 30_000 + i * 20_000L);
+        }
+        assertEquals("99/100 12pts/2pts", value(EventHud.rows(false, true), "fresh"));
+        EventHud.onCatch("kenai", "blue_catfish", 3_000_000);
+        assertEquals("0/100 12pts/2pts", value(EventHud.rows(false, true), "fresh"), "never 101/100");
+        chat(mission(2, "Freshwater", "", "(0/100) [14 pts|2 pts] \u221E"), 3_000_400);
+        assertEquals("0/100 14pts/2pts", value(EventHud.rows(false, true), "fresh"));
+        EventHud.onCatch("kenai", "blue_catfish", 3_020_000);
+        assertEquals("1/100 14pts/2pts", value(EventHud.rows(false, true), "fresh"));
+    }
+
+    @Test
+    void aCatchOfARiverMonsterSpeciesCountsForRiverMonsters() {
+        EventHud.read(bookMenu());
+        assertEquals("1/10 24pts/2pts", value(EventHud.rows(false, true), "monsters"));
+        for (String fish : List.of("piraiba", "Alligator Gar", "wels_catfish", "muskellunge", "murray_cod", "golden_dorado", "flathead_catfish",
+                "beluga_sturgeon", "tiger_muskellunge", "arapaima")) {
+            assertTrue(EventHud.onCatch("amazon", fish, 1_000_000), fish);
+            EventHud.read(bookMenu()); // the book's count again: one species at a time
+            assertEquals("1/10 24pts/2pts", value(EventHud.rows(false, true), "monsters"), "back to the book's count");
+        }
+        assertTrue(EventHud.onCatch("amazon", "electric_eel", 1_000_000));
+        assertEquals("2/10 24pts/2pts", value(EventHud.rows(false, true), "monsters"));
+        EventHud.onCatch("amazon", "blue_catfish", 2_000_000);
+        assertEquals("2/10 24pts/2pts", value(EventHud.rows(false, true), "monsters"), "a catfish that is no river monster");
+        for (int i = 0; i < 8; i++) {
+            EventHud.onCatch("amazon", "piraiba", 3_000_000 + i * 20_000L);
+        }
+        assertEquals("0/10 24pts/2pts", value(EventHud.rows(false, true), "monsters"), "10 full: starts again");
+    }
+
+    @Test
+    void theHudShortensLocationsAndTwoMissionNames() {
+        EventHud.read(bookMenu());
+        List<String[]> rows = EventHud.rows(false, true);
+        for (String label : List.of("monsters", "monsters gigantic", "fresh", "amazon", "danube", "toledo", "great lakes", "murray")) {
+            assertNotNull(value(rows, label), label);
+        }
+        assertNull(value(rows, "river monsters"));
+        assertNull(value(rows, "freshwater"));
+        assertNull(value(rows, "toledo bend reservoir"));
     }
 
     @Test
@@ -140,10 +199,10 @@ class EventHudTest {
     void missionsTakeTheMenusColours() {
         EventHud.read(bookMenu());
         List<String[]> rows = EventHud.rows(false, true);
-        String[] river = rows.stream().filter(r -> r[0].equals("river monsters")).findFirst().orElseThrow();
+        String[] river = rows.stream().filter(r -> r[0].equals("monsters")).findFirst().orElseThrow();
         assertEquals(Integer.toString(0xFF55FFAA), river[2]);
         assertEquals(Integer.toString(0xFF55FF55), river[3]);
-        assertEquals(Integer.toString(0xFF55FF55), EventHud.rows(false, true).stream().filter(r -> r[0].equals("amazon river")).findFirst().orElseThrow()[2], "gold becomes bright green");
+        assertEquals(Integer.toString(0xFF55FF55), EventHud.rows(false, true).stream().filter(r -> r[0].equals("amazon")).findFirst().orElseThrow()[2], "gold becomes bright green");
         String[] unknown = rows.stream().filter(r -> r[0].equals("wels catfish")).findFirst().orElseThrow();
         assertEquals(Integer.toString(0xFFFFFFFF), unknown[2]);
     }
@@ -154,9 +213,9 @@ class EventHudTest {
         EventHud.read(bookMenu());
         chat(mission(50, "Wels Catfish", "", "(4/10) [200 pts|50 pts] Partial"), 10_000);
         assertEquals("4/10 200pts/50pts", value(EventHud.rows(false, true), "wels catfish"));
-        chat(mission(2, "River Monsters", "", "(1/10) [26 pts|2 pts] ∞"), 20_000);
-        assertEquals("1/10 26pts/2pts", value(EventHud.rows(false, true), "river monsters"), "the chat line says 0, the book count stays");
-        assertEquals(Integer.toString(0xFF55FFAA), EventHud.rows(false, true).stream().filter(r -> r[0].equals("river monsters")).findFirst().orElseThrow()[2]);
+        chat(mission(2, "River Monsters", "", "(0/10) [26 pts|2 pts] ∞"), 20_000);
+        assertEquals("0/10 26pts/2pts", value(EventHud.rows(false, true), "monsters"), "the server sends the line when a cycle of 10 is full: the count starts again");
+        assertEquals(Integer.toString(0xFF55FFAA), EventHud.rows(false, true).stream().filter(r -> r[0].equals("monsters")).findFirst().orElseThrow()[2]);
         chat(mission(50, "Wels Catfish", "✔", "(10/10) [500 pts|50 pts] Partial"), 30_000);
         assertNull(value(EventHud.rows(false, true), "wels catfish"), "done: gone");
     }

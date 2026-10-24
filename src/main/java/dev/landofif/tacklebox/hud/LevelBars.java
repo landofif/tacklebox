@@ -18,13 +18,14 @@ import java.util.Map;
  * are at ({@link XpEstimate#toNext}: read from the compendium, then moved along by the location xp of quest rewards and chat).
  */
 public final class LevelBars {
-    /** The one word of a location that matters; locations not listed keep their full name. */
-    private static final Map<String, String> SHORT = Map.ofEntries(
+    /** The one word of a location that matters; locations not listed keep their full name. Keys are our ids and foecollab's. */
+    static final Map<String, String> SHORT = Map.ofEntries(
             Map.entry("cypress", "cypress"), Map.entry("kenai", "kenai"), Map.entry("biwa", "biwa"), Map.entry("murray", "murray"),
             Map.entry("everglades", "everglades"), Map.entry("keywest", "key"), Map.entry("toledobend", "toledo"),
             Map.entry("greatlakes", "great lakes"), Map.entry("danube", "danube"), Map.entry("oilrig", "rig"),
             Map.entry("amazon", "amazon"), Map.entry("mediterranean", "med"), Map.entry("capecod", "cape"),
-            Map.entry("nile", "nile"), Map.entry("hawaii", "hawaii"), Map.entry("lofoten", "lofoten"), Map.entry("cairns", "cairns"));
+            Map.entry("nile", "nile"), Map.entry("hawaii", "hawaii"), Map.entry("lofoten", "lofoten"), Map.entry("cairns", "cairns"),
+            Map.entry("spawn", "cypress"), Map.entry("lofotenislands", "lofoten")); // the last two: foecollab's ids, for the event hud
 
     /** The location level in brackets is always this orange (minecraft gold), whatever the level. */
     private static final int LOCATION_LEVEL = 0xFFFFAA00;

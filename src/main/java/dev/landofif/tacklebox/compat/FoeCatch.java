@@ -32,7 +32,7 @@ public final class FoeCatch {
             dev.landofif.tacklebox.hud.CommunityGoal.onCatch(System.currentTimeMillis());
             String where = (String) constantId.get(location.get(fish));
             Compendium.onCatch((String) fishId.get(fish), (String) constantId.get(variant.get(fish)), (String) constantId.get(size.get(fish)), where);
-            if (dev.landofif.tacklebox.hud.EventHud.onCatch(where)) {
+            if (dev.landofif.tacklebox.hud.EventHud.onCatch(where, (String) fishId.get(fish), System.currentTimeMillis())) {
                 dev.landofif.tacklebox.TackleboxSettings.save();
             }
         } catch (ReflectiveOperationException | RuntimeException e) {

@@ -99,6 +99,8 @@ public final class EventHud {
 
     private static State state = new State();
     private static long tierUpAt;
+    /** When the chat last said a repeatable mission filled its cycle (not saved): the catch of that line is not counted again. */
+    private static final Map<String, Long> cycleAt = new java.util.HashMap<>();
 
     private EventHud() {}
 
@@ -281,9 +283,8 @@ public final class EventHud {
             int cur = Integer.parseInt(m.group(6)), max = Integer.parseInt(m.group(7));
             String mark = m.group(12).trim();
             String kind = mark.equals("∞") ? "repeat" : mark.equalsIgnoreCase("partial") ? "partial" : "once";
-            Mission before = state.missions.get(name.toLowerCase(Locale.ROOT));
-            if (kind.equals("repeat") && cur == 0 && before != null) {
-                cur = before.cur(); // the chat line of a repeatable mission always says 0, the book has the real count
+            if (kind.equals("repeat")) {
+                cycleAt.put(name.toLowerCase(Locale.ROOT), now); // sent when the cycle is full (10 River Monsters, 100 Freshwater): (0/100), a new one starts
             }
             mission = new Mission(name, kind, cur, max, num(m.group(8), m.group(9)), num(m.group(10), m.group(11)), done || !kind.equals("repeat") && cur >= max, -1);
         } else {
@@ -303,27 +304,46 @@ public final class EventHud {
     private static final java.util.Set<String> FRESH = java.util.Set.of("spawn", "cypress", "kenai", "biwa", "murray", "everglades",
             "toledobend", "greatlakes", "danube", "amazon", "nile");
 
+    /** The River Monster species of the event (the species item of /event), letters only like {@link #letters}: any catch of one counts for `River Monsters`. */
+    private static final java.util.Set<String> RIVER_MONSTERS = java.util.Set.of("piraiba", "alligatorgar", "welscatfish", "muskellunge", "murraycod",
+            "goldendorado", "flatheadcatfish", "belugasturgeon", "tigermuskellunge", "arapaima", "electriceel");
+
+    private static String letters(String name) {
+        return name.toLowerCase(Locale.ROOT).replaceAll("[^a-z]", "");
+    }
+
     /**
-     * A catch at a location ({@code FoeCatch}, foecollab's location id): the server sends no chat line for the count of a location mission
-     * ({@code Amazon (40/1500)}) or of {@code Freshwater (48/100)}, so it is counted here, +1 per catch there; the book sets it right when
-     * /event is opened. True when it changed.
+     * A catch ({@code FoeCatch}: foecollab's location and fish id): the server sends a chat line for a repeatable mission only when its cycle
+     * is full, and none for the count of a location mission ({@code Amazon (40/1500)}), so these are counted here, +1 per catch: the
+     * location's mission, {@code Freshwater} for fresh water and {@code River Monsters} for a species of the event. The book sets them
+     * right when /event is opened. True when something changed.
      */
-    public static boolean onCatch(String location) {
+    public static boolean onCatch(String location, String fishId, long now) {
         String name = ServerInfo.LOCATIONS.get(location); // the book names a location mission like the boss bar does: amazon river
-        boolean changed = bump(name == null ? null : name.toLowerCase(Locale.ROOT));
+        boolean changed = bump(name == null ? null : name.toLowerCase(Locale.ROOT), now);
         if (FRESH.contains(location)) {
-            changed |= bump("freshwater");
+            changed |= bump("freshwater", now);
+        }
+        if (fishId != null && RIVER_MONSTERS.contains(letters(fishId))) {
+            changed |= bump("river monsters", now);
         }
         return changed;
     }
 
-    private static boolean bump(String key) {
+    private static boolean bump(String key, long now) {
         Mission m = key == null ? null : state.missions.get(key);
         if (m == null || m.kind().equals("weight") || m.done() && !m.kind().equals("repeat")) {
             return false;
         }
+        boolean repeat = m.kind().equals("repeat");
+        if (repeat && now - cycleAt.getOrDefault(key, -SAME_CATCH_MS * 2) <= SAME_CATCH_MS) {
+            return false; // the chat line came first: this catch is the one that filled the cycle, already 0
+        }
         int cur = m.cur() + 1;
-        state.missions.put(key, new Mission(m.name(), m.kind(), cur, m.max(), m.earned(), m.per(), !m.kind().equals("repeat") && cur >= m.max(), m.color()));
+        if (repeat && cur >= m.max()) {
+            cur = 0; // the cycle is full: it starts again (the chat line follows and sets the points)
+        }
+        state.missions.put(key, new Mission(m.name(), m.kind(), cur, m.max(), m.earned(), m.per(), !repeat && cur >= m.max(), m.color()));
         return true;
     }
 
@@ -396,10 +416,20 @@ public final class EventHud {
                     case "partial" -> m.cur() + "/" + m.max() + " " + fmt(m.earned()) + "pts/" + fmt(m.per()) + "pts";
                     default -> m.cur() + "/" + m.max() + " " + fmt(m.per()) + "pts";
                 };
-                rows.add(colored(m.name().toLowerCase(Locale.ROOT), value, m.color(), GREEN));
+                rows.add(colored(label(m.name().toLowerCase(Locale.ROOT)), value, m.color(), GREEN));
             }
         }
         return rows;
+    }
+
+    /** The hud's label of a mission: a location by its short name (as in the level bars), `river monsters` as monsters, `freshwater` as fresh. */
+    private static String label(String name) {
+        for (Map.Entry<String, String> e : ServerInfo.LOCATIONS.entrySet()) {
+            if (e.getValue().equalsIgnoreCase(name)) {
+                return LevelBars.SHORT.getOrDefault(e.getKey(), name);
+            }
+        }
+        return name.equals("freshwater") ? "fresh" : name.startsWith("river monsters") ? name.substring("river ".length()) : name;
     }
 
     /** A name in the menu's gold or brown reads dark on the hud, so it is drawn in bright green. */
@@ -461,5 +491,6 @@ public final class EventHud {
     static void clear() {
         state = new State();
         tierUpAt = 0;
+        cycleAt.clear();
     }
 }
