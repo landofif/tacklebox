@@ -280,6 +280,10 @@ public final class EventHud {
             int cur = Integer.parseInt(m.group(6)), max = Integer.parseInt(m.group(7));
             String mark = m.group(12).trim();
             String kind = mark.equals("∞") ? "repeat" : mark.equalsIgnoreCase("partial") ? "partial" : "once";
+            Mission before = state.missions.get(name.toLowerCase(Locale.ROOT));
+            if (kind.equals("repeat") && cur == 0 && before != null) {
+                cur = before.cur(); // the chat line of a repeatable mission always says 0, the book has the real count
+            }
             mission = new Mission(name, kind, cur, max, num(m.group(8), m.group(9)), num(m.group(10), m.group(11)), done || !kind.equals("repeat") && cur >= max, -1);
         } else {
             mission = new Mission(name, "weight", 0, 0, num(m.group(14), m.group(15)), gained, false, -1);
@@ -291,6 +295,21 @@ public final class EventHud {
         if (state.points >= 0 && now - tierUpAt > SAME_CATCH_MS) {
             state.points += gained;
         }
+        return true;
+    }
+
+    /**
+     * A catch at a location ({@code FoeCatch}, foecollab's location id): the server sends no chat line for the count of a location mission
+     * ({@code Amazon (40/1500)}), so it is counted here, +1 per catch; the book sets it right when /event is opened. True when it changed.
+     */
+    public static boolean onCatch(String location) {
+        String key = LevelBars.SHORT.get(location);
+        Mission m = key == null ? null : state.missions.get(key);
+        if (m == null || m.kind().equals("weight") || m.done() && !m.kind().equals("repeat")) {
+            return false;
+        }
+        int cur = m.cur() + 1;
+        state.missions.put(key, new Mission(m.name(), m.kind(), cur, m.max(), m.earned(), m.per(), !m.kind().equals("repeat") && cur >= m.max(), m.color()));
         return true;
     }
 
@@ -358,7 +377,7 @@ public final class EventHud {
                     continue; // done, the heaviest arapaima and the albino, melanistic and trophy River Monsters are left out
                 }
                 String value = switch (m.kind()) {
-                    case "repeat" -> fmt(m.earned()) + "pts/" + fmt(m.per()) + "pts";
+                    case "repeat" -> m.cur() + "/" + m.max() + " " + fmt(m.earned()) + "pts/" + fmt(m.per()) + "pts";
                     case "weight" -> fmt(m.earned()) + " pts";
                     case "partial" -> m.cur() + "/" + m.max() + " " + fmt(m.earned()) + "pts/" + fmt(m.per()) + "pts";
                     default -> m.cur() + "/" + m.max() + " " + fmt(m.per()) + "pts";

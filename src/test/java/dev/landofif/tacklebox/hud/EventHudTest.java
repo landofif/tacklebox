@@ -104,7 +104,7 @@ class EventHudTest {
     void theBookListsEveryMissionAndTheHudKeepsTheOpenAndTheRepeatableOnes() {
         assertTrue(EventHud.read(bookMenu()));
         List<String[]> rows = EventHud.rows(false, true);
-        assertEquals("24pts/2pts", value(rows, "river monsters"));
+        assertEquals("1/10 24pts/2pts", value(rows, "river monsters"));
         assertEquals("40/1500 400pts", value(rows, "amazon"));
         assertNull(value(rows, "heaviest arapaima"), "left out");
         assertEquals("3/10 150pts/50pts", value(rows, "wels catfish"));
@@ -113,6 +113,15 @@ class EventHudTest {
         assertNull(value(rows, "murray cod"));
         assertNull(value(EventHud.rows(false, false), "amazon"), "missions switched off");
         assertFalse(EventHud.read(bookMenu()), "reading the same book again is no change");
+    }
+
+    @Test
+    void aCatchAtALocationCountsItsMission() {
+        EventHud.read(bookMenu());
+        assertTrue(EventHud.onCatch("amazon"));
+        assertEquals("41/1500 400pts", value(EventHud.rows(false, true), "amazon"));
+        assertFalse(EventHud.onCatch("kenai"), "no mission for that location");
+        assertFalse(EventHud.onCatch("danube"), "not in the book");
     }
 
     @Test
@@ -134,7 +143,7 @@ class EventHudTest {
         chat(mission(50, "Wels Catfish", "", "(4/10) [200 pts|50 pts] Partial"), 10_000);
         assertEquals("4/10 200pts/50pts", value(EventHud.rows(false, true), "wels catfish"));
         chat(mission(2, "River Monsters", "", "(1/10) [26 pts|2 pts] ∞"), 20_000);
-        assertEquals("26pts/2pts", value(EventHud.rows(false, true), "river monsters"));
+        assertEquals("1/10 26pts/2pts", value(EventHud.rows(false, true), "river monsters"), "the chat line says 0, the book count stays");
         assertEquals(Integer.toString(0xFF55FFAA), EventHud.rows(false, true).stream().filter(r -> r[0].equals("river monsters")).findFirst().orElseThrow()[2]);
         chat(mission(50, "Wels Catfish", "✔", "(10/10) [500 pts|50 pts] Partial"), 30_000);
         assertNull(value(EventHud.rows(false, true), "wels catfish"), "done: gone");

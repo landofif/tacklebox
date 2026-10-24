@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public final class LevelBars {
     /** The one word of a location that matters; locations not listed keep their full name. */
-    private static final Map<String, String> SHORT = Map.ofEntries(
+    static final Map<String, String> SHORT = Map.ofEntries(
             Map.entry("cypress", "cypress"), Map.entry("kenai", "kenai"), Map.entry("biwa", "biwa"), Map.entry("murray", "murray"),
             Map.entry("everglades", "everglades"), Map.entry("keywest", "key"), Map.entry("toledobend", "toledo"),
             Map.entry("greatlakes", "great lakes"), Map.entry("danube", "danube"), Map.entry("oilrig", "rig"),
