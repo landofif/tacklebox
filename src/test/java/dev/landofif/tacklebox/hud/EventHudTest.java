@@ -127,6 +127,16 @@ class EventHudTest {
     }
 
     @Test
+    void theArtInFrontOfALoreLineIsNotTheNamesColour() {
+        net.minecraft.text.MutableText line = net.minecraft.text.Text.literal("\uEEE4\uEEE1 \uD003 \uEEE8")
+                .setStyle(net.minecraft.text.Style.EMPTY.withColor(0x5C4B34));
+        line.append(net.minecraft.text.Text.literal("- ").setStyle(net.minecraft.text.Style.EMPTY.withColor(0x55FF55)));
+        line.append(net.minecraft.text.Text.literal("River Monsters").setStyle(net.minecraft.text.Style.EMPTY.withColor(0x55AAFF)));
+        assertEquals(0x55AAFF, EventHud.firstWordColor(line));
+        assertEquals(-1, EventHud.firstWordColor(net.minecraft.text.Text.literal("\uD003 ")));
+    }
+
+    @Test
     void missionsTakeTheMenusColours() {
         EventHud.read(bookMenu());
         List<String[]> rows = EventHud.rows(false, true);

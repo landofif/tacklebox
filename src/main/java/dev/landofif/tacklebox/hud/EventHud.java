@@ -142,9 +142,10 @@ public final class EventHud {
         return out.toString();
     }
 
-    /** The colour (rgb) of the first run with a letter in it, -1 for none. */
-    private static int firstWordColor(Text line) {
-        return line.visit((style, s) -> s.codePoints().anyMatch(Character::isLetter) && style.getColor() != null
+    /** The colour (rgb) of the first run with a latin letter in it, -1 for none. */
+    static int firstWordColor(Text line) {
+        // hangul syllables are letters too: the pack's art in front of every lore line (and its brown) must not count
+        return line.visit((style, s) -> style.getColor() != null && s.codePoints().anyMatch(cp -> cp < 0x250 && Character.isLetter(cp))
                 ? Optional.of(style.getColor().getRgb()) : Optional.empty(), Style.EMPTY).orElse(-1);
     }
 
