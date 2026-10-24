@@ -149,7 +149,6 @@ public class TackleboxSettings {
     public boolean eventHud;
     /** Whether the event hud lists the missions you have progressed, and the finished ones too. */
     public boolean eventMissions = true;
-    public boolean eventFinished;
     /** What it read from /event and chat (saved so it survives a restart). */
     public dev.landofif.tacklebox.hud.EventHud.State eventState;
     public int eventX = 360;

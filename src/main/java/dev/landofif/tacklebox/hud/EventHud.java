@@ -13,6 +13,7 @@ import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,17 +53,39 @@ public final class EventHud {
     /** The mission message follows the tier up line of the catch that caused it, with that mission's points already counted in. */
     private static final long SAME_CATCH_MS = 1500;
 
-    /** An item of the open menu as plain lowercase text ({@link Glyphs#plain}): name and lore lines. */
-    public record Item(String name, List<String> lines) {}
+    /** The River Monsters variants of the book: the tag is a pack glyph (U+F041..43, in the order of the menu), plain text drops it. */
+    private static final Map<Character, String> TAGS = Map.of('\uF041', "albino", '\uF042', "melanistic", '\uF043', "trophy");
+    private static final Pattern MISSION_NAME = Pattern.compile("^- (?:[^\\p{L}\\p{N}\\s]+ )?(.+?)( ✔)?$");
+    // ┗ (1/10) [24 pts|2 pts] ∞     or     ┗ (pts = Weight) 50.86 pts
+    private static final Pattern MISSION_LINE = Pattern.compile("^┗ (?:\\((\\d+)/(\\d+)\\) \\[" + NUM + " pts\\|" + NUM + " pts\\] ?(.*)|\\(pts = (.+?)\\) " + NUM + " pts)", CI);
 
-    /** A reward step: the points the head says you have, the points it needs in total, and its reward lines (money, items, bait package). */
-    public record Threshold(int n, double have, double need, List<String> rewards) {}
+    /**
+     * An item of the open menu as plain lowercase text ({@link Glyphs#plain}): name and lore lines. {@code colors} holds the menu's colour
+     * (rgb) of each lore line's first word, -1 for none; it may be empty.
+     */
+    public record Item(String name, List<String> lines, List<Integer> colors) {
+        public Item(String name, List<String> lines) {
+            this(name, lines, List.of());
+        }
+
+        int color(int line) {
+            return colorAt(colors, line);
+        }
+    }
+
+    /** A reward step: the points the head says you have, the points it needs in total, and its reward lines (money, items, bait package) with their colours. */
+    public record Threshold(int n, double have, double need, List<String> rewards, List<Integer> colors) {
+        public Threshold(int n, double have, double need, List<String> rewards) {
+            this(n, have, need, rewards, List.of());
+        }
+    }
 
     /**
      * A mission from chat. {@code kind}: "partial" (points per catch up to {@code max}, done at max), "repeat" (the infinity mark; {@code earned}
-     * is all it gave so far), "once" (one catch, {@code max} 1) or "weight" (points are the best weight).
+     * is all it gave so far), "once" (one catch, {@code max} 1) or "weight" (points are the best weight). {@code color} is the name's colour in
+     * the menu (rgb), -1 when unknown.
      */
-    public record Mission(String name, String kind, int cur, int max, double earned, double per, boolean done) {}
+    public record Mission(String name, String kind, int cur, int max, double earned, double per, boolean done, int color) {}
 
     /** What is saved in the settings. */
     public static final class State {
@@ -99,9 +123,32 @@ public final class EventHud {
                 continue;
             }
             LoreComponent lore = stack.get(DataComponentTypes.LORE);
-            items.add(new Item(Glyphs.plain(stack.getName()), lore == null ? List.of() : lore.lines().stream().map(Glyphs::plain).toList()));
+            List<Text> lines = lore == null ? List.<Text>of() : lore.lines();
+            items.add(new Item(Glyphs.plain(stack.getName()), lines.stream().map(EventHud::tagged).toList(), lines.stream().map(EventHud::firstWordColor).toList()));
         }
         return read(items);
+    }
+
+    /** The line as plain text, with the pack glyph of a River Monsters variant spelled out. */
+    private static String tagged(Text line) {
+        StringBuilder out = new StringBuilder(Glyphs.plain(line));
+        String raw = line.getString();
+        TAGS.forEach((glyph, tag) -> {
+            if (raw.indexOf(glyph) >= 0) {
+                out.append(' ').append(tag);
+            }
+        });
+        return out.toString();
+    }
+
+    /** The colour (rgb) of the first run with a letter in it, -1 for none. */
+    private static int firstWordColor(Text line) {
+        return line.visit((style, s) -> s.codePoints().anyMatch(Character::isLetter) && style.getColor() != null
+                ? Optional.of(style.getColor().getRgb()) : Optional.empty(), Style.EMPTY).orElse(-1);
+    }
+
+    private static int colorAt(List<Integer> colors, int i) {
+        return colors != null && i < colors.size() ? colors.get(i) : -1;
     }
 
     /** Takes what the menu items say; true when that changed the state (a menu without thresholds changes nothing). */
@@ -109,10 +156,14 @@ public final class EventHud {
         List<Threshold> found = new ArrayList<>();
         String title = "", placement = "";
         double points = -1, haveMax = -1;
+        Map<String, Mission> book = null;
         for (Item item : items) {
+            if (item.name().startsWith("event missions")) {
+                book = missions(item);
+            }
             Matcher m = THRESHOLD.matcher(item.name());
             if (m.find()) {
-                Threshold t = threshold(Integer.parseInt(m.group(1)), item.lines());
+                Threshold t = threshold(Integer.parseInt(m.group(1)), item);
                 if (t != null) {
                     found.add(t);
                     haveMax = Math.max(haveMax, t.have());
@@ -135,13 +186,17 @@ public final class EventHud {
                 }
             }
         }
+        boolean missionsChanged = book != null && !book.equals(state.missions);
+        if (missionsChanged) {
+            state.missions = book;
+        }
         if (found.isEmpty()) {
-            return false;
+            return missionsChanged;
         }
         found.sort((a, b) -> Integer.compare(a.n(), b.n()));
         double total = points >= 0 ? points : Math.max(0, haveMax);
         boolean changed = !found.equals(state.thresholds) || total != state.points || !placement.equals(state.placement)
-                || !title.isEmpty() && !title.equals(state.title);
+                || !title.isEmpty() && !title.equals(state.title) || missionsChanged;
         state.thresholds = found;
         state.points = total;
         state.placement = placement;
@@ -151,7 +206,36 @@ public final class EventHud {
         return changed;
     }
 
-    private static Threshold threshold(int n, List<String> lines) {
+    /** The book's list: a {@code - name [✔]} line, then its {@code ┗ (cur/max) [earned|per] mark} line, for every mission of the event. */
+    private static Map<String, Mission> missions(Item book) {
+        Map<String, Mission> found = new LinkedHashMap<>();
+        List<String> lines = book.lines();
+        for (int i = 0; i + 1 < lines.size(); i++) {
+            Matcher name = MISSION_NAME.matcher(lines.get(i));
+            Matcher detail = MISSION_LINE.matcher(lines.get(i + 1));
+            if (!name.find() || !detail.find()) {
+                continue;
+            }
+            String title = name.group(1).trim();
+            boolean done = name.group(2) != null;
+            Mission mission;
+            if (detail.group(1) != null) {
+                int cur = Integer.parseInt(detail.group(1)), max = Integer.parseInt(detail.group(2));
+                String mark = detail.group(7).trim();
+                String kind = mark.equals("∞") ? "repeat" : mark.equalsIgnoreCase("partial") ? "partial" : "once";
+                mission = new Mission(title, kind, cur, max, num(detail.group(3), detail.group(4)), num(detail.group(5), detail.group(6)),
+                        done || !kind.equals("repeat") && cur >= max, book.color(i));
+            } else {
+                double weight = num(detail.group(9), detail.group(10));
+                mission = new Mission(title, "weight", 0, 0, weight, weight, false, book.color(i));
+            }
+            found.put(title, mission);
+        }
+        return found;
+    }
+
+    private static Threshold threshold(int n, Item item) {
+        List<String> lines = item.lines();
         for (int i = 0; i < lines.size(); i++) {
             Matcher m = RANGE.matcher(lines.get(i));
             if (!m.find()) {
@@ -159,12 +243,15 @@ public final class EventHud {
             }
             double have = m.group(1) == null ? 0 : num(m.group(1), m.group(2));
             List<String> rewards = new ArrayList<>();
-            for (String line : lines.subList(i + 1, lines.size())) {
+            List<Integer> colors = new ArrayList<>();
+            for (int j = i + 1; j < lines.size(); j++) {
+                String line = lines.get(j);
                 if (!line.isEmpty() && !line.startsWith("┗")) { // the lines under the points; the bait package's biome line is dropped
                     rewards.add(line);
+                    colors.add(item.color(j));
                 }
             }
-            return new Threshold(n, have, num(m.group(3), m.group(4)), rewards);
+            return new Threshold(n, have, num(m.group(3), m.group(4)), rewards, colors);
         }
         return null;
     }
@@ -192,11 +279,14 @@ public final class EventHud {
             int cur = Integer.parseInt(m.group(6)), max = Integer.parseInt(m.group(7));
             String mark = m.group(12).trim();
             String kind = mark.equals("∞") ? "repeat" : mark.equalsIgnoreCase("partial") ? "partial" : "once";
-            mission = new Mission(name, kind, cur, max, num(m.group(8), m.group(9)), num(m.group(10), m.group(11)), done || !kind.equals("repeat") && cur >= max);
+            mission = new Mission(name, kind, cur, max, num(m.group(8), m.group(9)), num(m.group(10), m.group(11)), done || !kind.equals("repeat") && cur >= max, -1);
         } else {
-            mission = new Mission(name, "weight", 0, 0, num(m.group(14), m.group(15)), gained, false);
+            mission = new Mission(name, "weight", 0, 0, num(m.group(14), m.group(15)), gained, false, -1);
         }
-        state.missions.put(name.toLowerCase(Locale.ROOT), mission);
+        String key = name.toLowerCase(Locale.ROOT);
+        Mission old = state.missions.get(key);
+        state.missions.put(key, old == null ? mission : new Mission(mission.name(), mission.kind(), mission.cur(), mission.max(), mission.earned(),
+                mission.per(), mission.done(), old.color()));
         if (state.points >= 0 && now - tierUpAt > SAME_CATCH_MS) {
             state.points += gained;
         }
@@ -222,10 +312,10 @@ public final class EventHud {
     }
 
     /**
-     * The hud rows {label, value}; with preview and nothing read yet they hold dashes. Missions: the ones still going, with the repeatable ones
-     * showing what they gave so far, and with {@code finished} the done ones too.
+     * The hud rows {label, value} plus, for the coloured ones, {label colour, value colour} as rgb numbers; with preview and nothing read yet they
+     * hold dashes. Missions: the ones not done yet and the repeatable ones, with the points earned so far and the points one catch gives.
      */
-    static List<String[]> rows(boolean preview, boolean missions, boolean finished) {
+    static List<String[]> rows(boolean preview, boolean missions) {
         List<String[]> rows = new ArrayList<>();
         if (state.thresholds.isEmpty() && state.missions.isEmpty()) {
             if (preview) {
@@ -249,8 +339,8 @@ public final class EventHud {
         }
         if (next != null) {
             rows.add(new String[]{"threshold " + next.n(), fmt(next.need() - state.points) + " to go"});
-            for (String reward : next.rewards()) {
-                rows.add(new String[]{"  " + reward, ""});
+            for (int i = 0; i < next.rewards().size(); i++) {
+                rows.add(colored("  " + next.rewards().get(i), "", colorAt(next.colors(), i), 0));
             }
         } else if (!state.thresholds.isEmpty()) {
             rows.add(new String[]{"all thresholds done", ""});
@@ -263,18 +353,23 @@ public final class EventHud {
         }
         if (missions) {
             for (Mission m : state.missions.values()) {
-                if (m.done() && !finished) {
+                if (m.done() && !m.kind().equals("repeat")) {
                     continue;
                 }
                 String value = switch (m.kind()) {
-                    case "repeat" -> "∞ " + fmt(m.earned()) + " pts";
+                    case "repeat" -> fmt(m.earned()) + "pts/" + fmt(m.per()) + "pts";
                     case "weight" -> fmt(m.earned()) + " pts";
-                    default -> m.done() ? "done" : m.cur() + "/" + m.max();
+                    case "partial" -> m.cur() + "/" + m.max() + " " + fmt(m.earned()) + "pts/" + fmt(m.per()) + "pts";
+                    default -> m.cur() + "/" + m.max() + " " + fmt(m.per()) + "pts";
                 };
-                rows.add(new String[]{m.name().toLowerCase(Locale.ROOT), value});
+                rows.add(colored(m.name().toLowerCase(Locale.ROOT), value, m.color(), Foe.ACCENT));
             }
         }
         return rows;
+    }
+
+    private static String[] colored(String label, String value, int labelRgb, int valueArgb) {
+        return new String[]{label, value, Integer.toString(labelRgb < 0 ? Foe.TEXT : 0xFF000000 | labelRgb), Integer.toString(valueArgb == 0 ? Foe.TEXT : valueArgb)};
     }
 
     /** Draws the hud at its saved spot and returns {x, y, w, h}; with preview an empty hud still shows a line so it can be moved. */
@@ -289,7 +384,7 @@ public final class EventHud {
 
     private static int[] drawAt100(DrawContext ctx, boolean preview) {
         TackleboxSettings s = TackleboxSettings.get();
-        List<String[]> rows = rows(preview, s.eventMissions, s.eventFinished);
+        List<String[]> rows = rows(preview, s.eventMissions);
         if (rows.isEmpty()) {
             return null;
         }
@@ -309,8 +404,9 @@ public final class EventHud {
                 lx = s.eventAlign.x(s.eventX + 8, w - 16, tr.getWidth(l) + (v.getString().isEmpty() ? 0 : 12 + tr.getWidth(v)));
                 vx = lx + tr.getWidth(l) + 12;
             }
-            ctx.drawTextWithShadow(tr, l, lx, y, Foe.DIM);
-            ctx.drawTextWithShadow(tr, v, vx, y, Foe.TEXT);
+            String[] r = rows.get(i);
+            ctx.drawTextWithShadow(tr, l, lx, y, r.length > 2 ? Integer.parseInt(r[2]) : Foe.DIM);
+            ctx.drawTextWithShadow(tr, v, vx, y, r.length > 3 ? Integer.parseInt(r[3]) : Foe.TEXT);
         }
         return new int[]{s.eventX, s.eventY, w, h};
     }

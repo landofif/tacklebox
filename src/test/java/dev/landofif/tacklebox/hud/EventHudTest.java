@@ -48,14 +48,14 @@ class EventHudTest {
 
     @Test
     void nothingReadYetShowsDashesOnlyInPreview() {
-        assertTrue(EventHud.rows(false, true, false).isEmpty());
-        assertEquals("-", EventHud.rows(true, true, false).get(0)[1]);
+        assertTrue(EventHud.rows(false, true).isEmpty());
+        assertEquals("-", EventHud.rows(true, true).get(0)[1]);
     }
 
     @Test
     void zeroPointsPointAtTheFirstThresholdAndItsRewards() {
         assertTrue(EventHud.read(menu("<none>", "<none>")));
-        List<String[]> rows = EventHud.rows(false, true, false);
+        List<String[]> rows = EventHud.rows(false, true);
         assertArrayEquals(new String[]{"points", "0"}, rows.get(0));
         assertArrayEquals(new String[]{"threshold 1", "220 to go"}, rows.get(1));
         assertEquals("  $25k", rows.get(2)[0]);
@@ -68,52 +68,92 @@ class EventHudTest {
     @Test
     void pointsMoveToTheNextThreshold() {
         EventHud.read(menu("900", "900"));
-        List<String[]> rows = EventHud.rows(false, true, false);
+        List<String[]> rows = EventHud.rows(false, true);
         assertEquals("900", value(rows, "points"));
         assertEquals("600 to go", value(rows, "threshold 3"));
         assertEquals("2/3", value(rows, "thresholds"));
         EventHud.read(menu("2k", "2k"));
-        assertNotNull(value(EventHud.rows(false, true, false), "all thresholds done"));
+        assertNotNull(value(EventHud.rows(false, true), "all thresholds done"));
     }
 
     @Test
     void aMenuWithoutThresholdsChangesNothing() {
         EventHud.read(menu("500", "500"));
         assertFalse(EventHud.read(List.of(new EventHud.Item("close", List.of()))));
-        assertEquals("500", EventHud.rows(false, true, false).get(0)[1]);
+        assertEquals("500", EventHud.rows(false, true).get(0)[1]);
+    }
+
+    private static final List<String> BOOK = List.of("event missions → 2.61k pts", "",
+            "- 🎣 river monsters", "┗ (1/10) [24 pts|2 pts] ∞",
+            "- 🎣 amazon", "┗ (40/1500) [0 pts|400 pts]",
+            "- 🎣 heaviest arapaima", "┗ (pts = weight) 50.86 pts",
+            "- 🎣 tiger muskellunge ≥ 18lb ✔", "┗ (1/1) [500 pts|500 pts]",
+            "- 🎣 murray cod ✔", "┗ (10/10) [500 pts|50 pts] partial",
+            "- 🎣 wels catfish", "┗ (3/10) [150 pts|50 pts] partial",
+            "- 🎣 river monsters albino", "┗ (0/1) [0 pts|10 pts] ∞");
+
+    private static List<EventHud.Item> bookMenu() {
+        List<Integer> colors = new java.util.ArrayList<>(java.util.Collections.nCopies(BOOK.size(), -1));
+        colors.set(2, 0x55FF55);
+        colors.set(4, 0xFFAA00);
+        return List.of(new EventHud.Item("event missions → 2.61k pts", BOOK, colors));
     }
 
     @Test
-    void limitedMissionCountsUpAndFinishedOnesHideUnlessAsked() {
+    void theBookListsEveryMissionAndTheHudKeepsTheOpenAndTheRepeatableOnes() {
+        assertTrue(EventHud.read(bookMenu()));
+        List<String[]> rows = EventHud.rows(false, true);
+        assertEquals("24pts/2pts", value(rows, "river monsters"));
+        assertEquals("40/1500 400pts", value(rows, "amazon"));
+        assertEquals("50.86 pts", value(rows, "heaviest arapaima"));
+        assertEquals("3/10 150pts/50pts", value(rows, "wels catfish"));
+        assertEquals("0pts/10pts", value(rows, "river monsters albino"));
+        assertNull(value(rows, "tiger muskellunge ≥ 18lb"), "done ones are hidden");
+        assertNull(value(rows, "murray cod"));
+        assertNull(value(EventHud.rows(false, false), "amazon"), "missions switched off");
+        assertFalse(EventHud.read(bookMenu()), "reading the same book again is no change");
+    }
+
+    @Test
+    void missionsTakeTheMenusColours() {
+        EventHud.read(bookMenu());
+        List<String[]> rows = EventHud.rows(false, true);
+        String[] river = rows.stream().filter(r -> r[0].equals("river monsters")).findFirst().orElseThrow();
+        assertEquals(Integer.toString(0xFF55FF55), river[2]);
+        assertEquals(Integer.toString(0xFFFFAA00), river[3]);
+        String[] unknown = rows.stream().filter(r -> r[0].equals("wels catfish")).findFirst().orElseThrow();
+        assertEquals(Integer.toString(0xFFFFFFFF), unknown[2]);
+    }
+
+    @Test
+    void chatKeepsTheBookedMissionsCurrentAndKeepsTheirColour() {
         EventHud.read(menu("0", "0"));
-        assertTrue(chat(mission(50, "Murray Cod", "", "(1/10) [50 pts|50 pts] Partial"), 10_000));
-        assertTrue(chat(mission(50, "Murray Cod", "", "(2/10) [100 pts|50 pts] Partial"), 20_000));
-        List<String[]> rows = EventHud.rows(false, true, false);
-        assertEquals("2/10", value(rows, "murray cod"));
-        assertEquals("100", value(rows, "points"));
-        assertNull(value(EventHud.rows(false, false, false), "murray cod"), "missions switched off");
-
-        chat(mission(50, "Murray Cod", "✔", "(10/10) [500 pts|50 pts] Partial"), 30_000);
-        assertNull(value(EventHud.rows(false, true, false), "murray cod"));
-        assertEquals("done", value(EventHud.rows(false, true, true), "murray cod"));
+        EventHud.read(bookMenu());
+        chat(mission(50, "Wels Catfish", "", "(4/10) [200 pts|50 pts] Partial"), 10_000);
+        assertEquals("4/10 200pts/50pts", value(EventHud.rows(false, true), "wels catfish"));
+        chat(mission(2, "River Monsters", "", "(1/10) [26 pts|2 pts] ∞"), 20_000);
+        assertEquals("26pts/2pts", value(EventHud.rows(false, true), "river monsters"));
+        assertEquals(Integer.toString(0xFF55FF55), EventHud.rows(false, true).stream().filter(r -> r[0].equals("river monsters")).findFirst().orElseThrow()[2]);
+        chat(mission(50, "Wels Catfish", "✔", "(10/10) [500 pts|50 pts] Partial"), 30_000);
+        assertNull(value(EventHud.rows(false, true), "wels catfish"), "done: gone");
     }
 
     @Test
-    void repeatableMissionShowsWhatItGaveSoFar() {
-        EventHud.read(menu("0", "0"));
-        chat(mission(2, "River Monsters", "", "(0/10) [2 pts|2 pts] ∞"), 10_000);
-        chat(mission(2, "River Monsters", "", "(0/10) [4 pts|2 pts] ∞"), 20_000);
-        assertEquals("∞ 4 pts", value(EventHud.rows(false, true, false), "river monsters"));
-        assertEquals("4", value(EventHud.rows(false, true, false), "points"));
+    void rewardsOfTheNextThresholdKeepTheirColours() {
+        EventHud.Item head = new EventHud.Item("threshold 1", List.of("threshold 1", "", "[<none> pts|220 pts]", "", "$25k", "20x mozzarella cube"), List.of(0xFF5555, -1, 0xFFFF55, -1, 0x55FF55, -1));
+        EventHud.read(List.of(head, new EventHud.Item("event leaderboards", List.of("your placement: unranked", "event points: <none> pts"))));
+        List<String[]> rows = EventHud.rows(false, true);
+        String[] money = rows.stream().filter(r -> r[0].equals("  $25k")).findFirst().orElseThrow();
+        assertEquals(Integer.toString(0xFF55FF55), money[2]);
     }
 
     @Test
-    void oneTimeAndWeightMissions() {
+    void oneTimeAndWeightMissionsFromChat() {
         EventHud.read(menu("0", "0"));
         chat(mission(500, "Tiger Muskellunge ≥ 18lb", "✔", "(1/1) [500 pts|500 pts] "), 10_000);
         chat("\nHALLOWEEN 2026 EVENT MISSION [+50.86 pts]\n  🎣 Heaviest Arapaima \n    ┗ (pts = Weight) 50.86 pts \n", 20_000);
-        List<String[]> rows = EventHud.rows(false, true, true);
-        assertEquals("done", value(rows, "tiger muskellunge ≥ 18lb"));
+        List<String[]> rows = EventHud.rows(false, true);
+        assertNull(value(rows, "tiger muskellunge ≥ 18lb"));
         assertEquals("50.86 pts", value(rows, "heaviest arapaima"));
         assertEquals("550.86", value(rows, "points"));
     }
@@ -123,10 +163,10 @@ class EventHudTest {
         EventHud.read(menu("200", "200"));
         assertTrue(chat("HALLOWEEN 2026 EVENT THRESHOLD tier up! \n[250 pts|220 pts]", 100_000));
         chat(mission(50, "Murray Cod", "", "(5/10) [250 pts|50 pts] Partial"), 100_000);
-        assertEquals("250", value(EventHud.rows(false, true, false), "points"));
-        assertEquals("5/10", value(EventHud.rows(false, true, false), "murray cod"));
+        assertEquals("250", value(EventHud.rows(false, true), "points"));
+        assertEquals("5/10 250pts/50pts", value(EventHud.rows(false, true), "murray cod"));
         chat(mission(50, "Murray Cod", "", "(6/10) [300 pts|50 pts] Partial"), 160_000);
-        assertEquals("300", value(EventHud.rows(false, true, false), "points"));
+        assertEquals("300", value(EventHud.rows(false, true), "points"));
     }
 
     @Test
@@ -134,7 +174,7 @@ class EventHudTest {
         EventHud.read(menu("100", "100"));
         assertFalse(chat("[373] Realstranden » HALLOWEEN 2026 EVENT THRESHOLD tier up! [500 pts|220 pts]", 1));
         assertFalse(chat("[353] flown06 » Heaviest Arapaima (pts = Weight) 143.04 pts", 2));
-        assertEquals("100", value(EventHud.rows(false, true, false), "points"));
+        assertEquals("100", value(EventHud.rows(false, true), "points"));
     }
 
     @Test

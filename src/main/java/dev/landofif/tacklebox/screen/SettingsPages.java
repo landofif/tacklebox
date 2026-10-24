@@ -457,10 +457,8 @@ public final class SettingsPages {
                 () -> s.eventHud, v -> s.eventHud = v);
         cycle("event align", "how the text of the event hud lines up inside it: left, centre or right.",
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.eventAlign, v -> s.eventAlign = v);
-        toggle("event missions", "lists the missions you have progressed on the event hud: n/10 for the ones with a limit, the points so far for the repeatable ones. read from the mission chat lines.",
+        toggle("event missions", "lists the missions that are not done yet and the repeatable ones on the event hud, coloured like the menu, with the points earned and the points one catch gives. read from the mission book in /event and then follow the chat.",
                 () -> s.eventMissions, v -> s.eventMissions = v);
-        toggle("event finished missions", "keeps the missions you completed on the event hud.",
-                () -> s.eventFinished, v -> s.eventFinished = v);
         header("level progress");
         toggle("level progress hud", "two thin bars: your fishing level (from the vanilla xp bar) and the level of the location you are at. the location bar starts when you open /comp once and then follows the location xp of quest rewards and chat. move it with move huds.",
                 () -> s.levelBars, v -> s.levelBars = v);
