@@ -309,7 +309,8 @@ public final class EventHud {
      * /event is opened. True when it changed.
      */
     public static boolean onCatch(String location) {
-        boolean changed = bump(LevelBars.SHORT.get(location));
+        String name = ServerInfo.LOCATIONS.get(location); // the book names a location mission like the boss bar does: amazon river
+        boolean changed = bump(name == null ? null : name.toLowerCase(Locale.ROOT));
         if (FRESH.contains(location)) {
             changed |= bump("freshwater");
         }

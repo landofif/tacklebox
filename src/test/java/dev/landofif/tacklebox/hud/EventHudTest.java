@@ -86,7 +86,7 @@ class EventHudTest {
     private static final List<String> BOOK = List.of("event missions → 2.61k pts", "",
             "- 🎣 river monsters", "┗ (1/10) [24 pts|2 pts] ∞",
             "- 🎣 freshwater", "┗ (6/100) [10 pts|2 pts] ∞",
-            "- 🎣 amazon", "┗ (40/1500) [0 pts|400 pts]",
+            "- 🎣 amazon river", "┗ (40/1500) [0 pts|400 pts]",
             "- 🎣 heaviest arapaima", "┗ (pts = weight) 50.86 pts",
             "- 🎣 tiger muskellunge ≥ 18lb ✔", "┗ (1/1) [500 pts|500 pts]",
             "- 🎣 murray cod ✔", "┗ (10/10) [500 pts|50 pts] partial",
@@ -106,13 +106,13 @@ class EventHudTest {
         assertTrue(EventHud.read(bookMenu()));
         List<String[]> rows = EventHud.rows(false, true);
         assertEquals("1/10 24pts/2pts", value(rows, "river monsters"));
-        assertEquals("40/1500 400pts", value(rows, "amazon"));
+        assertEquals("40/1500 400pts", value(rows, "amazon river"));
         assertNull(value(rows, "heaviest arapaima"), "left out");
         assertEquals("3/10 150pts/50pts", value(rows, "wels catfish"));
         assertNull(value(rows, "river monsters albino"), "left out");
         assertNull(value(rows, "tiger muskellunge ≥ 18lb"), "done ones are hidden");
         assertNull(value(rows, "murray cod"));
-        assertNull(value(EventHud.rows(false, false), "amazon"), "missions switched off");
+        assertNull(value(EventHud.rows(false, false), "amazon river"), "missions switched off");
         assertFalse(EventHud.read(bookMenu()), "reading the same book again is no change");
     }
 
@@ -120,7 +120,7 @@ class EventHudTest {
     void aCatchAtALocationCountsItsMission() {
         EventHud.read(bookMenu());
         assertTrue(EventHud.onCatch("amazon"));
-        assertEquals("41/1500 400pts", value(EventHud.rows(false, true), "amazon"));
+        assertEquals("41/1500 400pts", value(EventHud.rows(false, true), "amazon river"));
         assertTrue(EventHud.onCatch("kenai"), "fresh water: the Freshwater mission counts it");
         assertFalse(EventHud.onCatch("keywest"), "salt water, and no mission for the location");
         assertEquals("8/100 10pts/2pts", value(EventHud.rows(false, true), "freshwater"), "amazon and kenai are fresh water");
@@ -143,7 +143,7 @@ class EventHudTest {
         String[] river = rows.stream().filter(r -> r[0].equals("river monsters")).findFirst().orElseThrow();
         assertEquals(Integer.toString(0xFF55FFAA), river[2]);
         assertEquals(Integer.toString(0xFF55FF55), river[3]);
-        assertEquals(Integer.toString(0xFF55FF55), EventHud.rows(false, true).stream().filter(r -> r[0].equals("amazon")).findFirst().orElseThrow()[2], "gold becomes bright green");
+        assertEquals(Integer.toString(0xFF55FF55), EventHud.rows(false, true).stream().filter(r -> r[0].equals("amazon river")).findFirst().orElseThrow()[2], "gold becomes bright green");
         String[] unknown = rows.stream().filter(r -> r[0].equals("wels catfish")).findFirst().orElseThrow();
         assertEquals(Integer.toString(0xFFFFFFFF), unknown[2]);
     }
