@@ -115,6 +115,7 @@ class EventHudTest {
         assertNull(value(rows, "heaviest arapaima"), "left out");
         assertEquals("3/10 150pts/50pts", value(rows, "wels catfish"));
         assertNull(value(rows, "monsters albino"), "left out");
+        assertNull(value(rows, "monsters gigantic"), "left out");
         assertNull(value(rows, "tiger muskellunge ≥ 18lb"), "done ones are hidden");
         assertNull(value(rows, "murray cod"));
         assertNull(value(EventHud.rows(false, false), "amazon"), "missions switched off");
@@ -177,7 +178,7 @@ class EventHudTest {
     void theHudShortensLocationsAndTwoMissionNames() {
         EventHud.read(bookMenu());
         List<String[]> rows = EventHud.rows(false, true);
-        for (String label : List.of("monsters", "monsters gigantic", "fresh", "amazon", "danube", "toledo", "great lakes", "murray")) {
+        for (String label : List.of("monsters", "fresh", "amazon", "danube", "toledo", "great lakes", "murray")) {
             assertNotNull(value(rows, label), label);
         }
         assertNull(value(rows, "river monsters"));

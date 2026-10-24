@@ -407,8 +407,8 @@ public final class EventHud {
         }
         if (missions) {
             for (Mission m : state.missions.values()) {
-                if (m.done() && !m.kind().equals("repeat") || m.kind().equals("weight") || TAGS.values().stream().anyMatch(m.name()::endsWith)) {
-                    continue; // done, the heaviest arapaima and the albino, melanistic and trophy River Monsters are left out
+                if (m.done() && !m.kind().equals("repeat") || m.kind().equals("weight") || variant(m.name())) {
+                    continue; // done, the heaviest arapaima and the albino, melanistic, trophy and gigantic River Monsters are left out
                 }
                 String value = switch (m.kind()) {
                     case "repeat" -> m.cur() + "/" + m.max() + " " + fmt(m.earned()) + "pts/" + fmt(m.per()) + "pts";
@@ -420,6 +420,12 @@ public final class EventHud {
             }
         }
         return rows;
+    }
+
+    /** A River Monsters variant (the tag is spelled out at the end of its name). */
+    private static boolean variant(String name) {
+        String n = name.toLowerCase(Locale.ROOT);
+        return TAGS.values().stream().anyMatch(n::endsWith) || n.endsWith("gigantic");
     }
 
     /** The hud's label of a mission: a location by its short name (as in the level bars), `river monsters` as monsters, `freshwater` as fresh. */
