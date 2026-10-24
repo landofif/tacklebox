@@ -147,6 +147,11 @@ public class TackleboxSettings {
     public HudAlign boostsAlign = HudAlign.LEFT;
     /** The event hud (hud/EventHud): points, next threshold and its rewards, placement, read from /event. */
     public boolean eventHud;
+    /** Whether the event hud lists the missions you have progressed, and the finished ones too. */
+    public boolean eventMissions = true;
+    public boolean eventFinished;
+    /** What it read from /event and chat (saved so it survives a restart). */
+    public dev.landofif.tacklebox.hud.EventHud.State eventState;
     public int eventX = 360;
     public int eventScale = 100;
     public int eventY = 70;
@@ -506,6 +511,12 @@ public class TackleboxSettings {
         if (questsPos == null) questsPos = new HudPos(questsX, questsY);
         if (levelBarsPos == null) levelBarsPos = new HudPos(levelBarsX, levelBarsY);
         if (boostsPos == null) boostsPos = new HudPos(boostsX, boostsY);
+        if (eventState == null) eventState = new dev.landofif.tacklebox.hud.EventHud.State();
+        if (eventState.title == null) eventState.title = "";
+        if (eventState.placement == null) eventState.placement = "";
+        if (eventState.thresholds == null) eventState.thresholds = new java.util.ArrayList<>();
+        if (eventState.missions == null) eventState.missions = new java.util.LinkedHashMap<>();
+        dev.landofif.tacklebox.hud.EventHud.bind(eventState);
         if (eventPos == null) eventPos = new HudPos(eventX, eventY);
         if (nowPlayingPos == null) nowPlayingPos = new HudPos(nowPlayingX, nowPlayingY);
         if (serverHudPos == null) serverHudPos = new HudPos(serverHudX, serverHudY);

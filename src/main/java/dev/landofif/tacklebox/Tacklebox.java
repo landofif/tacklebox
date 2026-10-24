@@ -96,6 +96,9 @@ public final class Tacklebox implements ClientModInitializer {
                 dev.landofif.tacklebox.hud.ServerHud.onChat(message);
                 dev.landofif.tacklebox.hud.BoostsHud.onChat(message);
                 dev.landofif.tacklebox.hud.CommunityGoal.onChat(dev.landofif.tacklebox.trigger.Matcher.normalize(message.getString()));
+                if (dev.landofif.tacklebox.hud.EventHud.onChat(dev.landofif.tacklebox.trigger.Matcher.normalize(message.getString()), System.currentTimeMillis())) {
+                    TackleboxSettings.save();
+                }
             }
             boolean show = TriggerEngine.onGameMessage(message, overlay);
             return show && (overlay || ChatTweaks.allow(message));

@@ -453,10 +453,14 @@ public final class SettingsPages {
         cycle("active boosts align", "how the text of the active boosts hud lines up inside it: left, centre or right.",
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.boostsAlign, v -> s.boostsAlign = v);
         header("event");
-        toggle("event hud", "the points, the next threshold with its rewards and your placement of the running event. read from /event whenever you open it, so it is blank until you did once. move it with move huds.",
+        toggle("event hud", "the points, the next threshold with its rewards, your placement and your missions of the running event. the points and thresholds are read from /event when you open it and then follow the chat. move it with move huds.",
                 () -> s.eventHud, v -> s.eventHud = v);
         cycle("event align", "how the text of the event hud lines up inside it: left, centre or right.",
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.eventAlign, v -> s.eventAlign = v);
+        toggle("event missions", "lists the missions you have progressed on the event hud: n/10 for the ones with a limit, the points so far for the repeatable ones. read from the mission chat lines.",
+                () -> s.eventMissions, v -> s.eventMissions = v);
+        toggle("event finished missions", "keeps the missions you completed on the event hud.",
+                () -> s.eventFinished, v -> s.eventFinished = v);
         header("level progress");
         toggle("level progress hud", "two thin bars: your fishing level (from the vanilla xp bar) and the level of the location you are at. the location bar starts when you open /comp once and then follows the location xp of quest rewards and chat. move it with move huds.",
                 () -> s.levelBars, v -> s.levelBars = v);
