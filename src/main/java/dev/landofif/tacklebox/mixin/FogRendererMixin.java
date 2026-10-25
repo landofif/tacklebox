@@ -9,12 +9,16 @@ import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-/** The black sky setting: the fog in the air is black too, or the horizon would stay bright. Water, lava and snow fog keep their colour. */
+/** The black sky setting: the fog in the air and under water is black too (vanilla draws no sky under water, only the fog colour). Lava and powder snow keep their colour. */
 @Mixin(FogRenderer.class)
 abstract class FogRendererMixin {
     @ModifyReturnValue(method = "getFogColor", at = @At("RETURN"))
     private Vector4f tacklebox$blackFog(Vector4f color, Camera camera) {
-        if (!TackleboxSettings.get().blackSky || camera.getSubmersionType() != CameraSubmersionType.ATMOSPHERIC) return color;
+        if (!TackleboxSettings.get().blackSky || !blackFor(camera.getSubmersionType())) return color;
         return new Vector4f(0f, 0f, 0f, color.w);
+    }
+
+    private static boolean blackFor(CameraSubmersionType type) {
+        return type == CameraSubmersionType.ATMOSPHERIC || type == CameraSubmersionType.WATER;
     }
 }
