@@ -40,6 +40,8 @@
     "TextFieldWidgetMixin",
     "ProfileDataHandlerMixin",
     "PressableWidgetMixin",
+    "SkyRenderingMixin",
+    "FogRendererMixin",
     "TextRendererMixin"
   ],
   "injectors": {

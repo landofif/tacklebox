@@ -286,6 +286,8 @@ public class TackleboxSettings {
     /** Stop drawing the servers item, block and text displays farther than this many blocks (8 to 64), a fps help at spawn (display/DisplayCull). */
     public boolean hideFarDisplays = false;
     public int farDisplayRange = 24;
+    /** Draw the sky flat black with no sun, moon, stars or rain, and the fog black too. Only what you see, the server clock is untouched (mixin/SkyRenderingMixin). */
+    public boolean blackSky = false;
 
     // ---- bobber looks (only you see these) ----
     public BobberSkin bobberSkin = BobberSkin.DEFAULT;

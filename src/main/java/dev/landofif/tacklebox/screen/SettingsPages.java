@@ -551,6 +551,8 @@ public final class SettingsPages {
                         net.minecraft.client.MinecraftClient.getInstance().reloadResources();
                     }
                 });
+        toggle("black sky", "makes the sky flat black, always midnight to your eyes: no sun, moon, stars, sunsets or rain. the server's real time and weather are untouched.",
+                () -> s.blackSky, v -> s.blackSky = v);
         header("lag");
         toggle("hide far displays", "stops drawing the servers item, block and text displays (spawn decor, shop signs, holograms) beyond the range below. at spawn this can double your fps. nearby ones stay.",
                 () -> s.hideFarDisplays, v -> s.hideFarDisplays = v);
