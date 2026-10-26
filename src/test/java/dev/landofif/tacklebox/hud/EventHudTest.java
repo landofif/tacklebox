@@ -53,27 +53,49 @@ class EventHudTest {
     }
 
     @Test
-    void zeroPointsPointAtTheFirstThresholdAndItsRewards() {
+    void zeroPointsAndPlacementFromTheMenu() {
         assertTrue(EventHud.read(menu("<none>", "<none>")));
         List<String[]> rows = EventHud.rows(false, true);
         assertArrayEquals(new String[]{"points", "0"}, rows.get(0));
-        assertArrayEquals(new String[]{"threshold 1", "220 to go"}, rows.get(1));
-        assertEquals("  $25k", rows.get(2)[0]);
-        assertEquals("  1x standard bait package", rows.get(5)[0]);
-        assertEquals("0/3", value(rows, "thresholds"));
         assertEquals("unranked", value(rows, "placement"));
         assertFalse(EventHud.read(menu("<none>", "<none>")), "reading the same menu again is no change");
     }
 
     @Test
-    void pointsMoveToTheNextThreshold() {
+    void pointsFollowTheMenu() {
         EventHud.read(menu("900", "900"));
         List<String[]> rows = EventHud.rows(false, true);
         assertEquals("900", value(rows, "points"));
-        assertEquals("600 to go", value(rows, "threshold 3"));
-        assertEquals("2/3", value(rows, "thresholds"));
         EventHud.read(menu("2k", "2k"));
-        assertNotNull(value(EventHud.rows(false, true), "all thresholds done"));
+        assertEquals("2K", value(EventHud.rows(false, true), "points"));
+    }
+
+    @Test
+    void doneThresholdsStillLetThePlacementUpdate() {
+        // luna's dump 2026-10-26: every head is named "Threshold n ✔", which the name pattern missed, so nothing was read and #28 stayed
+        List<EventHud.Item> done = new java.util.ArrayList<>();
+        for (int n = 1; n <= 2; n++) {
+            done.add(new EventHud.Item("threshold " + n + " ✔", List.of("threshold " + n + " ✔", "", "[5.57k pts|" + (n * 220) + " pts]", "", "$25k")));
+        }
+        done.add(new EventHud.Item("event leaderboards", List.of("event leaderboards", "your placement: #28", "event points: 5570.91 pts")));
+        EventHud.read(done);
+        assertEquals("#28", value(EventHud.rows(false, true), "placement"));
+        done.set(2, new EventHud.Item("event leaderboards", List.of("event leaderboards", "your placement: #22", "event points: 5570.91 pts")));
+        assertTrue(EventHud.read(done));
+        assertEquals("#22", value(EventHud.rows(false, true), "placement"));
+    }
+
+    @Test
+    void noThresholdRowsAreShown() {
+        EventHud.read(menu("900", "900"));
+        assertTrue(EventHud.rows(false, true).stream().noneMatch(r -> r[0].contains("threshold")));
+    }
+
+    @Test
+    void catchesAreTheCompletedFreshwaterCyclesPlusTheRunningOne() {
+        EventHud.read(List.of(new EventHud.Item("event missions → 5.57k pts", List.of("event missions → 5.57k pts", "",
+                "- 🎣 freshwater", "┗ (6/100) [104 pts|2 pts] ∞"))));
+        assertEquals("5206", value(EventHud.rows(false, true), "catches"));
     }
 
     @Test
@@ -228,15 +250,6 @@ class EventHudTest {
         assertEquals(Integer.toString(0xFF55FFAA), EventHud.rows(false, true).stream().filter(r -> r[0].equals("monsters")).findFirst().orElseThrow()[2]);
         chat(mission(50, "Wels Catfish", "✔", "(10/10) [500 pts|50 pts] Partial"), 30_000);
         assertNull(value(EventHud.rows(false, true), "wels catfish"), "done: gone");
-    }
-
-    @Test
-    void rewardsOfTheNextThresholdKeepTheirColours() {
-        EventHud.Item head = new EventHud.Item("threshold 1", List.of("threshold 1", "", "[<none> pts|220 pts]", "", "$25k", "20x mozzarella cube"), List.of(0xFF5555, -1, 0xFFFF55, -1, 0x55FF55, -1));
-        EventHud.read(List.of(head, new EventHud.Item("event leaderboards", List.of("your placement: unranked", "event points: <none> pts"))));
-        List<String[]> rows = EventHud.rows(false, true);
-        String[] money = rows.stream().filter(r -> r[0].equals("  $25k")).findFirst().orElseThrow();
-        assertEquals(Integer.toString(0xFF55FF55), money[2]);
     }
 
     @Test

@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
 public final class EventHud {
     private static final String NUM = "([0-9][0-9.,]*)\\s*([kmb]?)";
     private static final int CI = Pattern.CASE_INSENSITIVE;
-    private static final Pattern THRESHOLD = Pattern.compile("^threshold (\\d+)$", CI);
+    private static final Pattern THRESHOLD = Pattern.compile("^threshold (\\d+)(?: [^\\p{L}\\p{N}\\s]+)?$", CI);
     // [<none> pts|220 pts]   (<none> is the server's word for zero)
     private static final Pattern RANGE = Pattern.compile("^\\[\\s*(?:<?none>?|" + NUM + ")\\s*pts\\s*\\|\\s*" + NUM + "\\s*pts\\s*\\]", CI);
     // "Event Missions → <none> pts" on the book, "Event Points: <none> pts" on the leaderboard head
@@ -382,28 +382,12 @@ public final class EventHud {
         if (state.points >= 0) {
             rows.add(new String[]{"points", fmt(state.points)});
         }
-        Threshold next = null;
-        int reached = 0;
-        for (Threshold t : state.thresholds) {
-            if (state.points >= t.need()) {
-                reached++;
-            } else if (next == null) {
-                next = t;
-            }
-        }
-        if (next != null) {
-            rows.add(new String[]{"threshold " + next.n(), fmt(next.need() - state.points) + " to go"});
-            for (int i = 0; i < next.rewards().size(); i++) {
-                rows.add(colored("  " + next.rewards().get(i), "", colorAt(next.colors(), i), 0));
-            }
-        } else if (!state.thresholds.isEmpty()) {
-            rows.add(new String[]{"all thresholds done", ""});
-        }
-        if (!state.thresholds.isEmpty()) {
-            rows.add(new String[]{"thresholds", reached + "/" + state.thresholds.size()});
-        }
         if (!state.placement.isEmpty()) {
             rows.add(new String[]{"placement", state.placement});
+        }
+        Mission fresh = state.missions.get("freshwater"); // every catch counts there: completed cycles of max catches plus the running one
+        if (fresh != null && fresh.kind().equals("repeat") && fresh.per() > 0) {
+            rows.add(new String[]{"catches", Long.toString(Math.round(fresh.earned() / fresh.per()) * fresh.max() + fresh.cur())});
         }
         if (missions) {
             for (Mission m : state.missions.values()) {
