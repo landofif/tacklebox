@@ -25,6 +25,12 @@ class BiteFocusTest {
     }
 
     @Test
+    void alreadyFocusedWindowIsLeftAlone() {
+        assertFalse(BiteFocus.wanted(true, 5000, 0));
+        assertTrue(BiteFocus.wanted(false, 5000, 0));
+    }
+
+    @Test
     void focusesByTitleOnly() {
         assertEquals(List.of("hyprctl", "dispatch", "hl.dsp.focus({ window = 'initialtitle:^Minecraft.*' })"), BiteFocus.COMMAND);
     }

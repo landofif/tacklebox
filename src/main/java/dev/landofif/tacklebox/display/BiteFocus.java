@@ -2,6 +2,7 @@ package dev.landofif.tacklebox.display;
 
 import dev.landofif.tacklebox.Tacklebox;
 import dev.landofif.tacklebox.TackleboxSettings;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 
 import java.util.List;
@@ -25,12 +26,17 @@ public final class BiteFocus {
         return last == 0 || now - last >= COOLDOWN_MS;
     }
 
+    /** Hyprland warps the cursor to the window centre on every focus, so a window that already has focus is left alone. */
+    static boolean wanted(boolean windowFocused, long now, long last) {
+        return !windowFocused && due(now, last);
+    }
+
     public static void onTitle(Text title) {
         if (title == null || !TackleboxSettings.get().biteFocus || !"BITE!".equals(title.getString())) {
             return;
         }
         long now = System.currentTimeMillis();
-        if (!due(now, lastFocus)) {
+        if (!wanted(MinecraftClient.getInstance().isWindowFocused(), now, lastFocus)) {
             return;
         }
         lastFocus = now;
