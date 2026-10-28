@@ -43,7 +43,7 @@ abstract class ChatScreenMixin extends Screen {
     /** Chat boxes: links and click to reply work in them like in the chat box. */
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void tacklebox$boxClick(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
-        if (click.button() != 0 || ChatBoxes.at(click.x(), click.y()) == null) {
+        if (click.button() != 0 || ChatSearch.active() || ChatBoxes.at(click.x(), click.y()) == null) {
             return;
         }
         Style style = ChatBoxes.styleAt(click.x(), click.y());
@@ -56,6 +56,21 @@ abstract class ChatScreenMixin extends Screen {
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void tacklebox$bars(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
         if (click.button() == 0 && (ChatBoxes.pressBar(click.x(), click.y()) || dev.landofif.tacklebox.chat.ChatBar.press(click.x(), click.y()))) {
+            cir.setReturnValue(true);
+        }
+    }
+
+    /** ctrl + f search: left click on a message leaves the search and scrolls to it (after the scroll bars, before links). */
+    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
+    private void tacklebox$searchJump(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
+        if (click.button() != 0 || !ChatSearch.active()) {
+            return;
+        }
+        boolean jumped = ChatBoxes.at(click.x(), click.y()) != null
+                ? ChatBoxes.jumpTo(click.x(), click.y())
+                : ChatCopy.jumpTo(click.x(), click.y());
+        if (jumped) {
+            chatField.setText("");
             cir.setReturnValue(true);
         }
     }

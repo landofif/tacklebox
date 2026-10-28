@@ -464,6 +464,31 @@ public final class ChatBoxes {
         return i < 0 ? null : state(box[0]).wrappedFrom.get(i);
     }
 
+    /** ctrl + f search: leaves it and scrolls the box so the message under the mouse is in the middle. False when there is none. */
+    public static boolean jumpTo(double mx, double my) {
+        ChatBox[] box = new ChatBox[1];
+        int i = lineAt(mx, my, box, new int[2]);
+        if (i < 0) {
+            return false;
+        }
+        Text message = state(box[0]).wrappedFrom.get(i);
+        ChatSearch.leave(); // every box wraps all its lines again, at the bottom
+        State st = state(box[0]);
+        List<OrderedText> all = wrapped(box[0], st, MinecraftClient.getInstance().textRenderer, box[0].width - PAD_X * 2);
+        int first = -1, last = -1;
+        for (int j = 0; j < st.wrappedFrom.size(); j++) {
+            if (st.wrappedFrom.get(j) == message) {
+                first = first < 0 ? j : first;
+                last = j;
+            }
+        }
+        if (first >= 0) { // wrapped lines are oldest first, scroll counts up from the newest
+            st.scroll = ChatSearch.scrollToShow(all.size() - 1 - last, last - first + 1, lines(box[0], chatOpen()), all.size());
+            st.shown = st.scroll;
+        }
+        return true;
+    }
+
     /** The arrival time of the message under the mouse in a box ("HH:mm:ss"), or null. */
     public static String timeAt(double mx, double my) {
         ChatBox[] box = new ChatBox[1];

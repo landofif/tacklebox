@@ -13,6 +13,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Finds the chat message under the mouse with the chat open. It runs the chat's own layout pass with a
@@ -24,6 +25,11 @@ public final class ChatCopy {
 
     /** The whole message (all its wrapped lines) under the mouse, or null. */
     public static @Nullable Text messageAt(double mouseX, double mouseY) {
+        ChatHudLine line = lineAt(mouseX, mouseY);
+        return line == null ? null : line.content();
+    }
+
+    private static @Nullable ChatHudLine lineAt(double mouseX, double mouseY) {
         MinecraftClient client = MinecraftClient.getInstance();
         ChatHud hud = client.inGameHud.getChatHud();
         ChatHudAccessor chat = (ChatHudAccessor) hud;
@@ -32,19 +38,78 @@ public final class ChatCopy {
         if (finder.found == null) {
             return null;
         }
-        List<ChatHudLine.Visible> visible = chat.tacklebox$visibleMessages();
-        List<ChatHudLine> messages = chat.tacklebox$messages();
-        // visible lines are newest first, and each message ends (index-wise starts) with an endOfEntry line
-        int message = -1;
-        for (int i = 0; i < visible.size(); i++) {
-            if (visible.get(i).endOfEntry()) {
-                message++;
+        return messageOf(chat.tacklebox$visibleMessages(), chat.tacklebox$messages(), finder.found, ChatSearch::hides);
+    }
+
+    /**
+     * The message a drawn line belongs to. Visible lines are newest first, each message ends (index-wise starts)
+     * with an endOfEntry line, and messages that ctrl + f search hides have no visible lines, so the n-th message
+     * on screen is the n-th one search does not hide.
+     */
+    static @Nullable ChatHudLine messageOf(List<ChatHudLine.Visible> visible, List<ChatHudLine> messages, OrderedText line, Predicate<Text> hidden) {
+        int shown = -1;
+        boolean found = false;
+        for (ChatHudLine.Visible v : visible) {
+            if (v.endOfEntry()) {
+                shown++;
             }
-            if (visible.get(i).content() == finder.found) {
-                return message >= 0 && message < messages.size() ? messages.get(message).content() : null;
+            if (v.content() == line) {
+                found = true;
+                break;
+            }
+        }
+        if (!found || shown < 0) {
+            return null;
+        }
+        for (ChatHudLine m : messages) {
+            if (!hidden.test(m.content()) && shown-- == 0) {
+                return m;
             }
         }
         return null;
+    }
+
+    /** ctrl + f search: leaves it and scrolls the chat so the message under the mouse is in the middle. False when there is none. */
+    public static boolean jumpTo(double mouseX, double mouseY) {
+        ChatHudLine line = lineAt(mouseX, mouseY);
+        if (line == null) {
+            return false;
+        }
+        ChatSearch.leave(); // shows every message again, scrolled to the bottom
+        ChatHud hud = MinecraftClient.getInstance().inGameHud.getChatHud();
+        ChatHudAccessor chat = (ChatHudAccessor) hud;
+        int index = -1;
+        List<ChatHudLine> messages = chat.tacklebox$messages();
+        for (int i = 0; i < messages.size(); i++) {
+            if (messages.get(i) == line) {
+                index = i;
+                break;
+            }
+        }
+        int scroll = index < 0 ? 0 : jumpScroll(chat.tacklebox$visibleMessages(), index, hud.getVisibleLineCount());
+        hud.scroll(scroll);
+        ChatBar.shown = chat.tacklebox$scrolled(); // jump, no easing
+        return true;
+    }
+
+    /** How far to scroll up (newest-first lines) so message number {@code message} sits in the middle of {@code shown} lines. */
+    static int jumpScroll(List<ChatHudLine.Visible> visible, int message, int shown) {
+        int bottom = -1;
+        int seen = -1;
+        for (int i = 0; i < visible.size(); i++) {
+            if (visible.get(i).endOfEntry() && ++seen == message) {
+                bottom = i;
+                break;
+            }
+        }
+        if (bottom < 0) {
+            return 0;
+        }
+        int count = 1;
+        while (bottom + count < visible.size() && !visible.get(bottom + count).endOfEntry()) {
+            count++;
+        }
+        return ChatSearch.scrollToShow(bottom, count, shown, visible.size());
     }
 
     /** Screen rectangle {x1, y1, x2, y2} of the whole message under the mouse (its lines that are on screen), or null. */
