@@ -290,6 +290,8 @@ public class TackleboxSettings {
     public int farDisplayRange = 24;
     /** Draw the sky flat black with no sun, moon, stars or rain, and the fog black too. Only what you see, the server clock is untouched (mixin/SkyRenderingMixin). */
     public boolean blackSky = false;
+    /** After F2, copy the screenshot to the clipboard (wl-copy) and show it in the top right with an open button (display/ScreenshotPreview). */
+    public boolean screenshotPreview;
 
     // ---- bobber looks (only you see these) ----
     public BobberSkin bobberSkin = BobberSkin.DEFAULT;

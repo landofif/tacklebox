@@ -563,6 +563,9 @@ public final class SettingsPages {
                 () -> s.chummerRing, v -> s.chummerRing = v);
         color("ring colour", "the colour of the chummer range ring.",
                 () -> s.chummerRingColor, v -> s.chummerRingColor = v);
+        header("screenshots");
+        toggle("screenshot preview", "after f2 the screenshot goes to your clipboard and shows in the top right for a few seconds. open chat to click open, which shows it in your image viewer. linux only, needs wl-copy. nothing is uploaded.",
+                () -> s.screenshotPreview, v -> s.screenshotPreview = v);
     }
 
 }

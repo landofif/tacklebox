@@ -89,6 +89,7 @@ public final class Tacklebox implements ClientModInitializer {
         dev.landofif.tacklebox.hud.NowPlaying.start();
         dev.landofif.tacklebox.display.FlatLeaves.register();
         dev.landofif.tacklebox.display.ChummerRing.register();
+        dev.landofif.tacklebox.display.ScreenshotPreview.register();
 
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
             if (!overlay) {
