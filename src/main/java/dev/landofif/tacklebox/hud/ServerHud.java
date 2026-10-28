@@ -5,6 +5,7 @@ import dev.landofif.tacklebox.menu.Locations;
 import dev.landofif.tacklebox.menu.Power;
 import dev.landofif.tacklebox.trigger.Matcher;
 import dev.landofif.tacklebox.trigger.TriggerEngine;
+import dev.landofif.tacklebox.util.ChatColors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
@@ -31,7 +32,6 @@ import java.util.regex.Pattern;
  * Everything is read from chat, the scoreboard and foecollab's TimerHandler, nothing is sent.
  */
 public final class ServerHud {
-    public static final Path IMAGE = TackleboxSettings.dir().resolve("hud.png");
     private static final Identifier TEXTURE = Identifier.of("tacklebox", "hud_image");
     private static final Pattern EVENT = Pattern.compile("^[^A-Za-z0-9]*(RAINBOW|STORM|RAIN|GOLD RUSH|BLOOMING OASIS|FABLED) [>»] (.*)$");
     private static final Pattern MOON = Pattern.compile("^[^A-Za-z0-9]*(FULL|BLUE|SUPER|BLOOD) MOON [>»] .* has (risen|set)");
@@ -41,12 +41,16 @@ public final class ServerHud {
     private static final Pattern SHARDS = Pattern.compile("Base Shard Chance.*?(\\d+)\\s*$");
     private static final Pattern ENDED = Pattern.compile("dissipated|faded|retracted|has ended|caught by");
 
-    /** Active events by name with the time they started and the bonus the server named. */
+    /** Active events by name: the time they started, the bonus the server named, the name, and the chat colours of name and bonus. */
     private static final Map<String, Object[]> EVENTS = new LinkedHashMap<>();
     private static String moon = "";
     private static String moonEffect = "";
+    /** The colours chat gives the moon's name and bonus, for the boosts hud. */
+    private static int moonColor = ChatColors.NONE, moonEffectColor = ChatColors.NONE;
     /** When "FABLED FISH EVENT" was seen; the next line, a moment later, is "Visit the X to" or "Caught by Y". */
     private static long fabledHeader;
+    /** The colour of that header's "FABLED". */
+    private static int fabledColor = ChatColors.NONE;
 
     /** Radius of the picture's rounded corners in gui pixels. */
     private static final int CORNER = 6;
@@ -65,10 +69,13 @@ public final class ServerHud {
             moon = m.group(2).equals("risen") ? title(m.group(1)) + " Moon" : "";
             java.util.regex.Matcher bonus = EFFECT.matcher(s);
             moonEffect = !moon.isEmpty() && bonus.find() ? bonus.group(1) : "";
+            moonColor = ChatColors.of(message, moon);
+            moonEffectColor = ChatColors.of(message, moonEffect);
             return;
         }
         if (EventLines.fabledHeader(s)) {
             fabledHeader = System.currentTimeMillis();
+            fabledColor = ChatColors.of(message, "FABLED");
             return;
         }
         if (fabledHeader != 0) {
@@ -76,7 +83,7 @@ public final class ServerHud {
             fabledHeader = 0;
             String place = fresh ? EventLines.fabledStart(s) : null;
             if (place != null) {
-                EVENTS.put("Fabled", new Object[]{System.currentTimeMillis(), "at " + place, "Fabled Event"});
+                EVENTS.put("Fabled", new Object[]{System.currentTimeMillis(), "at " + place, "Fabled Event", fabledColor, ChatColors.of(message, place)});
                 return;
             }
             if (fresh && EventLines.fabledEnded(s)) {
@@ -96,8 +103,12 @@ public final class ServerHud {
             java.util.regex.Matcher e = EFFECT.matcher(body);
             java.util.regex.Matcher noun = NOUN.matcher(body);
             java.util.regex.Matcher place = AT.matcher(body); // the fabled event says where
-            EVENTS.put(name, new Object[]{System.currentTimeMillis(), e.find() ? shorten(e.group(1)) : place.find() ? "at " + place.group(1) : "",
-                    name.equals("Fabled") ? "Fabled Event" : noun.find() ? title(noun.group(1)) : name});
+            boolean effect = e.find(), at = !effect && place.find(), named = !name.equals("Fabled") && noun.find();
+            String bonus = effect ? e.group(1) : at ? place.group(1) : "";
+            // the colours chat gives the name and the bonus go to the boosts hud
+            EVENTS.put(name, new Object[]{System.currentTimeMillis(), effect ? shorten(bonus) : at ? "at " + bonus : "",
+                    name.equals("Fabled") ? "Fabled Event" : named ? title(noun.group(1)) : name,
+                    ChatColors.of(message, named ? noun.group(1) : m.group(1)), ChatColors.of(message, bonus)});
         }
     }
 
@@ -114,18 +125,23 @@ public final class ServerHud {
         return m.find() ? "Shards → 1 in " + m.group(1) : effect;
     }
 
-    /** For {@link BoostsHud}: the active events as {name, bonus}. */
-    static List<String[]> activeEvents() {
-        List<String[]> out = new ArrayList<>();
+    /** For {@link BoostsHud}: the active events, name and bonus in their chat colours. */
+    static List<BoostsHud.Row> activeEvents() {
+        List<BoostsHud.Row> out = new ArrayList<>();
         for (Object[] e : EVENTS.values()) {
-            out.add(new String[]{(String) e[2], (String) e[1]});
+            out.add(new BoostsHud.Row(List.of(new BoostsHud.Part((String) e[2], (int) e[3])), new BoostsHud.Part((String) e[1], (int) e[4])));
         }
         return out;
     }
 
-    /** For {@link BoostsHud}: the moon as {name, bonus}, or null when none is up. */
-    static String[] activeMoon() {
-        return moon.isEmpty() ? null : new String[]{moon, moonEffect};
+    /** For {@link BoostsHud}: the moon, name and bonus in their chat colours, or null when none is up. */
+    static BoostsHud.Row activeMoon() {
+        return moon.isEmpty() ? null : new BoostsHud.Row(List.of(new BoostsHud.Part(moon, moonColor)), new BoostsHud.Part(moonEffect, moonEffectColor));
+    }
+
+    /** The picture behind the hud; a method so the class loads without Fabric (the tests feed it chat lines). */
+    public static Path image() {
+        return TackleboxSettings.dir().resolve("hud.png");
     }
 
     static String title(String caps) {
@@ -529,7 +545,7 @@ public final class ServerHud {
     private static boolean load(MinecraftClient mc) {
         nextCheck = System.currentTimeMillis() + 1000;
         try {
-            long stamp = Files.exists(IMAGE) ? Files.getLastModifiedTime(IMAGE).toMillis() : -1;
+            long stamp = Files.exists(image()) ? Files.getLastModifiedTime(image()).toMillis() : -1;
             if (stamp == imageStamp) {
                 return stamp >= 0;
             }
@@ -538,7 +554,7 @@ public final class ServerHud {
                 mc.getTextureManager().destroyTexture(TEXTURE);
                 return false;
             }
-            try (var in = Files.newInputStream(IMAGE)) {
+            try (var in = Files.newInputStream(image())) {
                 NativeImage img = NativeImage.read(in);
                 imageW = img.getWidth();
                 imageH = img.getHeight();

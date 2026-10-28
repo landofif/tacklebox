@@ -5,9 +5,11 @@ import dev.landofif.tacklebox.display.ChummerRing;
 import dev.landofif.tacklebox.trigger.Matcher;
 import dev.landofif.tacklebox.trigger.TriggerEngine;
 import dev.landofif.tacklebox.ui.Foe;
+import dev.landofif.tacklebox.util.ChatColors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
@@ -32,15 +34,25 @@ public final class BoostsHud {
 
     /** The chat line does not say how long a chummer lasts; every one in the logs ran out 15:14 to 15:23 after its line. */
     private static final long CHUMMER_MS = 15 * 60_000L, GRACE = 30_000L;
+    /** The green of "Bite Speed:" on a placed chummer's hologram, and the white chat gives player names. */
+    private static final int HOLOGRAM_GREEN = 0x41F55B, WHITE = 0xFFFFFF;
 
-    private record Booster(String label, long end) {}
+    /** Words of a row and the colour chat gave them ({@link ChatColors#NONE}: the hud's own grey, or white for the value). */
+    record Part(String text, int color) {}
+
+    /** One row: the parts on the left, then the time left or the bonus on the right. */
+    record Row(List<Part> label, Part value) {}
+
+    private record Booster(String type, String times, int typeColor, int timesColor, long end) {}
 
     /** By "type|player", so the expiry line (it names both) takes out the right one. Kept across servers, they are global. */
     private static final Map<String, Booster> BOOSTERS = new LinkedHashMap<>();
     private static long chummerEnd;
     private static String chummerBonus = "";
+    private static int chummerColor = ChatColors.NONE;
     private static long frenzyEnd;
     private static String frenzyPlace = "";
+    private static int frenzyColor = ChatColors.NONE, frenzyPlaceColor = ChatColors.NONE;
     private static long frenzySeen;
 
     private BoostsHud() {}
@@ -67,6 +79,8 @@ public final class BoostsHud {
             frenzyEnd = now + frenzy.remainingMs();
             frenzySeen = now;
             frenzyPlace = frenzy.place();
+            frenzyColor = ChatColors.of(message, "Fish Frenzy"); // the alert's "Fish at X" line has only "Fish"
+            frenzyPlaceColor = ChatColors.of(message, frenzy.place());
             return;
         }
         if (EventLines.frenzyEnded(s)) {
@@ -80,7 +94,9 @@ public final class BoostsHud {
                 case "m" -> 60_000L;
                 default -> 1000L;
             };
-            BOOSTERS.put(m.group(2) + "|" + m.group(1), new Booster(m.group(2) + " booster " + m.group(3) + "x", now + Long.parseLong(m.group(4)) * unit));
+            String type = m.group(2);
+            BOOSTERS.put(type + "|" + m.group(1), new Booster(type, m.group(3) + "x", ChatColors.of(message, type + " Booster"),
+                    ChatColors.of(message, m.group(3) + "x for"), now + Long.parseLong(m.group(4)) * unit));
             return;
         }
         m = EXPIRED.matcher(s);
@@ -96,6 +112,7 @@ public final class BoostsHud {
         if (m.find()) {
             chummerEnd = now + CHUMMER_MS;
             chummerBonus = m.group(1) == null ? "" : m.group(1);
+            chummerColor = ChatColors.of(message, chummerBonus.isEmpty() ? "Chummer" : chummerBonus);
         }
     }
 
@@ -104,33 +121,52 @@ public final class BoostsHud {
         chummerEnd = 0;
     }
 
-    private static List<String[]> rows() {
+    /** Each row's words in the colours chat gives them (luna 2026-10-28), so the timers stay white. */
+    static List<Row> rows() {
         long now = System.currentTimeMillis();
-        List<String[]> rows = new ArrayList<>();
+        List<Row> rows = new ArrayList<>();
         BOOSTERS.values().removeIf(b -> b.end() < now);
         for (Booster b : BOOSTERS.values()) {
-            rows.add(new String[]{b.label(), ServerHud.clock(b.end() - now)});
+            rows.add(new Row(List.of(new Part(b.type() + " booster", b.typeColor()), new Part(b.times(), b.timesColor())), timer(b.end() - now)));
         }
         List<ChummerRing.Detected> holograms = ChummerRing.detected();
         for (ChummerRing.Detected d : holograms) {
-            String label = "chummer " + (d.bite() >= 0 ? "+" + d.bite() + " " : "") + d.owner();
-            rows.add(new String[]{label.trim(), d.endMs() > 0 ? ServerHud.clock(Math.max(0, d.endMs() - now)) : ""});
+            rows.add(new Row(List.of(new Part("chummer" + (d.bite() >= 0 ? " +" + d.bite() : ""), HOLOGRAM_GREEN), new Part(d.owner(), WHITE)),
+                    d.endMs() > 0 ? timer(Math.max(0, d.endMs() - now)) : new Part("", ChatColors.NONE)));
         }
         // the chat line is the fallback for a chummer whose hologram the client does not track
         if (holograms.isEmpty() && chummerEnd + GRACE > now) {
-            rows.add(new String[]{("chummer " + chummerBonus).trim(), ServerHud.clock(Math.max(0, chummerEnd - now))});
+            rows.add(new Row(List.of(new Part(("chummer " + chummerBonus).trim(), chummerColor)), timer(Math.max(0, chummerEnd - now))));
         }
         if (frenzyEnd > now) {
-            rows.add(new String[]{"fish frenzy " + frenzyPlace, ServerHud.clock(frenzyEnd - now)});
+            rows.add(new Row(List.of(new Part("fish frenzy", frenzyColor), new Part(frenzyPlace, frenzyPlaceColor)), timer(frenzyEnd - now)));
         }
-        for (String[] e : ServerHud.activeEvents()) {
-            rows.add(e);
-        }
-        String[] moon = ServerHud.activeMoon();
+        rows.addAll(ServerHud.activeEvents());
+        Row moon = ServerHud.activeMoon();
         if (moon != null) {
             rows.add(moon);
         }
         return rows;
+    }
+
+    private static Part timer(long ms) {
+        return new Part(ServerHud.clock(ms), ChatColors.NONE);
+    }
+
+    /** The parts in small capitals with a space between them, each in its chat colour. */
+    static MutableText text(List<Part> parts) {
+        MutableText out = Text.empty();
+        for (Part p : parts) {
+            if (p.text().isEmpty()) {
+                continue;
+            }
+            if (!out.getSiblings().isEmpty()) {
+                out.append(" ");
+            }
+            MutableText t = Foe.text(p.text());
+            out.append(p.color() == ChatColors.NONE ? t : t.styled(st -> st.withColor(p.color())));
+        }
+        return out;
     }
 
     /** Draws the hud at its saved spot and returns {x, y, w, h}; with preview an empty hud still shows a line so it can be moved. */
@@ -144,17 +180,17 @@ public final class BoostsHud {
     }
 
     private static int[] drawAt100(DrawContext ctx, boolean preview) {
-        List<String[]> rows = rows();
+        List<Row> rows = rows();
         if (rows.isEmpty()) {
             if (!preview) {
                 return null;
             }
-            rows.add(new String[]{"nothing active", ""});
+            rows.add(new Row(List.of(new Part("nothing active", ChatColors.NONE)), new Part("", ChatColors.NONE)));
         }
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
         int w = 0;
-        for (String[] r : rows) {
-            w = Math.max(w, tr.getWidth(Foe.text(r[0])) + (r[1].isEmpty() ? 0 : 12 + tr.getWidth(Foe.text(r[1]))));
+        for (Row r : rows) {
+            w = Math.max(w, tr.getWidth(text(r.label())) + (r.value().text().isEmpty() ? 0 : 12 + tr.getWidth(text(List.of(r.value())))));
         }
         w += 16;
         int h = 25 + rows.size() * 11;
@@ -162,7 +198,7 @@ public final class BoostsHud {
         Foe.title(ctx, s.boostsX, s.boostsY, w, s.boostsAlign, Foe.text("active"));
         for (int i = 0; i < rows.size(); i++) {
             int y = s.boostsY + 20 + i * 11;
-            Text l = Foe.text(rows.get(i)[0]), v = Foe.text(rows.get(i)[1]);
+            Text l = text(rows.get(i).label()), v = text(List.of(rows.get(i).value()));
             int lx = s.boostsX + 8, vx = s.boostsX + w - 8 - tr.getWidth(v); // left keeps the values in a column on the right
             if (s.boostsAlign != TackleboxSettings.HudAlign.LEFT) {
                 lx = s.boostsAlign.x(s.boostsX + 8, w - 16, tr.getWidth(l) + (v.getString().isEmpty() ? 0 : 12 + tr.getWidth(v)));

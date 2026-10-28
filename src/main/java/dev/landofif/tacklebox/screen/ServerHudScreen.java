@@ -66,10 +66,10 @@ public class ServerHudScreen extends TackleboxScreen {
                 .dimensions(LEFT, y + 48, half, 20).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("open picture folder"), b -> {
             try {
-                java.nio.file.Files.createDirectories(ServerHud.IMAGE.getParent());
+                java.nio.file.Files.createDirectories(ServerHud.image().getParent());
             } catch (java.io.IOException ignored) {
             }
-            net.minecraft.util.Util.getOperatingSystem().open(ServerHud.IMAGE.getParent());
+            net.minecraft.util.Util.getOperatingSystem().open(ServerHud.image().getParent());
         }).dimensions(LEFT + half + GAP, y + 48, half, 20).build());
     }
 
