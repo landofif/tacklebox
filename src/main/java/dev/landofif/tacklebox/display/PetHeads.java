@@ -32,17 +32,20 @@ public final class PetHeads {
             return;
         }
         boolean dirty = false;
+        java.util.Set<String> looks = new java.util.HashSet<>();
         if (!vaultsRead) { // pets sitting in vaults you opened before
             vaultsRead = true;
             for (int n = 1; n <= dev.landofif.tacklebox.menu.Vaults.COUNT; n++) {
                 var items = dev.landofif.tacklebox.menu.Vaults.get(n);
                 for (int i = 0; items != null && i < items.size(); i++) {
                     dirty |= learn(items.get(i));
+                    dirty |= ItemLooks.learn(items.get(i), looks);
                 }
             }
         }
         for (var slot : client.player.currentScreenHandler.slots) {
             dirty |= learn(slot.getStack());
+            dirty |= ItemLooks.learn(slot.getStack(), looks); // rare items, for the totem pop
         }
         if (dirty) {
             TackleboxSettings.save();

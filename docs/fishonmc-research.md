@@ -351,6 +351,8 @@ Goal: when a chat line matches a rule, show a custom on-screen title and/or play
 | `title.style` | font (default: mod's typewriter mono), scale, bold/italic, shadow, colour or gradient, x/y anchor + offset |
 | `title.timing` | fade-in, stay, fade-out (ms); animation: none / slide / pop / typewriter-reveal / shake |
 | `title.queue` | replace current or queue behind it |
+
+2026-10-28: the title queue was replaced. A title of the same trigger stacks, a different trigger replaces it (`display/triggers.md`).
 | `sound` | any vanilla sound id or a custom `.ogg` dropped into the mod's sound folder; volume, pitch, repeat count + interval |
 | `extra` (optional) | toast, action-bar text, screen flash colour, chat echo with the mod's prefix |
 

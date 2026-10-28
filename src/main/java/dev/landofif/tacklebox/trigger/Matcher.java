@@ -13,8 +13,8 @@ import java.util.regex.PatternSyntaxException;
  * type {@code QUESTS > Quest} on a normal keyboard.
  */
 public final class Matcher {
-    /** Result of a match: the captured values by name (plus "message"), or null if no match. */
-    public record Result(Map<String, String> values) {}
+    /** Result of a match: the captured values by name (plus "message"), and where each one is in the normalized line ({start, end}). */
+    public record Result(Map<String, String> values, Map<String, int[]> spans) {}
 
     private final Pattern compiled;
     private final String error;
@@ -60,20 +60,45 @@ public final class Matcher {
             return null;
         }
         Map<String, String> values = new LinkedHashMap<>();
+        Map<String, int[]> spans = new java.util.HashMap<>();
         values.put("message", line);
+        spans.put("message", new int[]{0, line.length()});
         for (Map.Entry<String, Integer> group : m.namedGroups().entrySet()) {
-            String v = m.group(group.getValue());
-            values.put(group.getKey(), v == null ? "" : v.trim());
+            capture(line, m, group.getValue(), group.getKey(), values, spans);
         }
         for (int i = 1; i <= m.groupCount(); i++) {
-            String v = m.group(i);
-            values.putIfAbsent(String.valueOf(i), v == null ? "" : v.trim());
+            if (!values.containsKey(String.valueOf(i))) {
+                capture(line, m, i, String.valueOf(i), values, spans);
+            }
         }
-        return new Result(values);
+        return new Result(values, spans);
+    }
+
+    /** A group's text without the spaces around it (like {@link String#trim}), and where that text is in the line. */
+    private static void capture(String line, java.util.regex.Matcher m, int group, String name, Map<String, String> values, Map<String, int[]> spans) {
+        if (m.group(group) == null) {
+            values.put(name, "");
+            return;
+        }
+        int start = m.start(group);
+        int end = m.end(group);
+        while (start < end && line.charAt(start) <= ' ') {
+            start++;
+        }
+        while (end > start && line.charAt(end - 1) <= ' ') {
+            end--;
+        }
+        values.put(name, line.substring(start, end));
+        spans.put(name, new int[]{start, end});
     }
 
     /** Strips server icon glyphs and tidies whitespace so typed patterns line up with chat. */
     public static String normalize(String s) {
+        return normalize(s, null);
+    }
+
+    /** {@link #normalize(String)}, and in {@code from} (if given, at least as long as {@code s}) the index in {@code s} of each character kept. */
+    static String normalize(String s, int[] from) {
         if (s == null) {
             return "";
         }
@@ -89,12 +114,18 @@ public final class Matcher {
             }
             if (Character.isWhitespace(c)) {
                 if (!lastSpace && !sb.isEmpty()) {
+                    if (from != null) {
+                        from[sb.length()] = i;
+                    }
                     sb.append(' ');
                 }
                 lastSpace = true;
                 continue;
             }
             lastSpace = false;
+            if (from != null) {
+                from[sb.length()] = i;
+            }
             sb.append(c);
         }
         int end = sb.length();

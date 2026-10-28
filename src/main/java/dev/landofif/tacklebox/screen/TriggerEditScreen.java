@@ -224,6 +224,8 @@ public class TriggerEditScreen extends TackleboxScreen {
         y += ROW;
 
         addDrawableChild(toggle(left, y, half, "text shadow", () -> t.shadow, v -> t.shadow = v, "dark shadow behind the letters"));
+        addDrawableChild(toggle(left + half + 4, y, half, "chat colours", () -> t.chatColors, v -> t.chatColors = v,
+                "captured words keep the colour they had in chat"));
     }
 
     private void initTotem() {
@@ -232,8 +234,9 @@ public class TriggerEditScreen extends TackleboxScreen {
         addDrawableChild(toggle(left, y, width, "totem pop", () -> t.enabled, v -> t.enabled = v,
                 "the totem of undying animation with an item in it"));
         y += ROW;
-        textField(y, t.item, 256, v -> t.item = v, "minecraft:totem_of_undying, pet:{pet} or shard:{climate}")
-                .setTooltip(Tooltip.of(Foe.sentence("an item id, or pet:{pet} for the head of the pet the message names")));
+        textField(y, t.item, 256, v -> t.item = v, "an item id, an item name like {item}, pet:{pet} or shard:{climate}")
+                .setTooltip(Tooltip.of(Foe.sentence("an item id, an item name like {item} (shows the real item from your inventory), "
+                        + "pet:{pet} for the head of the pet the message names, or shard:{climate}")));
         y += ROW;
         addDrawableChild(new ValueSlider(left, y, width, 20, "size", 0.25, 4, 0.05, "x", t.scale, v -> t.scale = v));
     }

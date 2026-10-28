@@ -200,6 +200,8 @@ public class TackleboxSettings {
     public boolean presetsOtherBg = false;
     /** The head of each pet type ("fox", "seaturtle") as a profile component in json, learned from pet items seen in menus (display/PetHeads), for the totem pop. */
     public java.util.Map<String, String> petHeads = new java.util.LinkedHashMap<>();
+    /** How the server's items look ("lightninginabottle" to the item and its model components as json), learned from slots (display/ItemLooks), for the totem pop. */
+    public java.util.Map<String, String> itemLooks = new java.util.LinkedHashMap<>();
     /** Luck and scale of each armour preset seen on /presets, "armor:n" to "subtropical_luck" and so on (menu/BaitPicker reads them). */
     public java.util.Map<String, java.util.Map<String, Double>> presetStats = new java.util.LinkedHashMap<>();
     /** The bait picker screen: location id, where luck and scale come from ("worn" or "armor:n"), extra luck and scale on top (rod, pet), bait tiers on (bit per rarity), lures, bigger sizes count. */
@@ -555,6 +557,7 @@ public class TackleboxSettings {
         species.values().removeIf(m -> m == null);
         if (presetCache == null) presetCache = new java.util.LinkedHashMap<>();
         if (petHeads == null) petHeads = new java.util.LinkedHashMap<>();
+        if (itemLooks == null) itemLooks = new java.util.LinkedHashMap<>();
         if (presetStats == null) presetStats = new java.util.LinkedHashMap<>();
         menuSize = Math.max(40, Math.min(100, menuSize));
         presetsSize = Math.max(40, Math.min(100, presetsSize));

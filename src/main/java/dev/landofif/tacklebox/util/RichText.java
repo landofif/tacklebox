@@ -127,6 +127,41 @@ public final class RichText {
         return sb.toString();
     }
 
+    /** The colour code ({@code &r} for the default colour) and the formatting codes ({@code &l&o}) in effect at some point of a text. */
+    public record Codes(String color, String formats) {}
+
+    /**
+     * The codes in effect at the end of {@code input}, so text put in between can change colour and then hand the old style back.
+     * A colour code resets bold and the rest (see {@link #parse}), so the formats have to come again after each colour.
+     */
+    public static Codes codesAtEnd(String input) {
+        String color = "&r";
+        StringBuilder formats = new StringBuilder();
+        int i = 0;
+        while (i < input.length()) {
+            if (input.charAt(i) == '&' && i + 1 < input.length()) {
+                char code = Character.toLowerCase(input.charAt(i + 1));
+                if (code == '#' && i + 8 <= input.length() && isHex(input.substring(i + 2, i + 8))) {
+                    color = input.substring(i, i + 8);
+                    formats.setLength(0);
+                    i += 8;
+                    continue;
+                }
+                Formatting f = Formatting.byCode(code);
+                if (f == Formatting.RESET || f != null && f.isColor()) {
+                    color = "&" + code;
+                    formats.setLength(0);
+                } else if (f != null) {
+                    formats.append('&').append(code);
+                }
+                i += 2; // also skips "&&"
+                continue;
+            }
+            i++;
+        }
+        return new Codes(color, formats.toString());
+    }
+
     /** A colour code lifted off the start of a line: the colour, and the line without it. */
     public record Lead(int rgb, String rest) {}
 

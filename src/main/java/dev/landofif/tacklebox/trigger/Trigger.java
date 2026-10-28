@@ -61,12 +61,14 @@ public class Trigger {
         public double fadeOutSeconds = 0.6;
         public Animation animation = Animation.POP;
         public boolean shadow = true;
+        /** Captured words keep the colours the chat line gave them. Off for triggers saved before it existed, on in the presets. */
+        public boolean chatColors = false;
     }
 
     /** The vanilla totem of undying animation with another item in it. */
     public static class TotemSettings {
         public boolean enabled = false;
-        /** An item id, or {@code pet:<type>} for that pets head (learned from pet items you have opened). {name} placeholders work. */
+        /** An item id, an item name ({@code {item}}, the real item from the inventory), {@code pet:<type>} for that pets head or {@code shard:<climate>}. {name} placeholders work. */
         public String item = "minecraft:totem_of_undying";
         /** Multiplier on the animation's size (1 = vanilla). */
         public double scale = 1.0;

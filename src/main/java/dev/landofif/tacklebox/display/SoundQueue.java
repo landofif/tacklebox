@@ -42,6 +42,9 @@ public final class SoundQueue {
             return;
         }
         MinecraftClient client = MinecraftClient.getInstance();
+        if (client == null) {
+            return; // tests
+        }
         long now = System.currentTimeMillis();
         Iterator<Pending> it = PENDING.iterator();
         while (it.hasNext()) {
