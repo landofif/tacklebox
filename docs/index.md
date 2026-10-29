@@ -4,6 +4,7 @@ Read the index for your area first. Do not read every doc.
 
 | Area | Covers | Index |
 |---|---|---|
+| Feature list | Every tacklebox feature in one line, its setting and doc | `features.md` |
 | Rules | Full text of the text and no-automation rules | `rules/index.md` |
 | UI | Foecollab look, screens, settings screen, hotbar | `ui/index.md` |
 | Chat | Filters, chat boxes, scrolling, copy, stacking | `chat/index.md` |
