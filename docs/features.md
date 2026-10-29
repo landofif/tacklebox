@@ -86,6 +86,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Hold a key to peek at chat like it is open, wheel scrolls it. Key, unbound. `chat/chat.md`
 - One Escape closes chat even with command suggestions showing. Always on. `chat/chat.md`
 - Type "here" and press Tab to put in your location and instance. Always on. `chat/chat.md`
+- Up arrow history keeps plain messages too, after a restart or reconnect. Always on. `chat/chat.md`
 - 2000 lines of chat history instead of 100. Always on. **(no doc)**, `mixin/ChatHudMixin`
 - No `!` before player levels. Always on. `chat/chat.md`
 - Move and resize vanilla chat in the hud mover. `huds/positions.md`

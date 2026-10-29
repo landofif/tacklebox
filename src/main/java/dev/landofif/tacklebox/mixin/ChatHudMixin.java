@@ -43,6 +43,24 @@ abstract class ChatHudMixin {
         return 2000;
     }
 
+    /** The up arrow history keeps plain messages too, after a restart and a reconnect (chat/SentHistory). */
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void tacklebox$loadSent(CallbackInfo ci) {
+        dev.landofif.tacklebox.chat.SentHistory.load(((ChatHud) (Object) this).getMessageHistory());
+    }
+
+    @Inject(method = "clear", at = @At("RETURN"))
+    private void tacklebox$reloadSent(boolean clearHistory, CallbackInfo ci) {
+        if (clearHistory) {
+            dev.landofif.tacklebox.chat.SentHistory.load(((ChatHud) (Object) this).getMessageHistory());
+        }
+    }
+
+    @Inject(method = "addToMessageHistory", at = @At("RETURN"))
+    private void tacklebox$saveSent(String message, CallbackInfo ci) {
+        dev.landofif.tacklebox.chat.SentHistory.save(((ChatHud) (Object) this).getMessageHistory());
+    }
+
     /** Lines a chat box takes (dms, crew chat) skip the main chat, see chat/ChatBoxes. */
     @Inject(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
             at = @At("HEAD"), cancellable = true)
