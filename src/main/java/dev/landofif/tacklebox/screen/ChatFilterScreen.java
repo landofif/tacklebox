@@ -96,7 +96,7 @@ public class ChatFilterScreen extends TackleboxScreen {
             addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close()).dimensions(left + (bw + 4) * 2, y, bw, 20).build());
             return;
         }
-        int bw = (w - 24) / 7;
+        int bw = (w - 28) / 8;
         addDrawableChild(ButtonWidget.builder(Foe.text("+ hide rule"), b -> addRule()).dimensions(left, y, bw, 20)
                 .tooltip(Tooltip.of(Foe.sentence("add a rule. use * for anything, like: tackle shop > *restocked*"))).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("chat boxes"), b -> {
@@ -119,7 +119,11 @@ public class ChatFilterScreen extends TackleboxScreen {
             b.setMessage(timeLabel());
         }).dimensions(left + (bw + 4) * 5, y, bw, 20)
                 .tooltip(Tooltip.of(Foe.sentence("click to cycle: off (time only when you hover a line), [HH:MM:SS] or [HH:MM] in front of every chat line."))).build());
-        addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close()).dimensions(left + (bw + 4) * 6, y, bw, 20).build());
+        addDrawableChild(ButtonWidget.builder(Foe.text("highlight"), b -> {
+            TackleboxSettings.save();
+            client.setScreen(new ChatHighlightScreen(this));
+        }).dimensions(left + (bw + 4) * 6, y, bw, 20).tooltip(Tooltip.of(Foe.sentence("your name and chosen words in a colour inside chat lines"))).build());
+        addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close()).dimensions(left + (bw + 4) * 7, y, bw, 20).build());
     }
 
     private Text timeLabel() {

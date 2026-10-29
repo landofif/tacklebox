@@ -253,6 +253,10 @@ public class TackleboxSettings {
     public boolean hideBehindChat = false;
     /** Every chat line starts with its arrival time: 0 off (time only on hover), 1 [HH:MM:SS], 2 [HH:MM]. */
     public int chatTimeMode = 0;
+    /** Your name in chat lines in gold (chat/ChatHighlight). */
+    public boolean chatHighlightName = true;
+    /** Words shown in their colour inside chat lines. */
+    public java.util.List<dev.landofif.tacklebox.chat.ChatHighlight.Entry> chatHighlights = new java.util.ArrayList<>();
     /** Separate chat boxes (dms, crew chat). null until sanitize fills in the defaults. */
     public java.util.List<dev.landofif.tacklebox.chat.ChatBox> chatBoxes = null;
     /** Keys that run a command when pressed in game, see input/KeyCommands. */
@@ -496,6 +500,8 @@ public class TackleboxSettings {
         if (hotbarSelection == null) hotbarSelection = SelectionStyle.FRAME;
         if (chatFilters == null) chatFilters = new java.util.ArrayList<>();
         chatFilters.removeIf(java.util.Objects::isNull);
+        if (chatHighlights == null) chatHighlights = new java.util.ArrayList<>();
+        chatHighlights.removeIf(java.util.Objects::isNull);
         if (keyCommands == null) keyCommands = new java.util.ArrayList<>();
         keyCommands.removeIf(java.util.Objects::isNull);
         for (var k : keyCommands) {

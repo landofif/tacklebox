@@ -68,6 +68,10 @@ abstract class ChatHudMixin {
         TackleboxSettings st = TackleboxSettings.get();
         if (!rewriting) {
             Text out = ChatTimes.rewrite(message, st == null ? 0 : st.chatTimeMode, System.currentTimeMillis());
+            if (st != null) {
+                out = dev.landofif.tacklebox.chat.ChatHighlight.apply(out, net.minecraft.client.MinecraftClient.getInstance().getSession().getUsername(),
+                        st.chatHighlightName, st.chatHighlights);
+            }
             if (out != message) {
                 rewriting = true;
                 try {
