@@ -7,9 +7,11 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.landofif.tacklebox.display.PetSale;
 import dev.landofif.tacklebox.hud.ServerHud;
 import dev.landofif.tacklebox.menu.Locations;
+import dev.landofif.tacklebox.menu.QuestRedo;
 import dev.landofif.tacklebox.util.Glyphs;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.Generic3x3ContainerScreen;
@@ -21,6 +23,7 @@ import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -30,6 +33,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.List;
 
 /**
  * Chests, the inventory and fishonmc menus with no box at all: the menu name where a box would put it, a
@@ -120,6 +125,29 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
         if (data != null && Locations.isTravelItem(data.copyNbt())) {
             ctx.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, 0x88000000 | (mark & 0xFFFFFF));
         }
+    }
+
+    /** In /quests the quest items are remembered, and the difficulty and tier the clicked quest had get a see-through green square. */
+    @Inject(method = "drawSlot", at = @At("HEAD"))
+    private void tacklebox$questRedo(DrawContext ctx, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
+        if (slot.inventory instanceof PlayerInventory || slot.getStack().isEmpty() || !"quests".equals(Glyphs.menuName(getTitle()))) {
+            return;
+        }
+        String name = slot.getStack().getName().getString();
+        List<Text> lore = slot.getStack().getOrDefault(DataComponentTypes.LORE, LoreComponent.DEFAULT).lines();
+        QuestRedo.see(QuestRedo.number(name, slot.id), lore);
+        if (QuestRedo.marks(name, lore)) {
+            ctx.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, 0x8855FF55);
+        }
+    }
+
+    @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("HEAD"))
+    private void tacklebox$questClick(Slot slot, int slotId, int button, SlotActionType action, CallbackInfo ci) {
+        if (slot == null || slot.inventory instanceof PlayerInventory || slot.getStack().isEmpty() || !"quests".equals(Glyphs.menuName(getTitle()))) {
+            return;
+        }
+        QuestRedo.click(QuestRedo.number(slot.getStack().getName().getString(), slot.id),
+                slot.getStack().getOrDefault(DataComponentTypes.LORE, LoreComponent.DEFAULT).lines());
     }
 
     /** The title and the "inventory" label are drawn in the box now. */

@@ -108,6 +108,7 @@ public final class Tacklebox implements ClientModInitializer {
                 XpEstimate.onChat(message);
                 dev.landofif.tacklebox.hud.ServerHud.onChat(message);
                 dev.landofif.tacklebox.hud.BoostsHud.onChat(message);
+                dev.landofif.tacklebox.menu.QuestRedo.onChat(message);
                 dev.landofif.tacklebox.hud.CommunityGoal.onChat(dev.landofif.tacklebox.trigger.Matcher.normalize(message.getString()));
                 if (dev.landofif.tacklebox.hud.EventHud.onChat(dev.landofif.tacklebox.trigger.Matcher.normalize(message.getString()), System.currentTimeMillis())) {
                     TackleboxSettings.save();

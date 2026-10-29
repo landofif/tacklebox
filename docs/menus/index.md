@@ -8,3 +8,4 @@ Read the doc that matches your task. Do not read them all.
 | Personal vaults | `vaults.md` |
 | Power, new-in-compendium trigger, compendium scan | `power-and-compendium.md` |
 | Bait picker | `bait-picker.md` |
+| /quests marks for starting the same quest again | `quests.md` |
