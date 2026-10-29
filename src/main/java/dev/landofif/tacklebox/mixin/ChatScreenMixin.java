@@ -85,6 +85,27 @@ abstract class ChatScreenMixin extends Screen {
     @Shadow
     protected net.minecraft.client.gui.widget.TextFieldWidget chatField;
 
+    /** Escape skips the command suggestions (which would only hide themselves), so one press closes chat. */
+    @WrapOperation(method = "keyPressed", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/screen/ChatInputSuggestor;keyPressed(Lnet/minecraft/client/input/KeyInput;)Z"))
+    private boolean tacklebox$escapeCloses(net.minecraft.client.gui.screen.ChatInputSuggestor suggestor, net.minecraft.client.input.KeyInput input, Operation<Boolean> original) {
+        return dev.landofif.tacklebox.chat.ChatKeys.toSuggestions(input) && original.call(suggestor, input);
+    }
+
+    /** Tab right after "here" puts in your location and instance, see chat/ChatKeys. */
+    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
+    private void tacklebox$here(net.minecraft.client.input.KeyInput input, CallbackInfoReturnable<Boolean> cir) {
+        if (!input.isTab() || input.hasShift() || ChatSearch.active()) {
+            return;
+        }
+        dev.landofif.tacklebox.chat.ChatKeys.Edit edit = dev.landofif.tacklebox.chat.ChatKeys.here(chatField.getText(), chatField.getCursor());
+        if (edit != null) {
+            chatField.setText(edit.text());
+            chatField.setCursor(edit.cursor(), false);
+            cir.setReturnValue(true);
+        }
+    }
+
     /** ctrl + f turns the chat box into a search: only messages containing what you type stay visible. */
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void tacklebox$search(net.minecraft.client.input.KeyInput input, CallbackInfoReturnable<Boolean> cir) {

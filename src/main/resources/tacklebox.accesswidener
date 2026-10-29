@@ -8,3 +8,5 @@ accessible field net/minecraft/entity/PlayerLikeEntity PLAYER_MODE_CUSTOMIZATION
 # the menu and hud pictures are drawn with smooth filtering instead of the nearest pixel
 accessible field net/minecraft/client/texture/AbstractTexture sampler Lnet/minecraft/client/gl/GpuSampler;
 mutable field net/minecraft/client/texture/AbstractTexture sampler Lnet/minecraft/client/gl/GpuSampler;
+# chat/ChatKeys reads the instance from the tab list footer
+accessible field net/minecraft/client/gui/hud/PlayerListHud footer Lnet/minecraft/text/Text;
