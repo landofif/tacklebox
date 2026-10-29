@@ -5,8 +5,12 @@ import dev.landofif.tacklebox.ui.Foe;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.landofif.tacklebox.display.PetSale;
+import dev.landofif.tacklebox.hud.ServerHud;
+import dev.landofif.tacklebox.menu.Locations;
 import dev.landofif.tacklebox.util.Glyphs;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.Generic3x3ContainerScreen;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
@@ -102,6 +106,19 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
     private void tacklebox$profitTint(DrawContext ctx, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         if (TackleboxSettings.get().petProfitMarks && PetSale.of(slot.getStack()).filter(PetSale.Sale::profitable).isPresent()) {
             ctx.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, 0x6655FF55);
+        }
+    }
+
+    /** In the /travel chest a place in a frenzy gets a see-through green square behind its item, the fabled event's place a red one. */
+    @Inject(method = "drawSlot", at = @At("HEAD"))
+    private void tacklebox$travelMark(DrawContext ctx, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
+        if (slot.inventory instanceof PlayerInventory || slot.getStack().isEmpty()) {
+            return;
+        }
+        int mark = Locations.mark(slot.getStack().getName().getString(), ServerHud.fabledPlace());
+        NbtComponent data = mark != 0 ? slot.getStack().get(DataComponentTypes.CUSTOM_DATA) : null;
+        if (data != null && Locations.isTravelItem(data.copyNbt())) {
+            ctx.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, 0x88000000 | (mark & 0xFFFFFF));
         }
     }
 

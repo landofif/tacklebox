@@ -5,6 +5,7 @@ import dev.landofif.tacklebox.ui.Foe;
 import dev.landofif.tacklebox.ui.Hypr;
 import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.hud.BaitInfo;
+import dev.landofif.tacklebox.hud.ServerHud;
 import dev.landofif.tacklebox.menu.FishMenu;
 import dev.landofif.tacklebox.menu.Locations;
 import dev.landofif.tacklebox.ui.Arc;
@@ -46,8 +47,6 @@ public class FishMenuScreen extends TackleboxScreen {
     private static final int BAR = 30;
 
     /** One button of the menu: a filled chest slot, and where it sits in the grid. */
-    private static final int FRENZY = 0xFF2E8B3A;
-
     private record Tile(Slot slot, ItemStack stack, String name, String key, Locations.Location loc, FishMenu.Info info) {}
 
     private final GenericContainerScreen original;
@@ -362,17 +361,18 @@ public class FishMenuScreen extends TackleboxScreen {
         ctx.getMatrices().scale(scale, scale);
         float w = cellW / scale, h = cellH / scale;
         TackleboxSettings cfg = TackleboxSettings.get();
-        boolean frenzy = t.name.toLowerCase(java.util.Locale.ROOT).contains("frenzy"); // the server tags a place in a frenzy in its name
+        // the full name: Glyphs.plain could drop "*FRENZY!*" if the server put it in a pack font
+        int mark = t.loc != null ? Locations.mark(t.stack.getName().getString(), ServerHud.fabledPlace()) : 0;
         if (cfg.menuAccent) {
             int iw = (int) w, ih = (int) h;
             int gx = Math.round((gridX - x) / scale), gw = Math.round(cols * cellW / scale); // one gradient across the whole grid
-            Hypr.rrect(ctx, 0, 0, iw, ih, 0, frenzy ? Hypr.horizontal(FRENZY, FRENZY, gx, gw, 0.75f)
+            Hypr.rrect(ctx, 0, 0, iw, ih, 0, mark != 0 ? Hypr.horizontal(mark, mark, gx, gw, 0.75f)
                     : Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), gx, gw, cfg.menuAccentOpacity / 100f), 8);
             if (hot) {
                 Hypr.ring(ctx, 0, 0, iw, ih, 0, 1, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), gx, gw, 1), 8);
             }
         } else {
-            ctx.fill(0, 0, (int) w, (int) h, frenzy ? (hot ? 0xCC2E7D32 : 0xAA256B2A) : hot ? 0xAA313244 : 0x88181825); // square, so neighbours leave no holes at the corners
+            ctx.fill(0, 0, (int) w, (int) h, mark != 0 ? (hot ? 0xCC000000 : 0xAA000000) | (mark & 0xFFFFFF) : hot ? 0xAA313244 : 0x88181825); // square, so neighbours leave no holes at the corners
         }
         if (t.loc != null) {
             drawLocation(ctx, t, w, h);

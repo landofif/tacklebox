@@ -125,6 +125,12 @@ public final class ServerHud {
         return m.find() ? "Shards → 1 in " + m.group(1) : effect;
     }
 
+    /** Where the fabled event is, "" when none is on (for the /travel marks). */
+    public static String fabledPlace() {
+        Object[] e = EVENTS.get("Fabled");
+        return e == null ? "" : ((String) e[1]).replaceFirst("^at ", "");
+    }
+
     /** For {@link BoostsHud}: the active events, name and bonus in their chat colours. */
     static List<BoostsHud.Row> activeEvents() {
         List<BoostsHud.Row> out = new ArrayList<>();

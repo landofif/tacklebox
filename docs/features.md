@@ -14,7 +14,8 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 
 - Simple menus: chests and inventory as bare items, optional background colour and picture. `flatMenus`, off. `ui/look-and-settings.md`
 - Fishonmc menu as a big-icon tile screen (/menu, /stats, /crew, quests). `fishMenu`, off. `menus/fish-menu-and-presets.md`
-- Travel screen: location tiles with level rings, best place to fish, frenzy tile green. `fishMenu`, off. `menus/fish-menu-and-presets.md`
+- Travel screen: location tiles with level rings, best place to fish, frenzy tile green, fabled tile red. `fishMenu`, off. `menus/fish-menu-and-presets.md`
+- /travel chest marks: a place in a frenzy gets a green slot, the fabled event's place a red one. Always on. `menus/fish-menu-and-presets.md`
 - Presets wardrobe: armour sets on player models, rod parts as big items, click to equip. `presetsMenu`, off. `menus/fish-menu-and-presets.md`
 - Vault overview: all seven /pv vaults on one screen with search. `vaultMenu`, off. `menus/vaults.md`
 - Bait picker: fastest quest and best bait for a location. `/tacklebox bait`. `menus/bait-picker.md`

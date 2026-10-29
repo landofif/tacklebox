@@ -1,5 +1,7 @@
 package dev.landofif.tacklebox.menu;
 
+import net.minecraft.nbt.NbtCompound;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -44,6 +46,23 @@ public final class Locations {
             }
         }
         return null;
+    }
+
+    /** The /travel colours: the server adds "*FRENZY!*" to the name of a place in a frenzy; the fabled event's place is from chat. */
+    public static final int FRENZY = 0xFF2E8B3A, FABLED = 0xFFE0413A;
+
+    /** The colour of a /travel item by its full name (all fonts), 0 for none. A frenzy goes before the fabled event (luna 2026-10-29). */
+    public static int mark(String name, String fabledPlace) {
+        if (name.toLowerCase(Locale.ROOT).contains("frenzy")) {
+            return FRENZY;
+        }
+        Location loc = byName(name);
+        return loc != null && loc == byName(fabledPlace) ? FABLED : 0;
+    }
+
+    /** A /travel location item: its custom_data is {@code {fastTravel:1b}}. */
+    public static boolean isTravelItem(NbtCompound customData) {
+        return customData.contains("fastTravel");
     }
 
     public static List<Strategy> strategies(Location l) {
