@@ -1,6 +1,7 @@
 package dev.landofif.tacklebox;
 
 import dev.landofif.tacklebox.chat.ChatTweaks;
+import dev.landofif.tacklebox.chat.ChatPeek;
 import dev.landofif.tacklebox.display.FishTooltip;
 import dev.landofif.tacklebox.display.PetSale;
 import dev.landofif.tacklebox.display.PetTooltip;
@@ -134,6 +135,7 @@ public final class Tacklebox implements ClientModInitializer {
         KeyBinding.Category category = KeyBinding.Category.create(Identifier.of(MOD_ID, "main"));
         openKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.tacklebox.open", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_SHIFT, category));
 
+        ChatPeek.key = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.tacklebox.chat_peek", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, category));
         dumpKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.tacklebox.dump_gui", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_F8, category));
         net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT.register((client, screen, w, h) ->
                 net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.afterKeyPress(screen).register((s, input) -> {
@@ -208,6 +210,7 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.display.TotemPop.tick(client);
             dev.landofif.tacklebox.display.ChummerRing.tick(client);
             dev.landofif.tacklebox.input.KeyCommands.tick(client);
+            ChatPeek.tick(client);
             TriggerEngine.tick();
             while (openKey.wasPressed()) {
                 if (client.currentScreen == null) {

@@ -6,6 +6,7 @@ import dev.landofif.tacklebox.TackleboxSettings;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.landofif.tacklebox.chat.ChatBar;
 import dev.landofif.tacklebox.chat.ChatBoxes;
+import dev.landofif.tacklebox.chat.ChatPeek;
 import dev.landofif.tacklebox.chat.ChatTimes;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
@@ -107,6 +108,23 @@ abstract class ChatHudMixin {
     @Inject(method = RENDER, at = @At("RETURN"))
     private void tacklebox$scrollEnd(ChatHud.Backend backend, int h, int tick, boolean expanded, CallbackInfo ci) {
         ChatBar.end();
+    }
+
+    /**
+     * The peek key (chat/ChatPeek) draws the hud chat like open chat: all lines, none faded, the
+     * scroll bar. Only the flag passed on changes, so the hud backend (no hover, no clicks) stays.
+     */
+    @WrapOperation(method = "render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/font/TextRenderer;IIIZZ)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;" + RENDER))
+    private void tacklebox$peekRender(ChatHud hud, ChatHud.Backend backend, int h, int tick, boolean focused, Operation<Void> original) {
+        original.call(hud, backend, h, tick, ChatPeek.focused(focused));
+    }
+
+    /** While peeking: the open height, and a new line keeps the place you scrolled to. */
+    @WrapOperation(method = {"getHeight()I", "addVisibleMessage"},
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;isChatFocused()Z"))
+    private boolean tacklebox$peekFocused(ChatHud hud, Operation<Boolean> original) {
+        return ChatPeek.focused(original.call(hud));
     }
 
     /** One more line while the lines are between two positions, so the top does not show a gap. */

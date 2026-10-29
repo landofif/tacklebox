@@ -246,8 +246,9 @@ public final class ChatBoxes {
 
     // ------------------------------------------------------------------ drawing
 
+    /** Chat is open, or the peek key is held (chat/ChatPeek). */
     public static boolean chatOpen() {
-        return MinecraftClient.getInstance().currentScreen instanceof ChatScreen;
+        return MinecraftClient.getInstance().currentScreen instanceof ChatScreen || ChatPeek.active();
     }
 
     /** Hud element, drawn just after the chat. */

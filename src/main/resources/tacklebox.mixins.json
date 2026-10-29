@@ -30,6 +30,7 @@
     "PetEquipHandlerMixin",
     "LivingEntityMixin",
     "MinecraftClientMixin",
+    "MouseMixin",
     "MovableBoxWidgetMixin",
     "MoveHudScreenMixin",
     "DrawContextTextMixin",
