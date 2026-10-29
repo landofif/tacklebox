@@ -50,6 +50,8 @@ public final class Tacklebox implements ClientModInitializer {
     /** When to send /communityevent after joining (0 = not pending); sent once per game start. */
     private static long communityAskAt;
     private static boolean communityAsked;
+    /** When to send /active (0 = not pending), 2 seconds after /communityevent so the boosts hud knows the running boosters. */
+    private static long activeAskAt;
 
     private static void saveCommunity() {
         TackleboxSettings s = TackleboxSettings.get();
@@ -161,6 +163,7 @@ public final class Tacklebox implements ClientModInitializer {
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             communityAskAt = 0;
+            activeAskAt = 0;
             saveCommunity();
             TackleboxSettings.save(); // what the quests left hud learned
             dev.landofif.tacklebox.hud.ServerHud.reset();
@@ -211,7 +214,12 @@ public final class Tacklebox implements ClientModInitializer {
                 if (TriggerEngine.isOnFishOnMc()) {
                     communityAsked = true;
                     client.player.networkHandler.sendChatCommand("communityevent");
+                    activeAskAt = System.currentTimeMillis() + 2000; // luna 2026-10-29
                 }
+            }
+            if (activeAskAt > 0 && System.currentTimeMillis() >= activeAskAt && client.player != null) {
+                activeAskAt = 0;
+                client.player.networkHandler.sendChatCommand("active");
             }
             ServerInfo.tick(client);
             XpEstimate.tick(client);

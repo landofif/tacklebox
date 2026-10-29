@@ -26,6 +26,9 @@ import java.util.regex.Pattern;
 public final class BoostsHud {
     // BOOSTER » Ewiksen has activated a Global Luck Booster » 2x for 30m! (/tipall)
     private static final Pattern BOOSTER = Pattern.compile("^[^A-Za-z0-9]*BOOSTER [>»] (\\w+) has activated a Global (.+?) Booster [>»] (\\d+)x for (\\d+)([hms])");
+    // the /active reply, one line per booster: Global Luck Booster » 2x activated by Bostonfan3334 with 45m 48s remaining. Use /tipall ...
+    private static final Pattern ACTIVE = Pattern.compile("^[^A-Za-z0-9]*Global (.+?) Booster [>»] (\\d+)x activated by (\\w+) with ((?:\\d+[hms] ?)+) remaining");
+    private static final Pattern PART = Pattern.compile("(\\d+)([hms])");
     // BOOSTER » Global Luck Booster from Ewiksen has expired!
     private static final Pattern EXPIRED = Pattern.compile("^[^A-Za-z0-9]*BOOSTER [>»] Global (.+?) Booster from (\\w+) has expired");
     // CHUMMER » noawah activated a Chummer. (+75 Bite Speed)   and   CHUMMER » Chummer has run out of stock.
@@ -89,14 +92,16 @@ public final class BoostsHud {
         }
         java.util.regex.Matcher m = BOOSTER.matcher(s);
         if (m.find()) {
-            long unit = switch (m.group(5)) {
-                case "h" -> 3_600_000L;
-                case "m" -> 60_000L;
-                default -> 1000L;
-            };
             String type = m.group(2);
             BOOSTERS.put(type + "|" + m.group(1), new Booster(type, m.group(3) + "x", ChatColors.of(message, type + " Booster"),
-                    ChatColors.of(message, m.group(3) + "x for"), now + Long.parseLong(m.group(4)) * unit));
+                    ChatColors.of(message, m.group(3) + "x for"), now + millis(m.group(4) + m.group(5))));
+            return;
+        }
+        m = ACTIVE.matcher(s);
+        if (m.find()) {
+            String type = m.group(1);
+            BOOSTERS.put(type + "|" + m.group(3), new Booster(type, m.group(2) + "x", ChatColors.of(message, type + " Booster"),
+                    ChatColors.of(message, m.group(2) + "x activated"), now + millis(m.group(4))));
             return;
         }
         m = EXPIRED.matcher(s);
@@ -116,7 +121,22 @@ public final class BoostsHud {
         }
     }
 
-    /** The boosters stay (they are global and nothing repeats them on joining), the chummer is per server. */
+    /** "60m" or "1h 2m 3s" in milliseconds. */
+    private static long millis(String length) {
+        long ms = 0;
+        java.util.regex.Matcher m = PART.matcher(length);
+        while (m.find()) {
+            long unit = switch (m.group(2)) {
+                case "h" -> 3_600_000L;
+                case "m" -> 60_000L;
+                default -> 1000L;
+            };
+            ms += Long.parseLong(m.group(1)) * unit;
+        }
+        return ms;
+    }
+
+    /** The boosters stay (they are global, the /active sent on game start fills them in), the chummer is per server. */
     public static void reset() {
         chummerEnd = 0;
     }
