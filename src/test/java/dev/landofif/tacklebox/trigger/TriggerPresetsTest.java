@@ -96,4 +96,48 @@ class TriggerPresetsTest {
             assertNull(match(t, line), line);
         }
     }
+
+    @Test
+    void petMaxLevelMatchesEveryJumpTo100() {
+        Trigger t = TriggerPresets.petMaxLevel();
+        assertEquals("pet:{pet}", t.totem.item);
+        assertTrue(t.totem.enabled && t.title.enabled && t.sound.enabled);
+        String[][] lines = {
+                {"PETS » Your Bullfrog Pet is now level 99 → 100 (+1)", "Bullfrog"},
+                {"PETS » Your Bullfrog Pet is now level 98 → 100 (+2)", "Bullfrog"},
+                {"PETS » Your Marsh Rabbit Pet is now level 97 → 100 (+3)", "Marsh Rabbit"},
+                {"PETS » Your Eagle Pet is now level 99 → 100 (+1)", "Eagle"},
+        };
+        for (String[] l : lines) {
+            Map<String, String> v = match(t, l[0]);
+            assertNotNull(v, l[0]);
+            assertEquals(l[1], v.get("pet"), l[0]);
+            assertEquals("pet:" + l[1], TriggerEngine.fill(t.totem.item, v));
+        }
+    }
+
+    @Test
+    void petMaxLevelIgnoresLowerLevelsAndOtherPlayers() {
+        Trigger t = TriggerPresets.petMaxLevel();
+        for (String line : List.of(
+                "PETS » Your Duck Pet is now level 98 → 99 (+1)",
+                "PETS » Your Shark Pet is now level 9 → 10 (+1)",
+                "PETS » Your Shark Pet is now level 9 → 1000 (+1)",
+                "! [144]   JAH90909 » PETS » Your Duck Pet is now level 99 → 100 (+1)",
+                "! [21] Tokoyami_Yuuki » is the merged pet that comes out max level or lvl 1")) {
+            assertNull(match(t, line), line);
+        }
+    }
+
+    @Test
+    void rodNotCastMatchesTheModsOwnLine() {
+        Trigger t = TriggerPresets.rodIdle();
+        Map<String, String> v = match(t, "TACKLEBOX » Rod not cast for 60s");
+        assertNotNull(v);
+        assertEquals("60", v.get("seconds"));
+        assertEquals("not cast for 60s", TriggerEngine.fill(t.title.subtitle, v));
+        assertNull(match(t, "! [12] someone » rod not cast"));
+        List<String> names = TriggerPresets.all().stream().map(TriggerPresets.Preset::name).toList();
+        assertTrue(names.contains("pet max level") && names.contains("rod not cast"));
+    }
 }

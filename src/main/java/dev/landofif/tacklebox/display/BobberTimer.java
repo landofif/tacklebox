@@ -16,6 +16,9 @@ import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Your own bobber's waiting time (a hud element and/or text over the bobber) and the bite notification.
  * Display only. A right click with the bobber out (reel in or catch) hides the hud timer and the bite
@@ -57,36 +60,33 @@ public final class BobberTimer {
 
     /**
      * Every particle packet. Feeds the bite countdown with the fish's approach particles of your own bobber:
-     * the bobber whose line to the particle is most perpendicular to its sideways speed is the one that sent it.
+     * the bobber whose line to the particle is most perpendicular to its sideways speed is the one that sent it
+     * ({@link OwnFish}). Returns true to drop the particle: "only my fish" is on and it swims to someone else's bobber.
      */
-    public static void onParticle(ParticleS2CPacket packet) {
+    public static boolean onParticle(ParticleS2CPacket packet) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (TackleboxSettings.get().timerStyle != TackleboxSettings.TimerStyle.COUNTDOWN || !client.isOnThread() || client.world == null) {
-            return; // the handler also runs on the network thread first
+        TackleboxSettings s = TackleboxSettings.get();
+        boolean countdown = s.timerStyle == TackleboxSettings.TimerStyle.COUNTDOWN;
+        if ((!countdown && !s.ownFishOnly) || !client.isOnThread() || client.world == null) {
+            return false; // the handler also runs on the network thread first
         }
-        FishingBobberEntity mine = own(client);
-        if (mine == null || packet.getCount() != 0 || packet.getParameters().getType() != ParticleTypes.FISHING) {
-            return;
+        if (packet.getCount() != 0 || packet.getParameters().getType() != ParticleTypes.FISHING) {
+            return false;
         }
-        double px = packet.getX(), pz = packet.getZ();
-        double dx = px - mine.getX(), dz = pz - mine.getZ();
-        if (dx * dx + dz * dz > BiteCountdown.CAPTURE_RANGE * BiteCountdown.CAPTURE_RANGE) {
-            return;
-        }
-        FishingBobberEntity best = null;
-        double bestErr = BiteCountdown.PERP_TOLERANCE;
+        List<FishingBobberEntity> bobbers = new ArrayList<>();
         for (Entity e : client.world.getEntities()) {
             if (e instanceof FishingBobberEntity b) {
-                double err = BiteCountdown.perpendicularError(px - b.getX(), pz - b.getZ(), packet.getOffsetX(), packet.getOffsetZ());
-                if (err < bestErr) {
-                    bestErr = err;
-                    best = b;
-                }
+                bobbers.add(b);
             }
         }
-        if (best == mine) {
+        double px = packet.getX(), pz = packet.getZ();
+        FishingBobberEntity mine = own(client);
+        FishingBobberEntity owner = OwnFish.owner(px, pz, packet.getOffsetX(), packet.getOffsetZ(), bobbers, Entity::getX, Entity::getZ);
+        if (countdown && owner != null && owner == mine) {
+            double dx = px - mine.getX(), dz = pz - mine.getZ();
             BiteCountdown.onApproach(Math.sqrt(dx * dx + dz * dz), System.currentTimeMillis());
         }
+        return OwnFish.drops(s.ownFishOnly, owner, mine);
     }
 
     /** The server's title. Returns true if it is the BITE! title and should be hidden. */

@@ -8,6 +8,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Accent gradient: two colours for focused tiles, hovered buttons, toggles, hotbar and menu fills. `accent1`, `accent2`. `ui/look-and-settings.md`
 - Flat buttons and rounded text fields everywhere. `flatButtons`, off. `ui/look-and-settings.md`
 - No toast popups: every toast (recipes, advancements, hints) is blocked. Always on. **(no doc)**, `mixin/ToastManagerMixin`
+- Ask before disconnect: the pause menu's disconnect button asks yes or no first. `confirmDisconnect`, on. `ui/pause-menu.md`
 - Old foecollab title logo, from the built-in pack `tacklebox:foelogo`. Always on. **(no doc)**, one line in `dev/rename-tacklebox.md`
 
 ## Menus
@@ -52,6 +53,8 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Trigger presets (quest completed, pet drop, rare catch, fabled, storm and more). `+ new trigger`. `display/triggers.md`
 - Totem pop: a trigger can pop an item (pet head, shard head, the real item). Trigger totem tab. `display/world-and-totem.md`
 - Trigger share codes: copy and import a trigger as a short code. **(no doc)**, `trigger/TriggerStore`
+- Pet max level preset: a pet reaching level 100 pops its head. Trigger preset. `display/triggers.md`
+- Rod not cast alarm: rod in hand and no bobber out for a while hands a line to the triggers; the "rod not cast" preset shows it. `rodIdleSeconds` (60), preset. `huds/bobber-timer.md`
 - New in compendium alert, from foecollab's catch hook. Trigger preset. `menus/power-and-compendium.md`
 
 ## Huds
@@ -79,7 +82,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Hide empty chat lines. `hideEmptyChat`, off. **(no doc)**, named in `chat/index.md` only
 - Chat boxes: DMs and crew chat (or any rule) in their own movable, fading box. `chatBoxes`, on. `chat/chat.md`
 - Right-click copy with hover highlight. `chatCopy`, on. `chat/chat.md`
-- Stack repeats as (xN), even with other lines between or changed numbers, in chat and the boxes. `chatStack`, on. `chat/chat.md`
+- Stack a repeat of the newest line as (xN). `chatStack`, on. `chat/chat.md`
 - Timestamps on hover, optional prefix. `chatTimeMode`. `chat/chat.md`
 - Ctrl+F chat search, click a result to jump there. Always on. `chat/chat.md`
 - Smooth chat scrolling and a draggable scroll bar. Always on. `chat/chat.md`
@@ -108,5 +111,6 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 
 ## Dev
 
+- Daily backups of config/tacklebox (no pictures or dumps) to `backups/`, last 7 kept. Always on. `dev/backups.md`
 - F8 gui dump to a file and the clipboard. `dev/build-and-debug.md`
 - `/tacklebox debug item | entities | count | displays`. `dev/build-and-debug.md`

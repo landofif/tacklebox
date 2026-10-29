@@ -14,13 +14,15 @@ public final class TriggerPresets {
                 new Preset("blank trigger", "start from scratch", TriggerPresets::blank),
                 new Preset("quest completed", "quests > quest #1-8 has been completed!", TriggerPresets::questComplete),
                 new Preset("pet drop", "pet drop! you pulled ... with a totem pop of the pets head", TriggerPresets::petDrop),
+                new Preset("pet max level", "pets > your ... pet is now level ... → 100 with a totem pop of the pets head", TriggerPresets::petMaxLevel),
                 new Preset("rare catch", "rare catch! you pulled ... (shards, bottles, capsules, amulets) with a totem pop of the item", TriggerPresets::rareCatch),
                 new Preset("variant catch", "albino! / melanistic! / trophy! ... you caught a ...", TriggerPresets::variant),
                 new Preset("new in compendium", "a catch of yours that was missing in the compendium (needs foecollab and one read of that species page)", TriggerPresets::compendium),
                 new Preset("fabled event", "fabled > a fabled event is active at ...", TriggerPresets::fabled),
                 new Preset("storm", "storm > a thunderstorm / supercell has formed!", TriggerPresets::storm),
                 new Preset("moon rising", "full / blue / super / blood moon has risen", TriggerPresets::moon),
-                new Preset("fish sold", "sell > you just earned $... from selling your fish!", TriggerPresets::sold)
+                new Preset("fish sold", "sell > you just earned $... from selling your fish!", TriggerPresets::sold),
+                new Preset("rod not cast", "your rod in hand and no bobber out for a while (time in settings > bobber). it never casts for you", TriggerPresets::rodIdle)
         );
     }
 
@@ -67,6 +69,24 @@ public final class TriggerPresets {
         t.sound.soundId = "minecraft:entity.player.levelup";
         t.sound.plays = 2;
         t.sound.secondsBetween = 0.3;
+        return t;
+    }
+
+    /** "PETS » Your Bullfrog Pet is now level 99 → 100 (+1)", also jumps like "97 → 100 (+3)". 100 is the top: no log line goes past it. */
+    private static final String PET_MAX = "^pets > your (?<pet>.+?) pet is now level \\d+ → 100\\b";
+
+    public static Trigger petMaxLevel() {
+        Trigger t = preset("pet max level");
+        t.mode = Trigger.MatchMode.REGEX;
+        t.pattern = PET_MAX;
+        t.title.title = "&l{pet.lower} max level!";
+        t.title.titleColor = "#55ff55";
+        t.title.subtitle = "level 100";
+        t.title.animation = Trigger.Animation.POP;
+        t.totem.enabled = true;
+        t.totem.item = "pet:{pet}";
+        t.sound.soundId = "minecraft:block.bell.use";
+        t.sound.pitch = 2.0;
         return t;
     }
 
@@ -166,6 +186,20 @@ public final class TriggerPresets {
         t.title.staySeconds = 1.5;
         t.title.animation = Trigger.Animation.SLIDE;
         t.sound.soundId = "minecraft:entity.experience_orb.pickup";
+        return t;
+    }
+
+    /** The line is made by the mod ({@code display/RodIdle}), not the server: the rod has been in hand with no bobber out for {@code rodIdleSeconds}. */
+    public static Trigger rodIdle() {
+        Trigger t = preset("rod not cast");
+        t.pattern = "tacklebox > rod not cast for {seconds}s";
+        t.title.title = "&lcast your rod";
+        t.title.titleColor = "#ffaa00";
+        t.title.subtitle = "not cast for {seconds}s";
+        t.title.animation = Trigger.Animation.SHAKE;
+        t.sound.soundId = "minecraft:block.note_block.bell";
+        t.sound.plays = 2;
+        t.sound.secondsBetween = 0.2;
         return t;
     }
 }

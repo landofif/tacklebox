@@ -1,6 +1,7 @@
 package dev.landofif.tacklebox.screen;
 
 import dev.landofif.tacklebox.display.DisplayCull;
+import dev.landofif.tacklebox.display.RodIdle;
 import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.compat.FoeScreens;
 import dev.landofif.tacklebox.ui.Foe;
@@ -306,6 +307,9 @@ public final class SettingsPages {
                 () -> s.accent1, v -> s.accent1 = v);
         color("accent colour 2", "the second colour of that gradient. use the same as the first for a flat accent.",
                 () -> s.accent2, v -> s.accent2 = v);
+        header("pause menu");
+        toggle("ask before disconnect", "the disconnect button in the pause menu asks yes or no first.",
+                () -> s.confirmDisconnect, v -> s.confirmDisconnect = v);
         header("screens");
         link("chat triggers", TriggerListScreen::new);
         link("chat", ChatFilterScreen::new);
@@ -513,6 +517,8 @@ public final class SettingsPages {
                 () -> s.smoothCast, v -> s.smoothCast = v);
         toggle("hide other bobbers", "hides other players bobbers and their lines.",
                 () -> s.hideOtherBobbers, v -> s.hideOtherBobbers = v);
+        slider("rod not cast after", "how long your rod can be in hand with no bobber out before the rod not cast trigger fires. add that trigger from the presets in chat triggers. it never casts for you.",
+                RodIdle.MIN_SECONDS, RodIdle.MAX_SECONDS, 5, "s", () -> s.rodIdleSeconds, v -> s.rodIdleSeconds = (int) v);
         header("skin");
         cycle("bobber skin", "swaps your bobber for a skin. only you see it.",
                 TackleboxSettings.BobberSkin.values(), k -> k.label, () -> s.bobberSkin, v -> s.bobberSkin = v);

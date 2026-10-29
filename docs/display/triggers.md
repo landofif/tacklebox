@@ -42,6 +42,8 @@ luna found triggers late and plain next to skyblock mods. Before, every trigger 
 
 - **pet drop**: regex anchored with `^`. The rarity can be a glyph, a word or a word in brackets. Title "pet drop!", subtitle `{pet.lower}`, shake, totem `pet:{pet}`, level-up sound twice.
 - **rare catch**: `^rare catch! you (pulled|caught) (a )?<n>x <item>`, own lines only (shards, Lightning in a Bottle, Infusion Capsule, Prospecting Amulet). Title "rare catch!", subtitle `{item.lower}`, pop, totem `{item}`, amethyst chime three times.
+- **pet max level** (2026-10-29, from luna's own trigger "petg"): `^pets > your (?<pet>.+?) pet is now level \d+ → 100\b`, so a jump like `97 → 100 (+3)` fires too. 100 is the top: no log line goes past it. Title "{pet} max level!", subtitle "level 100", totem `pet:{pet}`, bell.
+- **rod not cast** (2026-10-29): matches `tacklebox > rod not cast for {seconds}s`, a line the mod hands to the triggers itself (not to chat), like the compendium line. Made by `display/RodIdle`, see `huds/bobber-timer.md`. Title "cast your rod", note block bell twice.
 - "pet totem", "climate shard" and "shard totem" are gone. Triggers saved from them stay as they are.
 
 ## Gotchas
@@ -53,6 +55,6 @@ luna found triggers late and plain next to skyblock mods. Before, every trigger 
 
 ## Tests
 
-`TriggerEngineTest` (fires at once, merge in place, cooldown, hide), `TitleOverlayTest` (stacking, own timers, slide, replace, update, entrance values), `TotemPopTest` (name keys, lookup order, shard fallback, leaving spin), `TotemPopSpinIntegrationTest` (a whole pop frame by frame), `TriggerColorsTest` (colour mapping, bold after the value, `.lower`, defaults), `TriggerPresetsTest` (real log lines, other players' lines), `TriggerIntegrationTest` (log lines through the engine with the presets).
+`TriggerEngineTest` (fires at once, merge in place, cooldown, hide), `TitleOverlayTest` (stacking, own timers, slide, replace, update, entrance values), `TotemPopTest` (name keys, lookup order, shard fallback, leaving spin), `TotemPopSpinIntegrationTest` (a whole pop frame by frame), `TriggerColorsTest` (colour mapping, bold after the value, `.lower`, defaults), `TriggerPresetsTest` (real log lines, other players' lines, pet max level, rod not cast), `TriggerIntegrationTest` (log lines through the engine with the presets, pet max level pop).
 
-Not run in game yet: titles come with the chat line, the pop shows the real shard, bottle or capsule, how a stack looks, the server's colours in the subtitle, the pop leaving with a 300° spin.
+Not run in game yet: the pet max level and rod not cast presets; titles come with the chat line, the pop shows the real shard, bottle or capsule, how a stack looks, the server's colours in the subtitle, the pop leaving with a 300° spin.

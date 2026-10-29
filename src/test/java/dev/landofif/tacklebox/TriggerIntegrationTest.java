@@ -90,4 +90,16 @@ class TriggerIntegrationTest {
         assertEquals("pet:Capybara", TotemPop.last());
         assertEquals(TotemPop.Source.HEAD, TotemPop.source(TotemPop.last(), id -> false, key -> true, key -> true));
     }
+
+    @Test
+    void petAtMaxLevelPopsItsHead() {
+        Trigger max = add(TriggerPresets.petMaxLevel());
+        add(TriggerPresets.petDrop());
+        assertTrue(TriggerEngine.onGameMessage(Text.literal("PETS » Your Duck Pet is now level 98 → 99 (+1)"), false));
+        assertEquals(List.of(), lines(TitleOverlay.shown()));
+        TriggerEngine.onGameMessage(Text.literal("PETS » Your Marsh Rabbit Pet is now level 97 → 100 (+3)"), false);
+        assertEquals(List.of("marsh rabbit max level! / level 100"), lines(TitleOverlay.shown()));
+        assertEquals(max.id, TitleOverlay.shown().get(0).trigger());
+        assertEquals("pet:Marsh Rabbit", TotemPop.last());
+    }
 }

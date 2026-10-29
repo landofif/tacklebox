@@ -3,6 +3,7 @@ package dev.landofif.tacklebox.mixin;
 import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.display.DisplayCull;
 import dev.landofif.tacklebox.display.Holograms;
+import dev.landofif.tacklebox.display.NearbyPlayers;
 import dev.landofif.tacklebox.display.OtherBobbers;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -19,7 +20,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /**
  * Hides entities on your screen only (ported from fishutils): other players bobbers (their lines go
  * with them), the servers over-head nametag stacks (yours, or everyones), and "+66xp" hologram
- * popups. Every world entity passes through shouldRender before it is drawn.
+ * popups. Also players near you while fishing (display/NearbyPlayers). Every world entity passes
+ * through shouldRender before it is drawn.
  */
 @Mixin(EntityRenderManager.class)
 abstract class EntityRenderManagerMixin {
@@ -39,6 +41,11 @@ abstract class EntityRenderManagerMixin {
             if (OtherBobbers.hidden(entity)) {
                 cir.setReturnValue(false);
             }
+            return;
+        }
+
+        if (NearbyPlayers.hidden(entity)) {
+            cir.setReturnValue(false);
             return;
         }
 

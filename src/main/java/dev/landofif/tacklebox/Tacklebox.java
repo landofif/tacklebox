@@ -77,6 +77,15 @@ public final class Tacklebox implements ClientModInitializer {
         } catch (IOException e) {
             LOGGER.error("Could not move config/dofisaddons to config/{}; starting with fresh settings", MOD_ID, e);
         }
+        try {
+            java.nio.file.Path zip = dev.landofif.tacklebox.util.ConfigBackups.run(TackleboxSettings.dir(), java.time.LocalDate.now(),
+                    dev.landofif.tacklebox.util.ConfigBackups.KEEP);
+            if (zip != null) {
+                LOGGER.info("backed up config/{} to {}", MOD_ID, zip.getFileName());
+            }
+        } catch (IOException e) {
+            LOGGER.error("Could not back up config/{}", MOD_ID, e);
+        }
         // a pack of our own for foecollabs old title logo (a built-in pack doesn't depend on how the mod ids sort)
         net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer(MOD_ID).ifPresent(c ->
                 net.fabricmc.fabric.api.resource.v1.ResourceLoader.registerBuiltinPack(net.minecraft.util.Identifier.of(MOD_ID, "foelogo"), c,
@@ -205,6 +214,7 @@ public final class Tacklebox implements ClientModInitializer {
             ServerInfo.tick(client);
             XpEstimate.tick(client);
             dev.landofif.tacklebox.display.BobberTimer.tick(client);
+            dev.landofif.tacklebox.display.RodIdle.tick(client);
             dev.landofif.tacklebox.hud.EquipmentRow.tick(client);
             dev.landofif.tacklebox.display.PetHeads.tick(client);
             dev.landofif.tacklebox.display.TotemPop.tick(client);

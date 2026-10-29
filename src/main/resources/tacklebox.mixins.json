@@ -18,6 +18,7 @@
     "FishingRodHandlerMixin",
     "FishingBobberRendererMixin",
     "FishingBobberStateMixin",
+    "GameMenuScreenMixin",
     "HandledScreenMixin",
     "HeldItemRendererMixin",
     "InGameHudHotbarMixin",

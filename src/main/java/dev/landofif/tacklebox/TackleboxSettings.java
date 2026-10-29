@@ -335,6 +335,10 @@ public class TackleboxSettings {
     public boolean biteHideTitle = true;
     /** Focus the game window through hyprctl on a bite (display/BiteFocus). Hyprland only. */
     public boolean biteFocus = false;
+    /** Seconds with a rod in hand and no bobber out before the "rod not cast" line goes to the triggers (display/RodIdle). */
+    public int rodIdleSeconds = 60;
+    /** Ask before the pause menu's disconnect button leaves the server (mixin/GameMenuScreenMixin). */
+    public boolean confirmDisconnect = true;
 
     public enum TimerStyle {
         UP("counts up"), COUNTDOWN("bite countdown");
@@ -550,6 +554,7 @@ public class TackleboxSettings {
         vmScale = Math.max(0.1, Math.min(3, vmScale));
         swingSlowness = Math.max(0.25, Math.min(4, swingSlowness));
         sneakHeight = dev.landofif.tacklebox.display.SneakHeight.clamp(sneakHeight);
+        rodIdleSeconds = dev.landofif.tacklebox.display.RodIdle.clamp(rodIdleSeconds);
         swingTurn = Math.max(0, Math.min(100, swingTurn));
         if (locLevels == null) locLevels = new java.util.LinkedHashMap<>();
         if (need == null) need = new java.util.LinkedHashMap<>();
