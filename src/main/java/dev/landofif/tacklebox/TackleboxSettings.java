@@ -294,6 +294,13 @@ public class TackleboxSettings {
     public int farDisplayRange = 24;
     /** Draw the sky flat black with no sun, moon, stars or rain, and the fog black too. Only what you see, the server clock is untouched (mixin/SkyRenderingMixin). */
     public boolean blackSky = false;
+    /** While your line is out, hide other players within this many blocks (2 to 12) of you or your bobber, and their nametags; crew and friends stay (display/NearbyPlayers). */
+    public boolean hideNearPlayers = false;
+    public int nearPlayersRange = 4;
+    /** Drop the fish approach particles that swim to other players bobbers (display/OwnFish). */
+    public boolean ownFishOnly = false;
+    /** Particle type ids switched off, like "minecraft:rain" (display/ParticleSwitches). */
+    public java.util.List<String> hiddenParticles = new java.util.ArrayList<>();
     /** After F2, copy the screenshot to the clipboard (wl-copy) and show it in the top right with an open button (display/ScreenshotPreview). */
     public boolean screenshotPreview;
 
@@ -551,6 +558,9 @@ public class TackleboxSettings {
         lineColor &= 0xFFFFFF;
         chummerRingColor &= 0xFFFFFF;
         farDisplayRange = dev.landofif.tacklebox.display.DisplayCull.clampRange(farDisplayRange);
+        nearPlayersRange = dev.landofif.tacklebox.display.NearbyPlayers.clampRange(nearPlayersRange);
+        if (hiddenParticles == null) hiddenParticles = new java.util.ArrayList<>();
+        hiddenParticles.removeIf(java.util.Objects::isNull);
         vmScale = Math.max(0.1, Math.min(3, vmScale));
         swingSlowness = Math.max(0.25, Math.min(4, swingSlowness));
         sneakHeight = dev.landofif.tacklebox.display.SneakHeight.clamp(sneakHeight);

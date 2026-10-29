@@ -40,6 +40,9 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Flat leaves. `flatLeaves`, off. `display/world-and-totem.md`
 - Black sky and fog. `blackSky`, off. `display/world-and-totem.md`
 - Hide far server displays for fps. `hideFarDisplays`, `farDisplayRange`, off. `display/world-and-totem.md`
+- Hide other players near you or your bobber while your line is out, crew and friends stay. `hideNearPlayers`, `nearPlayersRange`, off. `display/world-and-totem.md`
+- Only my fish: hide the fish particles swimming to other players' bobbers. `ownFishOnly`, off. `display/world-and-totem.md`
+- Particle switches: switch off any particle type seen this session (rain splashes and more). World page > particles, `hiddenParticles`. `display/world-and-totem.md`
 - Chummer range ring. `chummerRing`, `chummerRingColor`, off. `huds/chummer-range.md`
 - Screenshot preview: F2 copies to the clipboard and slides in at the top right. `screenshotPreview`, off. `display/screenshots.md`
 - Word swaps: replace any phrase wherever the game draws text. `/tacklebox words` (list empty by default). **(no doc)**, `display/WordSwap`
@@ -82,7 +85,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Hide empty chat lines. `hideEmptyChat`, off. **(no doc)**, named in `chat/index.md` only
 - Chat boxes: DMs and crew chat (or any rule) in their own movable, fading box. `chatBoxes`, on. `chat/chat.md`
 - Right-click copy with hover highlight. `chatCopy`, on. `chat/chat.md`
-- Stack a repeat of the newest line as (xN). `chatStack`, on. `chat/chat.md`
+- Stack repeats as (xN), even with other lines between or changed numbers, in chat and the boxes. `chatStack`, on. `chat/chat.md`
 - Timestamps on hover, optional prefix. `chatTimeMode`. `chat/chat.md`
 - Ctrl+F chat search, click a result to jump there. Always on. `chat/chat.md`
 - Smooth chat scrolling and a draggable scroll bar. Always on. `chat/chat.md`

@@ -1,6 +1,7 @@
 package dev.landofif.tacklebox.screen;
 
 import dev.landofif.tacklebox.display.DisplayCull;
+import dev.landofif.tacklebox.display.NearbyPlayers;
 import dev.landofif.tacklebox.display.RodIdle;
 import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.compat.FoeScreens;
@@ -559,6 +560,14 @@ public final class SettingsPages {
                 });
         toggle("black sky", "makes the sky flat black, always midnight to your eyes: no sun, moon, stars, sunsets or rain. the server's real time and weather are untouched.",
                 () -> s.blackSky, v -> s.blackSky = v);
+        link("particles", "switch off particle types, like rain splashes. lists every particle seen since the game started. a switched off type is hidden for everyone, your own too.", ParticleScreen::new);
+        header("crowds");
+        toggle("hide nearby players", "while your line is out, players near you or your bobber are not drawn, nor their nametags. crewmates and friends from foecollab stay. only on your screen.",
+                () -> s.hideNearPlayers, v -> s.hideNearPlayers = v);
+        slider("nearby range", "how close a player has to be to you or your bobber to be hidden, in blocks.", NearbyPlayers.MIN_RANGE, NearbyPlayers.MAX_RANGE, 1, " blocks",
+                () -> s.nearPlayersRange, v -> s.nearPlayersRange = (int) v);
+        toggle("only my fish", "hides the fish particles swimming to other players bobbers, so only the fish coming to yours shows.",
+                () -> s.ownFishOnly, v -> s.ownFishOnly = v);
         header("lag");
         toggle("hide far displays", "stops drawing the servers item, block and text displays (spawn decor, shop signs, holograms) beyond the range below. at spawn this can double your fps. nearby ones stay.",
                 () -> s.hideFarDisplays, v -> s.hideFarDisplays = v);
