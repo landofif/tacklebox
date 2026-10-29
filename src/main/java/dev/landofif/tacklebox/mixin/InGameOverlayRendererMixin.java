@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
-/** Scales the floating item (totem pop) by the trigger's size setting, and gives the mod's own pops a shorter spin as they leave. */
+/** Gives the mod's own floating item (totem pop) the trigger's size and a shorter spin as it leaves; a real totem stays vanilla. */
 @Mixin(InGameOverlayRenderer.class)
 abstract class InGameOverlayRendererMixin {
     @Shadow
@@ -23,7 +23,7 @@ abstract class InGameOverlayRendererMixin {
 
     @WrapOperation(method = "renderFloatingItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;scale(FFF)V"))
     private void tacklebox$scale(MatrixStack stack, float x, float y, float z, Operation<Void> original) {
-        float s = TotemPop.scale;
+        float s = TotemPop.size(floatingItem);
         original.call(stack, x * s, y * s, z * s);
     }
 

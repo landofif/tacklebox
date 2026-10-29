@@ -14,10 +14,10 @@ import java.util.function.Predicate;
 public final class TotemPop {
     private TotemPop() {}
 
-    /** Size multiplier of the pop being shown, read by {@code InGameOverlayRendererMixin}. */
-    public static float scale = 1f;
+    /** Size multiplier of the pop being shown, read through {@link #size}. */
+    static float scale = 1f;
 
-    /** The stack this mod last popped. Only that one gets {@link #spin}, so a real totem of undying stays vanilla. */
+    /** The stack this mod last popped. Only that one gets {@link #size} and {@link #spin}, so a real totem of undying stays vanilla. */
     static Object shown;
     /** Ticks vanilla's floating item animation lasts. */
     static final int TICKS = 40;
@@ -120,6 +120,11 @@ public final class TotemPop {
     private static void pop(MinecraftClient mc, ItemStack stack) {
         shown = stack;
         mc.gameRenderer.showFloatingItem(stack);
+    }
+
+    /** The size multiplier {@code InGameOverlayRendererMixin} draws {@code floatingItem} at: the trigger's for this mod's pop, else 1. */
+    public static float size(Object floatingItem) {
+        return floatingItem != null && floatingItem == shown ? scale : 1f;
     }
 
     /** Vanilla's progress curve over the animation, {@code f} 0 to 1: about 0.47 by tick 12, near 0.5 until tick 30, then 1. */

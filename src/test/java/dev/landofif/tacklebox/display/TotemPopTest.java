@@ -95,4 +95,19 @@ class TotemPopTest {
             before = now;
         }
     }
+
+    @Test
+    void sizeIsOnlyForTheModsOwnPop() {
+        Object ours = new Object();
+        TotemPop.shown = ours;
+        TotemPop.scale = 0.5f;
+        try {
+            assertEquals(0.5f, TotemPop.size(ours));
+            assertEquals(1f, TotemPop.size(new Object()));
+            assertEquals(1f, TotemPop.size(null));
+        } finally {
+            TotemPop.shown = null;
+            TotemPop.scale = 1f;
+        }
+    }
 }

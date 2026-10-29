@@ -6,13 +6,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Every frame of a 40 tick pop through the check the mixin makes: the mod's own pop leaves with a short spin, a real totem stays vanilla. */
+/** Every frame of a 40 tick pop through the checks the mixin makes: the mod's own pop has its size and leaves with a short spin, a real totem stays vanilla. */
 class TotemPopSpinIntegrationTest {
     private static final int FRAMES_PER_TICK = 3;
 
     @AfterEach
     void reset() {
         TotemPop.shown = null;
+        TotemPop.scale = 1f;
     }
 
     private static float vanilla(int timer, float tickProgress) {
@@ -23,6 +24,8 @@ class TotemPopSpinIntegrationTest {
     void ownPopComesInLikeVanillaAndLeavesWith300Degrees() {
         Object ours = new Object();
         TotemPop.shown = ours;
+        TotemPop.scale = 1.5f;
+        assertEquals(1.5f, TotemPop.size(ours));
         float most = 0f;
         float before = 0f;
         boolean leaving = false;
@@ -49,9 +52,12 @@ class TotemPopSpinIntegrationTest {
     }
 
     @Test
-    void realTotemAfterOwnPopStaysVanilla() {
+    void realTotemAfterOwnPopKeepsVanillaSizeAndSpin() {
         TotemPop.shown = new Object();
+        TotemPop.scale = 1.5f;
         Object totem = new Object();
+        assertEquals(1f, TotemPop.size(totem));
+        assertEquals(1f, TotemPop.size(null));
         for (int timer = 40; timer > 0; timer--) {
             float vanilla = vanilla(timer, 0.5f);
             assertEquals(vanilla, TotemPop.spin(totem, timer, 0.5f, vanilla));
