@@ -154,6 +154,7 @@ public final class Tacklebox implements ClientModInitializer {
                 }));
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            dev.landofif.tacklebox.chat.ChatRestore.join(handler.getRegistryManager());
             if (!communityAsked) {
                 communityAskAt = System.currentTimeMillis() + 5000; // luna 2026-10-18: ask the server once per game start
             }
@@ -167,6 +168,7 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.display.ChummerRing.reset();
         });
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
+            dev.landofif.tacklebox.chat.ChatRestore.stopping(client);
             saveCommunity();
             TackleboxSettings.save();
         });

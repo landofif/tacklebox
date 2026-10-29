@@ -396,6 +396,42 @@ public final class ChatBoxes {
         }
     }
 
+    /** Every box's lines by box name, oldest first, for chat/ChatRestore. */
+    public static Map<String, List<ChatRestore.Saved>> saved() {
+        Map<String, List<ChatRestore.Saved>> out = new java.util.LinkedHashMap<>();
+        for (ChatBox box : boxes()) {
+            State st = STATE.get(box);
+            if (box != null && st != null && !st.lines.isEmpty()) {
+                out.put(box.name, st.lines.stream().map(l -> new ChatRestore.Saved(l.text(), l.at())).toList());
+            }
+        }
+        return out;
+    }
+
+    /** Saved lines back into the box of that name, under the divider; only into a box with no lines yet. */
+    public static void restore(String name, List<ChatRestore.Saved> lines, Text divider) {
+        for (ChatBox box : boxes()) {
+            if (box == null || !box.name.equals(name)) {
+                continue;
+            }
+            State st = state(box);
+            if (!st.lines.isEmpty() || lines.isEmpty()) {
+                return;
+            }
+            for (ChatRestore.Saved l : lines) {
+                st.lines.addLast(new Line(l.text(), l.at()));
+            }
+            long now = System.currentTimeMillis();
+            st.lines.addLast(new Line(divider, now));
+            while (st.lines.size() > KEEP) {
+                st.lines.removeFirst();
+            }
+            st.version++;
+            st.lastAt = now;
+            return;
+        }
+    }
+
     /** Stacking in a box (chat/ChatStack): the repeated line leaves, the new one gets the count. */
     private static Text stack(Deque<Line> lines, Text message) {
         TackleboxSettings s = TackleboxSettings.get();

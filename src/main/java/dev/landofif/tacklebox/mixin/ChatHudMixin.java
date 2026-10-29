@@ -48,6 +48,12 @@ abstract class ChatHudMixin {
         dev.landofif.tacklebox.chat.SentHistory.load(((ChatHud) (Object) this).getMessageHistory());
     }
 
+    /** Chat is saved before a disconnect clears it, and comes back on the next join (chat/ChatRestore). */
+    @Inject(method = "clear", at = @At("HEAD"))
+    private void tacklebox$saveChat(boolean clearHistory, CallbackInfo ci) {
+        dev.landofif.tacklebox.chat.ChatRestore.beforeClear((ChatHud) (Object) this);
+    }
+
     @Inject(method = "clear", at = @At("RETURN"))
     private void tacklebox$reloadSent(boolean clearHistory, CallbackInfo ci) {
         if (clearHistory) {

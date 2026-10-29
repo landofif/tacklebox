@@ -22,8 +22,13 @@ public final class ChatTimes {
 
     private ChatTimes() {}
 
-    public static synchronized void record(Text message) {
-        if (TIMES.put(message, System.currentTimeMillis()) == null) {
+    public static void record(Text message) {
+        record(message, System.currentTimeMillis());
+    }
+
+    /** With a time of its own: lines chat/ChatRestore brings back. */
+    public static synchronized void record(Text message, long millis) {
+        if (TIMES.put(message, millis) == null) {
             ORDER.addLast(message);
             while (ORDER.size() > KEEP) {
                 TIMES.remove(ORDER.removeFirst());

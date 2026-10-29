@@ -94,6 +94,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Type "here" and press Tab to put in your location and instance. Always on. `chat/chat.md`
 - Up arrow history keeps plain messages too, after a restart or reconnect. Always on. `chat/chat.md`
 - Your name and chosen words in a colour inside chat lines. `chatHighlightName`, on; `chatHighlights`. `chat/chat.md`
+- Chat and chat boxes come back after a reconnect or restart, under a dated line. Always on, fishonmc only. `chat/chat.md`
 - 2000 lines of chat history instead of 100. Always on. **(no doc)**, `mixin/ChatHudMixin`
 - No `!` before player levels. Always on. `chat/chat.md`
 - Move and resize vanilla chat in the hud mover. `huds/positions.md`
