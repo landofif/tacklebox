@@ -128,7 +128,7 @@ public final class ChatBoxes {
         }
         State st = state(box);
         long now = System.currentTimeMillis();
-        st.lines.addLast(new Line(message, now));
+        st.lines.addLast(new Line(stack(st.lines, message), now));
         while (st.lines.size() > KEEP) {
             st.lines.removeFirst();
         }
@@ -394,6 +394,24 @@ public final class ChatBoxes {
             st.version++;
             st.scroll = 0;
         }
+    }
+
+    /** Stacking in a box (chat/ChatStack): the repeated line leaves, the new one gets the count. */
+    private static Text stack(Deque<Line> lines, Text message) {
+        TackleboxSettings s = TackleboxSettings.get();
+        if (s == null || !s.chatStack) {
+            return message;
+        }
+        java.util.function.Function<String, String> bare = t -> s.chatTimeMode > 0 ? ChatTimes.bare(t) : t;
+        List<Line> newestFirst = new ArrayList<>(lines).reversed();
+        int i = ChatStack.find(newestFirst, l -> bare.apply(l.text().getString()), bare.apply(message.getString()));
+        if (i < 0) {
+            return message;
+        }
+        Line old = newestFirst.get(i);
+        lines.removeLastOccurrence(old);
+        int count = ChatStack.count(bare.apply(old.text().getString())) + 1;
+        return message.copy().append(Text.literal(" (x" + count + ")").formatted(net.minecraft.util.Formatting.GRAY));
     }
 
     /** Closing the chat or sending a message brings every box back to its newest line. */

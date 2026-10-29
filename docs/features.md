@@ -79,7 +79,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Hide empty chat lines. `hideEmptyChat`, off. **(no doc)**, named in `chat/index.md` only
 - Chat boxes: DMs and crew chat (or any rule) in their own movable, fading box. `chatBoxes`, on. `chat/chat.md`
 - Right-click copy with hover highlight. `chatCopy`, on. `chat/chat.md`
-- Stack a repeat of the newest line as (xN). `chatStack`, on. `chat/chat.md`
+- Stack repeats as (xN), even with other lines between or changed numbers, in chat and the boxes. `chatStack`, on. `chat/chat.md`
 - Timestamps on hover, optional prefix. `chatTimeMode`. `chat/chat.md`
 - Ctrl+F chat search, click a result to jump there. Always on. `chat/chat.md`
 - Smooth chat scrolling and a draggable scroll bar. Always on. `chat/chat.md`

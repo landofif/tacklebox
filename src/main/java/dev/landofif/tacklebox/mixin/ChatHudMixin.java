@@ -7,6 +7,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.landofif.tacklebox.chat.ChatBar;
 import dev.landofif.tacklebox.chat.ChatBoxes;
 import dev.landofif.tacklebox.chat.ChatPeek;
+import dev.landofif.tacklebox.chat.ChatStack;
 import dev.landofif.tacklebox.chat.ChatTimes;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
@@ -34,8 +35,6 @@ abstract class ChatHudMixin {
     private static String bare(String s, TackleboxSettings st) {
         return st.chatTimeMode > 0 ? ChatTimes.bare(s) : s;
     }
-    private static String lastPlain = "", lastShown = "";
-    private static int lastCount;
 
     /** Vanilla keeps 100 lines, here 2000 (ctrl + f searches them). */
     @org.spongepowered.asm.mixin.injection.ModifyConstant(method = {"addVisibleMessage", "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V"}, constant = @org.spongepowered.asm.mixin.injection.Constant(intValue = 100))
@@ -95,26 +94,20 @@ abstract class ChatHudMixin {
         }
         if (st != null && st.chatStack) {
             ChatHudAccessor acc = (ChatHudAccessor) this;
-            String plain = bare(message.getString(), st);
             var lines = acc.tacklebox$messages();
-            if (!plain.isBlank() && plain.equals(lastPlain) && !lines.isEmpty()
-                    && bare(lines.getFirst().content().getString(), st).equals(lastShown)) {
-                lines.removeFirst();
+            int i = ChatStack.find(lines, l -> bare(l.content().getString(), st), bare(message.getString(), st));
+            if (i >= 0) {
+                int count = ChatStack.count(bare(lines.get(i).content().getString(), st)) + 1;
+                lines.remove(i);
                 acc.tacklebox$refresh();
-                lastCount++;
-                lastShown = plain + " (x" + lastCount + ")";
                 stacking = true;
                 try {
-                    ((ChatHud) (Object) this).addMessage(message.copy().append(Text.literal(" (x" + lastCount + ")").formatted(net.minecraft.util.Formatting.GRAY)), signature, indicator);
+                    ((ChatHud) (Object) this).addMessage(message.copy().append(Text.literal(" (x" + count + ")").formatted(net.minecraft.util.Formatting.GRAY)), signature, indicator);
                 } finally {
                     stacking = false;
                 }
                 ci.cancel();
-                return;
             }
-            lastPlain = plain;
-            lastShown = plain;
-            lastCount = 1;
         }
     }
 
