@@ -1,0 +1,6 @@
+{
+    "parent": "tacklebox:block/flat_leaves",
+    "textures": {
+        "all": "minecraft:block/azalea_leaves"
+    }
+}

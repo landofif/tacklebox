@@ -1,0 +1,6 @@
+{
+  "key.category.tacklebox.main": "tacklebox",
+  "key.tacklebox.open": "open tacklebox",
+  "key.tacklebox.chat_peek": "peek at chat (hold)",
+  "key.tacklebox.dump_gui": "dump open gui to file and clipboard"
+}

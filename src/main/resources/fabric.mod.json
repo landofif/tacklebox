@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "tacklebox",
+  "version": "${version}",
+  "name": "tacklebox",
+  "description": "an addon for foecollab on fishonmc: chat triggers with your own titles and sounds, a quests left hud, chat boxes, bobber and world tweaks, and one settings screen for both mods. it never fishes, sells or does quests for you.",
+  "authors": [
+    "landofif"
+  ],
+  "license": "MIT",
+  "icon": "assets/tacklebox/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.landofif.tacklebox.Tacklebox"
+    ],
+    "modmenu": [
+      "dev.landofif.tacklebox.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "tacklebox.mixins.json"
+  ],
+  "accessWidener": "tacklebox.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.19.0",
+    "fabric-api": "*",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "foecollab": ">=3.0.0"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}

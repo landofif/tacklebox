@@ -1,0 +1,12 @@
+accessWidener v2 named
+# ui/Arc adds its own gui elements, like DrawContext.fill does
+accessible field net/minecraft/client/gui/DrawContext state Lnet/minecraft/client/gui/render/state/GuiRenderState;
+accessible field net/minecraft/client/gui/DrawContext scissorStack Lnet/minecraft/client/gui/DrawContext$ScissorStack;
+accessible class net/minecraft/client/gui/DrawContext$ScissorStack
+# the presets screen draws a player model with the second skin layer
+accessible field net/minecraft/entity/PlayerLikeEntity PLAYER_MODE_CUSTOMIZATION_ID Lnet/minecraft/entity/data/TrackedData;
+# the menu and hud pictures are drawn with smooth filtering instead of the nearest pixel
+accessible field net/minecraft/client/texture/AbstractTexture sampler Lnet/minecraft/client/gl/GpuSampler;
+mutable field net/minecraft/client/texture/AbstractTexture sampler Lnet/minecraft/client/gl/GpuSampler;
+# chat/ChatKeys reads the instance from the tab list footer
+accessible field net/minecraft/client/gui/hud/PlayerListHud footer Lnet/minecraft/text/Text;
