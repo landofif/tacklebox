@@ -6,7 +6,7 @@ A trigger watches chat lines and, when one matches, shows a title, plays a sound
 
 - `trigger/TriggerEngine`: runs each chat line (`ALLOW_GAME`) through the triggers, merges lines, fills placeholders, reads chat colours.
 - `trigger/Matcher` (normalize, SIMPLE/EXACT/REGEX, capture spans), `Trigger` (saved model), `TriggerPresets`, `TriggerStore` (`config/tacklebox/triggers.json`).
-- `display/TitleOverlay` (titles on screen), `TotemPop` (the pop and its item lookup), `ItemLooks` (remembered item looks), `PetHeads` (pet and shard heads), `SoundQueue`.
+- `display/TitleOverlay` (titles on screen), `TotemPop` (the pop, its item lookup and the shorter leaving spin, see `world-and-totem.md`), `ItemLooks` (remembered item looks), `PetHeads` (pet and shard heads), `SoundQueue`.
 - `screen/TriggerEditScreen`: tabs when, title, totem, sound, and the preview.
 
 ## Timing (2026-10-28)
@@ -53,6 +53,6 @@ luna found triggers late and plain next to skyblock mods. Before, every trigger 
 
 ## Tests
 
-`TriggerEngineTest` (fires at once, merge in place, cooldown, hide), `TitleOverlayTest` (stacking, own timers, slide, replace, update, entrance values), `TotemPopTest` (name keys, lookup order, shard fallback), `TriggerColorsTest` (colour mapping, bold after the value, `.lower`, defaults), `TriggerPresetsTest` (real log lines, other players' lines), `TriggerIntegrationTest` (log lines through the engine with the presets).
+`TriggerEngineTest` (fires at once, merge in place, cooldown, hide), `TitleOverlayTest` (stacking, own timers, slide, replace, update, entrance values), `TotemPopTest` (name keys, lookup order, shard fallback, leaving spin), `TotemPopSpinIntegrationTest` (a whole pop frame by frame), `TriggerColorsTest` (colour mapping, bold after the value, `.lower`, defaults), `TriggerPresetsTest` (real log lines, other players' lines), `TriggerIntegrationTest` (log lines through the engine with the presets).
 
-Not run in game yet: titles come with the chat line, the pop shows the real shard, bottle or capsule, how a stack looks, the server's colours in the subtitle.
+Not run in game yet: titles come with the chat line, the pop shows the real shard, bottle or capsule, how a stack looks, the server's colours in the subtitle, the pop leaving with a 300° spin.

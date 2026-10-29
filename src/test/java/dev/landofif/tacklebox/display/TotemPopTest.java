@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** A totem pop of an item name: the inventory stack, else its remembered look, else wait for it, else a shard head or the totem. */
 class TotemPopTest {
@@ -58,5 +59,40 @@ class TotemPopTest {
     void showWithoutAGameDoesNothingButRemembersTheSpec() {
         TotemPop.show("  Subtropical Shard ", 1);
         assertEquals("Subtropical Shard", TotemPop.last());
+    }
+
+    private static float vanilla(float f) {
+        return 900f * (float) Math.abs(Math.sin(TotemPop.curve(f) * Math.PI));
+    }
+
+    @Test
+    void curveRisesHoldsNearTheMiddleThenEnds() {
+        assertEquals(0f, TotemPop.curve(0f), 1e-6f);
+        assertEquals(0.469f, TotemPop.curve(12 / 40f), 1e-3f);
+        assertEquals(0.5f, TotemPop.curve(21 / 40f), 2e-3f);
+        assertEquals(0.533f, TotemPop.curve(30 / 40f), 1e-3f);
+        assertEquals(1f, TotemPop.curve(1f), 1e-4f);
+    }
+
+    @Test
+    void comingInAndHoldingIsVanilla() {
+        for (int tick = 0; tick <= 21; tick++) {
+            float f = tick / 40f;
+            assertEquals(vanilla(f), TotemPop.spin(f), 1e-3f, "tick " + tick);
+        }
+        assertEquals(895.8f, TotemPop.spin(12 / 40f), 0.1f);
+    }
+
+    @Test
+    void leavingTurns300MoreTheSameWay() {
+        assertEquals(1200f, TotemPop.spin(1f), 0.5f);
+        assertEquals(900f + 300f * (1f - 636.7f / 900f), TotemPop.spin(37 / 40f), 0.5f);
+        float before = TotemPop.spin(0.5f);
+        for (int i = 501; i <= 1000; i++) {
+            float now = TotemPop.spin(i / 1000f);
+            assertTrue(now >= before - 1e-3f, "turns back at f " + i / 1000f);
+            assertTrue(now - before < 5f, "jumps at f " + i / 1000f);
+            before = now;
+        }
     }
 }
