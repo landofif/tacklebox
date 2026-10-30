@@ -2,7 +2,7 @@ package dev.landofif.tacklebox.hud;
 
 import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.Tacklebox;
-import dev.landofif.tacklebox.compat.FoeRarity;
+import dev.landofif.tacklebox.display.Rarity;
 import dev.landofif.tacklebox.display.SlotBox;
 import dev.landofif.tacklebox.ui.Hypr;
 import net.minecraft.client.MinecraftClient;
@@ -100,7 +100,7 @@ public final class EquipmentRow {
                 rgb = s.equipColor;
             }
             if (s.equipCircle && rgb >= 0) {
-                FoeRarity.disc(ctx, x, y, 0x66000000 | rgb);
+                Rarity.disc(ctx, x, y, 0x66000000 | rgb);
             } else if (rgb >= 0) { // a bar under the item in the rarity colour
                 ctx.fill(x + 1, y + 18, x + 15, y + 19, 0xFF000000 | rgb);
             }

@@ -5,7 +5,7 @@ import dev.landofif.tacklebox.menu.Vaults;
 import dev.landofif.tacklebox.ui.TackleboxScreen;
 import dev.landofif.tacklebox.ui.Foe;
 import dev.landofif.tacklebox.util.Glyphs;
-import dev.landofif.tacklebox.compat.FoeRarity;
+import dev.landofif.tacklebox.display.Rarity;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerInventory;
@@ -110,7 +110,7 @@ public class VaultScreen extends TackleboxScreen {
         ctx.getMatrices().pushMatrix();
         ctx.getMatrices().translate(x, y);
         ctx.getMatrices().scale(size / 16f, size / 16f);
-        FoeRarity.circle(ctx, 0, 0, st);
+        Rarity.circle(ctx, 0, 0, st);
         ctx.drawItem(st, 0, 0);
         ctx.drawStackOverlay(textRenderer, st, 0, 0);
         ctx.getMatrices().popMatrix();

@@ -212,6 +212,7 @@ public final class Tacklebox implements ClientModInitializer {
         dev.landofif.tacklebox.input.CommandAliases.register();
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             SoundQueue.tick();
+            dev.landofif.tacklebox.display.CatchWatch.tick(client);
             if (communityAskAt > 0 && System.currentTimeMillis() >= communityAskAt && client.player != null) {
                 communityAskAt = 0;
                 if (TriggerEngine.isOnFishOnMc()) {

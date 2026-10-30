@@ -313,7 +313,7 @@ public final class EventHud {
     }
 
     /**
-     * A catch ({@code FoeCatch}: foecollab's location and fish id): the server sends a chat line for a repeatable mission only when its cycle
+     * A catch ({@code CatchWatch}: the fish's location and fish id): the server sends a chat line for a repeatable mission only when its cycle
      * is full, and none for the count of a location mission ({@code Amazon (40/1500)}), so these are counted here, +1 per catch: the
      * location's mission, {@code Freshwater} for fresh water and {@code River Monsters} for a species of the event. The book sets them
      * right when /event is opened. True when something changed.
