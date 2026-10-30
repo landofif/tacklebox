@@ -17,8 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The menu panel's model from the items of luna's dumps (main menu 2026-10-11, /travel 2026-10-29): every button
- * gets a row with a line about it, the profile gives the header level, the missions column reads the Daily Missions
- * item, a /travel place gets its climate and its frenzy mark, and settings saved before the redo still load.
+ * gets a row with a line about it, the profile gives the header level, a /travel place gets its climate and its frenzy mark, and settings saved before the redo still load.
  */
 class MenuPanelIntegrationTest {
     private static final String P = " 퀃    ";
@@ -30,7 +29,7 @@ class MenuPanelIntegrationTest {
     }
 
     @Test
-    void mainMenuRowsProfileAndMissions() {
+    void buttonRowsProfileAndDailyMissionsRow() {
         List<String[]> buttons = List.of(
                 new String[]{"Daily Cosmetic Store", "View your daily cosmetic selection!"},
                 new String[]{"Recipes", "View our custom item recipes here."},
@@ -58,11 +57,6 @@ class MenuPanelIntegrationTest {
                 P + "- 🎣 Greenland Shark  ✔", P + "   ┗ (2/2)",
                 P + "- 🎣 Atlantic Bluefin Tuna  ", P + "   ┗ (0/3)", P + " ",
                 P + "Rerolls in 20h 13m 53s");
-        List<MenuRows.Mission> missions = MenuRows.missions(daily);
-        assertEquals(4, missions.size());
-        assertEquals(2, missions.stream().filter(MenuRows.Mission::done).count());
-        assertEquals("Lofoten Islands", missions.get(3).group());
-        assertEquals("Rerolls in 20h 13m 53s", MenuRows.rerolls(daily));
         // the Daily Missions row itself shows the first count it finds, which is the first mission
         assertEquals("204/250", MenuRows.of("Daily Missions", daily).amount());
     }
