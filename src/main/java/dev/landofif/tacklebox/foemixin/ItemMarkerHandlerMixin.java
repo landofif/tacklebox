@@ -1,7 +1,7 @@
 package dev.landofif.tacklebox.foemixin;
 
 import dev.landofif.tacklebox.TackleboxSettings;
-import dev.landofif.tacklebox.compat.FoeRarity;
+import dev.landofif.tacklebox.display.Rarity;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -31,6 +31,6 @@ abstract class ItemMarkerHandlerMixin {
         if (!TackleboxSettings.get().rarityCircles || tacklebox$skip) {
             return;
         }
-        FoeRarity.mark(ctx, x, y, stack, TackleboxSettings.get().rarityShape == TackleboxSettings.RarityShape.SQUARE);
+        Rarity.mark(ctx, x, y, stack, TackleboxSettings.get().rarityShape == TackleboxSettings.RarityShape.SQUARE);
     }
 }

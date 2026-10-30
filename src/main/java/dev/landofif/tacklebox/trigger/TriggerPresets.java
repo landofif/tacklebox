@@ -17,7 +17,7 @@ public final class TriggerPresets {
                 new Preset("pet max level", "pets > your ... pet is now level ... → 100 with a totem pop of the pets head", TriggerPresets::petMaxLevel),
                 new Preset("rare catch", "rare catch! you pulled ... (shards, bottles, capsules, amulets) with a totem pop of the item", TriggerPresets::rareCatch),
                 new Preset("variant catch", "albino! / melanistic! / trophy! ... you caught a ...", TriggerPresets::variant),
-                new Preset("new in compendium", "a catch of yours that was missing in the compendium (needs foecollab and one read of that species page)", TriggerPresets::compendium),
+                new Preset("new in compendium", "a catch of yours that was missing in the compendium (needs one read of that species page)", TriggerPresets::compendium),
                 new Preset("fabled event", "fabled > a fabled event is active at ...", TriggerPresets::fabled),
                 new Preset("storm", "storm > a thunderstorm / supercell has formed!", TriggerPresets::storm),
                 new Preset("moon rising", "full / blue / super / blood moon has risen", TriggerPresets::moon),

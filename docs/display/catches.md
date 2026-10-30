@@ -1,0 +1,7 @@
+# Catches and rarity
+
+- **Catches** (2026-10-30, `display/CatchWatch`; it used foecollab's catch hook before, now the same for everyone): `InGameHudOverlayMixin.setTitle` passes the title; one glyph in U+E000-E999 is the caught fish's icon, so the ids of your fish in the inventory are noted. For 3 seconds after, each tick looks for a fish stack (custom_data with `fish`) whose `catcher` is you and whose `id` was not there. That fish goes to `CommunityGoal.onCatch`, `Compendium.onCatch` (species, variant, size, location ids as in the NBT) and `EventHud.onCatch`. Research section 3.
+  - Not covered: a catch with a full inventory (the fish drops as an item entity), and the subtitle rarity check foecollab also does. Not seen in game yet.
+- **Rarity** (`display/Rarity`): the item's custom_data `rarity` (`common`, `rare`, `epic`, `legendary`, `mythical`, `special`), fishing rods left out, colours from research section 2. Used by the rarity circles/squares (slots, hotbar, vault, equipment row). Without foecollab the slot marks are drawn in `HandledScreenMixin.tacklebox$rarity`, with it in foecollab's slot markers (`foemixin/ItemMarkerHandlerMixin`).
+- **Crew and friends** (hide nearby players) still come from foecollab (`compat/FoeFriends`); without it nobody is kept. Own lists need F8 dumps of the crew members and friends menus.
+- Tests: `display/CatchWatchTest`, `display/CatchWatchIntegrationTest` (title, new fish, compendium count), `display/RarityTest`.

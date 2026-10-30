@@ -4,8 +4,8 @@ Small additions to server menus and items, asked for by luna on 2026-10-29. All 
 
 ## Rarity marks (`rarityCircles`, `rarityShape`)
 
-- A see-through mark in the item's rarity colour (foecollab's `FOMCItem.getRarity`, by reflection in `compat/FoeRarity`) behind items in menu slots and the hotbar. The first and last hotbar slot and the helmet slot never get one.
-- "rarity shape" (look page) picks a circle (16x16, the old look) or a square that covers the whole 18x18 slot, so neighbouring squares touch (`FoeRarity.mark`, `slotSquare`).
+- A see-through mark in the item's rarity colour (the item's custom_data `rarity`, fishing rods left out like foecollab does, `display/Rarity`; with foecollab the slot marks are drawn in its slot markers, without it in `HandledScreenMixin`) behind items in menu slots and the hotbar. The first and last hotbar slot and the helmet slot never get one.
+- "rarity shape" (look page) picks a circle (16x16, the old look) or a square that covers the whole 18x18 slot, so neighbouring squares touch (`Rarity.mark`, `slotSquare`).
 - Drawn from `mixin/ItemMarkerHandlerMixin` (foecollab's item marker background) and `mixin/InGameHudHotbarMixin`. The vault overview always draws circles; the equipment row has its own `equipCircle`.
 
 ## Page wheel (`pageWheel`)
@@ -32,7 +32,7 @@ Small additions to server menus and items, asked for by luna on 2026-10-29. All 
 
 ## Tests
 
-`compat/FoeRarityTest`, `screen/PresetsKeysTest`, `menu/MenuPagesTest` (names and lore from luna's dumps, Return and quests left out, cooldown), `display/TooltipScrollTest`, `menu/ChestScaleTest`, `MenuItemsIntegrationTest` (old settings keep everything off, saved values round-trip, bad values mended).
+`display/RarityTest`, `screen/PresetsKeysTest`, `menu/MenuPagesTest` (names and lore from luna's dumps, Return and quests left out, cooldown), `display/TooltipScrollTest`, `menu/ChestScaleTest`, `MenuItemsIntegrationTest` (old settings keep everything off, saved values round-trip, bad values mended).
 
 ## Not checked in game
 

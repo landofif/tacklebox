@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import dev.landofif.tacklebox.TackleboxSettings;
-import dev.landofif.tacklebox.compat.FoeRarity;
+import dev.landofif.tacklebox.display.Rarity;
 import dev.landofif.tacklebox.display.SlotBox;
 import dev.landofif.tacklebox.display.HotbarSelection;
 import net.minecraft.client.gui.DrawContext;
@@ -104,7 +104,7 @@ abstract class InGameHudHotbarMixin {
     private void tacklebox$circle(DrawContext ctx, int x, int y, RenderTickCounter tick, PlayerEntity player, ItemStack stack, int seed, CallbackInfo ci) {
         // the first and last slot are always full, nothing special
         if (TackleboxSettings.get().rarityCircles && stack != player.getInventory().getStack(0) && stack != player.getInventory().getStack(8)) {
-            FoeRarity.mark(ctx, x, y, stack, TackleboxSettings.get().rarityShape == TackleboxSettings.RarityShape.SQUARE);
+            Rarity.mark(ctx, x, y, stack, TackleboxSettings.get().rarityShape == TackleboxSettings.RarityShape.SQUARE);
         }
     }
 }

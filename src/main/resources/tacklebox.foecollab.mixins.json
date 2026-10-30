@@ -15,8 +15,7 @@
     "ItemMarkerHandlerMixin",
     "KeybindHandlerMixin",
     "MovableBoxWidgetMixin",
-    "PetEquipHandlerMixin",
-    "ProfileDataHandlerMixin"
+    "PetEquipHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

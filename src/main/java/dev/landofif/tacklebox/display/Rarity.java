@@ -1,20 +1,15 @@
-package dev.landofif.tacklebox.compat;
+package dev.landofif.tacklebox.display;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
-/** An items rarity colour as foecollab works it out (its FOMCItem.getRarity), by reflection. -1 if the server
- * gave it no rarity, which is every filler, button and arrow of a menu. */
-public final class FoeRarity {
-    private static Method rarity;
-    private static Field color;
-    private static Object none;
-    private static boolean tried;
-
-    private FoeRarity() {}
+/** An items rarity colour from its own custom_data {@code rarity} (fishing rods excepted, like foecollab). -1 if the server
+ * gave it no rarity, which is every filler, button and arrow of a menu. Read by tacklebox itself since 2026-10-30. */
+public final class Rarity {
+    private Rarity() {}
 
     /** A see-through circle in the items rarity colour, 16x16 at x, y, if the item has a rarity. */
     public static void circle(DrawContext ctx, int x, int y, ItemStack stack) {
@@ -53,24 +48,19 @@ public final class FoeRarity {
     }
 
     public static int color(ItemStack stack) {
-        if (!tried) {
-            tried = true;
-            try {
-                rarity = Class.forName("io.github.foecollab.FOMC.Types.FOMCItem").getMethod("getRarity", ItemStack.class);
-                color = rarity.getReturnType().getField("COLOR");
-                none = rarity.getReturnType().getField("DEFAULT").get(null);
-            } catch (ReflectiveOperationException | LinkageError e) {
-                rarity = null;
-            }
-        }
-        if (rarity == null || stack.isEmpty()) {
+        if (stack.isEmpty() || stack.isOf(Items.FISHING_ROD)) {
             return -1;
         }
-        try {
-            Object r = rarity.invoke(null, stack);
-            return r == null || r == none ? -1 : color.getInt(r) & 0xFFFFFF;
-        } catch (ReflectiveOperationException e) {
-            return -1;
-        }
+        NbtComponent data = stack.get(DataComponentTypes.CUSTOM_DATA);
+        return data == null ? -1 : color(data.copyNbt().getString("rarity").orElse(""));
+    }
+
+    /** RGB of a rarity id from custom_data (research section 2), -1 for none or one we do not know. */
+    public static int color(String rarity) {
+        return switch (rarity) {
+            case "common", "rare", "epic", "legendary", "mythical" -> dev.landofif.tacklebox.hud.BaitInfo.rarityColor(rarity);
+            case "special" -> 0xDD7ACF;
+            default -> -1;
+        };
     }
 }

@@ -114,6 +114,18 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
         }
     }
 
+    /** Rarity circles behind slots without foecollab (with it they are drawn in foecollab's slot markers, see foemixin/ItemMarkerHandlerMixin). */
+    @Inject(method = "drawSlot", at = @At("HEAD"))
+    private void tacklebox$rarity(DrawContext ctx, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
+        TackleboxSettings s = TackleboxSettings.get();
+        int i = slot.getIndex();
+        if (!s.rarityCircles || dev.landofif.tacklebox.compat.FoeCollab.loaded()
+                || slot.inventory instanceof PlayerInventory && (i == 0 || i == 8 || i == 39)) { // always full, nothing special
+            return;
+        }
+        dev.landofif.tacklebox.display.Rarity.mark(ctx, slot.x, slot.y, slot.getStack(), s.rarityShape == TackleboxSettings.RarityShape.SQUARE);
+    }
+
     /** In the /travel chest a place in a frenzy gets a see-through green square behind its item, the fabled event's place a red one. */
     @Inject(method = "drawSlot", at = @At("HEAD"))
     private void tacklebox$travelMark(DrawContext ctx, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
