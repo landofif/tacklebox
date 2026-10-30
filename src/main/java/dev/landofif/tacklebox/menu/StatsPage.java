@@ -154,11 +154,24 @@ public final class StatsPage {
                 if (m.find()) {
                     String n = m.group(1);
                     String rest = l.substring(label.length()).trim();
-                    return rest.startsWith("#") ? "#" + n : rest.contains(n + "x") ? n + "x" : n;
+                    return rest.startsWith("#") ? "#" + n : rest.contains(n + "x") ? n + "x" : shorten(n);
                 }
             }
         }
         return "";
+    }
+
+    /** A whole number of 1000 or more like the servers own: {@code 210,542} gives 210.54k, {@code 1,547,700} gives 1.55m. */
+    static String shorten(String n) {
+        if (!n.matches("[\\d,]+")) {
+            return n;
+        }
+        double v = MenuRows.number(n);
+        if (v < 1000) {
+            return n;
+        }
+        String s = String.format(Locale.ROOT, "%.2f", v >= 1_000_000 ? v / 1_000_000 : v / 1000);
+        return s.replaceAll("\\.?0+$", "") + (v >= 1_000_000 ? "m" : "k");
     }
 
     private static Piece named(List<Piece> pieces, String name) {

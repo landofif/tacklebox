@@ -97,7 +97,7 @@ class StatsPageIntegrationTest {
 
         assertEquals(new StatsPage.Tile(22, "425.18k", "power"), s.power());
         assertEquals(new StatsPage.Tile(32, "202", "runes"), s.runes());
-        assertEquals(new StatsPage.Tile(23, "210,542", "catches"), s.catches());
+        assertEquals(new StatsPage.Tile(23, "210.54k", "catches"), s.catches());
         assertEquals(new StatsPage.Tile(16, "433x", "Small Chunk Of Meat"), s.bait());
 
         assertEquals(List.of(2, 3, 4, 5, 6), s.displays());
