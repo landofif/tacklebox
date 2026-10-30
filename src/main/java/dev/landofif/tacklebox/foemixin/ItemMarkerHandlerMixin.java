@@ -1,4 +1,4 @@
-package dev.landofif.tacklebox.mixin;
+package dev.landofif.tacklebox.foemixin;
 
 import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.compat.FoeRarity;

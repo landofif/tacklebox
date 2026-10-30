@@ -1,5 +1,6 @@
 package dev.landofif.tacklebox.ui;
 
+import dev.landofif.tacklebox.compat.FoeCollab;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
@@ -64,9 +65,18 @@ public final class Foe {
         return text(s).formatted(Formatting.BOLD);
     }
 
-    /** A dark box with a brown border, {@code opacity} percent solid. */
+    /** A dark box with a brown border, {@code opacity} percent solid. Without foecollab (whose texture it is) a plain see-through rounded box. */
     public static void box(DrawContext ctx, int x, int y, int w, int h, int opacity) {
-        slice(ctx, BOX, x, y, w, h, opacity);
+        if (FoeCollab.loaded()) {
+            slice(ctx, BOX, x, y, w, h, opacity);
+        } else {
+            Hypr.rrect(ctx, x, y, w, h, Math.min(4, Math.min(w, h) / 2), plainBox(opacity));
+        }
+    }
+
+    /** The colour of the plain box: the dark of the buttons, {@code opacity} percent of its usual see-through. */
+    static int plainBox(int opacity) {
+        return (0xAA * Math.max(0, Math.min(100, opacity)) / 100) << 24 | 0x181825;
     }
 
     /** A button: a rounded see-through fill, with the accent gradient as a thin outline while hovered. */

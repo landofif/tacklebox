@@ -1,4 +1,4 @@
-package dev.landofif.tacklebox.mixin;
+package dev.landofif.tacklebox.foemixin;
 
 import dev.landofif.tacklebox.display.OtherBobbers;
 import net.minecraft.client.MinecraftClient;

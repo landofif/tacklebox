@@ -17,7 +17,7 @@ public final class FoeMainMenu {
     private FoeMainMenu() {}
 
     public static void open(boolean open) {
-        if (failed) {
+        if (failed || !FoeCollab.loaded()) {
             return;
         }
         try {
