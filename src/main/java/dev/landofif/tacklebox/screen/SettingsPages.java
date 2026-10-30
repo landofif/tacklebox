@@ -364,10 +364,6 @@ public final class SettingsPages {
         header("menus");
         toggle("simple menus", "chests, your inventory and fishonmc menus with no box and no slot boxes, just the items. hides the menu art from the server pack.",
                 () -> s.flatMenus, v -> s.flatMenus = v);
-        toggle("accent buttons", "fills the fishonmc menu buttons with the accent gradient instead of dark grey.",
-                () -> s.menuAccent, v -> s.menuAccent = v);
-        slider("accent strength", "how strong the accent fill of the menu buttons is.", 5, 100, 5, "%",
-                () -> s.menuAccentOpacity, v -> s.menuAccentOpacity = (int) Math.round(v));
         color("menu background", "the colour behind chests, your inventory and fishonmc menus when simple menus is on.",
                 () -> s.menuBgColor, v -> s.menuBgColor = v);
         slider("menu background opacity", "how strong that colour is. 0 is see-through.", 0, 100, 5, "%",
@@ -387,7 +383,7 @@ public final class SettingsPages {
                 () -> s.rarityCircles, v -> s.rarityCircles = v);
         cycle("rarity shape", "the rarity mark as a circle behind the item, or a square that fills the whole slot.",
                 TackleboxSettings.RarityShape.values(), e -> e.label, () -> s.rarityShape, v -> s.rarityShape = v);
-        toggle("fishonmc menu", "the main menu and /travel as a screen with big icons you can rearrange. off gives the chest back.",
+        toggle("fishonmc menu", "the main menu, /travel, quests, stats and crew as one dark panel with tabs and rows. off gives the chest back.",
                 () -> s.fishMenu, v -> s.fishMenu = v);
         slider("menu size", "how much of the screen the fishonmc menu fills.", 40, 100, 1, "%",
                 () -> s.menuSize, v -> s.menuSize = (int) Math.round(v));

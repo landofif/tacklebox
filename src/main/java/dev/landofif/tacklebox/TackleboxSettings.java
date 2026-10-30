@@ -63,8 +63,6 @@ public class TackleboxSettings {
     /** Chests, the inventory and fishonmc menus as one box with no slot boxes (drops the server's menu art). */
     public boolean flatMenus;
     /** What shows behind the box-less menus (display/MenuBackground): a colour and a picture, each in percent opacity (0 = none). */
-    public boolean menuAccent;
-    public int menuAccentOpacity = 40;
     public int menuBgColor = 0x000000, menuBgOpacity = 0, menuImageOpacity = 0;
     /** Every button as a flat see-through fill (lighter while hovered) instead of the bevelled texture. */
     public boolean flatButtons;
@@ -235,8 +233,6 @@ public class TackleboxSettings {
     public java.util.Map<String, java.util.Map<String, Boolean>> species = new java.util.LinkedHashMap<>();
     public int menuSize = 100;
     public int presetsSize = 100;
-    /** Where you put each menu button: "main:name" or "travel:id" to {column, row}. */
-    public java.util.Map<String, int[]> menuCells = new java.util.HashMap<>();
 
     // ---- chat ----
     /** Lines matching one of these never show in chat. */
