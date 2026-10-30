@@ -22,7 +22,9 @@ class BaitSortTest {
         assertEquals(0, BaitSort.rank(item("bait", "common")));
         assertEquals(3, BaitSort.rank(item("bait", "legendary")));
         assertEquals(BaitSort.ORDER.size(), BaitSort.rank(item("bait", "weird")));
-        assertEquals(-1, BaitSort.rank(item("lure", "common")));
+        assertEquals(0, BaitSort.rank(item("lure", "common")));
+        assertEquals(2, BaitSort.rank(item("lure", "epic")));
+        assertEquals(-1, BaitSort.rank(item("line", "common")));
         assertEquals(-1, BaitSort.rank(new NbtCompound()));
         assertEquals(-1, BaitSort.rank(null));
     }
