@@ -302,7 +302,7 @@ public class PresetsScreen extends TackleboxScreen {
     }
 
     /** A copy of the piece that renders on a player even where the server gives the armor no model of its own. */
-    private static ItemStack wearable(ItemStack stack, EquipmentSlot slot) {
+    static ItemStack wearable(ItemStack stack, EquipmentSlot slot) {
         ItemStack out = stack.copy();
         out.set(DataComponentTypes.EQUIPPABLE, net.minecraft.component.type.EquippableComponent.builder(slot)
                 .model(net.minecraft.item.equipment.EquipmentAssetKeys.LEATHER).build());
