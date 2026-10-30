@@ -28,8 +28,10 @@ public final class FishMenu {
     public record Info(int level, float progress) {}
 
     /** Menus that are only buttons, named by their art glyph (see util/Glyphs). The others (sell, vault, shops, pets, armor) need your inventory. */
-    private static final Set<String> BUTTON_MENUS = Set.of("main menu", "stats", "crew", "presets");
-    private static final Set<String> COMMANDS = Set.of("menu", "travel", "turbotravel", "stats", "crew", "presets");
+    private static final Set<String> BUTTON_MENUS = Set.of("stats", "crew", "presets");
+    private static final Set<String> COMMANDS = Set.of("travel", "turbotravel", "stats", "crew", "presets");
+    /** The instance list ("Instance 4 (14/75)"), which shares the crew menu's title. */
+    private static final Pattern INSTANCE = Pattern.compile("instance \\d+\\b.*");
     private static final Pattern LEVEL = Pattern.compile("(?:level|lvl)\\D{0,8}(\\d+)");
     private static final Pattern PERCENT = Pattern.compile("(\\d+(?:[.,]\\d+)?)\\s*%");
     private static final Pattern FRACTION = Pattern.compile("([\\d,.]+)\\s*([km]?)\\s*/\\s*([\\d,.]+)\\s*([km]?)");
@@ -70,6 +72,9 @@ public final class FishMenu {
         if (Vaults.number(screen) > 0) {
             return true;
         }
+        if (Glyphs.menuName(screen.getTitle()).equals("main menu")) {
+            return false; // luna, 2026-10-30: /menu stays the server's chest, made bigger by chestScale
+        }
         boolean typed = Util.getMeasuringTimeMs() - commandAt < 4000;
         commandAt = 0;
         // a button inside one of our menus (quests, then difficulty, then tier) stays in our screen too
@@ -79,6 +84,11 @@ public final class FishMenu {
                 || title.contains("pet menu") || title.contains("armor")
                 || screen.getTitle().getString().chars().anyMatch(c -> c >= 0xD541 && c <= 0xD546); // the auction house pages (title art only) keep their chest art
         return typed || BUTTON_MENUS.contains(Glyphs.menuName(screen.getTitle())) || (chained && !needsInventory);
+    }
+
+    /** The instance list, from its plain item names: it stays the server's chest like /menu. */
+    public static boolean isInstanceList(List<String> plainNames) {
+        return plainNames.stream().anyMatch(n -> INSTANCE.matcher(n).matches());
     }
 
     /** Whose profile item this is, from its plain lore ("profile of meowfih"), or null when it is no profile. */

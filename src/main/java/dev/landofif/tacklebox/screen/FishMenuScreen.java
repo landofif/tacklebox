@@ -1,6 +1,5 @@
 package dev.landofif.tacklebox.screen;
 
-import dev.landofif.tacklebox.compat.FoeMainMenu;
 import dev.landofif.tacklebox.ui.Foe;
 import dev.landofif.tacklebox.ui.Hypr;
 import dev.landofif.tacklebox.TackleboxSettings;
@@ -103,21 +102,8 @@ public class FishMenuScreen extends TackleboxScreen {
     }
 
     @Override
-    protected void init() {
-        if (FoeMainMenu.TITLE.equals(original.getTitle().getString())) {
-            FoeMainMenu.open(true); // foecollab's daily mission tracker reads the menu while this is set
-        }
-    }
-
-    @Override
     public void close() {
         client.player.closeHandledScreen();
-    }
-
-    @Override
-    public void removed() {
-        FoeMainMenu.open(false);
-        super.removed();
     }
 
     // ---- model ----
@@ -236,6 +222,16 @@ public class FishMenuScreen extends TackleboxScreen {
         String menu = menuName();
         collect(places);
         hits.clear();
+        if (FishMenu.isInstanceList(tiles.stream().map(t -> Glyphs.plain(t.stack.getName()).trim()).toList())) {
+            FishMenu.bypass = true; // it shares the crew title, so it is only known once its items are in
+            client.setScreen(original);
+            return;
+        }
+        for (Tile t : tiles) {
+            if (Glyphs.plain(t.stack.getName()).equals("fishing profile") && !FishMenu.othersProfile(original)) {
+                profile = t.row;
+            }
+        }
 
         int w = Math.min(vw() - 16, 600), h = vh() - 16;
         int x = vx() + (vw() - w) / 2, y = vy() + 8;
@@ -247,20 +243,6 @@ public class FishMenuScreen extends TackleboxScreen {
         Tile hover = null;
         if (tiles.isEmpty()) {
             ctx.drawCenteredTextWithShadow(textRenderer, Foe.text("waiting for the menu..."), x + w / 2, by + bh / 2, Foe.DIM);
-        } else if (menu.equals("main menu")) {
-            Tile missions = null;
-            for (Tile t : tiles) {
-                String plain = Glyphs.plain(t.stack.getName());
-                if (plain.equals("daily missions")) {
-                    missions = t;
-                } else if (plain.equals("fishing profile")) {
-                    profile = t.row;
-                }
-            }
-            int left = (bw - GAP) * 11 / 20;
-            hover = column(ctx, 0, tiles, bx, by, left, bh, mouseX, mouseY, menu);
-            splitX = bx + left + GAP / 2;
-            drawMissions(ctx, missions, bx + left + GAP, by, bw - left - GAP, bh);
         } else if (places) {
             int left = (bw - GAP) * 3 / 5;
             hover = column(ctx, 0, tiles, bx, by, left, bh, mouseX, mouseY, menu);
@@ -439,38 +421,6 @@ public class FishMenuScreen extends TackleboxScreen {
         }
         ctx.fill(x, y + 11, x + w, y + 12, LINE);
         return y + 16;
-    }
-
-    private void drawMissions(DrawContext ctx, Tile item, int x, int y, int w, int h) {
-        if (item == null) {
-            return;
-        }
-        List<String> lore = lore(item.stack);
-        List<MenuRows.Mission> missions = MenuRows.missions(lore);
-        long done = missions.stream().filter(MenuRows.Mission::done).count();
-        int ty = section(ctx, "daily missions", done + " / " + missions.size() + " done", x, y, w);
-        String group = null;
-        for (MenuRows.Mission m : missions) {
-            if (ty > y + h - 30) {
-                break;
-            }
-            if (!m.group().equals(group)) {
-                group = m.group();
-                ctx.drawText(textRenderer, Foe.text(group), x, ty + 2, Hypr.acc1(), false);
-                ty += 13;
-            }
-            Text amount = Text.literal(m.have() + "/" + m.need());
-            int aw = textRenderer.getWidth(amount);
-            Text name = fit(Foe.text((m.done() ? "✔ " : "") + m.name()), w - aw - 8);
-            ctx.drawText(textRenderer, name, x, ty, m.done() ? Foe.TITLE : Foe.TEXT, false);
-            ctx.drawText(textRenderer, amount, x + w - aw, ty, Foe.DIM, false);
-            bar(ctx, x, ty + 10, w, m.need() > 0 ? m.have() / (float) m.need() : 0, m.done());
-            ty += 17;
-        }
-        String rerolls = MenuRows.rerolls(lore);
-        if (!rerolls.isEmpty()) {
-            ctx.drawText(textRenderer, Foe.text(rerolls), x, Math.min(ty + 4, y + h - 10), Foe.FAINT, false);
-        }
     }
 
     // ---- best location ----

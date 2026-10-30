@@ -21,16 +21,8 @@ public final class MenuRows {
         }
     }
 
-    /** One daily mission: the group it is listed under ("Base", "Lofoten Islands"), its goal and its count. */
-    public record Mission(String group, String name, long have, long need) {
-        public boolean done() {
-            return have >= need;
-        }
-    }
-
     private static final Pattern FRACTION = Pattern.compile("\\(\\s*([\\d,.]+[kKmM]?)\\s*/\\s*([\\d,.]+[kKmM]?)\\s*\\)");
     private static final Pattern LEVEL = Pattern.compile("\\[(\\d+)]");
-    private static final Pattern MISSION = Pattern.compile("^-\\s*(.*?)\\s*(✔)?$");
 
     private MenuRows() {}
 
@@ -136,37 +128,6 @@ public final class MenuRows {
             return "";
         }
         return String.join(" · ", java.util.stream.Stream.of(climate, water, now).filter(s -> !s.isEmpty()).toList());
-    }
-
-    /** The missions in the Daily Missions item's lore: {@code - Goal ✔} then {@code ┗ (p/n)}, under a {@code ... Missions} header. */
-    public static List<Mission> missions(List<String> lore) {
-        List<Mission> out = new ArrayList<>();
-        String group = "", pending = null;
-        for (String raw : lore) {
-            String line = clean(raw);
-            Matcher m = MISSION.matcher(line);
-            Matcher f = FRACTION.matcher(line);
-            if (line.endsWith(" Missions")) {
-                group = line.substring(0, line.length() - 9);
-            } else if (m.matches()) {
-                pending = m.group(1).isEmpty() ? "mission" : m.group(1); // some goals are only a glyph
-            } else if (pending != null && f.find()) {
-                out.add(new Mission(group, pending, (long) number(f.group(1)), (long) number(f.group(2))));
-                pending = null;
-            }
-        }
-        return out;
-    }
-
-    /** The "Rerolls in 20h 13m 53s" line of the Daily Missions item, or "". */
-    public static String rerolls(List<String> lore) {
-        for (String raw : lore) {
-            String line = clean(raw);
-            if (line.startsWith("Rerolls in ")) {
-                return line;
-            }
-        }
-        return "";
     }
 
     /** 43,178 or 1.18M or 50K as a number. */

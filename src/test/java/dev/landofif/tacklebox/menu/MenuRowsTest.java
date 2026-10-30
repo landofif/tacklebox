@@ -82,24 +82,6 @@ class MenuRowsTest {
     }
 
     @Test
-    void missionsAndRerolls() {
-        List<String> lore = List.of(HEAD + "Daily Missions", P + "Base Missions",
-                P + "- 🎣 Anywhere  ", P + "   ┗ (204/250)",
-                P + "- 🎣 Quests Completed  ✔", P + "   ┗ (3/3)",
-                P + "- 🎣   ✔", P + "   ┗ (1/1)", P + " ",
-                P + "Lofoten Islands Missions", P + "- 🎣 Lumpfish  ", P + "   ┗ (5/14)", P + " ",
-                P + "Rerolls in 20h 13m 53s");
-        List<MenuRows.Mission> m = MenuRows.missions(lore);
-        assertEquals(List.of(new MenuRows.Mission("Base", "Anywhere", 204, 250),
-                new MenuRows.Mission("Base", "Quests Completed", 3, 3),
-                new MenuRows.Mission("Base", "mission", 1, 1),
-                new MenuRows.Mission("Lofoten Islands", "Lumpfish", 5, 14)), m);
-        assertTrue(m.get(1).done());
-        assertFalse(m.get(0).done());
-        assertEquals("Rerolls in 20h 13m 53s", MenuRows.rerolls(lore));
-    }
-
-    @Test
     void numbers() {
         assertEquals(1_180_000, MenuRows.number("1.18M"), 1e-6);
         assertEquals(43178, MenuRows.number("43,178"), 1e-6);
