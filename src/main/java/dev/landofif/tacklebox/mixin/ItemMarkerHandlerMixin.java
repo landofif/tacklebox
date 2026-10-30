@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * A see-through circle in the items rarity colour behind it, drawn where foecollab draws its slot
+ * A see-through circle or square in the items rarity colour behind it, drawn where foecollab draws its slot
  * backgrounds (before the item). By name, {@code require = 0}, see {@link BoxRendererMixin}.
  */
 @Mixin(targets = "io.github.foecollab.handler.ItemMarkerHandler")
@@ -31,6 +31,6 @@ abstract class ItemMarkerHandlerMixin {
         if (!TackleboxSettings.get().rarityCircles || tacklebox$skip) {
             return;
         }
-        FoeRarity.circle(ctx, x, y, stack);
+        FoeRarity.mark(ctx, x, y, stack, TackleboxSettings.get().rarityShape == TackleboxSettings.RarityShape.SQUARE);
     }
 }

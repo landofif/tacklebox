@@ -261,7 +261,7 @@ Spawn hub bounding box: x 95..145, z −58..38 (treated as Cypress Lake).
 | Main menu | `U+EEE4 할` (contains `END_CRYSTAL` named "Daily Missions"; lore lines `| <goal> (<p>/<n>)`) |
 | Quests (`/quests`, 45 slots) | `U+EEE4 픹` |
 | Crew / Leveling bonuses | `U+EEE4 핒` |
-| Pet menu | `Pet Menu` + `U+EEE6 U+EEE5 U+EEE3 핑` |
+| Pet menu (gone: luna 2026-10-29 says there is none; pets are taken out of /pv, put in the hotbar and right-clicked to equip. Foecollab still checks this title.) | `Pet Menu` + `U+EEE6 U+EEE5 U+EEE3 핑` |
 | Tackle shop | `Tackle Shop` + `U+EEE7 U+EEE3 합` |
 | Armor menu | `Armor Menu` + `U+EEE7 U+EEE2 핈` |
 | Fish Merchant (`/sell`, 54 slots) | contains "Fish Merchant" |

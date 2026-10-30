@@ -386,6 +386,8 @@ public final class SettingsPages {
                 () -> s.flatButtons, v -> s.flatButtons = v);
         toggle("rarity circles", "a see-through circle in the rarity colour behind items in your inventory. foecollabs corner mark has its own setting.",
                 () -> s.rarityCircles, v -> s.rarityCircles = v);
+        cycle("rarity shape", "the rarity mark as a circle behind the item, or a square that fills the whole slot.",
+                TackleboxSettings.RarityShape.values(), e -> e.label, () -> s.rarityShape, v -> s.rarityShape = v);
         toggle("fishonmc menu", "the main menu and /travel as a screen with big icons you can rearrange. off gives the chest back.",
                 () -> s.fishMenu, v -> s.fishMenu = v);
         slider("menu size", "how much of the screen the fishonmc menu fills.", 40, 100, 1, "%",
@@ -397,6 +399,11 @@ public final class SettingsPages {
                 () -> s.presetsSize, v -> s.presetsSize = (int) Math.round(v));
         toggle("other page boxes", "draws the card boxes behind the dimmed presets of the other page. off shows only the models.",
                 () -> s.presetsOtherBg, v -> s.presetsOtherBg = v);
+        header("chest menus");
+        slider("chest menu scale", "the gui scale of server chest menus while one is open, in whole steps like the games gui scale. the hud behind it changes with it. 0 keeps the games scale.", 0, 6, 1, "",
+                () -> s.chestScale, v -> s.chestScale = (int) Math.round(v));
+        toggle("page wheel", "the mouse wheel turns the pages of paged server menus, like the compendium and the auction house: down clicks next, up clicks back. not in quest menus.",
+                () -> s.pageWheel, v -> s.pageWheel = v);
         header("vaults");
         toggle("vault overview", "/pv as all seven personal vaults on one screen with a search. a vault shows what it held when you last opened it. off gives the chest back.",
                 () -> s.vaultMenu, v -> s.vaultMenu = v);
@@ -405,6 +412,8 @@ public final class SettingsPages {
                 () -> s.shortFishTooltips, v -> s.shortFishTooltips = v);
         toggle("short pet tooltips", "a pet with no line for its kind, no equipped skin, item or trail line when nothing is equipped, no right click hint, and the rarity mark next to the name. only changes what you see.",
                 () -> s.shortPetTooltips, v -> s.shortPetTooltips = v);
+        toggle("scroll tall tooltips", "a tooltip taller than the screen starts at its top and the mouse wheel scrolls it.",
+                () -> s.tooltipScroll, v -> s.tooltipScroll = v);
         toggle("pet profit marks", "in the auction house, a pet you could sell to the pet store for more than it costs gets a green tint, and every pet gets a line with what the store pays. only common and rare pets, the other rarities are not known yet. only changes what you see.",
                 () -> s.petProfitMarks, v -> s.petProfitMarks = v);
     }

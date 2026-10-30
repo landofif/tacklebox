@@ -25,6 +25,24 @@ public final class FoeRarity {
         disc(ctx, x, y, 0x66 << 24 | rgb);
     }
 
+    /** The rarity circles setting's mark behind an item at x, y: the circle, or a square over the whole 18x18 slot. */
+    public static void mark(DrawContext ctx, int x, int y, ItemStack stack, boolean square) {
+        if (!square) {
+            circle(ctx, x, y, stack);
+            return;
+        }
+        int rgb = color(stack);
+        if (rgb >= 0) {
+            int[] r = slotSquare(x, y);
+            ctx.fill(r[0], r[1], r[2], r[3], 0x66 << 24 | rgb);
+        }
+    }
+
+    /** The whole slot around a 16x16 item at x, y, as {x1, y1, x2, y2}: one pixel past the item on each side, so neighbouring squares touch. */
+    public static int[] slotSquare(int x, int y) {
+        return new int[]{x - 1, y - 1, x + 17, y + 17};
+    }
+
     /** A filled circle, 16x16 at x, y. */
     public static void disc(DrawContext ctx, int x, int y, int argb) {
         for (int row = 0; row < 16; row++) {

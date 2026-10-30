@@ -72,6 +72,14 @@ public class TackleboxSettings {
     public int accent1 = 0x33CCFF, accent2 = 0x00FF99;
     /** A see-through circle in the rarity colour behind items in slots (foecollabs rarity, drawn by its item markers). */
     public boolean rarityCircles = false;
+    /** The shape of those marks: a circle, or a square filling the whole slot. */
+    public RarityShape rarityShape = RarityShape.CIRCLE;
+    /** The mouse wheel clicks Next and Back in paged server menus (menu/MenuPages). */
+    public boolean pageWheel = false;
+    /** The mouse wheel scrolls tooltips taller than the screen (display/TooltipScroll). */
+    public boolean tooltipScroll = false;
+    /** The gui scale of server chest menus, 0 = the games own (menu/ChestScale). */
+    public int chestScale = 0;
     /** Caught fish tooltips without the scientific name, value and ecosystem, weight and length on one line (display/FishTooltip). */
     public boolean shortFishTooltips = false;
     /** Pet tooltips without the kind line, empty equipment lines and the right click hint (display/PetTooltip). */
@@ -468,6 +476,16 @@ public class TackleboxSettings {
         }
     }
 
+    public enum RarityShape {
+        CIRCLE("circle"), SQUARE("square");
+
+        public final String label;
+
+        RarityShape(String label) {
+            this.label = label;
+        }
+    }
+
     public enum SwingStyle {
         NORMAL("normal"), SMOOTH("smooth"), SNAPPY("snappy"), NONE("no swing");
 
@@ -495,6 +513,7 @@ public class TackleboxSettings {
         if (biteText == null) biteText = "bite!";
         if (swingStyle == null) swingStyle = SwingStyle.NORMAL;
         if (equipPlace == null) equipPlace = EquipPlace.ABOVE;
+        if (rarityShape == null) rarityShape = RarityShape.CIRCLE;
         if (hotbarLook == null) hotbarLook = hotbarBackground ? BoxLook.DEFAULT : BoxLook.OFF;
         if (equipLook == null) equipLook = hotbarBackground ? BoxLook.DEFAULT : BoxLook.OFF;
         if (lookVersion < 1) { // the hyprland look is the new default for the hotbar and equipment row
@@ -584,5 +603,6 @@ public class TackleboxSettings {
         if (presetStats == null) presetStats = new java.util.LinkedHashMap<>();
         menuSize = Math.max(40, Math.min(100, menuSize));
         presetsSize = Math.max(40, Math.min(100, presetsSize));
+        chestScale = Math.max(0, Math.min(6, chestScale));
     }
 }
