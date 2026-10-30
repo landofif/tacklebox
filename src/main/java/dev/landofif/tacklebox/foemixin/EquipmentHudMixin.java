@@ -1,4 +1,4 @@
-package dev.landofif.tacklebox.mixin;
+package dev.landofif.tacklebox.foemixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;

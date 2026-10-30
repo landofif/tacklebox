@@ -13,15 +13,15 @@ It was called dofisaddons until 2026-10-12; the local folder is still `dofis-add
 - **Text is small capitals.** `Foe.text()`/`Foe.bold()` for labels, titles, buttons; `Foe.sentence()` for long text. Details: `docs/rules/text-and-automation.md`.
 - **No automating the game.** The mod never fishes (casts, reels, minigame), sells or does quests for the player. Anything else is allowed, like foecollab's bait sorter. Gray areas (auto tipping, `/contest` refreshes): ask luna. Details: `docs/rules/text-and-automation.md`.
 - **Foecollab already has it, so the mod does not.** Before adding a feature, check foecollab's config for the same thing and ask luna.
-- **Addon to foecollab, not a theme.** No themes, fonts or restyling of foecollab or vanilla. Keep it minimal: luna wants less, not more.
-- **FOECollab is a runtime dependency.** Never compile against it: `compat/` reaches it by hud id, class names and reflection.
+- **Not a theme.** No themes, fonts or restyling of foecollab or vanilla. Keep it minimal: luna wants less, not more.
+- **FOECollab is optional** (2026-10-30, so FOE-R users can run tacklebox). Never compile against it: `compat/` reaches it by class names and reflection, behind `FoeCollab.loaded()`. Tweaks of foecollab itself are extras that only run when it is installed; tacklebox reads its own game data. See `docs/foecollab/integration.md`.
 - **FOECollab is AGPL.** API reference only, don't copy its code. Facts (strings, codepoints, NBT keys) are fine.
 - `fishonmc-autofish` is a data source only. None of its automation comes over.
 
 ## Gotchas
 
 - **Keep `yarn_mappings=1.21.11+build.3`.** build.6 broke `PositionedSoundInstance.master(SoundEvent,float,float)`.
-- **Only `@Mixin`/accessor classes go in `tacklebox.mixin`.** Anything else there causes `IllegalClassLoadError` (black screen on 2026-10-02). Duck interfaces go in `tacklebox.duck`.
+- **Only `@Mixin`/accessor classes go in `tacklebox.mixin` and `tacklebox.foemixin`.** Anything else there causes `IllegalClassLoadError` (black screen on 2026-10-02). Duck interfaces go in `tacklebox.duck`. Mixins into foecollab go in `foemixin` and `tacklebox.foecollab.mixins.json`, never in the main config.
 - **Resource file names must be lowercase.** Only font definitions belong under `assets/tacklebox/font/`.
 - `HudRenderCallback` is deprecated. Use `HudElementRegistry`.
 - Never `@Redirect` a call FOECollab also redirects (crash at load); use `@WrapOperation`. Dev runs keep foecollab on intermediary names, see `docs/foecollab/integration.md`.

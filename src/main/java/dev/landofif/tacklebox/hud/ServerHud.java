@@ -513,6 +513,9 @@ public final class ServerHud {
 
     /** Foecollab's TimerHandler keeps both countdowns, in milliseconds (-1 when it is not there). */
     private static long timer(String field) {
+        if (!dev.landofif.tacklebox.compat.FoeCollab.loaded()) {
+            return -1;
+        }
         try {
             if (instance == null) {
                 instance = Class.forName("io.github.foecollab.handler.TimerHandler").getMethod("instance");

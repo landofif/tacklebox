@@ -254,10 +254,13 @@ public final class Tacklebox implements ClientModInitializer {
     }
 
     private static LiteralArgumentBuilder<FabricClientCommandSource> settingsCommand(String name) {
-        return ClientCommandManager.literal(name)
+        LiteralArgumentBuilder<FabricClientCommandSource> command = ClientCommandManager.literal(name);
+        if (dev.landofif.tacklebox.compat.FoeCollab.loaded()) { // foecollab's custom hud editor
+            command.then(ClientCommandManager.literal("huds").executes(ctx -> open(() -> dev.landofif.tacklebox.compat.FoeScreens.customHuds(null))));
+        }
+        return command
                 .executes(ctx -> open(() -> new dev.landofif.tacklebox.screen.SettingsScreen(null)))
                 .then(ClientCommandManager.literal("triggers").executes(ctx -> open(() -> new TriggerListScreen(null))))
-                .then(ClientCommandManager.literal("huds").executes(ctx -> open(() -> dev.landofif.tacklebox.compat.FoeScreens.customHuds(null))))
                 .then(ClientCommandManager.literal("words").executes(ctx -> open(() -> new dev.landofif.tacklebox.screen.WordSwapScreen(null))))
                 .then(ClientCommandManager.literal("keys").executes(ctx -> open(() -> new dev.landofif.tacklebox.screen.KeyCommandScreen(null))))
                 .then(ClientCommandManager.literal("viewmodel").executes(ctx -> open(() -> new dev.landofif.tacklebox.screen.ViewmodelScreen(null))))

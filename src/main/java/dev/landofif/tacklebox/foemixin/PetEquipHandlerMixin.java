@@ -1,4 +1,4 @@
-package dev.landofif.tacklebox.mixin;
+package dev.landofif.tacklebox.foemixin;
 
 import dev.landofif.tacklebox.compat.FoePet;
 import net.minecraft.client.MinecraftClient;

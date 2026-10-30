@@ -1,0 +1,25 @@
+{
+  "required": false,
+  "package": "dev.landofif.tacklebox.foemixin",
+  "plugin": "dev.landofif.tacklebox.compat.FoeMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "BaitSortingHelperMixin",
+    "BobberTimerHudMixin",
+    "BoxRendererMixin",
+    "EquipmentHudMixin",
+    "FishingRodHandlerMixin",
+    "FoeCustomHudsMixin",
+    "FoeHudsMixin",
+    "InventoryScreenHandlerMixin",
+    "ItemMarkerHandlerMixin",
+    "KeybindHandlerMixin",
+    "MovableBoxWidgetMixin",
+    "MoveHudScreenMixin",
+    "PetEquipHandlerMixin",
+    "ProfileDataHandlerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
