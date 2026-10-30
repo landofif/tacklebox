@@ -68,6 +68,7 @@ public final class Tacklebox implements ClientModInitializer {
 
     /** Dumps the open screen (title, slots, lore) to a file and the clipboard, see display/DebugDump.gui. F8 by default. */
     private static KeyBinding dumpKey;
+    private static KeyBinding baitSortKey;
 
     @Override
     public void onInitializeClient() {
@@ -151,10 +152,14 @@ public final class Tacklebox implements ClientModInitializer {
 
         ChatPeek.key = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.tacklebox.chat_peek", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, category));
         dumpKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.tacklebox.dump_gui", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_F8, category));
+        baitSortKey = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.tacklebox.sort_bait", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, category));
         net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT.register((client, screen, w, h) ->
                 net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.afterKeyPress(screen).register((s, input) -> {
                     if (dumpKey.matchesKey(input)) {
                         dev.landofif.tacklebox.display.DebugDump.gui(s);
+                    }
+                    if (baitSortKey.matchesKey(input)) {
+                        dev.landofif.tacklebox.input.BaitSort.start(s);
                     }
                 }));
 
@@ -213,6 +218,7 @@ public final class Tacklebox implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             SoundQueue.tick();
             dev.landofif.tacklebox.display.CatchWatch.tick(client);
+            dev.landofif.tacklebox.input.BaitSort.tick(client);
             if (communityAskAt > 0 && System.currentTimeMillis() >= communityAskAt && client.player != null) {
                 communityAskAt = 0;
                 if (TriggerEngine.isOnFishOnMc()) {

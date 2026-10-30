@@ -106,12 +106,13 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 ## Keys and commands
 
 - Key commands: a key or mouse button sends a command once per press. `/tacklebox keys`. **(no doc)**, `input/KeyCommands`, one line in `rules/text-and-automation.md`
+- Bait sort key: sorts the bait in your inventory common to legendary. Key, unbound. `menus/bait-sort.md`
 - Command aliases, like `/sb 5` for `/sellall bait 5`. `aliases`. `chat/command-aliases.md`
 
 ## Foecollab tweaks
 
 - Lure matching in foecollab's bait sorting helper. Always on. `foecollab/tweaks.md`
-- Bait sorting key works as a toggle. Always on. `foecollab/tweaks.md`
+- Foecollab's bait sorting key works as a toggle. Always on with foecollab. `foecollab/tweaks.md`
 - `{instance}` in foecollab's custom inventory buttons. Always on. `foecollab/tweaks.md`
 - Pet hud remembers the equipped pet when foecollab's scan misses it. Always on. `foecollab/tweaks.md`
 - Daily missions keep updating while tacklebox's menu screen is open. `foecollab/tweaks.md`
