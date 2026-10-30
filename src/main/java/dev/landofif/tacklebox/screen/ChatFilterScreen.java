@@ -1,6 +1,5 @@
 package dev.landofif.tacklebox.screen;
 
-import dev.landofif.tacklebox.compat.FoeScreens;
 import dev.landofif.tacklebox.ui.Foe;
 import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.chat.ChatBox;
@@ -103,7 +102,7 @@ public class ChatFilterScreen extends TackleboxScreen {
             TackleboxSettings.save();
             client.setScreen(new ChatBoxScreen(this));
         }).dimensions(left + (bw + 4), y, bw, 20).tooltip(Tooltip.of(Foe.sentence("separate chat boxes for dms, crew chat or anything else"))).build());
-        addDrawableChild(ButtonWidget.builder(Foe.text("move chat"), b -> FoeScreens.openMover(this)).dimensions(left + (bw + 4) * 2, y, bw, 20).tooltip(Tooltip.of(Foe.sentence("drag the chat box and the chat boxes anywhere, right click chat to put it back"))).build());
+        addDrawableChild(ButtonWidget.builder(Foe.text("move chat"), b -> dev.landofif.tacklebox.hud.HudMover.open(this)).dimensions(left + (bw + 4) * 2, y, bw, 20).tooltip(Tooltip.of(Foe.sentence("drag the chat box and the chat boxes anywhere, right click chat to put it back"))).build());
         addDrawableChild(ButtonWidget.builder(copyLabel(), b -> {
             s.chatCopy = !s.chatCopy;
             b.setMessage(copyLabel());

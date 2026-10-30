@@ -1,11 +1,9 @@
-package dev.landofif.tacklebox.compat;
+package dev.landofif.tacklebox.hud;
 
 import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.chat.ChatBar;
 import dev.landofif.tacklebox.chat.ChatBox;
 import dev.landofif.tacklebox.chat.ChatBoxes;
-import dev.landofif.tacklebox.hud.HudPos;
-import dev.landofif.tacklebox.hud.XpEstimate;
 import dev.landofif.tacklebox.ui.Foe;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Click;
@@ -23,18 +21,54 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * The mods huds in foecollabs hud mover (its {@code MoveHudScreen}, see MoveHudScreenMixin): the quests
- * left box, the chat and every chat box can be dragged like foecollabs own. Right click puts one back;
- * scroll a chat box for more or fewer lines, shift + scroll for its width, or drag its edges (the chat's own chat window sizes, closed and open). While the mover is open the
- * mods huds draw here instead of in the game, so they show once.
+ * Tacklebox's own hud mover (2026-10-30, it used to sit in foecollab's): the quests left box, the chat, every chat box and the
+ * other huds of the mod can be dragged here. Right click puts one back; scroll a hud to resize it, a chat box for more or fewer
+ * lines, shift + scroll for its width, or drag its edges (the chat's own chat window sizes, closed and open). While the mover
+ * is open the mods huds draw here instead of in the game, so they show once. Foecollab's own huds stay in foecollab's mover.
  */
-public final class FoeMover {
-    private static final String MOVE = "io.github.foecollab.screens.movehud.MoveHudScreen";
+public final class HudMover extends Screen {
+    private final Screen parent;
 
-    private FoeMover() {}
+    public HudMover(Screen parent) {
+        super(Foe.text("move huds"));
+        this.parent = parent;
+    }
+
+    /** Opens the mover from {@code from}, saving the mods settings first. */
+    public static void open(Screen from) {
+        TackleboxSettings.save();
+        MinecraftClient.getInstance().setScreen(new HudMover(from));
+    }
 
     public static boolean isMover(Screen screen) {
-        return screen != null && screen.getClass().getName().equals(MOVE);
+        return screen instanceof HudMover;
+    }
+
+    @Override
+    protected void init() {
+        for (ClickableWidget box : boxes()) {
+            addDrawableChild(box);
+        }
+    }
+
+    /** No dimming: the game shows behind the boxes, with the help line on top. */
+    @Override
+    public void renderBackground(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        Foe.title(ctx, 4, 4, title);
+        ctx.drawTextWithShadow(textRenderer, Foe.text("drag to move, scroll to resize, right click puts it back"), 4, 18, Foe.DIM);
+    }
+
+    @Override
+    public boolean shouldPause() {
+        return false;
+    }
+
+    @Override
+    public void close() {
+        TackleboxSettings.save();
+        if (client != null) {
+            client.setScreen(parent);
+        }
     }
 
     /** A drag box for each of the mods huds that is on. */
@@ -48,7 +82,7 @@ public final class FoeMover {
             s.chatPos = new HudPos(0, 0);
             s.chatY = 0;
         });
-        chatBox.edges(true, FoeMover::chatOpen, FoeMover::dragChat);
+        chatBox.edges(true, HudMover::chatOpen, HudMover::dragChat);
         add.add(chatBox);
         add.add(new Box(ctx -> {
             int w = 182 * s.hotbarScale / 100, h = 22 * s.hotbarScale / 100;

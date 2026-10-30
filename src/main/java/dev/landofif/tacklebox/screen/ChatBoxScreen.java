@@ -1,6 +1,5 @@
 package dev.landofif.tacklebox.screen;
 
-import dev.landofif.tacklebox.compat.FoeScreens;
 import dev.landofif.tacklebox.ui.Foe;
 import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.chat.ChatBox;
@@ -50,7 +49,7 @@ public class ChatBoxScreen extends TackleboxScreen {
             s.chatBoxes.add(box);
             client.setScreen(new ChatFilterScreen(this, box));
         }).dimensions(left, y, bw, 20).tooltip(Tooltip.of(Foe.sentence("a new box. you pick which lines go in it next"))).build());
-        addDrawableChild(ButtonWidget.builder(Foe.text("move boxes"), b -> FoeScreens.openMover(this)).dimensions(left + bw + 4, y, bw, 20)
+        addDrawableChild(ButtonWidget.builder(Foe.text("move boxes"), b -> dev.landofif.tacklebox.hud.HudMover.open(this)).dimensions(left + bw + 4, y, bw, 20)
                 .tooltip(Tooltip.of(Foe.sentence("drag the boxes anywhere. scroll on one for more or fewer lines, shift + scroll for its width"))).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close()).dimensions(left + (bw + 4) * 2, y, bw, 20).build());
     }

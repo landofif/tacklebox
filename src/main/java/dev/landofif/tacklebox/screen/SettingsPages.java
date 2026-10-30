@@ -4,7 +4,6 @@ import dev.landofif.tacklebox.display.DisplayCull;
 import dev.landofif.tacklebox.display.NearbyPlayers;
 import dev.landofif.tacklebox.display.RodIdle;
 import dev.landofif.tacklebox.TackleboxSettings;
-import dev.landofif.tacklebox.compat.FoeScreens;
 import dev.landofif.tacklebox.ui.Foe;
 import dev.landofif.tacklebox.ui.Hypr;
 import net.minecraft.client.MinecraftClient;
@@ -321,7 +320,7 @@ public final class SettingsPages {
         link("power", PowerScreen::new);
         link("bobber timer", BobberScreen::new);
         link("viewmodel", ViewmodelScreen::new);
-        link("move huds", FoeScreens::move);
+        link("move huds", dev.landofif.tacklebox.hud.HudMover::new);
     }
 
     private void link(String name, Function<Screen, Screen> screen) {

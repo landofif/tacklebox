@@ -51,4 +51,16 @@ class FoeCollabOptionalIntegrationTest {
             assertTrue(src.contains("@Mixin(targets = \"io.github.foecollab."));
         }
     }
+
+    @Test
+    void hudsMoveInTackleboxsOwnMover() throws IOException {
+        assertFalse(json("tacklebox.foecollab.mixins.json").getAsJsonArray("client").toString().contains("MoveHudScreen"));
+        try (var files = Files.walk(SRC.resolve("java"))) {
+            for (Path f : files.filter(f -> f.toString().endsWith(".java")).toList()) {
+                assertFalse(Files.readString(f).contains("screens.movehud.MoveHudScreen"), f.toString());
+            }
+        }
+        String main = Files.readString(SRC.resolve("java/dev/landofif/tacklebox/Tacklebox.java"));
+        assertTrue(main.contains("new dev.landofif.tacklebox.hud.HudMover(null)"));
+    }
 }
