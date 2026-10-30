@@ -9,6 +9,7 @@ import dev.landofif.tacklebox.menu.FishMenu;
 import dev.landofif.tacklebox.menu.Locations;
 import dev.landofif.tacklebox.menu.MenuRows;
 import dev.landofif.tacklebox.menu.QuestRedo;
+import dev.landofif.tacklebox.menu.StatsPage;
 import dev.landofif.tacklebox.ui.TackleboxScreen;
 import dev.landofif.tacklebox.util.Glyphs;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
@@ -70,6 +71,11 @@ public class FishMenuScreen extends TackleboxScreen {
     private final List<Hit> hits = new ArrayList<>();
     private final float[] scroll = new float[2];
     private int splitX;
+    /** The /stats page when this menu is one, read again every frame. */
+    private StatsPage.Stats stats;
+    /** The model wearing the set on the /stats page, and whose profile it was made for. */
+    private net.minecraft.client.network.OtherClientPlayerEntity model;
+    private String modelOwner;
 
     public FishMenuScreen(GenericContainerScreen original) {
         super(Text.empty()); // the panel draws its own title
@@ -233,6 +239,8 @@ public class FishMenuScreen extends TackleboxScreen {
             }
         }
 
+        stats = places ? null : StatsPage.read(pieces());
+
         int w = Math.min(vw() - 16, 600), h = vh() - 16;
         int x = vx() + (vw() - w) / 2, y = vy() + 8;
         ctx.fill(x, y, x + w, y + h, PANEL);
@@ -243,6 +251,8 @@ public class FishMenuScreen extends TackleboxScreen {
         Tile hover = null;
         if (tiles.isEmpty()) {
             ctx.drawCenteredTextWithShadow(textRenderer, Foe.text("waiting for the menu..."), x + w / 2, by + bh / 2, Foe.DIM);
+        } else if (stats != null) {
+            hover = drawStats(ctx, bx, by, bw, bh, mouseX, mouseY);
         } else if (places) {
             int left = (bw - GAP) * 3 / 5;
             hover = column(ctx, 0, tiles, bx, by, left, bh, mouseX, mouseY, menu);
@@ -268,19 +278,29 @@ public class FishMenuScreen extends TackleboxScreen {
     }
 
     private void drawHeader(DrawContext ctx, int x, int y, int w, String menu, int mouseX, int mouseY) {
-        ctx.drawText(textRenderer, Foe.bold(menu), x + PAD, y + 9, Hypr.acc2(), false);
-        if (profile != null && profile.level() >= 0) { // the fishing level, like the event gui's placement
+        // on a /stats page the header is that profile's: its name, level and event placement
+        boolean page = stats != null;
+        ctx.drawText(textRenderer, Foe.bold(page && !stats.owner().isEmpty() ? stats.owner() : menu), x + PAD, y + 9, Hypr.acc2(), false);
+        int lvl = page ? stats.level() : profile != null ? profile.level() : -1;
+        if (lvl >= 0) { // the fishing level, like the event gui's placement
+            String have = page ? stats.amount() : profile.amount();
+            float progress = page ? stats.progress() : profile.progress();
             int rx = x + w - PAD;
-            if (!profile.amount().isEmpty()) {
-                Text amount = Text.literal(profile.amount().toLowerCase(java.util.Locale.ROOT));
+            if (!have.isEmpty()) {
+                Text amount = Text.literal(have.toLowerCase(java.util.Locale.ROOT));
                 rx -= textRenderer.getWidth(amount);
                 ctx.drawText(textRenderer, amount, rx, y + 9, Foe.DIM, false);
                 rx -= 66;
-                bar(ctx, rx, y + 12, 60, profile.progress(), false);
+                bar(ctx, rx, y + 12, 60, progress, false);
             }
-            Text level = Foe.text("lvl " + profile.level());
+            Text level = Foe.text("lvl " + lvl);
             rx -= textRenderer.getWidth(level) + 6;
             ctx.drawText(textRenderer, level, rx, y + 9, Foe.TEXT, false);
+            if (page && !stats.placement().isEmpty()) {
+                Text place = Foe.text(stats.placement() + " " + stats.event());
+                rx -= textRenderer.getWidth(place) + 14;
+                ctx.drawText(textRenderer, place, rx, y + 9, Foe.DIM, false);
+            }
         }
 
         int tx = x + PAD, ty = y + 27;
@@ -421,6 +441,208 @@ public class FishMenuScreen extends TackleboxScreen {
         }
         ctx.fill(x, y + 11, x + w, y + 12, LINE);
         return y + 16;
+    }
+
+    // ---- stats page ----
+
+    /** The chest items as the stats page reads them: slot id, name, lore and custom_data. */
+    private List<StatsPage.Piece> pieces() {
+        List<StatsPage.Piece> out = new ArrayList<>();
+        for (Slot slot : handler.slots) {
+            ItemStack stack = slot.getStack();
+            if (!(slot.inventory instanceof net.minecraft.entity.player.PlayerInventory) && !stack.isEmpty()) {
+                out.add(new StatsPage.Piece(slot.id, stack.getName().getString(), lore(stack), data(stack)));
+            }
+        }
+        return out;
+    }
+
+    private static net.minecraft.nbt.NbtCompound data(ItemStack stack) {
+        var data = stack.get(DataComponentTypes.CUSTOM_DATA);
+        return data != null ? data.copyNbt() : new net.minecraft.nbt.NbtCompound();
+    }
+
+    private Slot slot(int id) {
+        return id >= 0 && id < handler.slots.size() ? handler.getSlot(id) : null;
+    }
+
+    /** A screen tile for a chest slot with its own row text, or null when the slot is empty. */
+    private Tile gear(int id, String sub, float progress, String amount) {
+        Slot slot = slot(id);
+        if (slot == null || slot.getStack().isEmpty()) {
+            return null;
+        }
+        return new Tile(slot, slot.getStack(), new MenuRows.Row(MenuRows.clean(slot.getStack().getName().getString()), sub, -1, progress, amount), null, null);
+    }
+
+    /** Rarity, then armour quality and tier, from the item's custom_data. */
+    private static String about(ItemStack stack) {
+        var d = data(stack);
+        List<String> parts = new ArrayList<>();
+        String rarity = d.getString("rarity", "").toLowerCase(java.util.Locale.ROOT);
+        if (!rarity.isEmpty()) {
+            parts.add(rarity);
+        }
+        if (d.getString("type", "").equals("hat")) {
+            parts.add("hat");
+        }
+        d.getInt("quality").ifPresent(q -> parts.add("quality " + q + "%"));
+        d.getInt("tier").ifPresent(t -> parts.add("tier " + t));
+        return String.join(" · ", parts);
+    }
+
+    /** The profile layout: the model and showcase on the left, gear in the middle, number tiles and the pet on the right, buttons below. */
+    private Tile drawStats(DrawContext ctx, int x, int y, int w, int h, int mouseX, int mouseY) {
+        Tile hover = null;
+        int buttonsH = 18, body = h - buttonsH - 6;
+        int left = Math.max(96, Math.min(130, w / 4));
+        int right = (w - left - 2 * GAP) * 9 / 20, mid = w - left - right - 2 * GAP;
+        int mx = x + left + GAP, rx = mx + mid + GAP;
+
+        // left: the player wearing the set, the five showcase slots under it
+        int show = 18, showY = y + body - show;
+        drawModel(ctx, x, y, left, showY - y - 6, mouseX, mouseY);
+        int sx = x + (left - 5 * show) / 2;
+        for (int id : stats.displays()) {
+            Slot slot = slot(id);
+            boolean empty = slot.getStack().isOf(net.minecraft.item.Items.BREAD); // "Empty Profile Display"
+            boolean hot = in(mouseX, mouseY, sx, showY, show, show);
+            if (empty) {
+                Hypr.ring(ctx, sx + 1, showY + 1, show - 2, show - 2, 3, 1, hot ? Hypr.OVERLAY : LINE);
+            } else {
+                ctx.fill(sx, showY, sx + show, showY + show, hot ? HOVER : 0x0CFFFFFF);
+                ctx.drawItem(slot.getStack(), sx + 1, showY + 1);
+            }
+            Tile t = new Tile(slot, slot.getStack(), MenuRows.of(slot.getStack().getName().getString(), lore(slot.getStack())), null, null);
+            hits.add(new Hit(sx, showY, show, show, null, t));
+            hover = hot ? t : hover;
+            sx += show;
+        }
+
+        // middle: armour, then the rod parts with the line's durability
+        ctx.enableScissor(mx, y, mx + mid, y + body);
+        int ty = section(ctx, "armour", "", mx, y, mid);
+        for (int id : new int[]{stats.hat(), stats.helmet(), stats.chest(), stats.legs(), stats.boots()}) {
+            Tile t = gear(id, id >= 0 ? about(slot(id).getStack()) : "", -1, "");
+            if (t != null) {
+                hover = gearRow(ctx, t, mx, ty, mid, mouseX, mouseY, hover);
+                ty += ROW;
+            }
+        }
+        ty = section(ctx, "rod", "", mx, ty + 6, mid);
+        for (int id : new int[]{stats.reel(), stats.pole(), stats.line()}) {
+            boolean line = id == stats.line() && stats.lineMax() > 0;
+            Tile t = gear(id, id >= 0 ? about(slot(id).getStack()) : "", line ? stats.lineHave() / (float) stats.lineMax() : -1,
+                    line ? stats.lineHave() + "/" + stats.lineMax() : "");
+            if (t != null) {
+                hover = gearRow(ctx, t, mx, ty, mid, mouseX, mouseY, hover);
+                ty += ROW;
+            }
+        }
+        ctx.disableScissor();
+
+        // right: four number tiles, the pet card under them
+        int tw = (right - 6) / 2, th = 38;
+        StatsPage.Tile[] numbers = {stats.power(), stats.runes(), stats.catches(), stats.bait()};
+        for (int i = 0; i < numbers.length; i++) {
+            StatsPage.Tile n = numbers[i];
+            if (n == null) {
+                continue;
+            }
+            int tx = rx + (i % 2) * (tw + 6), tyy = y + (i / 2) * (th + 6);
+            Tile t = gear(n.slot(), "", -1, "");
+            boolean hot = in(mouseX, mouseY, tx, tyy, tw, th);
+            ctx.fill(tx, tyy, tx + tw, tyy + th, hot ? 0x1CFFFFFF : 0x0CFFFFFF);
+            ctx.getMatrices().pushMatrix();
+            ctx.getMatrices().translate(tx + 6, tyy + 6);
+            ctx.getMatrices().scale(2, 2);
+            ctx.drawText(textRenderer, fit(Foe.text(n.value().isEmpty() ? "-" : n.value().toLowerCase(java.util.Locale.ROOT)), (tw - 12) / 2), 0, 0, Hypr.acc2(), false);
+            ctx.getMatrices().popMatrix();
+            ctx.drawText(textRenderer, fit(Foe.text(n.sub()), tw - 12), tx + 6, tyy + th - 12, Foe.DIM, false);
+            if (t != null) {
+                hits.add(new Hit(tx, tyy, tw, th, null, t));
+                hover = hot ? t : hover;
+            }
+        }
+        StatsPage.Pet pet = stats.pet();
+        Tile petTile = pet == null ? null : gear(pet.slot(), "", -1, "");
+        if (petTile != null) {
+            int py = section(ctx, "pet", pet.level() >= 0 ? "lvl " + pet.level() : "", rx, y + 2 * (th + 6) + 4, right);
+            int ph = 34;
+            boolean hot = in(mouseX, mouseY, rx, py, right, ph);
+            if (hot) {
+                ctx.fill(rx, py, rx + right, py + ph, HOVER);
+            }
+            ctx.drawItem(petTile.stack, rx + 3, py + 3);
+            ctx.drawText(textRenderer, fit(Foe.text(pet.name()), right - 26), rx + 22, py + 3, hot ? Hypr.acc2() : Foe.TEXT, false);
+            if (!pet.item().isEmpty()) {
+                ctx.drawText(textRenderer, fit(Foe.sentence(pet.item()), right - 26), rx + 22, py + 13, Foe.DIM, false);
+            }
+            if (pet.progress() >= 0) {
+                Text amount = Text.literal(pet.amount().toLowerCase(java.util.Locale.ROOT));
+                int aw = textRenderer.getWidth(amount);
+                bar(ctx, rx + 3, py + ph - 5, right - aw - 12, pet.progress(), pet.progress() >= 1);
+                ctx.drawText(textRenderer, amount, rx + right - aw - 3, py + ph - 9, Foe.DIM, false);
+            }
+            hits.add(new Hit(rx, py, right, ph, null, petTile));
+            hover = hot ? petTile : hover;
+        }
+
+        // bottom: the other server buttons as small text buttons
+        int bxx = x, byy = y + h - buttonsH + 4;
+        for (int id : stats.buttons()) {
+            Tile t = gear(id, "", -1, "");
+            if (t == null) {
+                continue;
+            }
+            Text label = Foe.text(t.row.name().replace(" (Click)", ""));
+            int lw = textRenderer.getWidth(label);
+            if (bxx + lw > x + w) {
+                break;
+            }
+            boolean hot = in(mouseX, mouseY, bxx - 3, byy - 4, lw + 6, 16);
+            if (hot) {
+                ctx.fill(bxx - 3, byy - 4, bxx + lw + 3, byy + 12, HOVER);
+            }
+            ctx.drawText(textRenderer, label, bxx, byy, hot ? Foe.TEXT : Foe.DIM, false);
+            hits.add(new Hit(bxx - 3, byy - 4, lw + 6, 16, null, t));
+            hover = hot ? t : hover;
+            bxx += lw + 14;
+        }
+        return hover;
+    }
+
+    private Tile gearRow(DrawContext ctx, Tile t, int x, int y, int w, int mouseX, int mouseY, Tile hover) {
+        boolean hot = in(mouseX, mouseY, x, y, w, ROW);
+        drawRow(ctx, t, x, y, w, hot, "stats");
+        hits.add(new Hit(x, y, w, ROW, null, t));
+        return hot ? t : hover;
+    }
+
+    /**
+     * The profile's player wearing its chest, legs and boots (and a helmet if there is one); the hat is a pack model
+     * on a leather boot, so it stays in the list. Another player's skin comes from the tab list when they are online.
+     */
+    private void drawModel(DrawContext ctx, int x, int y, int w, int h, int mouseX, int mouseY) {
+        String owner = stats.owner().isEmpty() ? client.player.getName().getString() : stats.owner();
+        if (model == null || !owner.equalsIgnoreCase(modelOwner)) {
+            var entry = client.getNetworkHandler().getPlayerListEntry(owner);
+            boolean mine = owner.equalsIgnoreCase(client.player.getName().getString());
+            com.mojang.authlib.GameProfile gp = mine ? client.player.getGameProfile() : entry != null ? entry.getProfile()
+                    : new com.mojang.authlib.GameProfile(net.minecraft.util.Uuids.getOfflinePlayerUuid(owner), owner);
+            model = new net.minecraft.client.network.OtherClientPlayerEntity(client.world, gp);
+            model.getDataTracker().set(net.minecraft.entity.PlayerLikeEntity.PLAYER_MODE_CUSTOMIZATION_ID, (byte) 0x7F); // all skin layers
+            modelOwner = owner;
+        }
+        int[] ids = {stats.helmet(), stats.chest(), stats.legs(), stats.boots()};
+        net.minecraft.entity.EquipmentSlot[] slots = {net.minecraft.entity.EquipmentSlot.HEAD, net.minecraft.entity.EquipmentSlot.CHEST,
+                net.minecraft.entity.EquipmentSlot.LEGS, net.minecraft.entity.EquipmentSlot.FEET};
+        for (int i = 0; i < ids.length; i++) {
+            Slot slot = slot(ids[i]);
+            model.equipStack(slots[i], slot == null || slot.getStack().isEmpty() ? ItemStack.EMPTY : PresetsScreen.wearable(slot.getStack(), slots[i]));
+        }
+        ctx.fill(x, y, x + w, y + h, 0x0CFFFFFF);
+        net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity(ctx, x, y, x + w, y + h, (int) (h * 0.4), 0.0625f, mouseX, mouseY, model);
     }
 
     // ---- best location ----
