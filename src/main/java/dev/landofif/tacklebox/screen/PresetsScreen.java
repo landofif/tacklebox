@@ -32,7 +32,8 @@ import java.util.Map;
 /**
  * The fishonmc /presets menu like a skyblock wardrobe: every preset is a card, armor presets show a player
  * model wearing the set, other presets (rod parts) show their items big. Clicking a card clicks that
- * presets equip button. Reads the real chest slots, so paging and the armor/parts switch keep working.
+ * presets equip button, and so does number key n for the nth card on the page. Reads the real chest slots, so paging and
+ * the armor/parts switch keep working.
  */
 public class PresetsScreen extends TackleboxScreen {
     private final java.util.Map<Object, Float> focus = new java.util.HashMap<>();
@@ -395,7 +396,21 @@ public class PresetsScreen extends TackleboxScreen {
             close();
             return true;
         }
+        for (int k = 0; k < client.options.hotbarKeys.length; k++) {
+            if (client.options.hotbarKeys[k].matchesKey(input)) {
+                int i = keyCard(k, cards.size());
+                if (i >= 0) {
+                    sendClick(cards.get(i).equip.id, 0);
+                }
+                return true;
+            }
+        }
         return super.keyPressed(input);
+    }
+
+    /** The card a hotbar key (0 for key 1) equips: the nth card of the shown page, or -1 if the page has fewer cards. */
+    static int keyCard(int hotbarKey, int cardCount) {
+        return hotbarKey < cardCount ? hotbarKey : -1;
     }
 
     @Override

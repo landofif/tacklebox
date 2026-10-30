@@ -104,7 +104,7 @@ abstract class InGameHudHotbarMixin {
     private void tacklebox$circle(DrawContext ctx, int x, int y, RenderTickCounter tick, PlayerEntity player, ItemStack stack, int seed, CallbackInfo ci) {
         // the first and last slot are always full, nothing special
         if (TackleboxSettings.get().rarityCircles && stack != player.getInventory().getStack(0) && stack != player.getInventory().getStack(8)) {
-            FoeRarity.circle(ctx, x, y, stack);
+            FoeRarity.mark(ctx, x, y, stack, TackleboxSettings.get().rarityShape == TackleboxSettings.RarityShape.SQUARE);
         }
     }
 }

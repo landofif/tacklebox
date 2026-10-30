@@ -93,6 +93,8 @@ public final class Tacklebox implements ClientModInitializer {
                 net.fabricmc.fabric.api.resource.v1.ResourceLoader.registerBuiltinPack(net.minecraft.util.Identifier.of(MOD_ID, "foelogo"), c,
                         net.minecraft.text.Text.literal("foecollab old logo"), net.fabricmc.fabric.api.resource.v1.pack.PackActivationType.ALWAYS_ENABLED));
         dev.landofif.tacklebox.menu.FishMenu.register();
+        dev.landofif.tacklebox.display.TooltipScroll.register(); // before the page wheel: a tall tooltip takes the wheel first
+        dev.landofif.tacklebox.menu.MenuPages.register();
         dev.landofif.tacklebox.menu.Vaults.register();
         TriggerStore.load();
         TackleboxSettings.load();

@@ -18,7 +18,9 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Travel screen: location tiles with level rings, best place to fish, frenzy tile green, fabled tile red. `fishMenu`, off. `menus/fish-menu-and-presets.md`
 - /quests marks: after clicking a quest, its difficulty and tier buttons get a green slot, to start the same quest again. Always on. `menus/quests.md`
 - /travel chest marks: a place in a frenzy gets a green slot, the fabled event's place a red one. Always on. `menus/fish-menu-and-presets.md`
-- Presets wardrobe: armour sets on player models, rod parts as big items, click to equip. `presetsMenu`, off. `menus/fish-menu-and-presets.md`
+- Presets wardrobe: armour sets on player models, rod parts as big items, click or number key to equip. `presetsMenu`, off. `menus/fish-menu-and-presets.md`
+- Mouse wheel turns pages of paged server menus (compendium, auction house, vaults, presets). `pageWheel`, off. `menus/menu-controls.md`
+- Own gui scale for server chest menus. `chestScale`, 0 = the games. `menus/menu-controls.md`
 - Vault overview: all seven /pv vaults on one screen with search. `vaultMenu`, off. `menus/vaults.md`
 - Bait picker: fastest quest and best bait for a location. `/tacklebox bait`. `menus/bait-picker.md`
 - Power screen: power by source, cheapest next level, location table. `/tacklebox power`. `menus/power-and-compendium.md`
@@ -27,7 +29,8 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 
 - Short fish and pet tooltips. `shortFishTooltips`, `shortPetTooltips`, off. `display/item-tooltips.md`
 - Pet profit marks in the auction house (common and rare). `petProfitMarks`, off. `display/pet-profit.md`
-- Rarity circles behind items in slots and the hotbar. `rarityCircles`, off. **(no doc)**, `mixin/ItemMarkerHandlerMixin`
+- Rarity circles or squares behind items in slots and the hotbar. `rarityCircles`, off; `rarityShape`. `menus/menu-controls.md`
+- Scroll tooltips taller than the screen with the mouse wheel. `tooltipScroll`, off. `menus/menu-controls.md`
 
 ## Bobber and world
 
