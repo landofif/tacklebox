@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -78,6 +79,42 @@ public final class FishMenu {
                 || title.contains("pet menu") || title.contains("armor")
                 || screen.getTitle().getString().chars().anyMatch(c -> c >= 0xD541 && c <= 0xD546); // the auction house pages (title art only) keep their chest art
         return typed || BUTTON_MENUS.contains(Glyphs.menuName(screen.getTitle())) || (chained && !needsInventory);
+    }
+
+    /** Whose profile item this is, from its plain lore ("profile of meowfih"), or null when it is no profile. */
+    public static String profileOwner(List<String> plainLore) {
+        for (String line : plainLore) {
+            if (line.startsWith("profile of ")) {
+                return line.substring(11).trim();
+            }
+        }
+        return null;
+    }
+
+    /** A menu with someone else's profile ({@code /stats <player>}): nothing in it is yours to remember. */
+    public static boolean othersProfile(List<List<String>> plainLoreOfItems, String ownName) {
+        for (List<String> lore : plainLoreOfItems) {
+            String owner = profileOwner(lore);
+            if (owner != null && !owner.equalsIgnoreCase(ownName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** {@link #othersProfile} for an open menu. */
+    public static boolean othersProfile(net.minecraft.client.gui.screen.ingame.HandledScreen<?> screen) {
+        var client = MinecraftClient.getInstance();
+        if (client.player == null) {
+            return false;
+        }
+        List<List<String>> lore = new java.util.ArrayList<>();
+        for (var slot : screen.getScreenHandler().slots) {
+            if (!(slot.inventory instanceof net.minecraft.entity.player.PlayerInventory)) {
+                lore.add(slot.getStack().getOrDefault(DataComponentTypes.LORE, LoreComponent.DEFAULT).lines().stream().map(Glyphs::plain).toList());
+            }
+        }
+        return othersProfile(lore, client.player.getName().getString());
     }
 
     /** Level and progress from an items name and lore, trying "level n", "n%" and "a/b". */

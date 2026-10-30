@@ -16,3 +16,7 @@
 - Every text hud has a `*Align` setting (`questsAlign`, `boostsAlign`, `levelBarsAlign`, `nowPlayingAlign`, `serverHudAlign`), a `TackleboxSettings.HudAlign` (left, centre, right; default left = the old look), a cycle row under each hud's toggle. `HudAlign.x(from, span, w)` gives the left edge, `Foe.title(..., boxW, align, ...)` lines up the heading.
 - Quests and boosts: left keeps labels left and values in a right column; centre and right move each `label  value` row as one piece. Level bars: heading and the labels inside their column. Now playing: heading and text next to the art. Server hud: the title line stays centred.
 - Not run in game yet.
+
+## Someone else's profile (fixed 2026-10-30)
+
+luna saw the level bars show another player's xp after `/stats <player>`: `XpEstimate.scan` took any item with `Fishing Level [n] (a/b)`, and `Power.scan`, `Compendium.scan` and `EventHud.scan` read that menu as hers too. Now `FishMenu.othersProfile` looks for the profile item's `Profile of <name>` line; when the name is not yours, `XpEstimate.tick` reads nothing from that menu. Menus without a profile item are read as before. Test: `OthersProfileIntegrationTest`. Not seen in game yet.
