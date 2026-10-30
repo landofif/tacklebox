@@ -79,7 +79,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Focus the game window on a bite (Hyprland). `biteFocus`, off. `huds/bobber-timer.md`
 - Hotbar look, spacing, size, offhand box, gliding selection. Settings > huds > hotbar. `ui/look-and-settings.md`
 - Own armour and rod parts row above the hotbar. `equipHud`, off. `ui/look-and-settings.md`
-- Huds, hotbar, chat and chat boxes in foecollab's hud mover. `/tacklebox move`. `foecollab/integration.md`, `huds/positions.md`
+- Huds, hotbar, chat and chat boxes in tacklebox's own hud mover. `/tacklebox move`. `huds/mover.md`, `huds/positions.md`
 - Hide hud parts behind chat, chat boxes and the player list. `hideBehindChat`, off. `chat/chat.md`
 
 ## Chat
@@ -115,7 +115,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - `{instance}` in foecollab's custom inventory buttons. Always on. `foecollab/tweaks.md`
 - Pet hud remembers the equipped pet when foecollab's scan misses it. Always on. `foecollab/tweaks.md`
 - Daily missions keep updating while tacklebox's menu screen is open. `foecollab/tweaks.md`
-- Hud mover boxes as thin outlines, timer `s` in small caps. Always on. **(no doc)**, `mixin/MovableBoxWidgetMixin`
+- Foecollab's hud mover boxes as thin outlines, timer `s` in small caps. Always on with foecollab. **(no doc)**, `mixin/MovableBoxWidgetMixin`
 
 ## Dev
 

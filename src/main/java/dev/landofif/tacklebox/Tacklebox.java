@@ -182,7 +182,7 @@ public final class Tacklebox implements ClientModInitializer {
         HudElementRegistry.addLast(Identifier.of(MOD_ID, "custom_huds"), (context, tickCounter) -> {
             MinecraftClient client = MinecraftClient.getInstance();
             // These screens draw HUD boxes themselves.
-            if (client.options.hudHidden || dev.landofif.tacklebox.compat.FoeMover.isMover(client.currentScreen)) {
+            if (client.options.hudHidden || dev.landofif.tacklebox.hud.HudMover.isMover(client.currentScreen)) {
                 return;
             }
             XpEstimate.renderHud(context);
@@ -196,7 +196,7 @@ public final class Tacklebox implements ClientModInitializer {
         });
         HudElementRegistry.attachElementAfter(net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements.CHAT,
                 Identifier.of(MOD_ID, "chat_boxes"), (context, tickCounter) -> {
-                    if (!dev.landofif.tacklebox.compat.FoeMover.isMover(MinecraftClient.getInstance().currentScreen)) { // it draws the boxes itself
+                    if (!dev.landofif.tacklebox.hud.HudMover.isMover(MinecraftClient.getInstance().currentScreen)) { // it draws the boxes itself
                         dev.landofif.tacklebox.chat.ChatBoxes.render(context, tickCounter);
                     }
                 });
@@ -277,7 +277,7 @@ public final class Tacklebox implements ClientModInitializer {
                                 .then(ClientCommandManager.argument("radius", com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, 64))
                                         .executes(ctx -> dev.landofif.tacklebox.display.DebugDump.entities(
                                                 com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "radius"))))))
-                .then(ClientCommandManager.literal("move").executes(ctx -> open(() -> dev.landofif.tacklebox.compat.FoeScreens.move(null))));
+                .then(ClientCommandManager.literal("move").executes(ctx -> open(() -> new dev.landofif.tacklebox.hud.HudMover(null))));
     }
 
     private static int open(Supplier<Screen> screen) {

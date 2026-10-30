@@ -1,7 +1,6 @@
 package dev.landofif.tacklebox.screen;
 
 import dev.landofif.tacklebox.TackleboxSettings;
-import dev.landofif.tacklebox.compat.FoeScreens;
 import dev.landofif.tacklebox.display.BobberTimer;
 import dev.landofif.tacklebox.ui.TackleboxScreen;
 import dev.landofif.tacklebox.ui.Foe;
@@ -70,7 +69,7 @@ public class BobberScreen extends TackleboxScreen {
 
         int half = (w - 4) / 2;
         addDrawableChild(ButtonWidget.builder(Foe.text("test bite"), b -> BobberTimer.testBite()).dimensions(10, height - 52, half, 20).build());
-        addDrawableChild(ButtonWidget.builder(Foe.text("move huds"), b -> FoeScreens.openMover(this)).dimensions(14 + half, height - 52, half, 20).build());
+        addDrawableChild(ButtonWidget.builder(Foe.text("move huds"), b -> dev.landofif.tacklebox.hud.HudMover.open(this)).dimensions(14 + half, height - 52, half, 20).build());
         addDrawableChild(ButtonWidget.builder(Foe.text("done"), b -> close()).dimensions(10, height - 28, w, 20).build());
     }
 
