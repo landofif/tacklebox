@@ -104,6 +104,10 @@ public final class EventHud {
 
     private EventHud() {}
 
+    static State state() {
+        return state;
+    }
+
     /** Called once the settings are loaded; the hud then reads and writes that state. */
     public static void bind(State saved) {
         state = saved;

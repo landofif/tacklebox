@@ -4,6 +4,7 @@ import dev.landofif.tacklebox.ui.Foe;
 import dev.landofif.tacklebox.ui.Hypr;
 import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.hud.BaitInfo;
+import dev.landofif.tacklebox.hud.EventPage;
 import dev.landofif.tacklebox.hud.ServerHud;
 import dev.landofif.tacklebox.menu.FishMenu;
 import dev.landofif.tacklebox.menu.Locations;
@@ -50,7 +51,8 @@ public class FishMenuScreen extends TackleboxScreen {
     private record Tab(String label, String command, String menu) {}
 
     private static final List<Tab> TABS = List.of(new Tab("menu", "menu", "main menu"), new Tab("travel", "travel", "travel"),
-            new Tab("quests", "quests", "quests"), new Tab("stats", "stats", "stats"), new Tab("crew", "crew", "crew"));
+            new Tab("quests", "quests", "quests"), new Tab("stats", "stats", "stats"), new Tab("crew", "crew", "crew"),
+            new Tab("event", "event", "event"));
 
     /** One button of the menu: a filled chest slot and what its row shows. */
     private record Tile(Slot slot, ItemStack stack, MenuRows.Row row, Locations.Location loc, FishMenu.Info info) {}
@@ -253,6 +255,8 @@ public class FishMenuScreen extends TackleboxScreen {
             ctx.drawCenteredTextWithShadow(textRenderer, Foe.text("waiting for the menu..."), x + w / 2, by + bh / 2, Foe.DIM);
         } else if (stats != null) {
             hover = drawStats(ctx, bx, by, bw, bh, mouseX, mouseY);
+        } else if (menu.equals("event")) {
+            hover = drawEvent(ctx, bx, by, bw, bh, mouseX, mouseY);
         } else if (places) {
             int left = (bw - GAP) * 3 / 5;
             hover = column(ctx, 0, tiles, bx, by, left, bh, mouseX, mouseY, menu);
@@ -280,7 +284,9 @@ public class FishMenuScreen extends TackleboxScreen {
     private void drawHeader(DrawContext ctx, int x, int y, int w, String menu, int mouseX, int mouseY) {
         // on a /stats page the header is that profile's: its name, level and event placement
         boolean page = stats != null;
-        ctx.drawText(textRenderer, Foe.bold(page && !stats.owner().isEmpty() ? stats.owner() : menu), x + PAD, y + 9, Hypr.acc2(), false);
+        var event = menu.equals("event") ? EventPage.state() : null;
+        String title = page && !stats.owner().isEmpty() ? stats.owner() : event != null && !event.title.isEmpty() ? event.title : menu;
+        ctx.drawText(textRenderer, Foe.bold(title), x + PAD, y + 9, Hypr.acc2(), false);
         int lvl = page ? stats.level() : profile != null ? profile.level() : -1;
         if (lvl >= 0) { // the fishing level, like the event gui's placement
             String have = page ? stats.amount() : profile.amount();
@@ -296,8 +302,10 @@ public class FishMenuScreen extends TackleboxScreen {
             Text level = Foe.text("lvl " + lvl);
             rx -= textRenderer.getWidth(level) + 6;
             ctx.drawText(textRenderer, level, rx, y + 9, Foe.TEXT, false);
-            if (page && !stats.placement().isEmpty()) {
-                Text place = Foe.text(stats.placement() + " " + stats.event());
+            String placed = page && !stats.placement().isEmpty() ? stats.placement() + " " + stats.event()
+                    : event != null && event.points >= 0 ? (event.placement.isEmpty() ? "" : event.placement + " · ") + Math.round(event.points) + " pts" : "";
+            if (!placed.isEmpty()) {
+                Text place = Foe.text(placed);
                 rx -= textRenderer.getWidth(place) + 14;
                 ctx.drawText(textRenderer, place, rx, y + 9, Foe.DIM, false);
             }
@@ -441,6 +449,58 @@ public class FishMenuScreen extends TackleboxScreen {
         }
         ctx.fill(x, y + 11, x + w, y + 12, LINE);
         return y + 16;
+    }
+
+    // ---- event page ----
+
+    /** /event: the reward thresholds with their bars on the left, the missions from the book on the right, the other items below the thresholds. */
+    private Tile drawEvent(DrawContext ctx, int x, int y, int w, int h, int mouseX, int mouseY) {
+        var state = EventPage.state();
+        int left = (w - GAP) / 2, rx = x + left + GAP, rw = w - left - GAP;
+        List<Tile> steps = new ArrayList<>(), others = new ArrayList<>();
+        for (Tile t : tiles) {
+            String name = Glyphs.plain(t.stack.getName()).trim();
+            var step = name.startsWith("threshold ") ? state.thresholds.stream()
+                    .filter(th -> name.matches("threshold " + th.n() + "\\b.*")).findFirst().orElse(null) : null;
+            if (step != null) {
+                steps.add(new Tile(t.slot, t.stack, EventPage.threshold(step), null, null));
+            } else {
+                others.add(t);
+            }
+        }
+        Tile hover = null;
+        int ty = section(ctx, "thresholds", steps.stream().filter(t -> t.row.done()).count() + " / " + steps.size() + " reached", x, y, left);
+        for (Tile t : steps) {
+            hover = gearRow(ctx, t, x, ty, left, mouseX, mouseY, hover);
+            ty += ROW;
+        }
+        ty += 6;
+        for (Tile t : others) {
+            if (ty + ROW > y + h) {
+                break;
+            }
+            hover = gearRow(ctx, t, x, ty, left, mouseX, mouseY, hover);
+            ty += ROW;
+        }
+
+        var missions = EventPage.missions();
+        int done = (int) missions.stream().filter(m -> m.done()).count();
+        int my = section(ctx, "missions", done + " / " + missions.size() + " done", rx, y, rw);
+        scroll[1] = Math.min(scroll[1], Math.max(0, missions.size() * ROW - (y + h - my)));
+        splitX = rx - GAP / 2;
+        ctx.enableScissor(rx, my, rx + rw, y + h);
+        int top = my - Math.round(scroll[1]);
+        for (int i = 0; i < missions.size(); i++) {
+            int ry = top + i * ROW;
+            if (ry + ROW > my && ry < y + h) {
+                drawRow(ctx, new Tile(null, ItemStack.EMPTY, EventPage.mission(missions.get(i)), null, null), rx, ry, rw, false, "event");
+            }
+        }
+        ctx.disableScissor();
+        if (missions.isEmpty()) {
+            wrap(ctx, "the missions show once the event missions book is in.", rx, my, rw, Foe.DIM);
+        }
+        return hover;
     }
 
     // ---- stats page ----
