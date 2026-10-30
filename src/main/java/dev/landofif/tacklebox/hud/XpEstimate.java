@@ -101,6 +101,9 @@ public final class XpEstimate {
         }
         HandledScreen<?> open = client.currentScreen instanceof FishMenuScreen f ? f.original()
                 : client.currentScreen instanceof HandledScreen<?> screen ? screen : null;
+        if (open != null && FishMenu.othersProfile(open)) {
+            open = null; // /stats <player>: their level, power and placement are not yours
+        }
         if (open != null) {
             dev.landofif.tacklebox.menu.Compendium.scan(open); // every tick: pages flipped faster than the half second below were missed
         }
