@@ -28,8 +28,8 @@ public final class FishMenu {
     public record Info(int level, float progress) {}
 
     /** Menus that are only buttons, named by their art glyph (see util/Glyphs). The others (sell, vault, shops, pets, armor) need your inventory. */
-    private static final Set<String> BUTTON_MENUS = Set.of("stats", "crew", "presets");
-    private static final Set<String> COMMANDS = Set.of("travel", "turbotravel", "stats", "crew", "presets");
+    private static final Set<String> BUTTON_MENUS = Set.of("stats", "crew", "presets", "event");
+    private static final Set<String> COMMANDS = Set.of("travel", "turbotravel", "stats", "crew", "presets", "event");
     /** The instance list ("Instance 4 (14/75)"), which shares the crew menu's title. */
     private static final Pattern INSTANCE = Pattern.compile("instance \\d+\\b.*");
     private static final Pattern LEVEL = Pattern.compile("(?:level|lvl)\\D{0,8}(\\d+)");
