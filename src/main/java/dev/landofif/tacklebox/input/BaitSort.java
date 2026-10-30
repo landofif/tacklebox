@@ -18,8 +18,9 @@ import java.util.Deque;
 import java.util.List;
 
 /**
- * The bait sort key (luna 2026-10-30, tacklebox's own, also without foecollab): in your inventory, the baits (custom_data
- * {@code type} "bait") are put in rarity order, common first, legendary last, in the slots the baits already take. Swaps are
+ * The bait sort key (luna 2026-10-30, tacklebox's own, also without foecollab): in your inventory, the baits and lures
+ * (custom_data {@code type} "bait" or "lure", one group, luna 2026-10-30 "together") are put in rarity order, common first,
+ * legendary last, in the slots they already take. Swaps are
  * three pickup clicks, one click every 2 ticks; it stops if the inventory closes or something is on the cursor.
  */
 public final class BaitSort {
@@ -32,9 +33,10 @@ public final class BaitSort {
 
     private BaitSort() {}
 
-    /** Where a bait's rarity goes in the order; unknown rarities last. -1 for anything that is not a bait. */
+    /** Where a bait's or lure's rarity goes in the order; unknown rarities last. -1 for anything else. */
     static int rank(NbtCompound data) {
-        if (data == null || !"bait".equals(data.getString("type").orElse(""))) {
+        String type = data == null ? "" : data.getString("type").orElse("");
+        if (!type.equals("bait") && !type.equals("lure")) {
             return -1;
         }
         int i = ORDER.indexOf(data.getString("rarity").orElse(""));

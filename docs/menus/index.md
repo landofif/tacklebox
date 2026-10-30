@@ -10,4 +10,4 @@ Read the doc that matches your task. Do not read them all.
 | Bait picker | `bait-picker.md` |
 | Rarity marks, page wheel, tall tooltips, chest menu scale, presets number keys | `menu-controls.md` |
 | /quests marks for starting the same quest again | `quests.md` |
-| Bait sort key (common to legendary) | `bait-sort.md` |
+| Bait sort key (bait and lures, common to legendary) | `bait-sort.md` |
