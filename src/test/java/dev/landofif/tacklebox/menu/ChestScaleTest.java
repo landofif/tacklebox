@@ -24,4 +24,11 @@ class ChestScaleTest {
     void noScreenIsNoChest() {
         assertFalse(ChestScale.isChest(null));
     }
+
+    @Test
+    void hudShrinksBackToTheGamesScale() {
+        assertEquals(2f, ChestScale.hudShrink(2, 3) * 3, 1e-6); // a hud pixel stays 2 screen pixels with the chest at 3
+        assertEquals(4f, ChestScale.hudShrink(4, 2) * 2, 1e-6);
+        assertEquals(1f, ChestScale.hudShrink(3, 3));
+    }
 }

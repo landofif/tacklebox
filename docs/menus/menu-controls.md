@@ -23,7 +23,7 @@ Small additions to server menus and items, asked for by luna on 2026-10-29. All 
 
 ## Chest menu scale (`chestScale`)
 
-- `menu/ChestScale`: while a server chest menu is open (generic chest, 3x3, hopper, shulker screen) the window uses this gui scale; 0 keeps the games. Whole steps only, since the games scale factor is an int; too big a number is cut to the biggest that fits, like the game's own option. The hud behind the chest changes size with it while it is open.
+- `menu/ChestScale`: while a server chest menu is open (generic chest, 3x3, hopper, shulker screen) the window uses this gui scale; 0 keeps the games. Whole steps only, since the games scale factor is an int; too big a number is cut to the biggest that fits, like the game's own option. The hud behind the chest (hotbar, vanilla, fabric and foecollab huds) keeps the games scale: `mixin/GameRendererMixin` wraps `InGameHud.render`, puts the window back on the games scale for the huds layout and shrinks it by games / chest scale (`ChestScale.drawHud`), so hud pixels stay whole screen pixels. The F3 screen and toasts are drawn outside it and still change size.
 - `mixin/MinecraftClientMixin`: set before a new screen reads the scaled size in `setScreen`, put back at the end of `setScreen` (closing has no layout step), and kept on a window resize by wrapping `calculateScaleFactor` in `onResolutionChanged`. The mods own menu, presets and vault screens are not chests, so they keep the games scale and their own size settings.
 
 ## Presets number keys
@@ -36,4 +36,4 @@ Small additions to server menus and items, asked for by luna on 2026-10-29. All 
 
 ## Not checked in game
 
-All of it. Things to look at: the square at hotbar spacings other than 20; that Mouse Tweaks still works in menus without page items; a compendium page turn in the mods menu screen; the hud and foecollab's buttons after a chest opens at another scale.
+All of it. Things to look at: the square at hotbar spacings other than 20; that Mouse Tweaks still works in menus without page items; a compendium page turn in the mods menu screen; the hud keeping its size behind a chest at another scale, hotbar item icons looking sharp there (they are drawn at the chest scale and shrunk), and foecollab's buttons.
