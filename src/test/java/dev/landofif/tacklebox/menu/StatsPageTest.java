@@ -54,8 +54,18 @@ class StatsPageTest {
         assertEquals(3.02 / 4.22, s.progress(), 1e-4);
         assertEquals(new StatsPage.Tile(22, "425.18k", "power"), s.power());
         assertEquals(new StatsPage.Tile(32, "202", "runes"), s.runes());
-        assertEquals(new StatsPage.Tile(23, "210,542", "catches"), s.catches());
+        assertEquals(new StatsPage.Tile(23, "210.54k", "catches"), s.catches());
         assertEquals(new StatsPage.Tile(16, "433x", "Small Chunk Of Meat"), s.bait());
+    }
+
+    @Test
+    void bigNumbersShortenToKAndM() {
+        assertEquals("1.55m", StatsPage.shorten("1,547,700"));
+        assertEquals("210.54k", StatsPage.shorten("210,542"));
+        assertEquals("2k", StatsPage.shorten("2,000"));
+        assertEquals("1.5m", StatsPage.shorten("1,500,000"));
+        assertEquals("999", StatsPage.shorten("999"));
+        assertEquals("425.18k", StatsPage.shorten("425.18k")); // already short
     }
 
     @Test
