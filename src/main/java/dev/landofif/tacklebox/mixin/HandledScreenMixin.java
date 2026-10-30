@@ -139,17 +139,25 @@ abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
         }
     }
 
-    /** In /quests the quest items are remembered, and the difficulty and tier the clicked quest had get a see-through green square. */
-    @Inject(method = "drawSlot", at = @At("HEAD"))
-    private void tacklebox$questRedo(DrawContext ctx, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
-        if (slot.inventory instanceof PlayerInventory || slot.getStack().isEmpty() || !"quests".equals(Glyphs.menuName(getTitle()))) {
+    /**
+     * In /quests the quest items are remembered, and the difficulty and tier the clicked quest had get a red outline.
+     * After all slots, not in drawSlot: foecollab's quest squares cancel drawSlot and cover anything drawn behind the item.
+     */
+    @Inject(method = "drawSlots", at = @At("TAIL"))
+    private void tacklebox$questRedo(DrawContext ctx, int mouseX, int mouseY, CallbackInfo ci) {
+        if (!"quests".equals(Glyphs.menuName(getTitle()))) {
             return;
         }
-        String name = slot.getStack().getName().getString();
-        List<Text> lore = slot.getStack().getOrDefault(DataComponentTypes.LORE, LoreComponent.DEFAULT).lines();
-        QuestRedo.see(QuestRedo.number(name, slot.id), lore);
-        if (QuestRedo.marks(name, lore)) {
-            ctx.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, 0x8855FF55);
+        for (Slot slot : handler.slots) {
+            if (slot.inventory instanceof PlayerInventory || slot.getStack().isEmpty()) {
+                continue;
+            }
+            String name = slot.getStack().getName().getString();
+            List<Text> lore = slot.getStack().getOrDefault(DataComponentTypes.LORE, LoreComponent.DEFAULT).lines();
+            QuestRedo.see(QuestRedo.number(name, slot.id), lore);
+            if (QuestRedo.marks(name, lore)) {
+                ctx.drawStrokedRectangle(slot.x - 1, slot.y - 1, 18, 18, 0xFFFF5555);
+            }
         }
     }
 
