@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -59,6 +60,33 @@ class StatsPageTest {
     }
 
     @Test
+    void aLureIsTheBaitAndNoButton() {
+        // lures are custom_data type "lure"; without a Stock line the tile shows the lure's name
+        List<StatsPage.Piece> pieces = base();
+        pieces.add(piece(16, "Crankbait", "{type:\"lure\",rarity:\"rare\"}", "Crankbait", "", "ʟᴜʀᴇ ɪᴛᴇᴍ"));
+        StatsPage.Stats s = StatsPage.read(pieces);
+        assertEquals(new StatsPage.Tile(16, "Crankbait", "lure"), s.bait());
+        assertFalse(s.buttons().contains(16));
+
+        pieces.set(2, piece(16, "Crankbait", "{type:\"lure\"}", "Stock: 12x"));
+        assertEquals(new StatsPage.Tile(16, "12x", "Crankbait"), StatsPage.read(pieces).bait());
+    }
+
+    @Test
+    void fillerBreadIsNoButton() {
+        List<StatsPage.Piece> pieces = base();
+        pieces.add(new StatsPage.Piece(45, "Bread", List.of(), new NbtCompound()));
+        pieces.add(new StatsPage.Piece(47, "Bread", List.of(), new NbtCompound()));
+        pieces.add(piece(21, "Collections", "", "View all information for fishing"));
+        pieces.add(piece(3, "Empty Profile Display", "", "ᴄʟɪᴄᴋ ᴛᴏ sᴇʟᴇᴄᴛ"));
+        StatsPage.Stats s = StatsPage.read(pieces);
+        assertEquals(List.of(21), s.buttons());
+        assertEquals(List.of(3), s.displays()); // the showcase's bread has lore
+        assertTrue(StatsPage.filler(new StatsPage.Piece(45, "Bread", List.of(), new NbtCompound())));
+        assertFalse(StatsPage.filler(piece(45, "Bread", "", "a line")));
+    }
+
+    @Test
     void bigNumbersShortenToKAndM() {
         assertEquals("1.55m", StatsPage.shorten("1,547,700"));
         assertEquals("210.54k", StatsPage.shorten("210,542"));
@@ -102,18 +130,23 @@ class StatsPageTest {
     }
 
     @Test
-    void petAtMaxIsAFullBar() {
+    void petAtMaxSaysMax() {
         StatsPage.Pet pet = StatsPage.pet(piece(7, "Kangaroo Pet", "{type:\"pet\"}", "", "sᴇᴍɪ₋ᴀʀɪᴅ ᴘᴇᴛ",
                 "ᴘᴇᴛ ʟᴇᴠᴇʟ: [100]", "                       (246.69M/MAX)", "Equipped Skin: Default", "Equipped Item: Wade's Amulet"));
         assertEquals(new StatsPage.Pet(7, "Kangaroo Pet", 100, 1f, "246.69M/MAX", "Wade's Amulet"), pet);
+        assertTrue(pet.max()); // the card says max, no full bar
 
         StatsPage.Pet young = StatsPage.pet(piece(7, "Otter Pet", "{type:\"pet\"}", "ᴘᴇᴛ ʟᴇᴠᴇʟ: [12]", "(1.5M/6M)", "Equipped Item: Empty"));
         assertEquals(0.25f, young.progress(), 1e-4);
         assertEquals("", young.item());
+        assertFalse(young.max());
+
+        StatsPage.Pet billions = StatsPage.pet(piece(7, "Otter Pet", "{type:\"pet\"}", "(600M/1.2B)"));
+        assertEquals(0.5f, billions.progress(), 1e-4);
     }
 
     @Test
-    void showcaseSlotsGiveThePlacementAndTheRestAreButtons() {
+    void showcaseSlotsAndTheRestAreButtons() {
         List<StatsPage.Piece> pieces = base();
         pieces.add(piece(2, "Empty Profile Display", "", "ᴄʟɪᴄᴋ ᴛᴏ sᴇʟᴇᴄᴛ"));
         pieces.add(piece(4, "Christmas Event 2025", "", "ᴘʀᴏꜰɪʟᴇ ᴅɪsᴘʟᴀʏ", "Placement: #23", "Points: 23145pts"));
@@ -121,8 +154,6 @@ class StatsPageTest {
         pieces.add(piece(46, "Return", ""));
         pieces.add(piece(49, "Close", ""));
         StatsPage.Stats s = StatsPage.read(pieces);
-        assertEquals("#23", s.placement());
-        assertEquals("Christmas Event 2025", s.event());
         assertEquals(List.of(2, 4), s.displays());
         assertEquals(List.of(21), s.buttons());
         assertTrue(s.buttons().stream().noneMatch(id -> id == 22 || id == 23));

@@ -3,6 +3,7 @@ package dev.landofif.tacklebox.screen;
 import dev.landofif.tacklebox.ui.Foe;
 import dev.landofif.tacklebox.ui.Hypr;
 import dev.landofif.tacklebox.TackleboxSettings;
+import dev.landofif.tacklebox.compat.FoeArmor;
 import dev.landofif.tacklebox.hud.BaitInfo;
 import dev.landofif.tacklebox.hud.EventPage;
 import dev.landofif.tacklebox.hud.ServerHud;
@@ -44,7 +45,7 @@ import java.util.List;
  */
 public class FishMenuScreen extends TackleboxScreen {
     private static final int HEADER = 46, FOOTER = 16, ROW = 22, PAD = 10, GAP = 14;
-    private static final int PANEL = 0xF0101016, LINE = 0x22FFFFFF, TRACK = 0x33FFFFFF, HOVER = 0x18FFFFFF;
+    private static final int PANEL = 0xFF101016, LINE = 0x22FFFFFF, TRACK = 0x33FFFFFF, HOVER = 0x18FFFFFF;
     private static final String TRAVEL_TITLE = "픁", COMPENDIUM_TITLE = "픂";
 
     /** The tabs: label, the command it runs, and the menu name that makes it the active one. */
@@ -78,6 +79,8 @@ public class FishMenuScreen extends TackleboxScreen {
     /** The model wearing the set on the /stats page, and whose profile it was made for. */
     private net.minecraft.client.network.OtherClientPlayerEntity model;
     private String modelOwner;
+    /** foecollabs "hide armor" would hide the set on the model, so it is off while a stats page shows. */
+    private final FoeArmor armor = new FoeArmor();
 
     public FishMenuScreen(GenericContainerScreen original) {
         super(Text.empty()); // the panel draws its own title
@@ -106,12 +109,30 @@ public class FishMenuScreen extends TackleboxScreen {
         if (isPlaces()) {
             return original.getTitle().getString().contains(COMPENDIUM_TITLE) ? "compendium" : "travel";
         }
-        return Glyphs.menuName(original.getTitle());
+        String name = Glyphs.menuName(original.getTitle());
+        return name.equals("crew") ? FishMenu.crewTitleMenu(names()) : name;
+    }
+
+    /** The plain names of the chest's items. */
+    private List<String> names() {
+        List<String> out = new ArrayList<>();
+        for (Slot slot : handler.slots) {
+            if (!(slot.inventory instanceof net.minecraft.entity.player.PlayerInventory) && !slot.getStack().isEmpty()) {
+                out.add(Glyphs.plain(slot.getStack().getName()).trim());
+            }
+        }
+        return out;
     }
 
     @Override
     public void close() {
         client.player.closeHandledScreen();
+    }
+
+    @Override
+    public void removed() {
+        armor.show(false);
+        super.removed();
     }
 
     // ---- model ----
@@ -242,6 +263,7 @@ public class FishMenuScreen extends TackleboxScreen {
         }
 
         stats = places ? null : StatsPage.read(pieces());
+        armor.show(stats != null);
 
         int w = Math.min(vw() - 16, 600), h = vh() - 16;
         int x = vx() + (vw() - w) / 2, y = vy() + 8;
@@ -274,7 +296,7 @@ public class FishMenuScreen extends TackleboxScreen {
             }
         }
 
-        Text hint = Foe.text("esc = back · wheel = scroll · hover for details");
+        Text hint = Foe.text(stats != null ? "esc = back · hover for details" : "esc = back · wheel = scroll · hover for details");
         ctx.drawText(textRenderer, hint, x + w - PAD - textRenderer.getWidth(hint), y + h - 12, Foe.FAINT, false);
         if (hover != null) {
             ctx.drawItemTooltip(textRenderer, hover.stack, mouseX, mouseY);
@@ -282,7 +304,7 @@ public class FishMenuScreen extends TackleboxScreen {
     }
 
     private void drawHeader(DrawContext ctx, int x, int y, int w, String menu, int mouseX, int mouseY) {
-        // on a /stats page the header is that profile's: its name, level and event placement
+        // on a /stats page the header is that profile's: its name and level
         boolean page = stats != null;
         var event = menu.equals("event") ? EventPage.state() : null;
         String title = page && !stats.owner().isEmpty() ? stats.owner() : event != null && !event.title.isEmpty() ? event.title : menu;
@@ -302,8 +324,7 @@ public class FishMenuScreen extends TackleboxScreen {
             Text level = Foe.text("lvl " + lvl);
             rx -= textRenderer.getWidth(level) + 6;
             ctx.drawText(textRenderer, level, rx, y + 9, Foe.TEXT, false);
-            String placed = page && !stats.placement().isEmpty() ? stats.placement() + " " + stats.event()
-                    : event != null && event.points >= 0 ? (event.placement.isEmpty() ? "" : event.placement + " · ") + Math.round(event.points) + " pts" : "";
+            String placed = event != null && event.points >= 0 ? (event.placement.isEmpty() ? "" : event.placement + " · ") + Math.round(event.points) + " pts" : "";
             if (!placed.isEmpty()) {
                 Text place = Foe.text(placed);
                 rx -= textRenderer.getWidth(place) + 14;
@@ -402,12 +423,13 @@ public class FishMenuScreen extends TackleboxScreen {
         String right = info != null ? (level >= 0 ? "lvl " + level : "") : t.row.amount().toLowerCase(java.util.Locale.ROOT);
         int rw = right.isEmpty() ? 0 : textRenderer.getWidth(Foe.text(right));
         int barW = progress >= 0 ? Math.min(70, w / 4) : 0;
-        int tx = x + 22, room = w - 22 - 4 - Math.max(rw, barW) - (rw > 0 || barW > 0 ? 8 : 0);
+        // the amount sits on the name line, the bar on the line under it
+        int tx = x + 22, room = w - 22 - 4 - (rw > 0 ? rw + 8 : 0), subRoom = w - 22 - 4 - (barW > 0 ? barW + 8 : 0);
 
         String name = t.loc != null ? t.loc.name() : t.row.name();
         ctx.drawText(textRenderer, fit(Foe.text(name), room), tx, y + 2, hot ? Hypr.acc2() : Foe.TEXT, false);
         if (!t.row.sub().isEmpty()) {
-            ctx.drawText(textRenderer, fit(Foe.sentence(t.row.sub()), room), tx, y + 12, Foe.DIM, false);
+            ctx.drawText(textRenderer, fit(Foe.sentence(t.row.sub()), subRoom), tx, y + 12, Foe.DIM, false);
         }
         if (rw > 0) {
             ctx.drawText(textRenderer, Foe.text(right), x + w - 4 - rw, y + 3, progress >= 1 ? Foe.TITLE : Foe.TEXT, false);
@@ -560,8 +582,7 @@ public class FishMenuScreen extends TackleboxScreen {
         int mx = x + left + GAP, rx = mx + mid + GAP;
 
         // left: the player wearing the set, the five showcase slots under it
-        int show = 18, showY = y + body - show;
-        drawModel(ctx, x, y, left, showY - y - 6, mouseX, mouseY);
+        int show = 18, showY = y + drawModel(ctx, x, y, left, body - show - 6, mouseX, mouseY) + 6;
         int sx = x + (left - 5 * show) / 2;
         for (int id : stats.displays()) {
             Slot slot = slot(id);
@@ -601,22 +622,24 @@ public class FishMenuScreen extends TackleboxScreen {
         }
         ctx.disableScissor();
 
-        // right: four number tiles, the pet card under them
-        int tw = (right - 6) / 2, th = 38;
-        StatsPage.Tile[] numbers = {stats.power(), stats.runes(), stats.catches(), stats.bait()};
-        for (int i = 0; i < numbers.length; i++) {
-            StatsPage.Tile n = numbers[i];
+        // right: up to four number tiles in order, the pet card under them
+        int tw = (right - 6) / 2, th = 38, i = 0;
+        for (StatsPage.Tile n : new StatsPage.Tile[]{stats.power(), stats.runes(), stats.catches(), stats.bait()}) {
             if (n == null) {
                 continue;
             }
             int tx = rx + (i % 2) * (tw + 6), tyy = y + (i / 2) * (th + 6);
+            i++;
             Tile t = gear(n.slot(), "", -1, "");
             boolean hot = in(mouseX, mouseY, tx, tyy, tw, th);
             ctx.fill(tx, tyy, tx + tw, tyy + th, hot ? 0x1CFFFFFF : 0x0CFFFFFF);
+            // a number big; a word (a lure's name) at the normal size when it does not fit big
+            Text value = Foe.text(n.value().isEmpty() ? "-" : n.value().toLowerCase(java.util.Locale.ROOT));
+            int big = textRenderer.getWidth(value) * 2 <= tw - 12 ? 2 : 1;
             ctx.getMatrices().pushMatrix();
             ctx.getMatrices().translate(tx + 6, tyy + 6);
-            ctx.getMatrices().scale(2, 2);
-            ctx.drawText(textRenderer, fit(Foe.text(n.value().isEmpty() ? "-" : n.value().toLowerCase(java.util.Locale.ROOT)), (tw - 12) / 2), 0, 0, Hypr.acc2(), false);
+            ctx.getMatrices().scale(big, big);
+            ctx.drawText(textRenderer, fit(value, (tw - 12) / big), 0, 0, Hypr.acc2(), false);
             ctx.getMatrices().popMatrix();
             ctx.drawText(textRenderer, fit(Foe.text(n.sub()), tw - 12), tx + 6, tyy + th - 12, Foe.DIM, false);
             if (t != null) {
@@ -627,7 +650,7 @@ public class FishMenuScreen extends TackleboxScreen {
         StatsPage.Pet pet = stats.pet();
         Tile petTile = pet == null ? null : gear(pet.slot(), "", -1, "");
         if (petTile != null) {
-            int py = section(ctx, "pet", pet.level() >= 0 ? "lvl " + pet.level() : "", rx, y + 2 * (th + 6) + 4, right);
+            int py = section(ctx, "pet", pet.level() >= 0 ? "lvl " + pet.level() : "", rx, y + (i + 1) / 2 * (th + 6) + 4, right);
             int ph = 34;
             boolean hot = in(mouseX, mouseY, rx, py, right, ph);
             if (hot) {
@@ -638,7 +661,10 @@ public class FishMenuScreen extends TackleboxScreen {
             if (!pet.item().isEmpty()) {
                 ctx.drawText(textRenderer, fit(Foe.sentence(pet.item()), right - 26), rx + 22, py + 13, Foe.DIM, false);
             }
-            if (pet.progress() >= 0) {
+            if (pet.max()) {
+                Text max = Foe.text("max");
+                ctx.drawText(textRenderer, max, rx + right - textRenderer.getWidth(max) - 3, py + ph - 9, Foe.TITLE, false);
+            } else if (pet.progress() >= 0) {
                 Text amount = Text.literal(pet.amount().toLowerCase(java.util.Locale.ROOT));
                 int aw = textRenderer.getWidth(amount);
                 bar(ctx, rx + 3, py + ph - 5, right - aw - 12, pet.progress(), pet.progress() >= 1);
@@ -682,8 +708,10 @@ public class FishMenuScreen extends TackleboxScreen {
     /**
      * The profile's player wearing its chest, legs and boots (and a helmet if there is one); the hat is a pack model
      * on a leather boot, so it stays in the list. Another player's skin comes from the tab list when they are online.
+     * Scaled to fit both sides of the room it has (the arms clipped when it was scaled by the height only); returns
+     * the height of its box, which is about the model's.
      */
-    private void drawModel(DrawContext ctx, int x, int y, int w, int h, int mouseX, int mouseY) {
+    private int drawModel(DrawContext ctx, int x, int y, int w, int h, int mouseX, int mouseY) {
         String owner = stats.owner().isEmpty() ? client.player.getName().getString() : stats.owner();
         if (model == null || !owner.equalsIgnoreCase(modelOwner)) {
             var entry = client.getNetworkHandler().getPlayerListEntry(owner);
@@ -701,8 +729,11 @@ public class FishMenuScreen extends TackleboxScreen {
             Slot slot = slot(ids[i]);
             model.equipStack(slots[i], slot == null || slot.getStack().isEmpty() ? ItemStack.EMPTY : PresetsScreen.wearable(slot.getStack(), slots[i]));
         }
-        ctx.fill(x, y, x + w, y + h, 0x0CFFFFFF);
-        net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity(ctx, x, y, x + w, y + h, (int) (h * 0.4), 0.0625f, mouseX, mouseY, model);
+        // a player is about 1.9 blocks tall and, with the arms, armour and the turn towards the mouse, 1.1 wide
+        int size = (int) Math.min(h / 2.1f, w / 1.2f), box = Math.min(h, Math.round(size * 2.1f));
+        ctx.fill(x, y, x + w, y + box, 0x0CFFFFFF);
+        net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity(ctx, x, y, x + w, y + box, size, 0.0625f, mouseX, mouseY, model);
+        return box;
     }
 
     // ---- best location ----

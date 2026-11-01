@@ -85,6 +85,7 @@ class MenuRowsTest {
     void numbers() {
         assertEquals(1_180_000, MenuRows.number("1.18M"), 1e-6);
         assertEquals(43178, MenuRows.number("43,178"), 1e-6);
+        assertEquals(1_200_000_000, MenuRows.number("1.2B"), 1e-3);
         assertEquals(0, MenuRows.number("."));
     }
 }

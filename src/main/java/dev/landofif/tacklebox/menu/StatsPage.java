@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
 /**
  * The fishonmc /stats page (your own and {@code /stats <player>}) read into the pieces of the profile layout.
  * Gear is told apart by its custom_data {@code type} ({@code hat}, {@code armor} with {@code piece}, {@code reel},
- * {@code pole}, {@code line}, {@code pet}, {@code bait}); the buttons have no custom_data, so by their name; the
- * five showcase items by their slots 2-6. Slot map: docs/fishonmc-research.md (luna's dump 2026-10-30).
+ * {@code pole}, {@code line}, {@code pet}, {@code bait} or {@code lure}); the buttons have no custom_data, so by their
+ * name; the five showcase items by their slots 2-6. Slot map: docs/fishonmc-research.md (luna's dump 2026-10-30).
  */
 public final class StatsPage {
     /** One chest item: its slot, raw name, raw lore lines and custom_data (empty when it has none). */
@@ -22,11 +22,16 @@ public final class StatsPage {
     /** A big number tile: the slot it clicks, the number, and a dim line under it. */
     public record Tile(int slot, String value, String sub) {}
 
-    /** The pet card: its xp bar is full at MAX. */
-    public record Pet(int slot, String name, int level, float progress, String amount, String item) {}
+    /** The pet card with its xp bar. */
+    public record Pet(int slot, String name, int level, float progress, String amount, String item) {
+        /** At the top level the xp reads {@code (246.69M/MAX)}: the card says max instead of a bar. */
+        public boolean max() {
+            return amount.endsWith("/MAX");
+        }
+    }
 
     /** A slot of the page is -1 when the menu has no such item. */
-    public record Stats(String owner, int level, float progress, String amount, String event, String placement,
+    public record Stats(String owner, int level, float progress, String amount,
                         int hat, int helmet, int chest, int legs, int boots,
                         int reel, int pole, int line, int lineHave, int lineMax, Pet pet,
                         Tile power, Tile runes, Tile catches, Tile bait,
@@ -41,6 +46,7 @@ public final class StatsPage {
 
     /** The page, or null when these items are not a /stats page (it has the Fishing Profile and General Statistics). */
     public static Stats read(List<Piece> pieces) {
+        pieces = pieces.stream().filter(p -> !filler(p)).toList();
         Piece profile = named(pieces, "fishing profile"), general = named(pieces, "general statistics");
         if (profile == null || general == null) {
             return null;
@@ -53,7 +59,6 @@ public final class StatsPage {
                 owner = l.substring(11).trim();
             }
         }
-        String event = "", placement = "";
         List<Integer> displays = new ArrayList<>();
         int hat = -1, helmet = -1, chest = -1, legs = -1, boots = -1, reel = -1, pole = -1, line = -1, lineHave = -1, lineMax = -1;
         Pet pet = null;
@@ -63,11 +68,6 @@ public final class StatsPage {
             String type = p.data.getString("type", "");
             if (p.slot >= DISPLAY_FIRST && p.slot <= DISPLAY_LAST) {
                 displays.add(p.slot);
-                String place = find(p.lore, "placement:");
-                if (placement.isEmpty() && !place.isEmpty()) {
-                    placement = place;
-                    event = MenuRows.clean(p.name);
-                }
             } else if (type.equals("hat")) {
                 hat = p.slot;
             } else if (type.equals("armor")) {
@@ -93,8 +93,9 @@ public final class StatsPage {
                 lineMax = p.data.getInt("maxDurability", -1);
             } else if (type.equals("pet")) {
                 pet = pet(p);
-            } else if (type.equals("bait")) {
-                bait = new Tile(p.slot, find(p.lore, "stock:"), MenuRows.clean(p.name));
+            } else if (type.equals("bait") || type.equals("lure")) {
+                String stock = find(p.lore, "stock:");
+                bait = stock.isEmpty() ? new Tile(p.slot, MenuRows.clean(p.name), type) : new Tile(p.slot, stock, MenuRows.clean(p.name));
             } else {
                 continue;
             }
@@ -116,7 +117,7 @@ public final class StatsPage {
                 buttons.add(p.slot);
             }
         }
-        return new Stats(owner, row.level(), row.progress(), row.amount(), event, placement, hat, helmet, chest, legs, boots,
+        return new Stats(owner, row.level(), row.progress(), row.amount(), hat, helmet, chest, legs, boots,
                 reel, pole, line, lineHave, lineMax, pet, power, runesTile, catches, bait, displays, buttons);
     }
 
@@ -172,6 +173,11 @@ public final class StatsPage {
         }
         String s = String.format(Locale.ROOT, "%.2f", v >= 1_000_000 ? v / 1_000_000 : v / 1000);
         return s.replaceAll("\\.?0+$", "") + (v >= 1_000_000 ? "m" : "k");
+    }
+
+    /** The server's filler for a free slot: a bread named "Bread" with no lore (the showcase's "Empty Profile Display" bread has lore). */
+    static boolean filler(Piece p) {
+        return p.name.equals("Bread") && p.lore.isEmpty();
     }
 
     private static Piece named(List<Piece> pieces, String name) {
