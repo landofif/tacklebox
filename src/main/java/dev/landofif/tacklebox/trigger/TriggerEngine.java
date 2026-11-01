@@ -161,13 +161,21 @@ public final class TriggerEngine {
         long now = clock.getAsLong();
         int[] colors = null;
 
-        for (Trigger trigger : TriggerStore.all()) {
+        List<Trigger> all = new ArrayList<>(RareDrops.triggers());
+        all.addAll(TriggerStore.all());
+        for (Trigger trigger : all) {
             if (!trigger.enabled || (trigger.fishOnMcOnly && !onFishOnMc)) {
                 continue;
             }
             Matcher.Result result = matcher(trigger).match(raw);
             if (result == null) {
                 continue;
+            }
+            if (RareDrops.isBuiltIn(trigger)) {
+                trigger = RareDrops.apply(trigger, result);
+                if (trigger == null) {
+                    continue; // every part of this drop is switched off
+                }
             }
             if (trigger.title.chatColors && colors == null) {
                 colors = lineColors(message);
@@ -299,7 +307,13 @@ public final class TriggerEngine {
         }
     }
 
+    /** Tests have no server to be on: this says they are on FishOnMC. */
+    public static boolean assumeFishOnMc;
+
     public static boolean isOnFishOnMc() {
+        if (assumeFishOnMc) {
+            return true;
+        }
         MinecraftClient client = MinecraftClient.getInstance();
         if (client == null) {
             return false; // tests

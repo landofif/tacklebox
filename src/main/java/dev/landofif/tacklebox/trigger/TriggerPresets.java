@@ -13,9 +13,7 @@ public final class TriggerPresets {
         return List.of(
                 new Preset("blank trigger", "start from scratch", TriggerPresets::blank),
                 new Preset("quest completed", "quests > quest #1-8 has been completed!", TriggerPresets::questComplete),
-                new Preset("pet drop", "pet drop! you pulled ... with a totem pop of the pets head", TriggerPresets::petDrop),
                 new Preset("pet max level", "pets > your ... pet is now level ... → 100 with a totem pop of the pets head", TriggerPresets::petMaxLevel),
-                new Preset("rare catch", "rare catch! you pulled ... (shards, bottles, capsules, amulets) with a totem pop of the item", TriggerPresets::rareCatch),
                 new Preset("variant catch", "albino! / melanistic! / trophy! ... you caught a ...", TriggerPresets::variant),
                 new Preset("new in compendium", "a catch of yours that was missing in the compendium (needs one read of that species page)", TriggerPresets::compendium),
                 new Preset("fabled event", "fabled > a fabled event is active at ...", TriggerPresets::fabled),
@@ -54,7 +52,7 @@ public final class TriggerPresets {
     }
 
     /** Anchored: other players' drops are broadcast as "! [366] name » PET DROP! ..." and must not fire. The rarity is a tag glyph (removed before matching), a word or a word in brackets ("[COMMON]", as the game log shows it), so it is optional here. */
-    private static final String PET_DROP = "^pet drop! you (?:pulled|caught) (?:an? )?(?:\\[?(?<rarity>common|rare|epic|legendary|mythic|mythical)]? )?(?<pet>.+?) pet\\b";
+    static final String PET_DROP = "^pet drop! you (?:pulled|caught) (?:an? )?(?:\\[?(?<rarity>common|rare|epic|legendary|mythic|mythical)]? )?(?<pet>.+?) pet\\b";
 
     public static Trigger petDrop() {
         Trigger t = preset("pet drop");
@@ -94,7 +92,7 @@ public final class TriggerPresets {
      * Own rare catches only, anchored like {@link #PET_DROP}: "RARE CATCH! You pulled a 1x Subtropical Shard", "... pulled 1x Lightning in a Bottle".
      * The pop shows the item itself ({@code {item}} is its name, see display/TotemPop).
      */
-    private static final String RARE_CATCH = "^rare catch! you (?:pulled|caught) (?:an? )?(?<n>\\d+)x (?<item>.+?)!?$";
+    static final String RARE_CATCH = "^rare catch! you (?:pulled|caught) (?:an? )?(?<n>\\d+)x (?<item>.+?)!?$";
 
     public static Trigger rareCatch() {
         Trigger t = preset("rare catch");

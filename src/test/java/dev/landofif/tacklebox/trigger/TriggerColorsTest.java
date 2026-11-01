@@ -1,5 +1,6 @@
 package dev.landofif.tacklebox.trigger;
 
+import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.display.SoundQueue;
 import dev.landofif.tacklebox.display.TitleOverlay;
 import dev.landofif.tacklebox.util.RichText;
@@ -26,6 +27,7 @@ class TriggerColorsTest {
     @AfterEach
     void tearDown() {
         TriggerEngine.playSound = SoundQueue::play;
+        TackleboxSettings.get().rareDrops = true;
         TriggerStore.all().clear();
         TitleOverlay.clear();
     }
@@ -109,6 +111,7 @@ class TriggerColorsTest {
         t.fishOnMcOnly = false;
         t.title.chatColors = chatColors;
         t.totem.enabled = false;
+        TackleboxSettings.get().rareDrops = false; // the built-in rare catch would fire next to this copy
         TriggerStore.all().clear();
         TriggerStore.all().add(t);
         TriggerEngine.playSound = s -> {};

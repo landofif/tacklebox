@@ -161,6 +161,13 @@ public class TackleboxSettings {
     public int eventScale = 100;
     public int eventY = 70;
     public HudAlign eventAlign = HudAlign.LEFT;
+    /** Your own pet drops and rare catches (trigger/RareDrops), built in instead of triggers; the kinds of drop whose title, totem pop or sound are switched off. */
+    public boolean rareDrops = true;
+    public java.util.Set<String> dropTitleOff = new java.util.HashSet<>();
+    public java.util.Set<String> dropPopOff = new java.util.HashSet<>();
+    public java.util.Set<String> dropSoundOff = new java.util.HashSet<>();
+    /** The old pet drop and rare catch triggers were switched off once (RareDrops.migrate). */
+    public boolean dropsMigrated;
     /** The cryptids hud (hud/CryptidHud): what can be caught where now and what comes next; the popups when an event starts. */
     public boolean cryptidHud;
     public boolean cryptidPopups = true;
@@ -569,6 +576,9 @@ public class TackleboxSettings {
         dev.landofif.tacklebox.hud.EventHud.bind(eventState);
         if (eventPos == null) eventPos = new HudPos(eventX, eventY);
         if (cryptidPos == null) cryptidPos = new HudPos(cryptidX, cryptidY);
+        if (dropTitleOff == null) dropTitleOff = new java.util.HashSet<>();
+        if (dropPopOff == null) dropPopOff = new java.util.HashSet<>();
+        if (dropSoundOff == null) dropSoundOff = new java.util.HashSet<>();
         if (cryptidOff == null) cryptidOff = new java.util.HashSet<>();
         if (cryptidDry == null) cryptidDry = new java.util.HashMap<>();
         if (moonRiseAt <= 0) moonRiseAt = dev.landofif.tacklebox.hud.Cryptids.SEEN_RISE;
