@@ -110,6 +110,24 @@ class MenuTilesIntegrationTest {
     }
 
     @Test
+    void everyCollectionNameFitsAsWholeWordsInLunasWindow() throws Exception {
+        // her game window on 2026-11-01: 941 px at gui scale 2, so the grid is 434 wide and a tile 80; the name gets 68
+        List<Item> items = buttons("collections-20261010.txt");
+        MenuTiles.Layout layout = MenuTiles.layout(items.size() + 1, 5, 434, 433);
+        assertEquals(80, layout.tw());
+        assertEquals(47, layout.th());
+        assertEquals(2, MenuTiles.nameRows(layout.th())); // so temperate perches keeps both lines above the bar
+        java.util.function.ToIntFunction<String> w = s -> s.length() * 6 - (int) s.chars().filter(c -> c == ' ').count() * 2;
+        for (Item i : items) {
+            String name = MenuTiles.shortName(i.name);
+            List<String> lines = MenuTiles.nameLines(name, layout.tw() - 12, 2, w);
+            assertEquals(name, String.join(" ", lines), name);
+        }
+        assertEquals(List.of("eurasian", "minnows"), MenuTiles.nameLines("eurasian minnows", 68, 2, w));
+        assertEquals(List.of("gigantic"), MenuTiles.nameLines("gigantic", 68, 2, w));
+    }
+
+    @Test
     void travelPlacesInServerOrderInFourColumns() throws Exception {
         List<Item> items = buttons("travel-20261029.txt");
         assertEquals(17, items.size());

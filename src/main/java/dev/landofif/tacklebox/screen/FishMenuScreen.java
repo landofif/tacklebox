@@ -884,17 +884,24 @@ public class FishMenuScreen extends TackleboxScreen {
             bw = textRenderer.getWidth(big) * 2;
             big(ctx, big, x + w - 6 - bw, y + 5, Foe.TEXT);
         }
-        int nx = x + 6;
+        int nx = x + 6, ny = y + 6;
         if (collection) {
+            // the icon and the level on top, the name across the tile under them (luna, 2026-11-01): beside them an
+            // 80 wide tile had room for about five letters, so most names were split in a word
             ctx.drawItem(t.stack, x + 5, y + 5);
-            nx = x + 25;
-        }
-        int room = x + w - 6 - bw - 4 - nx, ny = y + 6;
-        Text name = Foe.text(collection ? MenuTiles.shortName(t.row.name()) : t.loc.name());
-        List<OrderedText> lines = textRenderer.wrapLines(name, room);
-        for (OrderedText line : lines.size() <= 2 ? lines : List.of(fit(name, room).asOrderedText())) { // two lines, else cut
-            ctx.drawText(textRenderer, line, nx, ny, Foe.TEXT, false);
-            ny += 10;
+            ny = y + 22;
+            for (String line : MenuTiles.nameLines(MenuTiles.shortName(t.row.name()), w - 12, MenuTiles.nameRows(h), s -> textRenderer.getWidth(Foe.text(s)))) {
+                ctx.drawText(textRenderer, Foe.text(line), nx, ny, Foe.TEXT, false);
+                ny += 9;
+            }
+        } else {
+            int room = x + w - 6 - bw - 4 - nx;
+            Text name = Foe.text(t.loc.name());
+            List<OrderedText> lines = textRenderer.wrapLines(name, room);
+            for (OrderedText line : lines.size() <= 2 ? lines : List.of(fit(name, room).asOrderedText())) { // two lines, else cut
+                ctx.drawText(textRenderer, line, nx, ny, Foe.TEXT, false);
+                ny += 10;
+            }
         }
         String word = MenuTiles.markWord(mark);
         if (!word.isEmpty()) {
@@ -909,10 +916,13 @@ public class FishMenuScreen extends TackleboxScreen {
     private void drawLevel(DrawContext ctx, Tile t, int x, int y, int w, int h) {
         MenuTiles.State state = state(t);
         int color = state == MenuTiles.State.DONE ? Foe.TITLE : state == MenuTiles.State.NOW ? Hypr.acc2() : Foe.FAINT;
-        big(ctx, Text.literal(String.valueOf(MenuTiles.level(Glyphs.plain(t.stack.getName()).trim()))), x + 6, y + 5, color);
+        Text number = Text.literal(String.valueOf(MenuTiles.level(Glyphs.plain(t.stack.getName()).trim())));
+        big(ctx, number, x + 6, y + 5, color);
         if (state != MenuTiles.State.DONE && !t.row.amount().isEmpty()) {
+            // on the number's line when it fits, else the line under it ("1,886/5,000" ran into a big 9)
             Text count = Text.literal(MenuTiles.count(t.row.amount()));
-            ctx.drawText(textRenderer, count, x + w - 6 - textRenderer.getWidth(count), y + 6, state == MenuTiles.State.NOW ? Foe.TEXT : Foe.DIM, false);
+            int cw = textRenderer.getWidth(count), cy = MenuTiles.countBeside(w, textRenderer.getWidth(number) * 2, cw) ? y + 6 : y + 22;
+            ctx.drawText(textRenderer, count, x + w - 6 - cw, cy, state == MenuTiles.State.NOW ? Foe.TEXT : Foe.DIM, false);
         }
         if (state == MenuTiles.State.DONE || t.row.progress() >= 0) {
             tileBar(ctx, x + 6, y + h - 7, w - 12, state == MenuTiles.State.DONE ? 1 : t.row.progress(), color);

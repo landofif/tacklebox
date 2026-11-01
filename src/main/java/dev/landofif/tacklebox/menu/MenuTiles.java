@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +45,55 @@ public final class MenuTiles {
         int th = Math.max(MIN_H, Math.min(MAX_H, (h - (rows - 1) * GAP) / rows));
         int height = rows * th + (rows - 1) * GAP;
         return new Layout(cols, (w - (cols - 1) * GAP) / cols, th, height, height > h);
+    }
+
+    /**
+     * A collection's name in lines at most {@code room} wide, broken only at spaces (before 2026-11-01 a word was split,
+     * "giga" and "ntic"). What does not fit in {@code rows} lines, or a word wider than a line, is cut with "..".
+     */
+    public static List<String> nameLines(String name, int room, int rows, ToIntFunction<String> width) {
+        List<String> out = new ArrayList<>();
+        String line = "";
+        for (String word : name.split(" ")) {
+            String longer = line.isEmpty() ? word : line + " " + word;
+            if (line.isEmpty() || width.applyAsInt(longer) <= room) {
+                line = longer;
+            } else {
+                out.add(line);
+                line = word;
+            }
+        }
+        out.add(line);
+        if (out.size() > rows) {
+            String rest = String.join(" ", out.subList(rows - 1, out.size()));
+            out = new ArrayList<>(out.subList(0, rows - 1));
+            out.add(rest);
+        }
+        out.replaceAll(l -> cut(l, room, width));
+        return out;
+    }
+
+    private static String cut(String s, int room, ToIntFunction<String> width) {
+        if (width.applyAsInt(s) <= room) {
+            return s;
+        }
+        while (s.length() > 1 && width.applyAsInt(s + "..") > room) {
+            s = s.substring(0, s.length() - 1);
+        }
+        return s + "..";
+    }
+
+    /**
+     * How many name lines a collection tile {@code th} high has room for: they start at 22 under the icon, 9 apart, and
+     * small caps fill rows 2 to 6 of a line, so the second needs 46 to stay clear of the bar at {@code th - 7}.
+     */
+    public static int nameRows(int th) {
+        return Math.max(1, (th - 37) / 9 + 1);
+    }
+
+    /** Whether a level's count fits on the line of its big number ({@code numberW} wide) in a tile {@code tw} wide. */
+    public static boolean countBeside(int tw, int numberW, int countW) {
+        return 6 + numberW + 4 + countW + 6 <= tw;
     }
 
     /** "Basses Collection" as "basses": every tile on the page is a collection, so the word goes. */
