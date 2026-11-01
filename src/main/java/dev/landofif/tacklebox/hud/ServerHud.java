@@ -131,6 +131,17 @@ public final class ServerHud {
         return e == null ? "" : ((String) e[1]).replaceFirst("^at ", "");
     }
 
+    /** The moon that is up ("Blood Moon"), "" when none. */
+    public static String moon() {
+        return moon;
+    }
+
+    /** The name of an active event by its chat tag ("Storm" gives "Thunderstorm" or "Supercell"), null when it is not on. */
+    static String event(String tag) {
+        Object[] e = EVENTS.get(tag);
+        return e == null ? null : (String) e[2];
+    }
+
     /** For {@link BoostsHud}: the active events, name and bonus in their chat colours. */
     static List<BoostsHud.Row> activeEvents() {
         List<BoostsHud.Row> out = new ArrayList<>();
@@ -371,8 +382,11 @@ public final class ServerHud {
             case "moon" -> {
                 if (!moon.isEmpty()) {
                     out.add(plain(row("Moon: ", moon, moon.startsWith("Blood") ? Formatting.RED : Formatting.LIGHT_PURPLE)));
-                } else if (timer("moonTimer") >= 0) {
-                    out.add(plain(row("Moon Cycle: ", clock(timer("moonTimer")), Formatting.YELLOW)));
+                } else { // the last rise seen plus 160 minutes, not foecollab's fixed time, which the server's restarts move away from
+                    long now = System.currentTimeMillis(), next = Cryptids.nextMoon(TackleboxSettings.get().moonRiseAt, now);
+                    if (next > 0) {
+                        out.add(plain(row("Moon Cycle: ", clock(next - now), Formatting.YELLOW)));
+                    }
                 }
             }
             case "frenzy" -> {

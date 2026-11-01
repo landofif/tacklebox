@@ -468,6 +468,23 @@ public final class SettingsPages {
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.eventAlign, v -> s.eventAlign = v);
         toggle("event missions", "lists the missions that are not done yet and the repeatable ones on the event hud, coloured like the menu, with the points earned and the points one catch gives. read from the mission book in /event and then follow the chat.",
                 () -> s.eventMissions, v -> s.eventMissions = v);
+        header("cryptids");
+        toggle("cryptids hud", "what can be caught where right now (moons, rainbow, storms, fabled, and the cryptids of the in-game clock) with the odds and the drops, then when the next moon and clock window come. read from chat and the clock in the top bar. move it with move huds.",
+                () -> s.cryptidHud, v -> s.cryptidHud = v);
+        cycle("cryptids align", "how the text of the cryptids hud lines up inside it: left, centre or right.",
+                TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.cryptidAlign, v -> s.cryptidAlign = v);
+        toggle("cryptids popups", "a title when one of the events below starts, saying where to go and what for. these are not triggers, nothing needs adding in /triggers.",
+                () -> s.cryptidPopups, v -> s.cryptidPopups = v);
+        for (String[] k : new String[][]{{"moons", "rougarou at toledo bend and bessie at the great lakes during any moon, and the infusion capsule in a blood moon."},
+                {"rainbow", "garaboncias at the danube."}, {"storms", "lightning in a bottle anywhere, 1/500 in a thunderstorm and 1/250 in a supercell."},
+                {"fabled", "the fabled fish at the place the chat names."}, {"bigfoot", "cypress lake between 1 and 3 am in-game."},
+                {"titanoboa", "the amazon between 2 and 4 am in-game."}, {"bessie", "the great lakes between 4 and 6 am in-game."}}) {
+            toggle("cryptids: " + k[0], "shows " + k[0] + " on the cryptids hud and its popup: " + k[1],
+                    () -> !s.cryptidOff.contains(k[0]), v -> {
+                        if (v) s.cryptidOff.remove(k[0]);
+                        else s.cryptidOff.add(k[0]);
+                    });
+        }
         header("level progress");
         toggle("level progress hud", "two thin bars: your fishing level (from the vanilla xp bar) and the level of the location you are at. the location bar starts when you open /comp once and then follows the location xp of quest rewards and chat. move it with move huds.",
                 () -> s.levelBars, v -> s.levelBars = v);

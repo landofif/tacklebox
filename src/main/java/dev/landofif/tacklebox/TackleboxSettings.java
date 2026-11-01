@@ -122,7 +122,7 @@ public class TackleboxSettings {
      * {@code *X} and {@code *Y} are the spot a hud is drawn at this frame, set from its pos on every draw; settings saved before
      * pos existed have them as the spot and sanitize makes the pos from them. Edit a pos, never these.
      */
-    public HudPos questsPos, levelBarsPos, boostsPos, nowPlayingPos, serverHudPos, eventPos;
+    public HudPos questsPos, levelBarsPos, boostsPos, nowPlayingPos, serverHudPos, eventPos, cryptidPos;
     /** The quests left hud: whether it shows. */
     public boolean questsHud;
     public int questsX = 4;
@@ -161,6 +161,19 @@ public class TackleboxSettings {
     public int eventScale = 100;
     public int eventY = 70;
     public HudAlign eventAlign = HudAlign.LEFT;
+    /** The cryptids hud (hud/CryptidHud): what can be caught where now and what comes next; the popups when an event starts. */
+    public boolean cryptidHud;
+    public boolean cryptidPopups = true;
+    /** The kinds of event switched off, from {@code Cryptids.KINDS}: hidden from the hud and the popups. */
+    public java.util.Set<String> cryptidOff = new java.util.HashSet<>();
+    /** The last moonrise seen in chat (epoch ms); the next ones are every 160 minutes from it. */
+    public long moonRiseAt = dev.landofif.tacklebox.hud.Cryptids.SEEN_RISE;
+    /** Dry streaks by spot ("rougarou", "lightning", ...): own catches while its event was on at its place, since its last drop. */
+    public java.util.Map<String, Integer> cryptidDry = new java.util.HashMap<>();
+    public int cryptidX = 360;
+    public int cryptidScale = 100;
+    public int cryptidY = 150;
+    public HudAlign cryptidAlign = HudAlign.LEFT;
     /** The now playing hud (hud/NowPlaying): what Spotify, a browser tab or any other player is playing, where it sits. */
     public boolean nowPlaying;
     public int nowPlayingX = 4;
@@ -555,6 +568,10 @@ public class TackleboxSettings {
         if (eventState.missions == null) eventState.missions = new java.util.LinkedHashMap<>();
         dev.landofif.tacklebox.hud.EventHud.bind(eventState);
         if (eventPos == null) eventPos = new HudPos(eventX, eventY);
+        if (cryptidPos == null) cryptidPos = new HudPos(cryptidX, cryptidY);
+        if (cryptidOff == null) cryptidOff = new java.util.HashSet<>();
+        if (cryptidDry == null) cryptidDry = new java.util.HashMap<>();
+        if (moonRiseAt <= 0) moonRiseAt = dev.landofif.tacklebox.hud.Cryptids.SEEN_RISE;
         if (nowPlayingPos == null) nowPlayingPos = new HudPos(nowPlayingX, nowPlayingY);
         if (serverHudPos == null) serverHudPos = new HudPos(serverHudX, serverHudY);
         if (chatPos == null) chatPos = new HudPos(chatX, 0);
