@@ -29,6 +29,7 @@ class RareDropsTest {
         TriggerEngine.clock = () -> now[0];
         TriggerEngine.playSound = s -> sounds++;
         TriggerEngine.assumeFishOnMc = true;
+        TriggerEngine.forgetFires();
         reset();
         TriggerStore.all().clear();
         TitleOverlay.clear();
@@ -89,9 +90,19 @@ class RareDropsTest {
     @Test
     void everythingOnByDefault() {
         chat("RARE CATCH! You pulled a 1x Subtropical Shard");
-        assertEquals(List.of("rare catch!"), titles());
+        assertEquals(List.of("+ subtropical shard"), titles());
         assertEquals("Subtropical Shard", TotemPop.last());
         assertEquals(1, sounds, "one sound request, the queue repeats it");
+    }
+
+    @Test
+    void titleIsPlusTheItemInItsChatColour() {
+        TriggerEngine.onGameMessage(TriggerColorsTest.line("RARE CATCH! ", 0xFFAA00, "You pulled a 1x ", 0xFFFFFF, "Subtropical Shard", 0x55FF55), false);
+        TitleOverlay.Shown shown = TitleOverlay.shown().get(0);
+        assertEquals("", shown.subtitle().getString());
+        List<String> chars = TriggerColorsTest.chars(shown.title());
+        assertEquals("+:ffaa00:b", chars.get(0));
+        assertEquals("s:55ff55:b", chars.get(2));
     }
 
     private static List<String> titles() {
@@ -112,7 +123,7 @@ class RareDropsTest {
         TackleboxSettings.get().dropPopOff.add(RareDrops.PET);
         String before = TotemPop.last();
         chat("PET DROP! You pulled a [COMMON] Capybara Pet");
-        assertEquals(List.of("pet drop!"), titles());
+        assertEquals(List.of("+ capybara pet"), titles());
         assertEquals(before, TotemPop.last(), "no pop for the pet");
     }
 
@@ -120,7 +131,7 @@ class RareDropsTest {
     void soundOffIsSilent() {
         TackleboxSettings.get().dropSoundOff.add(RareDrops.BOTTLE);
         chat("RARE CATCH! You pulled 1x Lightning in a Bottle");
-        assertEquals(List.of("rare catch!"), titles());
+        assertEquals(List.of("+ lightning in a bottle"), titles());
         assertEquals(0, sounds);
     }
 
@@ -128,7 +139,7 @@ class RareDropsTest {
     void oneKindOffLeavesTheOthers() {
         TackleboxSettings.get().dropTitleOff.add(RareDrops.SHARD);
         chat("RARE CATCH! You pulled 1x Lightning in a Bottle");
-        assertEquals(List.of("rare catch!"), titles());
+        assertEquals(List.of("+ lightning in a bottle"), titles());
     }
 
     @Test

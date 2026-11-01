@@ -43,10 +43,11 @@ luna found triggers late and plain next to skyblock mods. Before, every trigger 
 
 Pet drops and rare catches are no longer presets in /triggers. `RareDrops` holds two built-in triggers (ids `builtin:pet-drop`, `builtin:rare-catch`, made from `TriggerPresets.petDrop()/rareCatch()`) that `TriggerEngine.onGameMessage` runs before the saved triggers, so timing, stacking, merging and chat colours are the same.
 
+- **Title** (2026-11-01): one line, no subtitle: `+ {item}` ("+ subtropical shard") and `+ {pet} pet` ("+ capybara pet"). The "+" is the trigger colour (orange, pink for pets), the name keeps its chat colour. No count, so "3x arctic shard" reads "+ arctic shard".
 - **Rows.** `RareDrops.row` sorts a drop: pet, shards (any climate), lightning in a bottle, infusion capsule, prospecting amulet, bigfoot items (by item name, a guess: no bigfoot log line yet), other rare catch.
 - **Switches.** Settings > world > "rare drops" tile: a main switch (`rareDrops`) and per row a title, totem pop and sound toggle, stored as off-sets `dropTitleOff`, `dropPopOff`, `dropSoundOff` (all on by default). `RareDrops.apply` fires a copy with those parts off, and nothing at all (no cooldown used) when all three are off.
 - **Migration.** Once (`dropsMigrated`, `RareDrops.migrate()` from `Tacklebox`), saved triggers whose pattern is exactly the old pet drop or rare catch regex are switched off, not deleted; edited ones stay.
-- Test hook: `TriggerEngine.assumeFishOnMc` (built-ins are FishOnMC only).
+- Test hook: `TriggerEngine.assumeFishOnMc` (built-ins are FishOnMC only). `TriggerEngine.forgetFires()` clears cooldowns, since Gradle reruns failed classes first and a real-clock fire from `TriggerIntegrationTest` blocked `RareDropsTest`'s fake clock.
 - Tests: `RareDropsTest`, plus `TriggerIntegrationTest` (log lines through the built-ins). Not run in game yet.
 
 ## Presets

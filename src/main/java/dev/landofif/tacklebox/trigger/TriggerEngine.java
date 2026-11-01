@@ -145,6 +145,12 @@ public final class TriggerEngine {
         return out;
     }
 
+    /** Tests: forget cooldowns and lines being merged, so a test's own clock is not blocked by another test's fires. */
+    static void forgetFires() {
+        LAST_FIRED.clear();
+        MERGING.clear();
+    }
+
     /** Patterns changed: recompile lazily on the next message. */
     public static void invalidate() {
         MATCHERS.clear();

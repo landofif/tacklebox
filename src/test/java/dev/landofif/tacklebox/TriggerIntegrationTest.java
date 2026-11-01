@@ -63,7 +63,7 @@ class TriggerIntegrationTest {
 
         // a rare catch is another trigger: the quest title goes, the shard shows alone, with the shard's chat colour
         TriggerEngine.onGameMessage(colored("RARE CATCH! You pulled a 1x ", "Subtropical Shard"), false);
-        assertEquals(List.of("rare catch! / subtropical shard"), lines(TitleOverlay.shown()));
+        assertEquals(List.of("+ subtropical shard / "), lines(TitleOverlay.shown()));
         assertEquals(rareId, TitleOverlay.shown().get(0).trigger());
         assertEquals("Subtropical Shard", TotemPop.last());
         assertEquals(TotemPop.Source.WAIT, TotemPop.source(TotemPop.last(), id -> false, key -> false, key -> false));
@@ -71,13 +71,13 @@ class TriggerIntegrationTest {
 
         // another player's rare catch changes nothing
         TriggerEngine.onGameMessage(Text.literal("! [366] meowfih » RARE CATCH! You pulled 1x Prospecting Amulet"), false);
-        assertEquals(List.of("rare catch! / subtropical shard"), lines(TitleOverlay.shown()));
+        assertEquals(List.of("+ subtropical shard / "), lines(TitleOverlay.shown()));
 
         // the next own rare catch, past the merge window and the 1 s cooldown, stacks under the first
         Thread.sleep(1100);
         TriggerEngine.tick();
         TriggerEngine.onGameMessage(Text.literal("RARE CATCH! You pulled 1x Lightning in a Bottle"), false);
-        assertEquals(List.of("rare catch! / subtropical shard", "rare catch! / lightning in a bottle"), lines(TitleOverlay.shown()));
+        assertEquals(List.of("+ subtropical shard / ", "+ lightning in a bottle / "), lines(TitleOverlay.shown()));
         assertEquals(List.of(1, 0), TitleOverlay.shown().stream().map(TitleOverlay.Shown::place).toList());
         assertEquals("Lightning in a Bottle", TotemPop.last());
         assertEquals(TotemPop.Source.INVENTORY,
@@ -86,7 +86,7 @@ class TriggerIntegrationTest {
 
         // a pet drop replaces both, and pops the pet's head
         TriggerEngine.onGameMessage(Text.literal("PET DROP! You pulled a [COMMON] Capybara Pet"), false);
-        assertEquals(List.of("pet drop! / capybara"), lines(TitleOverlay.shown()));
+        assertEquals(List.of("+ capybara pet / "), lines(TitleOverlay.shown()));
         assertEquals(petId, TitleOverlay.shown().get(0).trigger());
         assertEquals("pet:Capybara", TotemPop.last());
         assertEquals(TotemPop.Source.HEAD, TotemPop.source(TotemPop.last(), id -> false, key -> true, key -> true));

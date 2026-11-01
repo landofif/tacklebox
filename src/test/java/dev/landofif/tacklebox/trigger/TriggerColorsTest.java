@@ -110,6 +110,7 @@ class TriggerColorsTest {
         Trigger t = TriggerPresets.rareCatch();
         t.fishOnMcOnly = false;
         t.title.chatColors = chatColors;
+        t.title.subtitle = "{item.lower}"; // the built-in has the item in its title; a subtitle keeps this test on the subtitle colour
         t.totem.enabled = false;
         TackleboxSettings.get().rareDrops = false; // the built-in rare catch would fire next to this copy
         TriggerStore.all().clear();
