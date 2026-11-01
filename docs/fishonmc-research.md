@@ -107,7 +107,7 @@ Hook via Fabric `ClientReceiveMessageEvents.ALLOW_GAME` (observe/suppress) and `
 - `RARE CATCH! You pulled a <N>x ... Shard ...`: shards (count between `a ` and `x `; >1 with Prospecting Amulet). One shard per climate (luna, 2026-10-06): arid, semi-arid, subtropical, oceanic, arctic, savanna, subarctic, continental, monsoon, rainforest, e.g. `Subarctic Shard`.
 - `RARE CATCH! You pulled ... Lightning in a Bottle ...`: only during Thunderstorm.
 - `RARE CATCH! You pulled ... Infusion Capsule ...`: only during Blood Moon.
-- Other rare catch names known from constants: Prospecting Amulet, Bigfoot Fur, Bigfoot Tooth (Witching Hour, Cypress Lake, 12–3 AM in-game, "1 in 300 chance for bigfoot to steal your fish (and leave a gift)").
+- Other rare catch names known from constants: Prospecting Amulet, Bigfoot Fur, Bigfoot Tooth (Witching Hour, Cypress Lake, 1–3 AM in-game per the wiki (luna 2026-11-01; an older note said 12–3), "1 in 300 chance for bigfoot to steal your fish (and leave a gift)").
 
 **Quests**
 - `QUEST Complete [...` and then the next ~5 lines are rewards: `+ <N>x ... Shard`, `+ <rarityGlyph> ... Pet`.
@@ -133,6 +133,8 @@ Hook via Fabric `ClientReceiveMessageEvents.ALLOW_GAME` (observe/suppress) and `
 - `SUPER MOON » A Super Moon has risen.` (+120 Bite Speed, +150 Reel Speed)
 - `BLOOD MOON » A Blood Moon has risen!` (+120 Bite Speed)
 - Moon set: contains `» The ` … ` has set.`
+- Moon timing (luna's logs, 75 rises 2026-09-05 to 11-01): every 160 minutes to the second, 600 s long, kind random; the phase shifts now and then (probably restarts), so foecollab's fixed 00:03:01 UTC anchor drifted. See `huds/cryptids.md`.
+- Cryptids (luna's paste 2026-11-01): Titanoboa (Amazon, 1/1500 between 2-4 am, Titan's Fang), Rougarou (Toledo Bend, 1/300 in moons, Rougarou Blood or Claw), Garaboncias (Danube, 1/250 in rainbows, Wizard's Vile Concoction or Purifying Essence), Bessie (Great Lakes, 1/1000 4-6 am, 1/500 in moons, Silver Scale). Their chat lines are not in the logs yet.
 - Fabled (luna's logs 2026-10-10, the old `FABLED » ...` format was wrong): separate chat lines. Start: `FABLED FISH EVENT`, `Visit the Cypress Lake to`, `try and catch it!`. End: `FABLED FISH EVENT`, `Caught by <player>`, then the fish name. No length.
 - Fish Frenzy (luna's logs 2026-10-10, Kenai River both times, random start, not every 3 hours: ended 18:17:54, next alert 19:43:05): start `FISH FRENZY ALERT`, `Fish at Kenai River for 1 hour of buffed rates`, two bonus lines (+100 Bite Speed +50 Prospect +25% Pet Luck +100% Money +250 Luck +250 Scale). Reminders `FISH FRENZY » A Fish Frenzy is active at Kenai River (for 16m 56s)` give the time left (also on joining). End `FRENZY » The Fish Frenzy has ended at Kenai River`.
 - Fish Frenzy cycles (luna's sheet 2026-10-18, Middle European summer time): cycle starts 13, 16, 19, 22, 01, 04, 07, 10 o'clock; a frenzy can spawn until start +2h ("spawn window end"), lasts 1h from its spawn, the cycle ends at start +3h and the next window opens then. The 2026-10-10 logs fit it (ended 18:17:54, next alert 19:43:05). Sheet only, not seen to repeat in logs yet.

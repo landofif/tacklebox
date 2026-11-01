@@ -132,6 +132,12 @@ public final class HudMover extends Screen {
                 s.eventPos = new HudPos(360, 70);
             }));
         }
+        if (s.cryptidHud) {
+            add.add(new Box(ctx -> dev.landofif.tacklebox.hud.CryptidHud.draw(ctx, true), (x, y, r) -> s.cryptidPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.cryptidScale = Math.max(50, Math.min(300, s.cryptidScale + step * 5)), () -> {
+                s.cryptidScale = 100;
+                s.cryptidPos = new HudPos(360, 150);
+            }));
+        }
         if (s.nowPlaying) {
             add.add(new Box(ctx -> dev.landofif.tacklebox.hud.NowPlaying.draw(ctx, true), (x, y, r) -> s.nowPlayingPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.nowPlayingScale = Math.max(50, Math.min(300, s.nowPlayingScale + step * 5)), () -> {
                 s.nowPlayingScale = 100;

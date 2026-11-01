@@ -105,11 +105,12 @@ public final class CatchWatch {
         }
     }
 
-    /** Everything a catch of yours feeds: the community goal, the compendium lists and the event missions. */
+    /** Everything a catch of yours feeds: the community goal, the compendium lists, the event missions and the cryptid dry streaks. */
     static void onCatch(Fish f, long now) {
         CommunityGoal.onCatch(now);
         Compendium.onCatch(f.fish(), f.variant(), f.size(), f.location());
-        if (EventHud.onCatch(f.location(), f.fish(), now)) {
+        boolean event = EventHud.onCatch(f.location(), f.fish(), now);
+        if (dev.landofif.tacklebox.hud.CryptidHud.onCatch(f.location(), f.variant(), now) || event) {
             TackleboxSettings.save();
         }
     }
