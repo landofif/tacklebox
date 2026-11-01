@@ -283,6 +283,7 @@ public final class SettingsPages {
         p.bobber();
         p.page("world");
         p.chat();
+        p.drops();
         p.world();
         p.page("screens");
         p.screens();
@@ -306,6 +307,26 @@ public final class SettingsPages {
         rows.clear();
         main = null;
         tileName = name;
+    }
+
+    private void drops() {
+        header("rare drops");
+        toggle("rare drops", "your own pet drops and rare catches (shards, lightning in a bottle, infusion capsules, prospecting amulets, bigfoot items) show a title, pop their item in the totem animation and play a sound. these are built in, not triggers. other players drops never show.",
+                () -> s.rareDrops, v -> s.rareDrops = v);
+        main();
+        for (dev.landofif.tacklebox.trigger.RareDrops.Row r : dev.landofif.tacklebox.trigger.RareDrops.ROWS) {
+            dropToggle(r, "title", s.dropTitleOff);
+            dropToggle(r, "totem pop", s.dropPopOff);
+            dropToggle(r, "sound", s.dropSoundOff);
+        }
+    }
+
+    private void dropToggle(dev.landofif.tacklebox.trigger.RareDrops.Row r, String part, java.util.Set<String> off) {
+        toggle(r.label() + ": " + part, "the " + part + " for " + r.desc(),
+                () -> !off.contains(r.key()), v -> {
+                    if (v) off.remove(r.key());
+                    else off.add(r.key());
+                });
     }
 
     private void screens() {

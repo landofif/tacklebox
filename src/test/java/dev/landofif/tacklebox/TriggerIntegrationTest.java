@@ -27,6 +27,7 @@ class TriggerIntegrationTest {
     void tearDown() {
         TriggerStore.all().clear();
         TitleOverlay.clear();
+        TriggerEngine.assumeFishOnMc = false;
     }
 
     private static Trigger add(Trigger t) {
@@ -48,8 +49,8 @@ class TriggerIntegrationTest {
     void chatLinesToTitlesAndPops() throws InterruptedException {
         TriggerStore.all().clear();
         Trigger quest = add(TriggerPresets.questComplete());
-        Trigger rare = add(TriggerPresets.rareCatch());
-        Trigger pet = add(TriggerPresets.petDrop());
+        TriggerEngine.assumeFishOnMc = true;
+        String rareId = "builtin:rare-catch", petId = "builtin:pet-drop"; // the built-in rare drops, not in the store
 
         // two quests done by one catch: one title, changed in place by the second line
         assertTrue(TriggerEngine.onGameMessage(Text.literal("QUESTS » Quest #3 has been completed!"), false));
@@ -63,7 +64,7 @@ class TriggerIntegrationTest {
         // a rare catch is another trigger: the quest title goes, the shard shows alone, with the shard's chat colour
         TriggerEngine.onGameMessage(colored("RARE CATCH! You pulled a 1x ", "Subtropical Shard"), false);
         assertEquals(List.of("rare catch! / subtropical shard"), lines(TitleOverlay.shown()));
-        assertEquals(rare.id, TitleOverlay.shown().get(0).trigger());
+        assertEquals(rareId, TitleOverlay.shown().get(0).trigger());
         assertEquals("Subtropical Shard", TotemPop.last());
         assertEquals(TotemPop.Source.WAIT, TotemPop.source(TotemPop.last(), id -> false, key -> false, key -> false));
         assertEquals("shard:subtropical", TotemPop.fallback(TotemPop.last()));
@@ -86,7 +87,7 @@ class TriggerIntegrationTest {
         // a pet drop replaces both, and pops the pet's head
         TriggerEngine.onGameMessage(Text.literal("PET DROP! You pulled a [COMMON] Capybara Pet"), false);
         assertEquals(List.of("pet drop! / capybara"), lines(TitleOverlay.shown()));
-        assertEquals(pet.id, TitleOverlay.shown().get(0).trigger());
+        assertEquals(petId, TitleOverlay.shown().get(0).trigger());
         assertEquals("pet:Capybara", TotemPop.last());
         assertEquals(TotemPop.Source.HEAD, TotemPop.source(TotemPop.last(), id -> false, key -> true, key -> true));
     }
@@ -94,7 +95,6 @@ class TriggerIntegrationTest {
     @Test
     void petAtMaxLevelPopsItsHead() {
         Trigger max = add(TriggerPresets.petMaxLevel());
-        add(TriggerPresets.petDrop());
         assertTrue(TriggerEngine.onGameMessage(Text.literal("PETS » Your Duck Pet is now level 98 → 99 (+1)"), false));
         assertEquals(List.of(), lines(TitleOverlay.shown()));
         TriggerEngine.onGameMessage(Text.literal("PETS » Your Marsh Rabbit Pet is now level 97 → 100 (+3)"), false);

@@ -57,7 +57,8 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 ## Triggers
 
 - Chat triggers: a matching chat line shows an animated title and plays sounds, can hide the line. `/triggers`. `display/triggers.md`
-- Trigger presets (quest completed, pet drop, rare catch, fabled, storm and more). `+ new trigger`. `display/triggers.md`
+- Rare drops (2026-11-01): your own pet drops and rare catches are built in (not triggers), with a title, totem pop and sound switch per kind of drop in settings > world > rare drops. `display/triggers.md`
+- Trigger presets (quest completed, pet max level, fabled, storm and more). `+ new trigger`. `display/triggers.md`
 - Totem pop: a trigger can pop an item (pet head, shard head, the real item). Trigger totem tab. `display/world-and-totem.md`
 - Trigger share codes: copy and import a trigger as a short code. **(no doc)**, `trigger/TriggerStore`
 - Pet max level preset: a pet reaching level 100 pops its head. Trigger preset. `display/triggers.md`

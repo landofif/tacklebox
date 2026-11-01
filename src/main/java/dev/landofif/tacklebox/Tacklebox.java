@@ -99,6 +99,10 @@ public final class Tacklebox implements ClientModInitializer {
         dev.landofif.tacklebox.menu.Vaults.register();
         TriggerStore.load();
         TackleboxSettings.load();
+        if (dev.landofif.tacklebox.trigger.RareDrops.migrate()) {
+            TriggerStore.save();
+            TackleboxSettings.save();
+        }
         TackleboxSettings cs = TackleboxSettings.get();
         dev.landofif.tacklebox.hud.CommunityGoal.restore(cs.communityCurrent, cs.communityGoal, cs.communityMine);
         dev.landofif.tacklebox.hud.NowPlaying.start();

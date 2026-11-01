@@ -7,6 +7,7 @@ A trigger watches chat lines and, when one matches, shows a title, plays a sound
 - `trigger/TriggerEngine`: runs each chat line (`ALLOW_GAME`) through the triggers, merges lines, fills placeholders, reads chat colours.
 - `trigger/Matcher` (normalize, SIMPLE/EXACT/REGEX, capture spans), `Trigger` (saved model), `TriggerPresets`, `TriggerStore` (`config/tacklebox/triggers.json`).
 - `display/TitleOverlay` (titles on screen), `TotemPop` (the pop, its item lookup and the shorter leaving spin, see `world-and-totem.md`), `ItemLooks` (remembered item looks), `PetHeads` (pet and shard heads), `SoundQueue`.
+- `trigger/RareDrops`: the built-in pet drop and rare catch (2026-11-01, see Rare drops).
 - `screen/TriggerEditScreen`: tabs when, title, totem, sound, and the preview.
 
 ## Timing (2026-10-28)
@@ -38,10 +39,20 @@ luna found triggers late and plain next to skyblock mods. Before, every trigger 
 - `fill` writes a coloured capture as `&#RRGGBB` runs, then puts back the colour and formatting from before the placeholder (`RichText.codesAtEnd`). This is needed because a colour code resets bold in `RichText`, like vanilla. `{x.lower}` keeps the colours.
 - Only colour is taken, not bold. The totem item and everything outside the title get plain values. Lines without colours (the Compendium's own line) stay plain.
 
+## Rare drops (2026-11-01, asked for by luna)
+
+Pet drops and rare catches are no longer presets in /triggers. `RareDrops` holds two built-in triggers (ids `builtin:pet-drop`, `builtin:rare-catch`, made from `TriggerPresets.petDrop()/rareCatch()`) that `TriggerEngine.onGameMessage` runs before the saved triggers, so timing, stacking, merging and chat colours are the same.
+
+- **Rows.** `RareDrops.row` sorts a drop: pet, shards (any climate), lightning in a bottle, infusion capsule, prospecting amulet, bigfoot items (by item name, a guess: no bigfoot log line yet), other rare catch.
+- **Switches.** Settings > world > "rare drops" tile: a main switch (`rareDrops`) and per row a title, totem pop and sound toggle, stored as off-sets `dropTitleOff`, `dropPopOff`, `dropSoundOff` (all on by default). `RareDrops.apply` fires a copy with those parts off, and nothing at all (no cooldown used) when all three are off.
+- **Migration.** Once (`dropsMigrated`, `RareDrops.migrate()` from `Tacklebox`), saved triggers whose pattern is exactly the old pet drop or rare catch regex are switched off, not deleted; edited ones stay.
+- Test hook: `TriggerEngine.assumeFishOnMc` (built-ins are FishOnMC only).
+- Tests: `RareDropsTest`, plus `TriggerIntegrationTest` (log lines through the built-ins). Not run in game yet.
+
 ## Presets
 
-- **pet drop**: regex anchored with `^`. The rarity can be a glyph, a word or a word in brackets. Title "pet drop!", subtitle `{pet.lower}`, shake, totem `pet:{pet}`, level-up sound twice.
-- **rare catch**: `^rare catch! you (pulled|caught) (a )?<n>x <item>`, own lines only (shards, Lightning in a Bottle, Infusion Capsule, Prospecting Amulet). Title "rare catch!", subtitle `{item.lower}`, pop, totem `{item}`, amethyst chime three times.
+- **pet drop** (built in now, see Rare drops; `TriggerPresets.petDrop()` still makes it): regex anchored with `^`. The rarity can be a glyph, a word or a word in brackets. Title "pet drop!", subtitle `{pet.lower}`, shake, totem `pet:{pet}`, level-up sound twice.
+- **rare catch** (built in now): `^rare catch! you (pulled|caught) (a )?<n>x <item>`, own lines only (shards, Lightning in a Bottle, Infusion Capsule, Prospecting Amulet). Title "rare catch!", subtitle `{item.lower}`, pop, totem `{item}`, amethyst chime three times.
 - **pet max level** (2026-10-29, from luna's own trigger "petg"): `^pets > your (?<pet>.+?) pet is now level \d+ → 100\b`, so a jump like `97 → 100 (+3)` fires too. 100 is the top: no log line goes past it. Title "{pet} max level!", subtitle "level 100", totem `pet:{pet}`, bell.
 - **rod not cast** (2026-10-29): matches `tacklebox > rod not cast for {seconds}s`, a line the mod hands to the triggers itself (not to chat), like the compendium line. Made by `display/RodIdle`, see `huds/bobber-timer.md`. Title "cast your rod", note block bell twice.
 - "pet totem", "climate shard" and "shard totem" are gone. Triggers saved from them stay as they are.

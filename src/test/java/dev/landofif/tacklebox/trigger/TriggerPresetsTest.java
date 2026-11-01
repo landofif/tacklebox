@@ -19,9 +19,9 @@ class TriggerPresetsTest {
     }
 
     @Test
-    void onePetDropAndOneRareCatchPreset() {
+    void petDropAndRareCatchAreBuiltInNotPresets() {
         List<String> names = TriggerPresets.all().stream().map(TriggerPresets.Preset::name).toList();
-        assertTrue(names.contains("pet drop") && names.contains("rare catch"));
+        assertFalse(names.contains("pet drop") || names.contains("rare catch"), "built in under settings > rare drops");
         for (String gone : List.of("pet totem", "climate shard", "shard totem")) {
             assertFalse(names.contains(gone), gone);
         }
