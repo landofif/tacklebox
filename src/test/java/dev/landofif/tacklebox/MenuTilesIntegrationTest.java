@@ -70,7 +70,7 @@ class MenuTilesIntegrationTest {
         assertEquals(35, items.size());
         assertEquals("collections", FishMenu.crewTitleMenu(items.stream().map(Item::plain).toList()));
 
-        List<Item> order = MenuTiles.byNextLevel(items, i -> i.row().progress(), i -> i.row().level() >= MenuTiles.COLLECTION_TOP);
+        List<Item> order = MenuTiles.byNextLevel(items, i -> i.row().progress(), i -> MenuTiles.maxed(i.lore));
         List<String> names = order.stream().map(i -> MenuTiles.shortName(i.name)).toList();
         // mackerels 1,495/1.5K, gars 196/200, tunas 970/1K, carps 19,249/20K, seabreams 1,414/1.5K
         assertEquals(List.of("mackerels", "gars", "tunas", "carps", "seabreams"), names.subList(0, 5));
@@ -89,16 +89,24 @@ class MenuTilesIntegrationTest {
     }
 
     @Test
-    void aFinishedCollectionGoesLastWithMax() throws Exception {
-        // the dump is from before catfishes reached level 7; the lore of a finished one is a guess until a new dump
+    void aFinishedCollectionGoesLastWithMaxAndGiganticAtEightDoesNot() throws Exception {
+        // the dump is from before catfishes reached level 7: its lore is put in from luna's screenshot of 2026-11-01, and
+        // gigantic (10 levels; red block, at 8 in her screenshot) is added in the species' format, which a dump has to confirm
+        String p = " 퀃    ";
         List<Item> items = new ArrayList<>(buttons("collections-20261010.txt"));
         Item cat = items.stream().filter(i -> i.plain().equals("catfishes collection")).findFirst().orElseThrow();
-        items.set(items.indexOf(cat), new Item(cat.slot, cat.id, cat.name, List.of(" 퀃    Catfishes Collection", " 퀃    Current Level - [7]")));
+        items.set(items.indexOf(cat), new Item(cat.slot, cat.id, cat.name, List.of(p + "Catfishes Collection", p + "ᴄʟɪᴄᴋ ᴛᴏ ᴏᴘᴇɴ",
+                p + "Current Level - [7]", p + "                        (30,039/MAX)", p + "Catch at:", p + "- Cypress Lake")));
+        items.add(new Item(36, "red_concrete", "Gigantic Collection", List.of(p + "Gigantic Collection", p + "ᴄʟɪᴄᴋ ᴛᴏ ᴏᴘᴇɴ",
+                p + "Current Level - [8]", p + "                        (1,886/5K)", p + "Progress to Level 9")));
 
-        List<Item> order = MenuTiles.byNextLevel(items, i -> i.row().progress(), i -> i.row().level() >= MenuTiles.COLLECTION_TOP);
-        assertEquals("catfishes", MenuTiles.shortName(order.get(34).name));
-        assertEquals("1 max · 7 almost there", MenuTiles.summary(1, 7));
-        assertEquals("Level 7, max", MenuTiles.collectionTip(order.get(34).row(), order.get(34).lore).get(1));
+        List<Item> order = MenuTiles.byNextLevel(items, i -> i.row().progress(), i -> MenuTiles.maxed(i.lore));
+        assertEquals("catfishes", MenuTiles.shortName(order.get(35).name));
+        assertEquals(1, items.stream().filter(i -> MenuTiles.maxed(i.lore)).count());
+        assertEquals("Level 7, max", MenuTiles.collectionTip(order.get(35).row(), order.get(35).lore).get(1));
+        Item gigantic = order.stream().filter(i -> i.plain().equals("gigantic collection")).findFirst().orElseThrow();
+        assertTrue(order.indexOf(gigantic) < 34);
+        assertEquals("Level 8, 1,886/5,000 to level 9", MenuTiles.collectionTip(gigantic.row(), gigantic.lore).get(1));
     }
 
     @Test

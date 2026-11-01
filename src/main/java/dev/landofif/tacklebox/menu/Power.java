@@ -47,7 +47,8 @@ public final class Power {
     /** Power for reaching species collection level 1 to 7, the same for every species collection (luna's dumps 2026-10-10, 35 of them). */
     private static final int[] SPECIES = {50, 100, 250, 400, 1000, 5000, 10000};
     /** Collections whose levels give other power than the species table, so the overview cannot tell what their next level gives. */
-    private static final java.util.Set<String> NOT_SPECIES = java.util.Set.of("albino", "all", "common", "rare", "epic", "legendary", "mythical", "fabled");
+    private static final java.util.Set<String> NOT_SPECIES = java.util.Set.of("albino", "all", "common", "rare", "epic", "legendary", "mythical", "fabled",
+            "melanistic", "trophy", "gigantic");
     private static final String[] SOURCES = {"total", "leveling", "compendium", "collections", "unique"};
 
     /** One location: where its level is, what the next one gives and what fish it still has. {@code level} 0 = not read yet. */
@@ -196,7 +197,7 @@ public final class Power {
         }
     }
 
-    /** A species collection on the overview page ("Basses Collection", lore "Current Level - [6]", "(43,178/50K)"): the next level is the one after the current, its power comes from the species table. A finished one goes to {@code finished}. */
+    /** A species collection on the overview page ("Basses Collection", lore "Current Level - [6]", "(43,178/50K)"): the next level is the one after the current, its power comes from the species table. A finished one ("(30,039/MAX)") goes to {@code finished}. */
     static void overview(String name, List<String> lines, Map<String, String> found, java.util.Set<String> finished) {
         if (!name.endsWith(" collection")) {
             return;
@@ -206,13 +207,13 @@ public final class Power {
         if (level == null || NOT_SPECIES.contains(cat)) {
             return;
         }
-        int current = Integer.parseInt(level.group(1));
-        if (current >= SPECIES.length) {
+        if (MenuTiles.maxed(lines)) {
             finished.add(cat);
             return;
         }
+        int current = Integer.parseInt(level.group(1));
         Matcher progress = lines.stream().map(PROGRESS::matcher).filter(Matcher::matches).findFirst().orElse(null);
-        if (progress != null) {
+        if (progress != null && current < SPECIES.length) {
             found.put(cat, (current + 1) + "|" + (long) XpEstimate.num(progress.group(1), progress.group(2)) + "|" + (long) XpEstimate.num(progress.group(3), progress.group(4))
                     + "|" + SPECIES[current]);
         }

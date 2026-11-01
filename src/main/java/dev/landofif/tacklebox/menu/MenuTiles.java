@@ -19,8 +19,8 @@ import java.util.regex.Pattern;
  * can be tested without the game; {@code FishMenuScreen} only draws it.
  */
 public final class MenuTiles {
-    /** The top level of a species collection (7 levels each, research doc) and of a place (20 location levels). */
-    public static final int COLLECTION_TOP = 7, PLACE_TOP = 20;
+    /** The top level of a place (20 location levels); a collection's top is in its lore ({@link #maxed}). */
+    public static final int PLACE_TOP = 20;
     /** A collection at least this far to its next level is "almost there" in the header. */
     public static final float ALMOST = 0.9f;
     /** Tiles are at most {@code MAX_H} tall and get shorter down to {@code MIN_H} before the page scrolls. */
@@ -34,6 +34,7 @@ public final class MenuTiles {
 
     private static final Pattern LEVEL_NAME = Pattern.compile("level (\\d+)");
     private static final Pattern LEVEL_OF = Pattern.compile("\\(Level \\d+\\)\\s*(.*)");
+    private static final Pattern MAXED = Pattern.compile("\\(\\s*[\\d,.]+\\s*[kmb]?\\s*/\\s*max\\s*\\)", Pattern.CASE_INSENSITIVE);
 
     private MenuTiles() {}
 
@@ -91,6 +92,14 @@ public final class MenuTiles {
         return line(done > 0 ? done + " max" : "", almost > 0 ? almost + " almost there" : "");
     }
 
+    /**
+     * A finished collection: its count reads {@code (30,039/MAX)} instead of the next level's need (luna, 2026-11-01).
+     * Not a level number: species collections end at 7, gigantic, albino, fabled and the rarities at 10.
+     */
+    public static boolean maxed(List<String> lore) {
+        return lore.stream().anyMatch(line -> MAXED.matcher(MenuRows.clean(line)).find());
+    }
+
     /** The places under "Catch at:" in a collection's lore ("- Toledo Bend Reservoir"), by their short names. */
     public static List<String> catchAt(List<String> lore) {
         List<String> out = new ArrayList<>();
@@ -111,7 +120,7 @@ public final class MenuTiles {
     public static List<String> collectionTip(MenuRows.Row row, List<String> lore) {
         List<String> out = new ArrayList<>();
         out.add(row.name().toLowerCase(Locale.ROOT));
-        if (row.level() >= COLLECTION_TOP) {
+        if (maxed(lore)) {
             out.add("Level " + row.level() + ", max");
         } else if (row.level() >= 0) {
             out.add("Level " + row.level() + (row.amount().isEmpty() ? "" : ", " + count(row.amount()) + " to level " + (row.level() + 1)));
