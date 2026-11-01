@@ -61,8 +61,20 @@ class MenuTilesTest {
         assertEquals(List.of("cypress lake", "toledo bend"), MenuTiles.catchAt(lore));
         assertEquals(List.of("basses collection", "Level 6, 43.1k/50k to level 7", "Catch at cypress lake, toledo bend"),
                 MenuTiles.collectionTip(row, lore));
-        MenuRows.Row max = MenuRows.of("Catfishes Collection", List.of(P + "Current Level - [7]"));
-        assertEquals("Level 7, max", MenuTiles.collectionTip(max, List.of()).get(1));
+    }
+
+    @Test
+    void aCollectionIsMaxOnlyWhenItsCountSaysMax() {
+        // luna's catfishes at its top (screenshot 2026-11-01), and gigantic at 8 of its 10 levels
+        List<String> catfishes = List.of(P + "Catfishes Collection", P + "ᴄʟɪᴄᴋ ᴛᴏ ᴏᴘᴇɴ", P + " ", P + "Current Level - [7]",
+                P + "   (30,039/MAX)", P + " ", P + "Catch at:", P + "- Cypress Lake", P + "- Nile River");
+        List<String> gigantic = List.of(P + "Gigantic Collection", P + "ᴄʟɪᴄᴋ ᴛᴏ ᴏᴘᴇɴ", P + "Current Level - [8]",
+                P + "   (1,886/5K)", P + "Progress to Level 9");
+        assertTrue(MenuTiles.maxed(catfishes));
+        assertFalse(MenuTiles.maxed(gigantic));
+        assertEquals(List.of("catfishes collection", "Level 7, max", "Catch at cypress lake, nile river"),
+                MenuTiles.collectionTip(MenuRows.of("Catfishes Collection", catfishes), catfishes));
+        assertEquals("Level 8, 1,886/5,000 to level 9", MenuTiles.collectionTip(MenuRows.of("Gigantic Collection", gigantic), gigantic).get(1));
     }
 
     @Test

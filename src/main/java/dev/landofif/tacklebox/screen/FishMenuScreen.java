@@ -32,8 +32,9 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.Set;
 
 /**
  * The fishonmc main menu, /travel and the button menus (quests, stats, crew) as one dark panel of the mods own:
@@ -61,8 +62,8 @@ public class FishMenuScreen extends TackleboxScreen {
 
     private enum Kind { COLLECTIONS, PLACES, LEVELS }
 
-    /** A tile page: the tiles in the order they show, the other buttons as rows under them, and what the header says. */
-    private record Grid(Kind kind, List<Tile> tiles, List<Tile> rest, int cols, String title, String summary) {}
+    /** A tile page: the tiles in the order they show, the other buttons as rows under them, what the header says, and the finished collections (read once from their lore, not every frame). */
+    private record Grid(Kind kind, List<Tile> tiles, List<Tile> rest, int cols, String title, String summary, Set<Tile> max) {}
 
     /** Something clickable from the last frame. */
     private record Hit(int x, int y, int w, int h, Runnable action, Tile tile) {
@@ -781,17 +782,21 @@ public class FishMenuScreen extends TackleboxScreen {
                     marks.add(word + " at " + t.loc.name());
                 }
             }
-            return new Grid(Kind.PLACES, tiles, List.of(), 4, "", MenuTiles.line(max > 0 ? max + " max" : "", String.join(" · ", marks)));
+            return new Grid(Kind.PLACES, tiles, List.of(), 4, "", MenuTiles.line(max > 0 ? max + " max" : "", String.join(" · ", marks)), Set.of());
         }
         List<Tile> picked = new ArrayList<>(), rest = new ArrayList<>();
         if (menu.equals("collections")) {
             for (Tile t : tiles) {
                 (Glyphs.plain(t.stack.getName()).trim().endsWith(" collection") ? picked : rest).add(t);
             }
-            Predicate<Tile> done = t -> t.row.level() >= MenuTiles.COLLECTION_TOP;
-            int max = (int) picked.stream().filter(done).count();
-            int almost = (int) picked.stream().filter(t -> !done.test(t) && t.row.progress() >= MenuTiles.ALMOST).count();
-            return new Grid(Kind.COLLECTIONS, MenuTiles.byNextLevel(picked, t -> t.row.progress(), done), rest, 5, "", MenuTiles.summary(max, almost));
+            Set<Tile> max = new HashSet<>();
+            for (Tile t : picked) {
+                if (MenuTiles.maxed(lore(t.stack))) {
+                    max.add(t);
+                }
+            }
+            int almost = (int) picked.stream().filter(t -> !max.contains(t) && t.row.progress() >= MenuTiles.ALMOST).count();
+            return new Grid(Kind.COLLECTIONS, MenuTiles.byNextLevel(picked, t -> t.row.progress(), max::contains), rest, 5, "", MenuTiles.summary(max.size(), almost), max);
         }
         if (!MenuTiles.isLevelPage(tiles.stream().map(t -> Glyphs.plain(t.stack.getName()).trim()).toList())) {
             return null;
@@ -800,7 +805,7 @@ public class FishMenuScreen extends TackleboxScreen {
             (MenuTiles.level(Glyphs.plain(t.stack.getName()).trim()) > 0 ? picked : rest).add(t);
         }
         long done = picked.stream().filter(t -> state(t) == MenuTiles.State.DONE).count();
-        return new Grid(Kind.LEVELS, picked, rest, 5, MenuTiles.levelPageTitle(lore(picked.get(0).stack)), done + "/" + picked.size() + " done");
+        return new Grid(Kind.LEVELS, picked, rest, 5, MenuTiles.levelPageTitle(lore(picked.get(0).stack)), done + "/" + picked.size() + " done", Set.of());
     }
 
     private static int mark(Tile t) {
@@ -868,7 +873,7 @@ public class FishMenuScreen extends TackleboxScreen {
         boolean collection = grid.kind() == Kind.COLLECTIONS;
         int level = collection ? t.row.level() : t.info.level();
         float progress = collection ? t.row.progress() : t.info.progress();
-        boolean done = level >= (collection ? MenuTiles.COLLECTION_TOP : MenuTiles.PLACE_TOP);
+        boolean done = collection ? grid.max().contains(t) : level >= MenuTiles.PLACE_TOP;
         int bw = 0;
         if (done) { // a green "max" at the normal size
             Text max = Foe.text("max");
