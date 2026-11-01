@@ -105,6 +105,17 @@ class RareDropsTest {
         assertEquals("s:55ff55:b", chars.get(2));
     }
 
+    @Test
+    void countShowsOnlyWhenMoreThanOne() {
+        chat("RARE CATCH! You pulled a 3x Arctic Shard");
+        assertEquals(List.of("+3 arctic shard"), titles());
+        assertEquals("Arctic Shard", TotemPop.last());
+        TitleOverlay.clear();
+        now[0] += 60_000;
+        chat("RARE CATCH! You pulled a 1x Arctic Shard");
+        assertEquals(List.of("+ arctic shard"), titles());
+    }
+
     private static List<String> titles() {
         return TitleOverlay.shown().stream().map(s -> s.title().getString()).toList();
     }

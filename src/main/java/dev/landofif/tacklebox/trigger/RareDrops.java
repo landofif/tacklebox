@@ -60,7 +60,7 @@ public final class RareDrops {
         return OTHER;
     }
 
-    /** A copy of the built-in with this drop's switched off parts off, or null when the drop shows nothing at all. */
+    /** A copy of the built-in with this drop's switched off parts off and the count in the title when more than one, or null when the drop shows nothing at all. */
     public static Trigger apply(Trigger builtIn, Matcher.Result r) {
         TackleboxSettings s = TackleboxSettings.get();
         String row = row(builtIn, r);
@@ -74,6 +74,10 @@ public final class RareDrops {
         t.title.enabled = title;
         t.totem.enabled = pop;
         t.sound.enabled = sound;
+        String n = r.values().get("n");
+        if (n != null && !n.equals("1")) {
+            t.title.title = "&l+" + n + " {item.lower}"; // "+3 arctic shard"; one is just "+ arctic shard"
+        }
         return t;
     }
 
