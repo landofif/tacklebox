@@ -91,6 +91,20 @@ public final class FishMenu {
         return plainNames.stream().anyMatch(n -> INSTANCE.matcher(n).matches());
     }
 
+    /**
+     * The menus that share the crew title {@code 핒} (U+D552), named by their plain item names: the collections overview
+     * ("basses collection"), a location leveling page ("location leveling data"), otherwise the crew menu itself.
+     */
+    public static String crewTitleMenu(List<String> plainNames) {
+        if (plainNames.stream().anyMatch(n -> n.endsWith(" collection"))) {
+            return "collections";
+        }
+        if (plainNames.contains("location leveling data")) {
+            return "location leveling";
+        }
+        return "crew";
+    }
+
     /** Whose profile item this is, from its plain lore ("profile of meowfih"), or null when it is no profile. */
     public static String profileOwner(List<String> plainLore) {
         for (String line : plainLore) {

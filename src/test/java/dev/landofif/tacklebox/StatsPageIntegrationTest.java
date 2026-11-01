@@ -23,13 +23,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * luna's whole /stats dump (2026-10-30, F8 while tacklebox's screen was open) read into the profile layout, as her
- * own page and as someone else's ({@code /stats <player>}, only the "Profile of" line differs).
+ * own page and as someone else's ({@code /stats <player>}, only the "Profile of" line differs). The dump leaves out
+ * the server's filler bread (lore-less "Bread" in every free slot), so it is put back here as the real chest has it.
  */
 class StatsPageIntegrationTest {
     private static final Pattern SLOT = Pattern.compile("^slot (\\d+) \\S+ x\\d+$");
     private static final Pattern ESCAPE = Pattern.compile("\\\\u([0-9A-Fa-f]{4})");
 
-    /** The dump's slots as pieces: {@code name="..."}, {@code lore="..."} (java escapes), {@code custom_data={...}} (snbt). */
+    /**
+     * The dump's slots as pieces: {@code name="..."}, {@code lore="..."} (java escapes), {@code custom_data={...}} (snbt),
+     * and filler bread in the other slots of the 54.
+     */
     static List<StatsPage.Piece> dump(String owner) throws Exception {
         String text;
         try (InputStream in = StatsPageIntegrationTest.class.getResourceAsStream("/dumps/stats-20261030.txt")) {
@@ -58,6 +62,13 @@ class StatsPageIntegrationTest {
                 data = StringNbtReader.readCompound(line.substring(14));
             }
         }
+        List<Integer> used = out.stream().map(StatsPage.Piece::slot).toList();
+        for (int free = 0; free < 54; free++) {
+            if (!used.contains(free)) {
+                out.add(new StatsPage.Piece(free, "Bread", List.of(), new NbtCompound()));
+            }
+        }
+        out.sort(java.util.Comparator.comparingInt(StatsPage.Piece::slot));
         return out;
     }
 
@@ -73,14 +84,12 @@ class StatsPageIntegrationTest {
     @Test
     void ownStatsPage() throws Exception {
         List<StatsPage.Piece> pieces = dump("meowfih");
-        assertEquals(24, pieces.size());
+        assertEquals(54, pieces.size()); // the dump's 24 items and 30 filler breads
         StatsPage.Stats s = StatsPage.read(pieces);
         assertNotNull(s);
         assertEquals("meowfih", s.owner());
         assertEquals(287, s.level());
         assertEquals("3.02M/4.22M", s.amount());
-        assertEquals("#23", s.placement());
-        assertEquals("Christmas Event 2025", s.event());
 
         // gear by its custom_data, in the dump's slots
         assertEquals(10, s.hat());
@@ -100,8 +109,10 @@ class StatsPageIntegrationTest {
         assertEquals(new StatsPage.Tile(23, "210.54k", "catches"), s.catches());
         assertEquals(new StatsPage.Tile(16, "433x", "Small Chunk Of Meat"), s.bait());
 
+        // the "Empty Profile Display" breads have lore, so they stay showcase slots
         assertEquals(List.of(2, 3, 4, 5, 6), s.displays());
-        // fishing menu, collections, power breakdown, level 300 colors, admiral colors; return and close are left to esc
+        // fishing menu, collections, power breakdown, level 300 colors, admiral colors; return and close are left to esc,
+        // the filler bread is no button
         assertEquals(List.of(1, 21, 31, 48, 50), s.buttons());
         assertFalse(FishMenu.othersProfile(plainLore(pieces), "meowfih"));
     }

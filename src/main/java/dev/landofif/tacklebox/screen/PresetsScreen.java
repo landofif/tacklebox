@@ -3,6 +3,7 @@ package dev.landofif.tacklebox.screen;
 import dev.landofif.tacklebox.ui.Foe;
 import dev.landofif.tacklebox.ui.Hypr;
 import dev.landofif.tacklebox.TackleboxSettings;
+import dev.landofif.tacklebox.compat.FoeArmor;
 import dev.landofif.tacklebox.menu.FishMenu;
 import dev.landofif.tacklebox.ui.TackleboxScreen;
 import dev.landofif.tacklebox.util.Glyphs;
@@ -97,37 +98,18 @@ public class PresetsScreen extends TackleboxScreen {
         this.handler = original.getScreenHandler();
     }
 
-    private boolean armorWasHidden;
-    private boolean armorTouched;
-
-    /** foecollabs "hide armor" cancels armor drawing everywhere, the models here included: switch it off while this screen is open. */
-    private void showArmor(boolean show) {
-        try {
-            Object cfg = Class.forName("io.github.foecollab.config.FOEConfig").getMethod("getConfig").invoke(null);
-            Object fun = cfg.getClass().getField("fun").get(cfg);
-            var f = fun.getClass().getField("hideArmor");
-            if (show && !armorTouched) {
-                armorWasHidden = f.getBoolean(fun);
-                armorTouched = true;
-                f.setBoolean(fun, false);
-            } else if (!show && armorTouched) {
-                f.setBoolean(fun, armorWasHidden);
-                armorTouched = false;
-            }
-        } catch (ReflectiveOperationException | LinkageError e) {
-            // no foecollab, nothing hides the armor
-        }
-    }
+    /** foecollabs "hide armor" would hide the armor on the models, so it is off while this screen is open. */
+    private final FoeArmor armor = new FoeArmor();
 
     @Override
     public void removed() {
-        showArmor(false);
+        armor.show(false);
         super.removed();
     }
 
     @Override
     protected void init() {
-        showArmor(true);
+        armor.show(true);
         int y = vy() + vh() - BAR + 4;
         int left = vx() + PAD, right = vx() + vw() - PAD;
         addDrawableChild(ButtonWidget.builder(Foe.text("previous"), b -> nav("back")).dimensions(left, y, 70, 20).build());

@@ -2,6 +2,7 @@ package dev.landofif.tacklebox;
 
 import com.google.gson.Gson;
 import dev.landofif.tacklebox.hud.ServerHud;
+import dev.landofif.tacklebox.menu.FishMenu;
 import dev.landofif.tacklebox.menu.Locations;
 import dev.landofif.tacklebox.menu.MenuRows;
 import dev.landofif.tacklebox.util.Glyphs;
@@ -17,7 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The menu panel's model from the items of luna's dumps (main menu 2026-10-11, /travel 2026-10-29): every button
- * gets a row with a line about it, the profile gives the header level, a /travel place gets its climate and its frenzy mark, and settings saved before the redo still load.
+ * gets a row with a line about it, the profile gives the header level, a /travel place gets its climate and its frenzy mark,
+ * the menus that share the crew title get their own names, and settings saved before the redo still load.
  */
 class MenuPanelIntegrationTest {
     private static final String P = " 퀃    ";
@@ -71,6 +73,24 @@ class MenuPanelIntegrationTest {
         assertNotNull(loc);
         assertEquals("Subtropical · Freshwater · 21°C", MenuRows.of(name, lore).sub());
         assertEquals(Locations.FRENZY, Locations.mark(name, ServerHud.fabledPlace()));
+    }
+
+    @Test
+    void menusUnderTheCrewTitleAreNamedByTheirItems() {
+        // the title of all three in luna's dumps (2026-10-06 crew, 2026-10-08 location leveling, 2026-10-10 collections)
+        Text title = Text.literal("\uEEE4\uD552");
+        assertEquals("crew", Glyphs.menuName(title));
+        List<String> overview = List.of("Basses Collection", "Billfishes Collection", "Bonytongues Collection", "Return", "Close");
+        List<String> leveling = List.of("Location Leveling Data", "Level 1", "Level 2", "Return", "Leveling Bonuses");
+        List<String> crew = List.of("Empty Crew Display", "Daily Missions (Resets in ---)", "Crew Info", "Crew Leveling",
+                "\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   meowfih (Online)", "Return", "Close");
+        assertEquals("collections", FishMenu.crewTitleMenu(plain(overview)));
+        assertEquals("location leveling", FishMenu.crewTitleMenu(plain(leveling)));
+        assertEquals("crew", FishMenu.crewTitleMenu(plain(crew)));
+    }
+
+    private static List<String> plain(List<String> names) {
+        return names.stream().map(n -> Glyphs.plain(Text.literal(n)).trim()).toList();
     }
 
     @Test

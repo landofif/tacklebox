@@ -19,7 +19,7 @@ public final class Glyphs {
             "픲", "stats",       // 픲
             "할", "main menu",   // 할
             "픹", "quests",      // 픹
-            "핒", "crew",        // 핒
+            "핒", "crew",        // 핒, shared with the collections overview and location leveling (FishMenu.crewTitleMenu)
             "함", "event");      // 함
     private static final String SMALL_CAPS = "ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡʏᴢ";
     private static final String PLAIN = "abcdefghijklmnopqrstuvwyz";

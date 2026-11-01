@@ -130,10 +130,10 @@ public final class MenuRows {
         return String.join(" · ", java.util.stream.Stream.of(climate, water, now).filter(s -> !s.isEmpty()).toList());
     }
 
-    /** 43,178 or 1.18M or 50K as a number. */
+    /** 43,178 or 1.18M or 50K or 1.2B as a number. */
     static double number(String s) {
         s = s.replace(",", "").toLowerCase(Locale.ROOT);
-        double k = s.endsWith("k") ? 1_000 : s.endsWith("m") ? 1_000_000 : 1;
+        double k = s.endsWith("k") ? 1_000 : s.endsWith("m") ? 1_000_000 : s.endsWith("b") ? 1_000_000_000 : 1;
         if (k > 1) {
             s = s.substring(0, s.length() - 1);
         }
