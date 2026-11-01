@@ -64,6 +64,28 @@ class MenuTilesTest {
     }
 
     @Test
+    void collectionNamesBreakOnlyAtSpaces() {
+        java.util.function.ToIntFunction<String> w = s -> s.length() * 6; // about the small caps' 6 px a letter
+        assertEquals(List.of("gigantic"), MenuTiles.nameLines("gigantic", 68, 2, w));
+        assertEquals(List.of("temperate", "perches"), MenuTiles.nameLines("temperate perches", 68, 2, w));
+        assertEquals(List.of("temperate.."), MenuTiles.nameLines("temperate perches", 68, 1, w)); // a short tile: one line
+        assertEquals(List.of("gig.."), MenuTiles.nameLines("gigantic", 33, 2, w)); // never "giga" and "ntic"
+        assertEquals(2, MenuTiles.nameRows(MenuTiles.MAX_H));
+        assertEquals(2, MenuTiles.nameRows(46));
+        assertEquals(1, MenuTiles.nameRows(45));
+        assertEquals(1, MenuTiles.nameRows(MenuTiles.MIN_H));
+    }
+
+    @Test
+    void aLevelCountGoesUnderTheNumberWhenItDoesNotFitBeside() {
+        // luna's window (2026-11-01): 80 wide tiles; "9" big is 12, "1,886/5,000" 58, "10" big 24, "1.8k/10k" 44
+        assertFalse(MenuTiles.countBeside(80, 12, 58));
+        assertFalse(MenuTiles.countBeside(80, 24, 44));
+        assertTrue(MenuTiles.countBeside(80, 12, 30));
+        assertTrue(MenuTiles.countBeside(109, 12, 58)); // full screen
+    }
+
+    @Test
     void aCollectionIsMaxOnlyWhenItsCountSaysMax() {
         // luna's catfishes at its top (screenshot 2026-11-01), and gigantic at 8 of its 10 levels
         List<String> catfishes = List.of(P + "Catfishes Collection", P + "ᴄʟɪᴄᴋ ᴛᴏ ᴏᴘᴇɴ", P + " ", P + "Current Level - [7]",
