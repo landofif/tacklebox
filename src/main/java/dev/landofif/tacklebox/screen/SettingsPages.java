@@ -31,7 +31,12 @@ import java.util.function.Supplier;
 public final class SettingsPages {
     public record Page(String name, List<Tile> tiles) {}
 
-    public record Tile(String title, Text heading, List<Row> rows) {}
+    /** A section of a page. {@code main} is its on/off switch, shown on the tile in the page's grid, or null. */
+    public record Tile(String title, Text heading, List<Row> rows, Row main) {
+        public Tile(String title, Text heading, List<Row> rows) {
+            this(title, heading, rows, null);
+        }
+    }
 
     /** A setting: a label, a tooltip and a control drawn at the right of the row. */
     public abstract static class Row {
@@ -262,6 +267,7 @@ public final class SettingsPages {
     private final List<Tile> tiles = new ArrayList<>();
     private final List<Row> rows = new ArrayList<>();
     private String pageName, tileName;
+    private Row main;
 
     private SettingsPages() {}
 
@@ -295,9 +301,10 @@ public final class SettingsPages {
 
     private void header(String name) {
         if (tileName != null && !rows.isEmpty()) {
-            tiles.add(new Tile(tileName, Foe.bold(tileName), new ArrayList<>(rows)));
+            tiles.add(new Tile(tileName, Foe.bold(tileName), new ArrayList<>(rows), main));
         }
         rows.clear();
+        main = null;
         tileName = name;
     }
 
@@ -310,6 +317,7 @@ public final class SettingsPages {
         header("pause menu");
         toggle("ask before disconnect", "the disconnect button in the pause menu asks yes or no first.",
                 () -> s.confirmDisconnect, v -> s.confirmDisconnect = v);
+        main();
         header("screens");
         link("chat triggers", TriggerListScreen::new);
         link("chat", ChatFilterScreen::new);
@@ -336,6 +344,11 @@ public final class SettingsPages {
                 mc.setScreen(next);
             }
         });
+    }
+
+    /** The row just added switches the whole tile on and off, so the grid shows it on the tile. */
+    private void main() {
+        main = rows.get(rows.size() - 1);
     }
 
     private void action(String name, String desc, String button, Runnable press) {
@@ -390,6 +403,7 @@ public final class SettingsPages {
         header("presets");
         toggle("presets screen", "/presets as a wardrobe of cards with player models. off gives the chest back.",
                 () -> s.presetsMenu, v -> s.presetsMenu = v);
+        main();
         slider("presets size", "how much of the screen the presets screen fills.", 40, 100, 1, "%",
                 () -> s.presetsSize, v -> s.presetsSize = (int) Math.round(v));
         toggle("other page boxes", "draws the card boxes behind the dimmed presets of the other page. off shows only the models.",
@@ -402,6 +416,7 @@ public final class SettingsPages {
         header("vaults");
         toggle("vault overview", "/pv as all seven personal vaults on one screen with a search. a vault shows what it held when you last opened it. off gives the chest back.",
                 () -> s.vaultMenu, v -> s.vaultMenu = v);
+        main();
         header("tooltips");
         toggle("short fish tooltips", "a caught fish with no scientific name, value or ecosystem line, no kg or cm, weight and length on one line and the rarity mark next to the name. only changes what you see.",
                 () -> s.shortFishTooltips, v -> s.shortFishTooltips = v);
@@ -430,6 +445,7 @@ public final class SettingsPages {
         header("equipment");
         toggle("equipment hud", "your chestplate, leggings and boots and the reel, pole and line of your rod as two rounded groups above the hotbar. off brings back foecollabs own row.",
                 () -> s.equipHud, v -> s.equipHud = v);
+        main();
         slider("equipment size", "how big foecollabs armour and rod parts row is. move it with move huds.", 50, 200, 5, "%",
                 () -> s.equipScale, v -> s.equipScale = (int) Math.round(v));
         cycle("equipment place", "where the armour and rod parts row sits: above the hotbar, or level with it on its left or right. you can still drag it from there.",
@@ -451,6 +467,7 @@ public final class SettingsPages {
         header("quests left");
         toggle("quests left hud", "quests until your next level and the next level of your location. it learns from /menu, /quests and the compendium. move it with move huds.",
                 () -> s.questsHud, v -> s.questsHud = v);
+        main();
         cycle("quests left align", "how the text of the quests left hud lines up inside it: left, centre or right.",
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.questsAlign, v -> s.questsAlign = v);
     }
@@ -459,11 +476,13 @@ public final class SettingsPages {
         header("active boosts");
         toggle("active boosts hud", "what is on right now: player boosters with a countdown, the chummer, and the weather events and moon. read from chat lines only. the server hud shows the events and moon too, switch its weather and moon lines off if you only want them here. move it with move huds.",
                 () -> s.boostsHud, v -> s.boostsHud = v);
+        main();
         cycle("active boosts align", "how the text of the active boosts hud lines up inside it: left, centre or right.",
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.boostsAlign, v -> s.boostsAlign = v);
         header("event");
         toggle("event hud", "the points, the next threshold with its rewards, your placement and your missions of the running event. the points and thresholds are read from /event when you open it and then follow the chat. move it with move huds.",
                 () -> s.eventHud, v -> s.eventHud = v);
+        main();
         cycle("event align", "how the text of the event hud lines up inside it: left, centre or right.",
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.eventAlign, v -> s.eventAlign = v);
         toggle("event missions", "lists the missions that are not done yet and the repeatable ones on the event hud, coloured like the menu, with the points earned and the points one catch gives. read from the mission book in /event and then follow the chat.",
@@ -471,6 +490,7 @@ public final class SettingsPages {
         header("cryptids");
         toggle("cryptids hud", "what can be caught where right now (moons, rainbow, storms, fabled, and the cryptids of the in-game clock) with the odds and the drops, then when the next moon and clock window come. read from chat and the clock in the top bar. move it with move huds.",
                 () -> s.cryptidHud, v -> s.cryptidHud = v);
+        main();
         cycle("cryptids align", "how the text of the cryptids hud lines up inside it: left, centre or right.",
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.cryptidAlign, v -> s.cryptidAlign = v);
         toggle("cryptids popups", "a title when one of the events below starts, saying where to go and what for. these are not triggers, nothing needs adding in /triggers.",
@@ -488,6 +508,7 @@ public final class SettingsPages {
         header("level progress");
         toggle("level progress hud", "two thin bars: your fishing level (from the vanilla xp bar) and the level of the location you are at. the location bar starts when you open /comp once and then follows the location xp of quest rewards and chat. move it with move huds.",
                 () -> s.levelBars, v -> s.levelBars = v);
+        main();
         toggle("level progress heading", "the green level progress title above the bars.",
                 () -> s.levelBarsHeading, v -> s.levelBarsHeading = v);
         toggle("level progress fishing line", "the fishing level bar.",
@@ -511,6 +532,7 @@ public final class SettingsPages {
         header("now playing");
         toggle("now playing hud", "shows what is playing on your computer (spotify, youtube in a browser, anything that works with playerctl): title, artist and the time. linux only, needs playerctl installed. shows only, it never controls the player. move it with move huds.",
                 () -> s.nowPlaying, v -> s.nowPlaying = v);
+        main();
         toggle("now playing heading", "the green now playing title above the track.",
                 () -> s.nowPlayingHeading, v -> s.nowPlayingHeading = v);
         toggle("now playing album art", "the cover next to the text. it is fetched once per track from the address the player gives (spotify, youtube thumbnails).",
@@ -526,6 +548,7 @@ public final class SettingsPages {
         header("server hud");
         toggle("server hud", "a sidebar styled hud: time, location, wallet and credits, the tackle shop and moon timers, and the weather events and moon that are active. move and resize it with move huds.",
                 () -> s.serverHud, v -> s.serverHud = v);
+        main();
         cycle("server hud align", "how the text of the server hud (the title stays centred) lines up inside it: left, centre or right.",
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.serverHudAlign, v -> s.serverHudAlign = v);
         link("choose lines", "which lines the server hud shows, in what order.", ServerHudScreen::new);
@@ -549,6 +572,7 @@ public final class SettingsPages {
         header("line");
         toggle("custom line colour", "colours your own fishing line.",
                 () -> s.customLineColor, v -> s.customLineColor = v);
+        main();
         color("line colour", "the colour of your fishing line.",
                 () -> s.lineColor, v -> s.lineColor = v);
     }
@@ -592,16 +616,19 @@ public final class SettingsPages {
         header("lag");
         toggle("hide far displays", "stops drawing the servers item, block and text displays (spawn decor, shop signs, holograms) beyond the range below. at spawn this can double your fps. nearby ones stay.",
                 () -> s.hideFarDisplays, v -> s.hideFarDisplays = v);
+        main();
         slider("display range", "how far away displays still get drawn, in blocks.", DisplayCull.MIN_RANGE, DisplayCull.MAX_RANGE, 2, " blocks",
                 () -> s.farDisplayRange, v -> s.farDisplayRange = (int) v);
         header("chummer");
         toggle("chummer range ring", "draws a thin ring on the ground at the range of every placed chummer your client can see, 20 blocks out. read from the chummer's hologram, not from chat.",
                 () -> s.chummerRing, v -> s.chummerRing = v);
+        main();
         color("ring colour", "the colour of the chummer range ring.",
                 () -> s.chummerRingColor, v -> s.chummerRingColor = v);
         header("screenshots");
         toggle("screenshot preview", "after f2 the screenshot goes to your clipboard and shows in the top right for a few seconds. open chat to click open, which shows it in your image viewer. linux only, needs wl-copy. nothing is uploaded.",
                 () -> s.screenshotPreview, v -> s.screenshotPreview = v);
+        main();
     }
 
 }

@@ -4,7 +4,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 
 ## Screens and look
 
-- Settings screen: pages, search, alt+number page switch, hover help. `/tacklebox` (alias `/dofi`), right shift, Mod Menu. `ui/look-and-settings.md`
+- Settings screen: pages of click-to-open tiles, search, alt+number page switch, hover help. `/tacklebox` (alias `/dofi`), right shift, Mod Menu. `ui/look-and-settings.md`
 - Accent gradient: two colours for focused tiles, hovered buttons, toggles, hotbar and menu fills. `accent1`, `accent2`. `ui/look-and-settings.md`
 - Flat buttons and rounded text fields everywhere. `flatButtons`, off. `ui/look-and-settings.md`
 - No toast popups: every toast (recipes, advancements, hints) is blocked. Always on. **(no doc)**, `mixin/ToastManagerMixin`
