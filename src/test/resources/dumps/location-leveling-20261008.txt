@@ -1,0 +1,364 @@
+screen net.minecraft.class_476
+title text="\uEEE4\uD552"
+title plain="" menuName=crew
+handler class_1707 syncId=23
+
+slot 0 minecraft:bread x1
+  name="Bread"
+
+slot 1 minecraft:bread x1
+  name="Bread"
+
+slot 2 minecraft:bread x1
+  name="Bread"
+
+slot 3 minecraft:bread x1
+  name="Bread"
+
+slot 4 minecraft:gunpowder x1
+  name="Location Leveling Data"
+  lore="Information for Lake Biwa"
+  lore=""
+  lore="Level: [20]"
+  lore="                     (11.85M/2.32M)"
+
+slot 5 minecraft:bread x1
+  name="Bread"
+
+slot 6 minecraft:bread x1
+  name="Bread"
+
+slot 7 minecraft:bread x1
+  name="Bread"
+
+slot 8 minecraft:bread x1
+  name="Bread"
+
+slot 9 minecraft:bread x1
+  name="Bread"
+
+slot 10 minecraft:green_concrete x1
+  name="Level 1"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 1) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Species Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     50 \uF064"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     1x Standard Bait Package"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     \u2517 \uF033 Lake Biwa"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 11 minecraft:green_concrete x1
+  name="Level 2"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 2) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Species Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     75 \uF064"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 12 minecraft:green_concrete x1
+  name="Level 3"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 3) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Generic Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     100 \uF064"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     1x Standard Bait Package"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     \u2517 \uF034 Lake Biwa"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 13 minecraft:green_concrete x1
+  name="Level 4"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 4) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Species Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     125 \uF064"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 14 minecraft:green_concrete x1
+  name="Level 5"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 5) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Generic Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     150 \uF064"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     1x Advanced Bait Package"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     \u2517 \uF035 Lake Biwa"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 15 minecraft:green_concrete x1
+  name="Level 6"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 6) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Species Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     175 \uF064"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 16 minecraft:green_concrete x1
+  name="Level 7"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 7) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Generic Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     250 \uF064"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 17 minecraft:bread x1
+  name="Bread"
+
+slot 18 minecraft:bread x1
+  name="Bread"
+
+slot 19 minecraft:green_concrete x1
+  name="Level 8"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 8) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Species Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     325 \uF064"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     1x Advanced Bait Package"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     \u2517 \uF036 Lake Biwa"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 20 minecraft:green_concrete x1
+  name="Level 9"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 9) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Species Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     500 \uF064"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 21 minecraft:green_concrete x1
+  name="Level 10"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 10) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Sell/XP Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     Rod Title: Sakura Rod"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     750 \uF064"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     1x Advanced Bait Package"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     \u2517 \uF037 Lake Biwa"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 22 minecraft:green_concrete x1
+  name="Level 11"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 11) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Species Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     1.25K \uF064"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     2x Advanced Bait Package"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     \u2517 \uF035 Lake Biwa"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 23 minecraft:green_concrete x1
+  name="Level 12"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 12) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Generic Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     1.75K \uF064"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     Hat: Fox Bucket Hat"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     1x Advanced Bait Package"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     \u2517 \uF036 Lake Biwa"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 24 minecraft:green_concrete x1
+  name="Level 13"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 13) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Species Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     2.5K \uF064"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     1x Advanced Bait Package"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     \u2517 \uF036 Lake Biwa"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 25 minecraft:green_concrete x1
+  name="Level 14"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 14) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Species Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     3.75K \uF064"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     2x Advanced Bait Package"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     \u2517 \uF036 Lake Biwa"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 26 minecraft:bread x1
+  name="Bread"
+
+slot 27 minecraft:bread x1
+  name="Bread"
+
+slot 28 minecraft:green_concrete x1
+  name="Level 15"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 15) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Generic Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     4K \uF064"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     Rod Skin: Sakura Rod"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     1x Advanced Bait Package"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     \u2517 \uF037 Lake Biwa"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 29 minecraft:green_concrete x1
+  name="Level 16"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 16) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Species Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     6K \uF064"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     1x Advanced Bait Package"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     \u2517 \uF037 Lake Biwa"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 30 minecraft:green_concrete x1
+  name="Level 17"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 17) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Species Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     7.75K \uF064"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     2x Advanced Bait Package"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     \u2517 \uF037 Lake Biwa"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 31 minecraft:green_concrete x1
+  name="Level 18"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 18) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Generic Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     9.25K \uF064"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     2x Advanced Bait Package"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     \u2517 \uF037 Lake Biwa"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 32 minecraft:green_concrete x1
+  name="Level 19"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 19) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Species Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     11.25K \uF064"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     3x Advanced Bait Package"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     \u2517 \uF037 Lake Biwa"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 33 minecraft:green_concrete x1
+  name="Level 20"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   \u2714 (Level 20) Lake Biwa "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u1D04\u1D0F\u029F\u029F\u1D07\u1D04\u1D1B\u026A\u1D0F\u0274s"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2                                                  "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Rewards:"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     (+1) Location Sell/XP Bonus Roll"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     14K \uF064"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     5x Advanced Bait Package"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2     \u2517 \uF037 Lake Biwa"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2 "
+
+slot 34 minecraft:bread x1
+  name="Bread"
+
+slot 35 minecraft:bread x1
+  name="Bread"
+
+slot 36 minecraft:bread x1
+  name="Bread"
+
+slot 37 minecraft:bread x1
+  name="Bread"
+
+slot 38 minecraft:bread x1
+  name="Bread"
+
+slot 39 minecraft:bread x1
+  name="Bread"
+
+slot 40 minecraft:bread x1
+  name="Bread"
+
+slot 41 minecraft:bread x1
+  name="Bread"
+
+slot 42 minecraft:bread x1
+  name="Bread"
+
+slot 43 minecraft:bread x1
+  name="Bread"
+
+slot 44 minecraft:bread x1
+  name="Bread"
+
+slot 45 minecraft:bread x1
+  name="Bread"
+
+slot 46 minecraft:gunpowder x1
+  name="Return"
+
+slot 47 minecraft:bread x1
+  name="Bread"
+
+slot 48 minecraft:gunpowder x1
+  name="Leveling Bonuses"
+  lore="\uEEE4\uEEE1 \uD001 \uEEE8\uEEE7\uEEE5\uEEE2   Leveling Bonuses"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2 "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   Bonuses Available: (20/20)"
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   "
+  lore="\uEEE4\uEEE1 \uD003 \uEEE8\uEEE7\uEEE5\uEEE2   \u1D04\u029F\u026A\u1D04\u1D0B \u1D1B\u1D0F \u0280\u1D0F\u029F\u029F \u029F\u1D0F\u1D04\u1D00\u1D1B\u026A\u1D0F\u0274 \u0299\u1D0F\u0274\u1D1Cs\u1D07s"
+  lore="\uEEE4\uEEE1 \uD004 \uEEE8\uEEE7\uEEE5\uEEE2   "
+
+slot 49 minecraft:gunpowder x1
+  name="Close"
+
+slot 50 minecraft:bread x1
+  name="Bread"
+
+slot 51 minecraft:bread x1
+  name="Bread"
+
+slot 52 minecraft:bread x1
+  name="Bread"
+
+slot 53 minecraft:bread x1
+  name="Bread"

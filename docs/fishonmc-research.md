@@ -433,7 +433,7 @@ List of rules → editor with a **"test against text"** box (paste a chat line, 
   - tunas: 50,200,1K,2.5K,5K,10K,30K
   - whitefishes: 75,250,1.5K,3K,7.5K,15K,30K
   - wrasses: 50,200,1K,2.5K,5K,10K,30K
-  The overview page (title `U+EEE4 핒` U+D552, the crew title, so `FishMenu.crewTitleMenu` names it "collections" by its items; slots 1 to 35, then Return and Close) shows each as an item named `<Group> Collection` with lore `Current Level - [n]` and `(have/need)` for the next level, no power, so `Power.overview` reads all 35 from that page (next level = n + 1, power from the table above). One /collections visit is enough. Unknown: how a finished collection (level 7) looks there; the reader drops the entry for level 7 or higher.
+  The overview page (title `U+EEE4 핒` U+D552, the crew title, so `FishMenu.crewTitleMenu` names it "collections" by its items; slots 1 to 35, then Return and Close) shows each as an item named `<Group> Collection` with lore `Current Level - [n]` and `(have/need)` for the next level, no power, so `Power.overview` reads all 35 from that page (next level = n + 1, power from the table above). One /collections visit is enough. Unknown: how a finished collection (level 7) looks there; the reader drops the entry for level 7 or higher. The menu panel's collection tiles count level 7 or higher as max (a guess until a dump of a finished one).
 
 ## fishing stats formulas (wiki "Fishing Stats" page, pasted by luna 2026-10-18)
 
