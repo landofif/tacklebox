@@ -58,9 +58,8 @@ public final class TriggerPresets {
         Trigger t = preset("pet drop");
         t.mode = Trigger.MatchMode.REGEX;
         t.pattern = PET_DROP;
-        t.title.title = "&lpet drop!";
+        t.title.title = "&l+ {pet.lower} pet";
         t.title.titleColor = "#fd95f6";
-        t.title.subtitle = "{pet.lower}";
         t.title.animation = Trigger.Animation.SHAKE;
         t.totem.enabled = true;
         t.totem.item = "pet:{pet}";
@@ -98,9 +97,8 @@ public final class TriggerPresets {
         Trigger t = preset("rare catch");
         t.mode = Trigger.MatchMode.REGEX;
         t.pattern = RARE_CATCH;
-        t.title.title = "&lrare catch!";
+        t.title.title = "&l+ {item.lower}";
         t.title.titleColor = "#ffaa00";
-        t.title.subtitle = "{item.lower}";
         t.title.animation = Trigger.Animation.POP;
         t.totem.enabled = true;
         t.totem.item = "{item}";
