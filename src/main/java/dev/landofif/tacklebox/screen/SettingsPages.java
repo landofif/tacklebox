@@ -415,8 +415,12 @@ public final class SettingsPages {
                 () -> s.flatButtons, v -> s.flatButtons = v);
         toggle("rarity circles", "a see-through circle in the rarity colour behind items in your inventory. foecollabs corner mark has its own setting.",
                 () -> s.rarityCircles, v -> s.rarityCircles = v);
-        cycle("rarity shape", "the rarity mark as a circle behind the item, or a square that fills the whole slot.",
+        cycle("rarity shape", "the rarity mark as a circle behind the item, or a square around it.",
                 TackleboxSettings.RarityShape.values(), e -> e.label, () -> s.rarityShape, v -> s.rarityShape = v);
+        slider("rarity opacity", "how strong the rarity circles and squares are. 0 hides them.", 0, 100, 5, "%",
+                () -> s.rarityOpacity, v -> s.rarityOpacity = (int) Math.round(v));
+        toggle("square gradient", "the rarity square fades toward its top, clear at the top. only for the square shape.",
+                () -> s.rarityGradient, v -> s.rarityGradient = v);
         toggle("fishonmc menu", "the main menu, /travel, quests, stats and crew as one dark panel with tabs and rows. off gives the chest back.",
                 () -> s.fishMenu, v -> s.fishMenu = v);
         slider("menu size", "how much of the screen the fishonmc menu fills.", 40, 100, 1, "%",

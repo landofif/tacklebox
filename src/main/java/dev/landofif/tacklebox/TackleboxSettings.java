@@ -70,8 +70,12 @@ public class TackleboxSettings {
     public int accent1 = 0x33CCFF, accent2 = 0x00FF99;
     /** A see-through circle in the rarity colour behind items in slots (foecollabs rarity, drawn by its item markers). */
     public boolean rarityCircles = false;
-    /** The shape of those marks: a circle, or a square filling the whole slot. */
+    /** The shape of those marks: a circle, or a square around the item. */
     public RarityShape rarityShape = RarityShape.CIRCLE;
+    /** How strong those marks are, in percent opacity (0 hides them; 40 is the old fixed look). */
+    public int rarityOpacity = 40;
+    /** The square mark fades from clear at its top to the opacity at its bottom. Square only. */
+    public boolean rarityGradient = false;
     /** The mouse wheel clicks Next and Back in paged server menus (menu/MenuPages). */
     public boolean pageWheel = false;
     /** The mouse wheel scrolls tooltips taller than the screen (display/TooltipScroll). */

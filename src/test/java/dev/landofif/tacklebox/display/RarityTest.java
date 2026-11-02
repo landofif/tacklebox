@@ -5,18 +5,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** The square rarity mark covers the whole slot. */
+/** The square rarity mark is 14x14 around the item, so neighbouring squares keep a gap. */
 class FoeRarityTest {
     @Test
-    void squareIsTheWholeSlotAroundTheItem() {
-        assertArrayEquals(new int[]{9, 19, 27, 37}, Rarity.slotSquare(10, 20));
+    void squareIsCentredOnTheItem() {
+        assertArrayEquals(new int[]{11, 21, 25, 35}, Rarity.markSquare(10, 20));
     }
 
     @Test
-    void neighbouringSquaresTouch() {
+    void neighbouringSquaresKeepAGap() {
         // chest slots are 18 pixels apart, both ways
-        assertEquals(Rarity.slotSquare(8, 18)[2], Rarity.slotSquare(26, 18)[0]);
-        assertEquals(Rarity.slotSquare(8, 18)[3], Rarity.slotSquare(8, 36)[1]);
+        assertEquals(4, Rarity.markSquare(26, 18)[0] - Rarity.markSquare(8, 18)[2]);
+        assertEquals(4, Rarity.markSquare(8, 36)[1] - Rarity.markSquare(8, 18)[3]);
     }
 
     @Test

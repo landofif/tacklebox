@@ -29,7 +29,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 
 - Short fish and pet tooltips. `shortFishTooltips`, `shortPetTooltips`, off. `display/item-tooltips.md`
 - Pet profit marks in the auction house (common and rare). `petProfitMarks`, off. `display/pet-profit.md`
-- Rarity circles or squares behind items in slots and the hotbar. `rarityCircles`, off; `rarityShape`. `menus/menu-controls.md`
+- Rarity circles or squares behind items in slots and the hotbar. `rarityCircles`, off; `rarityShape`; `rarityOpacity` (40%); `rarityGradient` (square only, off). `menus/menu-controls.md`
 - Scroll tooltips taller than the screen with the mouse wheel. `tooltipScroll`, off. `menus/menu-controls.md`
 
 ## Bobber and world

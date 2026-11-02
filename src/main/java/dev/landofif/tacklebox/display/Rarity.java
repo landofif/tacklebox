@@ -1,5 +1,6 @@
 package dev.landofif.tacklebox.display;
 
+import dev.landofif.tacklebox.TackleboxSettings;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
@@ -17,10 +18,11 @@ public final class Rarity {
         if (rgb < 0) {
             return;
         }
-        disc(ctx, x, y, 0x66 << 24 | rgb);
+        disc(ctx, x, y, alpha() << 24 | rgb);
     }
 
-    /** The rarity circles setting's mark behind an item at x, y: the circle, or a square over the whole 18x18 slot. */
+    /** The rarity circles setting's mark behind an item at x, y: the circle, or a square around it. With the gradient
+     * on, the square is clear at its top and reaches the opacity setting at its bottom. */
     public static void mark(DrawContext ctx, int x, int y, ItemStack stack, boolean square) {
         if (!square) {
             circle(ctx, x, y, stack);
@@ -28,14 +30,24 @@ public final class Rarity {
         }
         int rgb = color(stack);
         if (rgb >= 0) {
-            int[] r = slotSquare(x, y);
-            ctx.fill(r[0], r[1], r[2], r[3], 0x66 << 24 | rgb);
+            int[] r = markSquare(x, y);
+            if (TackleboxSettings.get().rarityGradient) {
+                ctx.fillGradient(r[0], r[1], r[2], r[3], rgb, alpha() << 24 | rgb);
+            } else {
+                ctx.fill(r[0], r[1], r[2], r[3], alpha() << 24 | rgb);
+            }
         }
     }
 
-    /** The whole slot around a 16x16 item at x, y, as {x1, y1, x2, y2}: one pixel past the item on each side, so neighbouring squares touch. */
-    public static int[] slotSquare(int x, int y) {
-        return new int[]{x - 1, y - 1, x + 17, y + 17};
+    /** The square around a 16x16 item at x, y, as {x1, y1, x2, y2}: 14x14 and centred on the item, so in the 18 pixel
+     * slot grid neighbouring squares keep a 4 pixel gap. */
+    public static int[] markSquare(int x, int y) {
+        return new int[]{x + 1, y + 1, x + 15, y + 15};
+    }
+
+    /** The opacity setting in alpha (0-255), 40% gives the old 0x66. */
+    private static int alpha() {
+        return TackleboxSettings.get().rarityOpacity * 255 / 100;
     }
 
     /** A filled circle, 16x16 at x, y. */
