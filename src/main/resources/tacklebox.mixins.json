@@ -21,6 +21,7 @@
     "InGameHudHotbarMixin",
     "InGameHudOverlayMixin",
     "InGameOverlayRendererMixin",
+    "KeyboardInputMixin",
     "LivingEntityMixin",
     "MinecraftClientMixin",
     "MouseMixin",

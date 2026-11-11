@@ -6,3 +6,5 @@ accessible field net/minecraft/client/texture/AbstractTexture sampler Lnet/minec
 mutable field net/minecraft/client/texture/AbstractTexture sampler Lnet/minecraft/client/gl/GpuSampler;
 # chat/ChatKeys reads the instance from the tab list footer
 accessible field net/minecraft/client/gui/hud/PlayerListHud footer Lnet/minecraft/text/Text;
+# input/FishKey: a press of the fish key is one right click, through the games own item use
+accessible method net/minecraft/client/MinecraftClient doItemUse ()V

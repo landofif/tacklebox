@@ -26,6 +26,7 @@ abstract class InGameHudOverlayMixin {
     private void tacklebox$overlay(Text message, boolean tinted, CallbackInfo ci) {
         String raw = message == null ? "" : message.getString();
         dev.landofif.tacklebox.display.BiteCountdown.noteActionBar(!raw.isEmpty(), System.currentTimeMillis());
+        dev.landofif.tacklebox.input.FishKey.onActionBar(message, System.currentTimeMillis());
         if (raw.isEmpty()) {
             return;
         }
@@ -41,6 +42,7 @@ abstract class InGameHudOverlayMixin {
     private void tacklebox$title(Text title, CallbackInfo ci) {
         dev.landofif.tacklebox.display.BiteFocus.onTitle(title);
         dev.landofif.tacklebox.display.CatchWatch.onTitle(title);
+        dev.landofif.tacklebox.input.FishKey.onTitle(title == null ? "" : title.getString(), System.currentTimeMillis());
         if (dev.landofif.tacklebox.display.BobberTimer.onTitle(title)) {
             ci.cancel();
         }

@@ -3,5 +3,6 @@
   "key.tacklebox.open": "open tacklebox",
   "key.tacklebox.chat_peek": "peek at chat (hold)",
   "key.tacklebox.dump_gui": "dump open gui to file and clipboard",
-  "key.tacklebox.sort_bait": "sort bait and lures, common to legendary (in your inventory)"
+  "key.tacklebox.sort_bait": "sort bait and lures, common to legendary (in your inventory)",
+  "key.tacklebox.fish": "fish key: right click with a rod, sneak in the minigame"
 }

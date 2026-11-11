@@ -108,6 +108,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 ## Keys and commands
 
 - Key commands: a key or mouse button sends a command once per press. `/tacklebox keys`. **(no doc)**, `input/KeyCommands`, one line in `rules/text-and-automation.md`
+- Fish key: one key for fishing as a rebind. A press is a right click with the rod (cast, reel in, start the minigame), held in the minigame it is sneak. Key, unbound. `keys/fish-key.md`
 - Bait sort key: sorts the bait and lures in your inventory common to legendary, as one group. Key, unbound. `menus/bait-sort.md`
 - Command aliases, like `/sb 5` for `/sellall bait 5`. `aliases`. `chat/command-aliases.md`
 
