@@ -77,13 +77,14 @@ Size words are plain small caps with colour: `ʙᴀʙʏ` 468CE7, `ᴊᴜᴠᴇɴ
 
 ### Fishing minigame font (autofish `reference/fishing_font_map.json`)
 
-Useful only for *display* (e.g. knowing a minigame is on screen, or which themed backdrop is shown); never for steering.
+Useful only for *display* (e.g. knowing a minigame is on screen, or which themed backdrop is shown); never for steering. The fish key (`keys/fish-key.md`, 2026-11-11) reads "a minigame is on screen" from it to turn the key from right click into sneak; the player still does the steering.
 
 - Fonts `fishing_1/2/3` (ascent 140/155/170), drawn in the **action bar** (confirmed by luna 2026-10-17: Noxesium's `Action Bar Scale` slider resizes the minigame; Title Scale and Boss Bar Scale are not it).
 - Progress glyphs `p00..p100` in `U+EC00–U+ECC0` (lookup table in `decode/Glyphs.java`).
 - Named glyphs: `minigame_box U+FAA0`, `newbar U+EDD0`, `successful U+EFF4`, `failure U+EFF1`, `negative_space U+E994`.
 - Themed backdrops (event/location skins): `cobweb U+ED00`, `fallleaves U+ED03`, `frozen_preset U+ED06`, `christmas_preset U+ED09`, `spring U+ED12`, `shark U+ED13`, `volcano U+ED14`, `koipond U+ED15`, `bigfoot U+ED16`, `santa U+ED17`, `lofoten_shark U+ED18`, `sharkweek2026 U+ED20`.
 - Seeing `successful`/`failure` would give a clean catch-success vs. escape counter (not yet observed in a trace; may arrive as a title).
+- Not known yet (the fish key depends on it, `keys/fish-key.md`): how often a frame is sent, whether the fishing font shows in the action bar outside the minigame, and what the last message of a minigame is.
 
 ## 3. Detecting a catch (core of session stats)
 

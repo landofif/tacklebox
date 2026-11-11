@@ -57,8 +57,12 @@ abstract class MinecraftClientMixin {
         return original.call(window, ChestScale.guiScale(ChestScale.isChest(currentScreen), TackleboxSettings.get().chestScale, guiScale), unicode);
     }
 
-    @Inject(method = "doItemUse", at = @At("HEAD"))
+    @Inject(method = "doItemUse", at = @At("HEAD"), cancellable = true)
     private void tacklebox$use(CallbackInfo ci) {
+        if (dev.landofif.tacklebox.input.FishKey.blockUse()) { // the fish key on right mouse is sneak in the minigame
+            ci.cancel();
+            return;
+        }
         dev.landofif.tacklebox.display.BobberTimer.onUse((MinecraftClient) (Object) this);
     }
 }
