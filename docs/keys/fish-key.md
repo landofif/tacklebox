@@ -14,9 +14,10 @@
   2. an empty action bar,
   3. an action bar line that is not a frame (the `+66xp` line that follows a catch),
   4. no new frame for a while: 500 ms until three frames were seen, then twice the longest wait between frames in this minigame plus 50 ms, between 150 and 1500 ms. At a frame per tick that is 150 ms.
+  5. the bobber is gone (luna 2026-11-13: the key often sneaked when she wanted a right click; "the bobber stays out during the minigame and only disappears when the fish is caught"). Checked every tick in `FishKey.tick` (`player.fishHook`), so without a bobber the key is never sneak, whatever the action bar shows.
   The `successful` / `failure` glyphs are not used: nobody has seen yet whether they mark the end or every tick of the minigame.
 - The key is read at the start of the client tick (`ClientTickEvents.START_CLIENT_TICK`), before the game handles its own keys and the player's input, so a press acts in the same tick.
-- Tests: unit `input/FishKeyTest`, integration `FishKeyIntegrationTest` (two rounds on the key tick by tick, a minigame that just stops, the key on right mouse).
+- Tests: unit `input/FishKeyTest`, integration `FishKeyIntegrationTest` (two rounds on the key tick by tick, a minigame that just stops, the bobber gone while frames still come, the key on right mouse).
 - Not run in game yet. To check:
   - the action bar shows the fishing font only during the minigame. If it also shows it while waiting for a bite, the key would stay sneak and could not reel in.
   - which end signal comes first after a catch and after an escape, and that the next cast feels instant.

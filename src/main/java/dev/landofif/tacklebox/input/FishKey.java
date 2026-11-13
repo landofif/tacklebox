@@ -23,7 +23,8 @@ import java.util.Optional;
  *
  * The only game state read is "the minigame is on screen": the action bar carries the minigame in the fishing_1/2/3
  * fonts (research section 2). It is over, and the key a right click again, at the first of: the catch title, an empty
- * action bar, an action bar line that is not the minigame (the +xp line), or no new frame for a short while.
+ * action bar, an action bar line that is not the minigame (the +xp line), or no new frame for a short while. And the
+ * key is never sneak without the bobber out: it stays out for the whole minigame and is gone the moment the fish is caught.
  */
 public final class FishKey {
     /** The gap that ends the minigame before the frame rhythm is known, and its bounds once it is. */
@@ -113,6 +114,14 @@ public final class FishKey {
         return minigame;
     }
 
+    /** The bobber is out for the whole minigame and gone when the fish is caught (luna 2026-11-13): without it, a right click. */
+    public static boolean minigame(long now, boolean bobberOut) {
+        if (!bobberOut) {
+            minigame = false;
+        }
+        return minigame(now);
+    }
+
     /** How long without a frame ends the minigame: a bit over twice the longest wait between frames seen in this one. */
     static long gap() {
         return frames < 3 ? FIRST_GAP : Math.max(MIN_GAP, Math.min(MAX_GAP, longest * 2 + 50));
@@ -164,7 +173,7 @@ public final class FishKey {
                 && (p.getMainHandStack().isOf(Items.FISHING_ROD) || p.getOffHandStack().isOf(Items.FISHING_ROD))
                 && TriggerEngine.isOnFishOnMc();
         boolean shared = !key.isUnbound() && KeyBindingHelper.getBoundKeyOf(key).equals(KeyBindingHelper.getBoundKeyOf(client.options.useKey));
-        if (step(presses, key.isPressed(), ready, minigame(System.currentTimeMillis()), shared) && !p.isUsingItem()) {
+        if (step(presses, key.isPressed(), ready, minigame(System.currentTimeMillis(), p != null && p.fishHook != null), shared) && !p.isUsingItem()) {
             client.doItemUse(); // the same path as the use key, so the bobber timer and the bite hud see it
         }
     }

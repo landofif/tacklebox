@@ -133,6 +133,20 @@ class FishKeyIntegrationTest {
         assertEquals(3, clicks);
     }
 
+    /** The fish is caught while frames still come: the bobber is gone, so the very next press casts instead of sneaking. */
+    @Test
+    void theBobberGoneGivesTheKeyBackWhileFramesStillCome() {
+        tap(); // cast
+        tap(); // reel in
+        for (int i = 0; i < 10; i++) {
+            FishKey.onActionBar(frame(i), now);
+            tick(0, false);
+        }
+        FishKey.onActionBar(frame(10), now); // a late frame in the same tick the bobber goes
+        assertTrue(FishKey.step(1, true, true, FishKey.minigame(now, false), false));
+        assertFalse(FishKey.sneaking());
+    }
+
     /**
      * The fish key on right mouse: the game makes the right clicks itself (one per press here, as its use key does), the
      * mod never adds one, and in the minigame the game's click is dropped while the button is sneak.

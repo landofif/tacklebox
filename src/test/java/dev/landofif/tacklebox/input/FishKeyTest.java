@@ -118,6 +118,20 @@ class FishKeyTest {
     }
 
     @Test
+    void theBobberGoneEndsItAtOnce() {
+        FishKey.onActionBar(true, 1000);
+        assertTrue(FishKey.minigame(1010, true));
+        assertFalse(FishKey.minigame(1020, false)); // caught: the bobber is gone, frames or not
+        assertFalse(FishKey.minigame(1030, true));
+    }
+
+    @Test
+    void aFrameWithoutTheBobberIsNotTheMinigame() {
+        FishKey.onActionBar(true, 1000);
+        assertFalse(FishKey.minigame(1000, false));
+    }
+
+    @Test
     void otherTitlesDoNotEndIt() {
         FishKey.onActionBar(true, 1000);
         FishKey.onTitle("BITE!", 1010);
