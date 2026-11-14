@@ -61,7 +61,7 @@ class SettingsTilesIntegrationTest {
     @Test
     void hudTilesHaveSwitches() {
         List<Page> pages = SettingsPages.build();
-        for (String t : List.of("equipment", "quests left", "active boosts", "event", "cryptids", "level progress", "now playing", "server hud")) {
+        for (String t : List.of("equipment", "quests left", "catch title", "active boosts", "event", "cryptids", "level progress", "now playing", "server hud")) {
             assertNotNull(tile(pages, "huds", t).main(), t);
         }
         assertNull(tile(pages, "huds", "hotbar").main(), "the hotbar has no on/off");

@@ -170,6 +170,16 @@ public final class HudMover extends Screen {
                 s.biteSize = 250;
             }));
         }
+        if (s.catchTitle) {
+            add.add(new Box(ctx -> dev.landofif.tacklebox.display.CatchTitle.draw(ctx, true), (x, y, r) -> {
+                s.catchX = Math.max(0, Math.min(100, (x + r[2] / 2.0) * 100 / Math.max(1, sw()))); // its middle sideways, its top downwards
+                s.catchY = Math.max(0, Math.min(100, y * 100.0 / Math.max(1, sh())));
+            }, (step, shift) -> s.catchScale = Math.max(50, Math.min(400, s.catchScale + step * 10)), () -> {
+                s.catchX = 50;
+                s.catchY = 25;
+                s.catchScale = 100;
+            }));
+        }
         for (ChatBox box : s.chatBoxes) {
             if (!box.enabled) {
                 continue;

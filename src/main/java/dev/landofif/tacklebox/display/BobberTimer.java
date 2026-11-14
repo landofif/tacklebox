@@ -157,38 +157,54 @@ public final class BobberTimer {
     /** Draws the bite notification; {@code sample} (the mover) skips the animation. Returns its rectangle. */
     public static int[] drawBite(DrawContext ctx, boolean sample) {
         TackleboxSettings s = TackleboxSettings.get();
-        float t = sample ? 1 : (System.currentTimeMillis() - biteAt) / 1000f;
         float alpha = 1, scale = 1, dx = 0, dy = 0;
         if (!sample) {
-            float out = Math.min(0.25f, (float) s.biteSeconds / 3);
-            if (t > s.biteSeconds) {
+            float[] a = anim(s.biteAnim, (System.currentTimeMillis() - biteAt) / 1000f, s.biteSeconds);
+            if (a == null) {
                 if (!preview) {
                     biteAt = 0;
                 }
                 return new int[]{0, 0, 0, 0};
             }
-            if (s.biteAnim != TackleboxSettings.BiteAnim.NONE && t > s.biteSeconds - out) {
-                alpha = (float) (s.biteSeconds - t) / out;
-            }
-            float in = MathHelper.clamp(t / 0.25f, 0, 1);
-            float ease = 1 - (1 - in) * (1 - in);
-            switch (s.biteAnim) {
-                case FADE -> alpha *= in;
-                case POP -> scale = in >= 1 ? 1 : 0.4f + 0.6f * ease + 0.2f * (float) Math.sin(in * Math.PI);
-                case SLIDE -> {
-                    dy = -24 * (1 - ease);
-                    alpha *= in;
-                }
-                case SHAKE -> dx = (float) Math.sin(t * 70) * 8 * Math.max(0, 1 - t / 0.5f);
-                case PULSE -> scale = 1 + 0.1f * (float) Math.sin(t * 12);
-                default -> {
-                }
-            }
+            alpha = a[0];
+            scale = a[1];
+            dx = a[2];
+            dy = a[3];
         }
         if (alpha <= 0.02f) {
             return new int[]{0, 0, 0, 0};
         }
         return centered(ctx, Foe.bold(s.biteText), s.biteX, s.biteY, s.biteSize / 100f * scale, alpha, dx, dy, 0xFF000000 | s.biteColor, s.biteShadow);
+    }
+
+    /**
+     * A notification {@code t} seconds into its {@code seconds} on screen: {alpha, scale, x shift, y shift}, or null once it
+     * is over. Every style but none fades out at the end. Shared with the catch title ({@link CatchTitle}).
+     */
+    public static float[] anim(TackleboxSettings.BiteAnim anim, float t, double seconds) {
+        if (t > seconds) {
+            return null;
+        }
+        float alpha = 1, scale = 1, dx = 0, dy = 0;
+        float out = Math.min(0.25f, (float) seconds / 3);
+        if (anim != TackleboxSettings.BiteAnim.NONE && t > seconds - out) {
+            alpha = (float) (seconds - t) / out;
+        }
+        float in = MathHelper.clamp(t / 0.25f, 0, 1);
+        float ease = 1 - (1 - in) * (1 - in);
+        switch (anim) {
+            case FADE -> alpha *= in;
+            case POP -> scale = in >= 1 ? 1 : 0.4f + 0.6f * ease + 0.2f * (float) Math.sin(in * Math.PI);
+            case SLIDE -> {
+                dy = -24 * (1 - ease);
+                alpha *= in;
+            }
+            case SHAKE -> dx = (float) Math.sin(t * 70) * 8 * Math.max(0, 1 - t / 0.5f);
+            case PULSE -> scale = 1 + 0.1f * (float) Math.sin(t * 12);
+            default -> {
+            }
+        }
+        return new float[]{alpha, scale, dx, dy};
     }
 
     private static int[] centered(DrawContext ctx, Text text, double xPct, double yPct, float scale, float alpha,

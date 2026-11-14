@@ -78,6 +78,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Bobber timer, on the hud or over the bobber. `/tacklebox bobber`, on. `huds/bobber-timer.md`
 - Bite countdown style for the timer. `timerStyle`. `huds/bobber-timer.md`
 - Bite notification replacing the server's BITE! title. `biteOn`, on. `huds/bobber-timer.md`
+- Catch title: on a catch the fish's picture, its rarity badge and name, and its size with weight and length, in place of the server's catch title; every part has a switch. `catchTitle`, off. `huds/catch-title.md`
 - Focus the game window on a bite (Hyprland). `biteFocus`, off. `huds/bobber-timer.md`
 - Hotbar look, spacing, size, offhand box, gliding selection. Settings > huds > hotbar. `ui/look-and-settings.md`
 - Own armour and rod parts row above the hotbar. `equipHud`, off. `ui/look-and-settings.md`

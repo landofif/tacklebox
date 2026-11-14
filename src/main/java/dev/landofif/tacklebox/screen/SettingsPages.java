@@ -495,6 +495,40 @@ public final class SettingsPages {
         main();
         cycle("quests left align", "how the text of the quests left hud lines up inside it: left, centre or right.",
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.questsAlign, v -> s.questsAlign = v);
+        header("catch title");
+        toggle("catch title", "when you catch a fish: its picture, under it the rarity badge and the name, under that the size with weight and length. the lines come from the fish in your inventory, so with a full inventory only the server's own line shows. move it with move huds.",
+                () -> s.catchTitle, v -> s.catchTitle = v);
+        main();
+        toggle("catch title hides the server's", "hides the server's own big catch title and its subtitle while the catch title is on. foecollab's catch title is switched off in foecollab's own settings.",
+                () -> s.catchHideTitle, v -> s.catchHideTitle = v);
+        toggle("catch title picture", "the picture of the caught fish on top, the same one the server shows.",
+                () -> s.catchImage, v -> s.catchImage = v);
+        slider("catch title picture size", "how tall the picture is. 100 is 32 pixels.", 25, 300, 5, "%",
+                () -> s.catchImageSize, v -> s.catchImageSize = (int) Math.round(v));
+        toggle("catch title rarity", "the rarity badge before the name.",
+                () -> s.catchRarity, v -> s.catchRarity = v);
+        toggle("catch title variant", "the badge of a fish that is not normal (albino, melanistic, trophy, fabled, event variants) before the name.",
+                () -> s.catchVariant, v -> s.catchVariant = v);
+        toggle("catch title name", "the name of the fish.",
+                () -> s.catchName, v -> s.catchName = v);
+        toggle("catch title name in rarity colour", "the name in the colour of its rarity instead of the text colour.",
+                () -> s.catchNameRarity, v -> s.catchNameRarity = v);
+        toggle("catch title size class", "baby, juvenile, adult, large or gigantic on the second line, in its own colour.",
+                () -> s.catchSize, v -> s.catchSize = v);
+        toggle("catch title weight", "the weight in lb on the second line.",
+                () -> s.catchWeight, v -> s.catchWeight = v);
+        toggle("catch title length", "the length in inches on the second line.",
+                () -> s.catchLength, v -> s.catchLength = v);
+        color("catch title text colour", "the colour of the name and of the weight and length.",
+                () -> s.catchColor, v -> s.catchColor = v);
+        toggle("catch title shadow", "a shadow behind the text. the pictures never get one.",
+                () -> s.catchShadow, v -> s.catchShadow = v);
+        slider("catch title seconds", "how long the catch title stays.", 0.5, 10, 0.5, "s",
+                () -> s.catchSeconds, v -> s.catchSeconds = v);
+        cycle("catch title animation", "how the catch title comes in.",
+                TackleboxSettings.BiteAnim.values(), k -> k.label, () -> s.catchAnim, v -> s.catchAnim = v);
+        slider("catch title size", "how big the whole catch title is. scrolling it in move huds does the same.", 50, 400, 10, "%",
+                () -> s.catchScale, v -> s.catchScale = (int) Math.round(v));
     }
 
     private void serverHud() {

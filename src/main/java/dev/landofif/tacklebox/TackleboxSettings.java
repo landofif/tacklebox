@@ -402,6 +402,34 @@ public class TackleboxSettings {
         }
     }
 
+    // ---- catch title (display/CatchTitle): the caught fish's picture over two lines ----
+    public boolean catchTitle = false;
+    /** The server's fish art on top, and how tall it is in percent (100 = 32 pixels at size 100). */
+    public boolean catchImage = true;
+    public int catchImageSize = 100;
+    /** Line 1: the rarity badge, the variant badge of a fish that is not normal, the name. */
+    public boolean catchRarity = true;
+    public boolean catchVariant = false;
+    public boolean catchName = true;
+    /** The name in the rarity colour instead of the text colour. */
+    public boolean catchNameRarity = false;
+    /** Line 2: the size class, the weight, the length. */
+    public boolean catchSize = true;
+    public boolean catchWeight = true;
+    public boolean catchLength = true;
+    /** RGB of the name and the numbers. */
+    public int catchColor = 0xFFFFFF;
+    public boolean catchShadow = true;
+    public double catchSeconds = 3;
+    public BiteAnim catchAnim = BiteAnim.POP;
+    /** Size of the whole title in percent. */
+    public int catchScale = 100;
+    /** Percent of the screen: the middle of the title sideways, its top edge downwards. */
+    public double catchX = 50;
+    public double catchY = 25;
+    /** Hide the server's own catch title and subtitle while the catch title is on. */
+    public boolean catchHideTitle = true;
+
     // ---- viewmodel (held item) ----
     public boolean viewmodel = false;
     public double vmScale = 1.0;
@@ -531,6 +559,13 @@ public class TackleboxSettings {
         if (timerStyle == null) timerStyle = TimerStyle.UP;
         if (biteAnim == null) biteAnim = BiteAnim.POP;
         if (biteText == null) biteText = "bite!";
+        if (catchAnim == null) catchAnim = BiteAnim.POP;
+        catchImageSize = Math.max(25, Math.min(300, catchImageSize));
+        catchScale = Math.max(50, Math.min(400, catchScale));
+        catchSeconds = Math.max(0.5, Math.min(10, catchSeconds));
+        catchX = Math.max(0, Math.min(100, catchX));
+        catchY = Math.max(0, Math.min(100, catchY));
+        catchColor &= 0xFFFFFF;
         if (swingStyle == null) swingStyle = SwingStyle.NORMAL;
         if (equipPlace == null) equipPlace = EquipPlace.ABOVE;
         if (rarityShape == null) rarityShape = RarityShape.CIRCLE;

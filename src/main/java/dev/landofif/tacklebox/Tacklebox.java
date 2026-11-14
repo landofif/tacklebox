@@ -209,6 +209,7 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.hud.CryptidHud.renderHud(context);
             dev.landofif.tacklebox.hud.NowPlaying.renderHud(context);
             dev.landofif.tacklebox.display.BobberTimer.renderHud(context);
+            dev.landofif.tacklebox.display.CatchTitle.renderHud(context);
         });
         HudElementRegistry.attachElementAfter(net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements.CHAT,
                 Identifier.of(MOD_ID, "chat_boxes"), (context, tickCounter) -> {

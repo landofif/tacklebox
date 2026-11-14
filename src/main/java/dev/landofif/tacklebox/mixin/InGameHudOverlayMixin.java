@@ -21,6 +21,12 @@ abstract class InGameHudOverlayMixin {
     private @Nullable Text overlayMessage;
     @Shadow
     private int overlayRemaining;
+    @Shadow
+    private @Nullable Text title;
+    @Shadow
+    private @Nullable Text subtitle;
+    @Shadow
+    private int titleRemainTicks;
 
     @Inject(method = "setOverlayMessage", at = @At("HEAD"), cancellable = true)
     private void tacklebox$overlay(Text message, boolean tinted, CallbackInfo ci) {
@@ -45,6 +51,26 @@ abstract class InGameHudOverlayMixin {
         dev.landofif.tacklebox.input.FishKey.onTitle(title == null ? "" : title.getString(), System.currentTimeMillis());
         if (dev.landofif.tacklebox.display.BobberTimer.onTitle(title)) {
             ci.cancel();
+        }
+    }
+
+    /**
+     * The catch title (display/CatchTitle) hides the server's own after it was set, not by cancelling: foecollab reads its
+     * catches from setTitle and setSubtitle too, and a cancel at the head could run before its hooks.
+     */
+    @Inject(method = "setTitle", at = @At("TAIL"))
+    private void tacklebox$catchTitle(Text shown, CallbackInfo ci) {
+        if (dev.landofif.tacklebox.display.CatchTitle.onTitle(shown, System.currentTimeMillis())) {
+            this.title = null;
+            this.subtitle = null;
+            this.titleRemainTicks = 0;
+        }
+    }
+
+    @Inject(method = "setSubtitle", at = @At("TAIL"))
+    private void tacklebox$catchSubtitle(Text shown, CallbackInfo ci) {
+        if (dev.landofif.tacklebox.display.CatchTitle.onSubtitle(shown, System.currentTimeMillis())) {
+            this.subtitle = null;
         }
     }
 }
