@@ -1,5 +1,7 @@
 package dev.landofif.tacklebox.hud;
 
+import dev.landofif.tacklebox.menu.Locations;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -297,7 +299,7 @@ public final class MiniEvent {
             if (m.cur >= m.max && !m.repeats()) {
                 continue;
             }
-            rows.add(new TextHud.Row(m.name, m.cur + "/" + m.max + " · " + m.mark, 0, m.cur >= m.max ? GREEN : 0));
+            rows.add(new TextHud.Row(Locations.shown(m.name), m.cur + "/" + m.max + " · " + m.mark, 0, m.cur >= m.max ? GREEN : 0));
         }
         return rows;
     }

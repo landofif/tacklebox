@@ -307,7 +307,7 @@ public final class XpEstimate {
         String where = locationLevel();
         String[][] rows = {
                 {"to level " + (p.experienceLevel + 1), level == null ? "-" : level},
-                {"to " + (ServerInfo.locationName.isEmpty() ? "location" : ServerInfo.locationName) + " level "
+                {"to " + (ServerInfo.locationName.isEmpty() ? "location" : Locations.shown(ServerInfo.locationName)) + " level "
                         + (where == null ? "?" : String.valueOf(Integer.parseInt(where) + 1)), loc == null ? "-" : loc}};
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
         int w = 0;

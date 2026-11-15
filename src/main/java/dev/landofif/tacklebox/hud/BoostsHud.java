@@ -2,6 +2,7 @@ package dev.landofif.tacklebox.hud;
 
 import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.display.ChummerRing;
+import dev.landofif.tacklebox.menu.Locations;
 import dev.landofif.tacklebox.trigger.Matcher;
 import dev.landofif.tacklebox.trigger.TriggerEngine;
 import dev.landofif.tacklebox.ui.Foe;
@@ -81,7 +82,7 @@ public final class BoostsHud {
         if (frenzy != null) {
             frenzyEnd = now + frenzy.remainingMs();
             frenzySeen = now;
-            frenzyPlace = frenzy.place();
+            frenzyPlace = Locations.shown(frenzy.place()); // as shown; the colour is looked up by the name as sent
             frenzyColor = ChatColors.of(message, "Fish Frenzy"); // the alert's "Fish at X" line has only "Fish"
             frenzyPlaceColor = ChatColors.of(message, frenzy.place());
             return;

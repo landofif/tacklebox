@@ -37,7 +37,7 @@ Daily missions reroll in 18h 13m 26s
 ## How it works
 
 - **Hiding**: after a send, a header within 3 s starts a hidden answer; its reroll line and missions (within 2 s of the header) are hidden with it. An answer to `/minievent` you typed yourself is read too and shown as usual.
-- **Rows**: `ends in`, `daily reroll`, then each mission that is not done, and the repeating ones always: `mediterranean sea | 59/100 · ∞ x25`. A finished one timer or daily is left out. The value is green when the goal is reached. Nothing shows with no event or after its end.
+- **Rows**: `ends in`, `daily reroll`, then each mission that is not done, and the repeating ones always: `med | 59/100 · ∞ x25` (the mediterranean sea is shown as med, `Locations.shown`, see `rules/text-and-automation.md`; the mission keeps its full name for counting). A finished one timer or daily is left out. The value is green when the goal is reached. Nothing shows with no event or after its end.
 - **Counting between answers** (`MiniEvent.counts`): a catch adds one to every unfinished mission whose whole name fits the fish: the place (the fish's `location`), the size word, the variant, the rarity, and what is left over is the fish's name or its `group` (`Rays`, with or without the plural s). Pet missions (`Lynx Pet`) and anything else are left to the server's next answer, which replaces all counts.
 
 ## Gotchas

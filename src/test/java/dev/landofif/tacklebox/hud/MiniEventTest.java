@@ -67,7 +67,10 @@ class MiniEventTest {
         List<TextHud.Row> rows = MiniEvent.rows(T + 26_000);
         assertEquals(new TextHud.Row("ends in", "2d 1h"), rows.get(0));
         assertEquals(new TextHud.Row("daily reroll", "18h 13m"), rows.get(1));
-        assertEquals(new TextHud.Row("mediterranean sea", "59/100 · ∞ x25", 0, 0), rows.get(2));
+        assertEquals(new TextHud.Row("med", "59/100 · ∞ x25", 0, 0), rows.get(2)); // the place is shown short, the mission keeps its name
+        assertEquals("mediterranean sea", MiniEvent.missions().get(0).name);
+        assertTrue(rows.stream().anyMatch(r -> r.label().equals("med rays")));
+        assertTrue(rows.stream().noneMatch(r -> r.label().contains("mediterranean")));
         assertEquals(11, rows.size()); // 2 clocks + 12 missions - 3 finished
         assertTrue(rows.stream().noneMatch(r -> r.label().equals("seabreams")));
         assertTrue(MiniEvent.rows(T + MiniEvent.duration("2d 1h 13m 26s")).isEmpty()); // the event is over

@@ -53,7 +53,7 @@ class MiniEventIntegrationTest {
         assertEquals("med sea mini event", MiniEvent.title());
         assertEquals(new TextHud.Row("ends in", "2d 4h"), rows.get(0));
         assertEquals(new TextHud.Row("daily reroll", "21h 00m"), rows.get(1));
-        assertEquals(List.of("mediterranean sea", "lynx pet", "mediterranean sea rays", "seabreams"),
+        assertEquals(List.of("med", "lynx pet", "med rays", "seabreams"),
                 rows.subList(2, rows.size()).stream().map(TextHud.Row::label).toList());
 
         // a ray at the mediterranean sea: three missions go up at once, and the server is asked again a minute after the last send

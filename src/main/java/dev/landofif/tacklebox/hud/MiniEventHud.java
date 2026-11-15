@@ -14,7 +14,7 @@ import java.util.List;
  */
 public final class MiniEventHud {
     private static final List<TextHud.Row> SAMPLE = List.of(new TextHud.Row("ends in", "2d 1h"), new TextHud.Row("daily reroll", "18h 13m"),
-            new TextHud.Row("mediterranean sea", "59/100 · ∞ x25"), new TextHud.Row("mediterranean sea rays", "16/18 · daily"));
+            new TextHud.Row("med", "59/100 · ∞ x25"), new TextHud.Row("med rays", "16/18 · daily"));
 
     private MiniEventHud() {}
 

@@ -347,7 +347,7 @@ public final class ServerHud {
             }
             case "location" -> {
                 if (!ServerInfo.locationName.isEmpty()) {
-                    out.add(plain(Text.literal("⏣ ").formatted(Formatting.GRAY).append(Text.literal(title(ServerInfo.locationName)).formatted(Formatting.GREEN))));
+                    out.add(plain(Text.literal("⏣ ").formatted(Formatting.GRAY).append(Text.literal(title(Locations.shown(ServerInfo.locationName))).formatted(Formatting.GREEN))));
                 }
             }
             case "players" -> {

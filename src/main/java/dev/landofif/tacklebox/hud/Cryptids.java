@@ -1,5 +1,7 @@
 package dev.landofif.tacklebox.hud;
 
+import dev.landofif.tacklebox.menu.Locations;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -112,7 +114,7 @@ public final class Cryptids {
         }
         if (!s.fabled.isEmpty()) {
             String id = ServerInfo.LOCATIONS.entrySet().stream().filter(e -> e.getValue().equalsIgnoreCase(s.fabled)).map(Map.Entry::getKey).findFirst().orElse("?");
-            out.put("fabled", List.of(new Spot("fabled", id, s.fabled.toLowerCase(Locale.ROOT), "fabled fish 1/3000", "", List.of())));
+            out.put("fabled", List.of(new Spot("fabled", id, Locations.shown(s.fabled.toLowerCase(Locale.ROOT)), "fabled fish 1/3000", "", List.of())));
         }
         for (Window w : WINDOWS) {
             if (open(w, s.clock)) {

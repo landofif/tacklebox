@@ -91,10 +91,10 @@ public final class BaitPicker {
         }
     }
 
-    /** The wiki location this mods location belongs to (their names are the same, lowercased). */
+    /** The wiki location this mods location belongs to (its name holds the location's key). */
     public static Loc loc(Locations.Location l) {
         for (Loc c : locs()) {
-            if (c.name().equalsIgnoreCase(l.name())) {
+            if (Locations.byName(c.name()) == l) {
                 return c;
             }
         }

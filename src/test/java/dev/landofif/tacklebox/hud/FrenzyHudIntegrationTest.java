@@ -41,5 +41,14 @@ class FrenzyHudIntegrationTest {
 
         BoostsHud.onChat(Text.literal("FRENZY » The Fish Frenzy has ended at Kenai River"));
         assertEquals(0, BoostsHud.frenzyLeft(System.currentTimeMillis()));
+
+        // the mediterranean sea is shown as med, in the colour the line gave the full name
+        BoostsHud.onChat(BoostsHudColorsTest.line("FISH FRENZY", 0xFFAA00, " » A ", 0xFFFFFF, "Fish Frenzy", 0xFFAA00, " is active at ", 0xFFFFFF,
+                "Mediterranean Sea", 0xFFFF55, " (for 16m 56s)", 0x555555));
+        assertEquals("Med", BoostsHud.frenzyPlace());
+        row = BoostsHud.rows().stream().filter(r -> r.label().get(0).text().equals("fish frenzy")).findFirst().orElseThrow();
+        assertEquals(List.of(new BoostsHud.Part("fish frenzy", 0xFFAA00), new BoostsHud.Part("Med", 0xFFFF55)), row.label());
+        BoostsHud.onChat(Text.literal("FRENZY » The Fish Frenzy has ended at Mediterranean Sea"));
+        assertEquals(0, BoostsHud.frenzyLeft(System.currentTimeMillis()));
     }
 }

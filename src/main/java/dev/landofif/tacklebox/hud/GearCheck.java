@@ -1,5 +1,7 @@
 package dev.landofif.tacklebox.hud;
 
+import dev.landofif.tacklebox.menu.Locations;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -128,11 +130,11 @@ public final class GearCheck {
         }
         List<String> parts = new ArrayList<>();
         if (!pet.isEmpty() && !pet.equals(here.petId())) {
-            parts.add("wrong pet at " + here.name() + ": use a " + here.pet() + " pet (" + (hasRight ? "in inventory" : "not in inventory") + ")");
+            parts.add("wrong pet at " + Locations.shown(here.name()) + ": use a " + here.pet() + " pet (" + (hasRight ? "in inventory" : "not in inventory") + ")");
         }
         List<String> pieces = wrongArmor(here, worn);
         if (!pieces.isEmpty()) {
-            parts.add("wrong armor: " + String.join(", ", pieces) + ", " + here.name() + " is " + here.climate());
+            parts.add("wrong armor: " + String.join(", ", pieces) + ", " + Locations.shown(here.name()) + " is " + here.climate());
         }
         return parts.isEmpty() ? null : String.join(" · ", parts);
     }

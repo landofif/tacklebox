@@ -11,7 +11,7 @@ import java.util.Locale;
  * luna and a friend noted down. The pictures are the items the server puts in the menu.
  */
 public final class Locations {
-    /** {@code key} is matched against a menu item's name; {@code wiki} is the wiki table's spelling. */
+    /** {@code name} is what is shown; {@code key} is matched against a menu item's name; {@code wiki} is the wiki table's spelling. */
     public record Location(String id, String name, String key, String wiki) {
     }
 
@@ -30,12 +30,20 @@ public final class Locations {
             new Location("danube", "danube river", "danube", "danube river"),
             new Location("oilrig", "oil rig", "oil rig", "oil rig"),
             new Location("amazon", "amazon river", "amazon", "amazon river"),
-            new Location("mediterranean", "mediterranean sea", "mediterranean", "med sea"),
+            new Location("mediterranean", "med", "mediterranean", "med sea"),
             new Location("capecod", "cape cod", "cape cod", "cape cod"),
             new Location("hawaii", "hawaii", "hawaii", "hawaii"),
             new Location("lofoten", "lofoten islands", "lofoten", "lofoten islands"),
             new Location("cairns", "cairns", "cairns", "cairns"),
             new Location("nile", "nile river", "nile", "nile river"));
+
+    /**
+     * A text of the server's with a place in it, as it is shown: the mediterranean sea is "med" everywhere (foecollab writes it
+     * the same in the compendium and the travel menu). Only for text that is drawn, never for matching.
+     */
+    public static String shown(String text) {
+        return text.replace("mediterranean sea", "med").replace("Mediterranean Sea", "Med");
+    }
 
     /** The location a menu item is named after, or null. */
     public static Location byName(String plainName) {

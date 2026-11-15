@@ -54,6 +54,7 @@ class GearCheckTest {
         assertEquals(List.of(new TextHud.Row("wrong pet", "use wolf · not in inventory", GearCheck.RED, 0)),
                 GearCheck.rows(DANUBE, "eagle", false, List.of()));
         assertEquals("wrong pet at danube river: use a wolf pet (not in inventory)", GearCheck.chatLine(DANUBE, "eagle", false, List.of()));
+        assertEquals("wrong pet at med: use a lynx pet (in inventory)", GearCheck.chatLine(GearCheck.place("mediterranean"), "wolf", true, List.of()));
     }
 
     @Test
