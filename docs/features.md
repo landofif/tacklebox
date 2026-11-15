@@ -24,6 +24,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Own gui scale for server chest menus. `chestScale`, 0 = the games. `menus/menu-controls.md`
 - Vault overview: all seven /pv vaults on one screen with search. `vaultMenu`, off. `menus/vaults.md`
 - Bait picker: fastest quest and best bait for a location. `/tacklebox bait`. `menus/bait-picker.md`
+- Pet prices screen: what pets sell for between players by rating and rarity, from the community's pet price sheet, downloaded at most once a day and credited on the screen. `/tacklebox prices`. `menus/pet-prices.md`
 - Power screen: power by source, cheapest next level, location table. `/tacklebox power`. `menus/power-and-compendium.md`
 
 ## Items and tooltips

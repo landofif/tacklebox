@@ -360,6 +360,7 @@ public final class SettingsPages {
         link("word swaps", WordSwapScreen::new);
         link("bait picker", BaitScreen::new);
         link("power", PowerScreen::new);
+        link("pet prices", "what pets sell for between players, by rating and rarity, from the community's pet price sheet. downloaded at most once a day.", PetPricesScreen::new);
         link("bobber timer", BobberScreen::new);
         link("viewmodel", ViewmodelScreen::new);
         link("move huds", dev.landofif.tacklebox.hud.HudMover::new);

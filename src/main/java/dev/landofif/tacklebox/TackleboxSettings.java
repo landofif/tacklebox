@@ -212,6 +212,8 @@ public class TackleboxSettings {
     public dev.landofif.tacklebox.hud.HudSpot miniEventHud = new dev.landofif.tacklebox.hud.HudSpot(360, 330);
     /** /tt, /travel and /turbotravel open as a world map (screen/TravelMapScreen) instead of the tiles or the chest. */
     public boolean travelMap;
+    /** When the pet price sheet was last downloaded (epoch ms, menu/PetPrices); the copy is config/tacklebox/petprices.csv. */
+    public long petPricesAt;
     /** When each vote of the last 24 hours came in (epoch ms), oldest first. */
     public java.util.List<Long> votes = new java.util.ArrayList<>();
     /** The now playing hud (hud/NowPlaying): what Spotify, a browser tab or any other player is playing, where it sits. */

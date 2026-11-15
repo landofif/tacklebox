@@ -313,6 +313,7 @@ public final class Tacklebox implements ClientModInitializer {
                 .then(ClientCommandManager.literal("serverhud").executes(ctx -> open(() -> new dev.landofif.tacklebox.screen.ServerHudScreen(null))))
                 .then(ClientCommandManager.literal("bait").executes(ctx -> open(() -> new dev.landofif.tacklebox.screen.BaitScreen(null))))
                 .then(ClientCommandManager.literal("power").executes(ctx -> open(() -> new dev.landofif.tacklebox.screen.PowerScreen(null))))
+                .then(ClientCommandManager.literal("prices").executes(ctx -> open(() -> new dev.landofif.tacklebox.screen.PetPricesScreen(null))))
                 .then(ClientCommandManager.literal("chat").executes(ctx -> open(() -> new ChatFilterScreen(null))))
                 .then(ClientCommandManager.literal("debug")
                         .then(ClientCommandManager.literal("displays").executes(ctx -> dev.landofif.tacklebox.display.DebugDump.toggleDisplays()))
