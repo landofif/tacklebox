@@ -16,6 +16,7 @@ jobs:
         with:
           name: tacklebox
           path: build/libs/*.jar
+          retention-days: 7
       - name: Build Prism test instance
         if: github.event_name == 'push'
         run: python3 .github/scripts/prism_instance.py
@@ -26,3 +27,4 @@ jobs:
         with:
           name: tacklebox-prism
           path: build/tacklebox-prism.zip
+          retention-days: 1 # 13 MB a push: the private repo's artifact storage is small
