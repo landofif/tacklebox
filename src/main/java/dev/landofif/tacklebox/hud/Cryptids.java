@@ -24,7 +24,7 @@ public final class Cryptids {
     public static final int MOON = 0xFFDD88FF, BLOOD = 0xFFFF5555, RAINBOW = 0xFFFF7BE0, STORM = 0xFFFFD83D, FABLED = 0xFFE0413A, CLOCK = 0xFF7FD18B;
 
     /**
-     * Where to fish and what for: "toledo bend", "rougarou 1/300", "blood/claw" (the drop is "" when the catch is the item).
+     * Where to fish and what for: "toledo", "rougarou 1/300", "blood/claw" (the drop is "" when the catch is the item).
      * {@code key} names its dry streak, {@code loc} is the location id catches must be at ("" anywhere), {@code items} the
      * drop names (lowercase) that end the streak.
      */
@@ -40,12 +40,12 @@ public final class Cryptids {
     /** A cryptid that bites between two in-game hours. */
     record Window(String name, int from, int to, Spot spot) {}
 
-    static final Spot ROUGAROU = new Spot("rougarou", "toledobend", "toledo bend", "rougarou 1/300", "blood/claw", List.of("rougarou blood", "rougarou claw"));
+    static final Spot ROUGAROU = new Spot("rougarou", "toledobend", "toledo", "rougarou 1/300", "blood/claw", List.of("rougarou blood", "rougarou claw"));
     static final Spot BESSIE_MOON = new Spot("bessie", "greatlakes", "great lakes", "bessie 1/500", "silver scale", List.of("silver scale"));
     static final Spot CAPSULE = new Spot("capsule", "", "anywhere", "infusion capsule 1/300", "", List.of("infusion capsule"));
     static final Spot GARABONCIAS = new Spot("garaboncias", "danube", "danube", "garaboncias 1/250", "concoction/essence", List.of("vile concoction", "purifying essence"));
     static final List<Window> WINDOWS = List.of(
-            new Window("bigfoot", 1, 3, new Spot("bigfoot", "spawn", "cypress lake", "bigfoot 1/300", "tooth/fur", List.of("bigfoot tooth", "bigfoot fur"))),
+            new Window("bigfoot", 1, 3, new Spot("bigfoot", "spawn", "cypress", "bigfoot 1/300", "tooth/fur", List.of("bigfoot tooth", "bigfoot fur"))),
             new Window("titanoboa", 2, 4, new Spot("titanoboa", "amazon", "amazon", "titanoboa 1/1500", "titan's fang", List.of("titan"))),
             new Window("bessie", 4, 6, new Spot("bessie", "greatlakes", "great lakes", "bessie 1/1000", "silver scale", List.of("silver scale"))));
     /** Every spot whose drop ends a dry streak, for {@link #dropKey}; the fabled fish ends by its catch instead. */

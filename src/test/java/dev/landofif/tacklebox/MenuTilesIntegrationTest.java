@@ -85,7 +85,7 @@ class MenuTilesIntegrationTest {
         assertEquals("1,495/1,500", MenuTiles.count(mackerels.row().amount()));
         Item basses = items.get(0);
         assertEquals(List.of("basses collection", "Level 6, 43.1k/50k to level 7",
-                "Catch at cypress lake, lake biwa, everglades, toledo bend, great lakes"), MenuTiles.collectionTip(basses.row(), basses.lore));
+                "Catch at cypress, biwa, everglades, toledo, great lakes"), MenuTiles.collectionTip(basses.row(), basses.lore));
     }
 
     @Test
@@ -133,7 +133,7 @@ class MenuTilesIntegrationTest {
         assertEquals(17, items.size());
         List<Locations.Location> places = items.stream().map(i -> Locations.byName(i.plain())).toList();
         assertTrue(places.stream().allMatch(java.util.Objects::nonNull));
-        assertEquals("cypress lake", places.get(0).name());
+        assertEquals("cypress", places.get(0).name());
         assertEquals("cairns", places.get(16).name());
 
         MenuTiles.Layout layout = MenuTiles.layout(items.size(), 4, 580, 462);
@@ -145,12 +145,12 @@ class MenuTilesIntegrationTest {
         assertEquals("frenzy", mark);
         // luna's saved level for toledo bend, 13|0.28695336
         List<String> tip = MenuTiles.placeTip(places.get(6), mark, 13, 0.28695336f, toledo.row().sub());
-        assertEquals(List.of("toledo bend · frenzy", "Level 13, 28% to level 14", "Subtropical · Freshwater · 13°C", ""), tip.subList(0, 4));
+        assertEquals(List.of("toledo · frenzy", "Level 13, 28% to level 14", "Subtropical · Freshwater · 13°C", ""), tip.subList(0, 4));
         assertTrue(tip.contains("bread (common), epic quest, 1r 1e"));
 
         // lake biwa at 20 (11.85M/2.32M) is the one max; the header also names the frenzy
         String summary = MenuTiles.line("1 max", mark + " at " + places.get(6).name());
-        assertEquals("1 max · frenzy at toledo bend", summary);
+        assertEquals("1 max · frenzy at toledo", summary);
         assertEquals("Level 20, max", MenuTiles.placeTip(places.get(2), "", 20, 1, items.get(2).row().sub()).get(1));
     }
 
@@ -179,7 +179,7 @@ class MenuTilesIntegrationTest {
         List<Item> rest = items.stream().filter(i -> MenuTiles.level(i.plain()) <= 0).toList();
         assertEquals(20, levels.size());
         assertEquals(List.of("location leveling data", "leveling bonuses"), rest.stream().map(Item::plain).toList());
-        assertEquals("lake biwa", MenuTiles.levelPageTitle(levels.get(0).lore));
+        assertEquals("biwa", MenuTiles.levelPageTitle(levels.get(0).lore));
         assertTrue(levels.stream().allMatch(i -> MenuTiles.state(i.id) == MenuTiles.State.DONE));
         assertNotNull(MenuTiles.layout(20, 5, 580, 462 - ROW_PAIR));
         assertFalse(MenuTiles.layout(20, 5, 580, 462 - ROW_PAIR).scrolls());

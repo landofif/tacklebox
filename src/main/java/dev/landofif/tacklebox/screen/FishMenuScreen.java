@@ -456,10 +456,10 @@ public class FishMenuScreen extends TackleboxScreen {
         // the amount sits on the name line, the bar on the line under it
         int tx = x + 22, room = w - 22 - 4 - (rw > 0 ? rw + 8 : 0), subRoom = w - 22 - 4 - (barW > 0 ? barW + 8 : 0);
 
-        String name = t.loc != null ? t.loc.name() : t.row.name();
+        String name = t.loc != null ? t.loc.name() : Locations.shown(t.row.name());
         ctx.drawText(textRenderer, fit(Foe.text(name), room), tx, y + 2, hot ? Hypr.acc2() : Foe.TEXT, false);
         if (!t.row.sub().isEmpty()) {
-            ctx.drawText(textRenderer, fit(Foe.sentence(t.row.sub()), subRoom), tx, y + 12, Foe.DIM, false);
+            ctx.drawText(textRenderer, fit(Foe.sentence(Locations.shown(t.row.sub())), subRoom), tx, y + 12, Foe.DIM, false);
         }
         if (rw > 0) {
             ctx.drawText(textRenderer, Foe.text(right), x + w - 4 - rw, y + 3, progress >= 1 ? Foe.TITLE : Foe.TEXT, false);
@@ -711,7 +711,7 @@ public class FishMenuScreen extends TackleboxScreen {
             if (t == null) {
                 continue;
             }
-            Text label = Foe.text(t.row.name().replace(" (Click)", ""));
+            Text label = Foe.text(Locations.shown(t.row.name().replace(" (Click)", "")));
             int lw = textRenderer.getWidth(label);
             if (bxx + lw > x + w) {
                 break;
@@ -890,7 +890,7 @@ public class FishMenuScreen extends TackleboxScreen {
             // 80 wide tile had room for about five letters, so most names were split in a word
             ctx.drawItem(t.stack, x + 5, y + 5);
             ny = y + 22;
-            for (String line : MenuTiles.nameLines(MenuTiles.shortName(t.row.name()), w - 12, MenuTiles.nameRows(h), s -> textRenderer.getWidth(Foe.text(s)))) {
+            for (String line : MenuTiles.nameLines(Locations.shown(MenuTiles.shortName(t.row.name())), w - 12, MenuTiles.nameRows(h), s -> textRenderer.getWidth(Foe.text(s)))) {
                 ctx.drawText(textRenderer, Foe.text(line), nx, ny, Foe.TEXT, false);
                 ny += 9;
             }

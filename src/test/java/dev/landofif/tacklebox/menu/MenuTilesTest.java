@@ -58,8 +58,8 @@ class MenuTilesTest {
         List<String> lore = List.of(P + "Basses Collection", P + "ᴄʟɪᴄᴋ ᴛᴏ ᴏᴘᴇɴ", P + "Current Level - [6]", P + "   (43,178/50K)",
                 P + "Progress to Level 7", P + "Catch at:", P + "- Cypress Lake", P + "- Toledo Bend Reservoir", P + " ");
         MenuRows.Row row = MenuRows.of("Basses Collection", lore);
-        assertEquals(List.of("cypress lake", "toledo bend"), MenuTiles.catchAt(lore));
-        assertEquals(List.of("basses collection", "Level 6, 43.1k/50k to level 7", "Catch at cypress lake, toledo bend"),
+        assertEquals(List.of("cypress", "toledo"), MenuTiles.catchAt(lore));
+        assertEquals(List.of("basses collection", "Level 6, 43.1k/50k to level 7", "Catch at cypress, toledo"),
                 MenuTiles.collectionTip(row, lore));
     }
 
@@ -94,7 +94,7 @@ class MenuTilesTest {
                 P + "   (1,886/5K)", P + "Progress to Level 9");
         assertTrue(MenuTiles.maxed(catfishes));
         assertFalse(MenuTiles.maxed(gigantic));
-        assertEquals(List.of("catfishes collection", "Level 7, max", "Catch at cypress lake, nile river"),
+        assertEquals(List.of("catfishes collection", "Level 7, max", "Catch at cypress, nile"),
                 MenuTiles.collectionTip(MenuRows.of("Catfishes Collection", catfishes), catfishes));
         assertEquals("Level 8, 1,886/5,000 to level 9", MenuTiles.collectionTip(MenuRows.of("Gigantic Collection", gigantic), gigantic).get(1));
     }
@@ -103,7 +103,7 @@ class MenuTilesTest {
     void placeHoverBoxHasMarkLevelClimateAndBait() {
         Locations.Location toledo = Locations.byName("toledo bend reservoir");
         List<String> tip = MenuTiles.placeTip(toledo, "frenzy", 13, .287f, "Subtropical · Freshwater · 13°C");
-        assertEquals("toledo bend · frenzy", tip.get(0));
+        assertEquals("toledo · frenzy", tip.get(0));
         assertEquals("Level 13, 28% to level 14", tip.get(1));
         assertEquals("Subtropical · Freshwater · 13°C", tip.get(2));
         assertTrue(tip.contains("dough balls (common), epic quest, 1r 1e"));
@@ -112,7 +112,7 @@ class MenuTilesTest {
         Locations.Location oil = Locations.byName("oil rig");
         assertEquals("Level 20, max", MenuTiles.placeTip(oil, "", 20, 1, "").get(1));
         List<String> unknown = MenuTiles.placeTip(oil, "", -1, -1, "");
-        assertEquals("oil rig", unknown.get(0));
+        assertEquals("rig", unknown.get(0));
         assertEquals("Level not known yet: open the compendium once", unknown.get(1));
         assertEquals("No bait noted for this place yet", unknown.get(unknown.size() - 1));
     }
@@ -138,7 +138,7 @@ class MenuTilesTest {
 
     @Test
     void levelPageTitleFromTheLore() {
-        assertEquals("lake biwa", MenuTiles.levelPageTitle(List.of(P + "✔ (Level 1) Lake Biwa", P + "ʟᴏᴄᴀᴛɪᴏɴ ᴄᴏʟʟᴇᴄᴛɪᴏɴs")));
+        assertEquals("biwa", MenuTiles.levelPageTitle(List.of(P + "✔ (Level 1) Lake Biwa", P + "ʟᴏᴄᴀᴛɪᴏɴ ᴄᴏʟʟᴇᴄᴛɪᴏɴs")));
         assertEquals("albino collection", MenuTiles.levelPageTitle(List.of(P + "✔ (Level 1)", P + "ᴀʟʙɪɴᴏ ᴄᴏʟʟᴇᴄᴛɪᴏɴ")));
         assertEquals("", MenuTiles.levelPageTitle(List.of(P + "Rewards:")));
     }

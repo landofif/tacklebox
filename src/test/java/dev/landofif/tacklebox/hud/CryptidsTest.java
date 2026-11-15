@@ -83,7 +83,7 @@ class CryptidsTest {
     void openWindowShowsWhereAndTimeLeft() {
         List<Cryptids.Row> rows = Cryptids.rows(quiet(0, 0, Cryptids.clockMinutes("2:53", "AM")), ms -> ms / 1000 + "s");
         assertEquals(new Cryptids.Row("bigfoot", "5s", Cryptids.CLOCK, true), rows.get(0));
-        assertEquals(new Cryptids.Row("cypress lake", "bigfoot 1/300 · tooth/fur (0)", 0, false), rows.get(1));
+        assertEquals(new Cryptids.Row("cypress", "bigfoot 1/300 · tooth/fur (0)", 0, false), rows.get(1));
         assertEquals(new Cryptids.Row("titanoboa", "55s", Cryptids.CLOCK, true), rows.get(2));
         assertEquals(new Cryptids.Row("amazon", "titanoboa 1/1500 · titan's fang (0)", 0, false), rows.get(3));
         assertEquals(new Cryptids.Row("next", "", 0, true), rows.get(4));
@@ -96,7 +96,7 @@ class CryptidsTest {
         long rise = 1_000_000;
         List<Cryptids.Row> rows = Cryptids.rows(state(rise + 60_000, "Blood Moon", rise, "", false, "", -1, Set.of()), ms -> ms / 1000 + "s");
         assertEquals(new Cryptids.Row("blood moon", "540s", Cryptids.BLOOD, true), rows.get(0));
-        assertEquals("toledo bend", rows.get(1).label());
+        assertEquals("toledo", rows.get(1).label());
         assertEquals("rougarou 1/300 · blood/claw (0)", rows.get(1).value());
         assertEquals("great lakes", rows.get(2).label());
         assertEquals("anywhere", rows.get(3).label());
@@ -109,8 +109,8 @@ class CryptidsTest {
         long rise = 1_000_000, now = rise + Cryptids.CYCLE - 30_000; // moon in 30 s
         List<Cryptids.Row> rows = Cryptids.rows(quiet(now, rise, 0), ms -> ms / 1000 + "s"); // midnight: bigfoot in 50 s
         assertEquals("next", rows.get(0).label());
-        assertEquals(new Cryptids.Row("moon · toledo bend, great lakes", "30s", Cryptids.MOON, false), rows.get(1));
-        assertEquals("bigfoot · cypress lake", rows.get(2).label());
+        assertEquals(new Cryptids.Row("moon · toledo, great lakes", "30s", Cryptids.MOON, false), rows.get(1));
+        assertEquals("bigfoot · cypress", rows.get(2).label());
         assertEquals("titanoboa · amazon", rows.get(3).label());
         assertEquals("bessie · great lakes", rows.get(4).label());
     }
@@ -118,7 +118,7 @@ class CryptidsTest {
     @Test
     void stormsRainbowAndFabled() {
         List<Cryptids.Row> rows = Cryptids.rows(state(0, "", 0, "Supercell", true, "Cypress Lake", -1, Set.of()), ms -> "");
-        assertEquals(List.of("rainbow", "danube", "supercell", "anywhere", "fabled", "cypress lake"), rows.stream().map(Cryptids.Row::label).toList());
+        assertEquals(List.of("rainbow", "danube", "supercell", "anywhere", "fabled", "cypress"), rows.stream().map(Cryptids.Row::label).toList());
         assertEquals("lightning bottle 1/250 (0)", rows.get(3).value());
         assertEquals("fabled fish 1/3000 (0)", rows.get(5).value());
         assertEquals("lightning bottle 1/500 (0)", Cryptids.rows(state(0, "", 0, "Thunderstorm", false, "", -1, Set.of()), ms -> "").get(1).value());
@@ -179,6 +179,6 @@ class CryptidsTest {
     void moonPopupNamesEverySpot() {
         Cryptids.Popup p = Cryptids.started(state(0, "Blood Moon", 0, "", false, "", -1, Set.of())).get(0);
         assertEquals("blood moon", p.title());
-        assertEquals("toledo bend rougarou 1/300 · great lakes bessie 1/500 · anywhere infusion capsule 1/300", p.subtitle());
+        assertEquals("toledo rougarou 1/300 · great lakes bessie 1/500 · anywhere infusion capsule 1/300", p.subtitle());
     }
 }

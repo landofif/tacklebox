@@ -37,7 +37,7 @@ Credit: the pet per location table and the idea come from FOE+ (`itshaxr/FOE-Plu
 - **Right pet in the inventory**: any item whose custom_data `pet` is the place's pet.
 - **Armor**: the worn chestplate, leggings and boots; the custom_data `name` holds the climate id (fact from FOE+/FOECollab). A piece of another climate than the place's is named ("savanna chestplate"); a piece without a known climate is ignored.
 - **Hud rows**: `wrong pet | use wolf · in inventory` and `wrong armor | savanna chestplate · need continental`, labels red. Shows only while something is wrong.
-- **Chat line**: 3 s after the place changed (the boss bar and items settle), once per arrival: `tacklebox » wrong pet at danube river: use a wolf pet (in inventory) · wrong armor: ...`. The mediterranean sea reads `med` here (`Locations.shown`).
+- **Chat line**: 3 s after the place changed (the boss bar and items settle), once per arrival: `tacklebox » wrong pet at danube: use a wolf pet (in inventory) · wrong armor: ...`. The place is named short here (`Locations.shown`, see `rules/text-and-automation.md`).
 
 ## Gotchas
 

@@ -54,7 +54,7 @@ class CryptidsIntegrationTest {
 
         chat("BLOOD MOON » The Blood Moon has set.", rise + Cryptids.MOON_LENGTH);
         rows = Cryptids.rows(state(rise + Cryptids.MOON_LENGTH), ms -> ms / 60_000 + "m");
-        assertEquals(new Cryptids.Row("moon · toledo bend, great lakes", "150m", Cryptids.MOON, false), rows.get(1));
+        assertEquals(new Cryptids.Row("moon · toledo, great lakes", "150m", Cryptids.MOON, false), rows.get(1));
     }
 
     @Test
@@ -98,7 +98,7 @@ class CryptidsIntegrationTest {
         TackleboxSettings.get().cryptidOff.add("titanoboa");
         List<String> labels = Cryptids.rows(state(now), ms -> "").stream().map(Cryptids.Row::label).toList();
         assertEquals("fabled", labels.get(0));
-        assertEquals("cypress lake", labels.get(1));
+        assertEquals("cypress", labels.get(1));
         assertTrue(labels.contains("bigfoot"));
         assertFalse(labels.contains("titanoboa"), "switched off in the settings");
     }

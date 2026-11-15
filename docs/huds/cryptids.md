@@ -12,13 +12,13 @@ What can be caught where right now, and when the next chance comes (luna, 2026-1
 
 | Event | Where | What |
 |---|---|---|
-| any moon | toledo bend | rougarou 1/300 · blood/claw |
+| any moon | toledo | rougarou 1/300 · blood/claw |
 | any moon | great lakes | bessie 1/500 · silver scale |
 | blood moon | anywhere | infusion capsule 1/300 |
 | rainbow | danube | garaboncias 1/250 · concoction/essence |
 | thunderstorm / supercell | anywhere | lightning bottle 1/500 / 1/250 |
 | fabled | the place from chat | fabled fish 1/3000 |
-| 1-3 am in-game | cypress lake | bigfoot 1/300 · tooth/fur |
+| 1-3 am in-game | cypress | bigfoot 1/300 · tooth/fur |
 | 2-4 am in-game | amazon | titanoboa 1/1500 · titan's fang |
 | 4-6 am in-game | great lakes | bessie 1/1000 · silver scale |
 

@@ -1,6 +1,7 @@
 package dev.landofif.tacklebox.hud;
 
 import dev.landofif.tacklebox.TackleboxSettings;
+import dev.landofif.tacklebox.menu.Locations;
 import dev.landofif.tacklebox.trigger.TriggerEngine;
 import dev.landofif.tacklebox.ui.Foe;
 import dev.landofif.tacklebox.util.Glyphs;
@@ -418,12 +419,7 @@ public final class EventHud {
 
     /** The hud's label of a mission: a location by its short name (as in the level bars), `river monsters` as monsters, `freshwater` as fresh. */
     private static String label(String name) {
-        for (Map.Entry<String, String> e : ServerInfo.LOCATIONS.entrySet()) {
-            if (e.getValue().equalsIgnoreCase(name)) {
-                return LevelBars.SHORT.getOrDefault(e.getKey(), name);
-            }
-        }
-        return name.equals("freshwater") ? "fresh" : name.startsWith("river monsters") ? name.substring("river ".length()) : name;
+        return name.equals("freshwater") ? "fresh" : name.startsWith("river monsters") ? name.substring("river ".length()) : Locations.shown(name);
     }
 
     /** A name in the menu's gold or brown reads dark on the hud, so it is drawn in bright green. */

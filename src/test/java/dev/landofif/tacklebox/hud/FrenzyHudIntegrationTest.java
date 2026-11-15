@@ -34,15 +34,15 @@ class FrenzyHudIntegrationTest {
                 "Kenai River", 0xFFFF55, " (for 16m 56s)", 0x555555));
         long now = System.currentTimeMillis();
         String active = line(now, BoostsHud.frenzyLeft(now), BoostsHud.frenzyPlace());
-        assertEquals("Kenai River 16m", active);
+        assertEquals("Kenai 16m", active); // the place by its short name
         // the active hud row in the colours of the line (luna 2026-10-28)
         BoostsHud.Row row = BoostsHud.rows().stream().filter(r -> r.label().get(0).text().equals("fish frenzy")).findFirst().orElseThrow();
-        assertEquals(List.of(new BoostsHud.Part("fish frenzy", 0xFFAA00), new BoostsHud.Part("Kenai River", 0xFFFF55)), row.label());
+        assertEquals(List.of(new BoostsHud.Part("fish frenzy", 0xFFAA00), new BoostsHud.Part("Kenai", 0xFFFF55)), row.label());
 
         BoostsHud.onChat(Text.literal("FRENZY » The Fish Frenzy has ended at Kenai River"));
         assertEquals(0, BoostsHud.frenzyLeft(System.currentTimeMillis()));
 
-        // the mediterranean sea is shown as med, in the colour the line gave the full name
+        // the short name keeps the colour the line gave the full name
         BoostsHud.onChat(BoostsHudColorsTest.line("FISH FRENZY", 0xFFAA00, " » A ", 0xFFFFFF, "Fish Frenzy", 0xFFAA00, " is active at ", 0xFFFFFF,
                 "Mediterranean Sea", 0xFFFF55, " (for 16m 56s)", 0x555555));
         assertEquals("Med", BoostsHud.frenzyPlace());

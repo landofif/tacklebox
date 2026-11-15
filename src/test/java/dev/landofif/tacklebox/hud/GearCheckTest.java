@@ -53,7 +53,7 @@ class GearCheckTest {
                 GearCheck.rows(DANUBE, "eagle", true, List.of()));
         assertEquals(List.of(new TextHud.Row("wrong pet", "use wolf · not in inventory", GearCheck.RED, 0)),
                 GearCheck.rows(DANUBE, "eagle", false, List.of()));
-        assertEquals("wrong pet at danube river: use a wolf pet (not in inventory)", GearCheck.chatLine(DANUBE, "eagle", false, List.of()));
+        assertEquals("wrong pet at danube: use a wolf pet (not in inventory)", GearCheck.chatLine(DANUBE, "eagle", false, List.of()));
         assertEquals("wrong pet at med: use a lynx pet (in inventory)", GearCheck.chatLine(GearCheck.place("mediterranean"), "wolf", true, List.of()));
     }
 
@@ -70,7 +70,7 @@ class GearCheckTest {
                 new GearCheck.Armor("boots", "semi-arid"), new GearCheck.Armor("boots", "not a climate"));
         assertEquals(List.of(new TextHud.Row("wrong armor", "savanna chestplate, semi-arid boots · need continental", GearCheck.RED, 0)),
                 GearCheck.rows(DANUBE, "wolf", true, worn));
-        assertEquals("wrong pet at danube river: use a wolf pet (in inventory) · wrong armor: savanna chestplate, semi-arid boots, danube river is continental",
+        assertEquals("wrong pet at danube: use a wolf pet (in inventory) · wrong armor: savanna chestplate, semi-arid boots, danube is continental",
                 GearCheck.chatLine(DANUBE, "duck", true, worn));
     }
 

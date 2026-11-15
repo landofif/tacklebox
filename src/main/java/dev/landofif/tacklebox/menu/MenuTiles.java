@@ -228,13 +228,13 @@ public final class MenuTiles {
         return itemPath.equals("green_concrete") ? State.DONE : itemPath.equals("yellow_concrete") ? State.NOW : State.LOCKED;
     }
 
-    /** What a level page is about, from a level's lore: "lake biwa" ({@code (Level 1) Lake Biwa}) or "albino collection" (its small caps line). */
+    /** What a level page is about, from a level's lore: "biwa" ({@code (Level 1) Lake Biwa}) or "albino collection" (its small caps line). */
     public static String levelPageTitle(List<String> lore) {
         for (String raw : lore) {
             String line = MenuRows.clean(raw);
             Matcher m = LEVEL_OF.matcher(line);
             if (m.find() && !m.group(1).isEmpty()) {
-                return m.group(1).toLowerCase(Locale.ROOT);
+                return Locations.shown(m.group(1).toLowerCase(Locale.ROOT));
             }
             String plain = Glyphs.fromSmallCaps(line).toLowerCase(Locale.ROOT);
             if (plain.endsWith(" collection")) {

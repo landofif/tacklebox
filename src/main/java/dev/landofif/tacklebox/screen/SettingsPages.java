@@ -519,9 +519,9 @@ public final class SettingsPages {
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.cryptidAlign, v -> s.cryptidAlign = v);
         toggle("cryptids popups", "a title when one of the events below starts, saying where to go and what for. these are not triggers, nothing needs adding in /triggers.",
                 () -> s.cryptidPopups, v -> s.cryptidPopups = v);
-        for (String[] k : new String[][]{{"moons", "rougarou at toledo bend and bessie at the great lakes during any moon, and the infusion capsule in a blood moon."},
+        for (String[] k : new String[][]{{"moons", "rougarou at toledo and bessie at the great lakes during any moon, and the infusion capsule in a blood moon."},
                 {"rainbow", "garaboncias at the danube."}, {"storms", "lightning in a bottle anywhere, 1/500 in a thunderstorm and 1/250 in a supercell."},
-                {"fabled", "the fabled fish at the place the chat names."}, {"bigfoot", "cypress lake between 1 and 3 am in-game."},
+                {"fabled", "the fabled fish at the place the chat names."}, {"bigfoot", "cypress between 1 and 3 am in-game."},
                 {"titanoboa", "the amazon between 2 and 4 am in-game."}, {"bessie", "the great lakes between 4 and 6 am in-game."}}) {
             toggle("cryptids: " + k[0], "shows " + k[0] + " on the cryptids hud and its popup: " + k[1],
                     () -> !s.cryptidOff.contains(k[0]), v -> {

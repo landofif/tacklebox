@@ -11,7 +11,7 @@ import java.util.Locale;
  * luna and a friend noted down. The pictures are the items the server puts in the menu.
  */
 public final class Locations {
-    /** {@code name} is what is shown; {@code key} is matched against a menu item's name; {@code wiki} is the wiki table's spelling. */
+    /** {@code name} is the short name that is shown; {@code key} is matched against a menu item's name; {@code wiki} is the wiki table's spelling. */
     public record Location(String id, String name, String key, String wiki) {
     }
 
@@ -19,30 +19,62 @@ public final class Locations {
     public record Strategy(String bait, String rarity, String quest, String targets, String extra) {}
 
     public static final List<Location> ALL = List.of(
-            new Location("cypress", "cypress lake", "cypress", "cypress lake"),
-            new Location("kenai", "kenai river", "kenai", "kenai river"),
-            new Location("biwa", "lake biwa", "biwa", "lake biwa"),
-            new Location("murray", "murray river", "murray", "murray river"),
+            new Location("cypress", "cypress", "cypress", "cypress lake"),
+            new Location("kenai", "kenai", "kenai", "kenai river"),
+            new Location("biwa", "biwa", "biwa", "lake biwa"),
+            new Location("murray", "murray", "murray", "murray river"),
             new Location("everglades", "everglades", "everglades", "everglades"),
-            new Location("keywest", "key west", "key west", "key west"),
-            new Location("toledobend", "toledo bend", "toledo", "toledo bend"),
+            new Location("keywest", "key", "key west", "key west"),
+            new Location("toledobend", "toledo", "toledo", "toledo bend"),
             new Location("greatlakes", "great lakes", "great lakes", "great lakes"),
-            new Location("danube", "danube river", "danube", "danube river"),
-            new Location("oilrig", "oil rig", "oil rig", "oil rig"),
-            new Location("amazon", "amazon river", "amazon", "amazon river"),
+            new Location("danube", "danube", "danube", "danube river"),
+            new Location("oilrig", "rig", "oil rig", "oil rig"),
+            new Location("amazon", "amazon", "amazon", "amazon river"),
             new Location("mediterranean", "med", "mediterranean", "med sea"),
-            new Location("capecod", "cape cod", "cape cod", "cape cod"),
+            new Location("capecod", "cape", "cape cod", "cape cod"),
             new Location("hawaii", "hawaii", "hawaii", "hawaii"),
-            new Location("lofoten", "lofoten islands", "lofoten", "lofoten islands"),
+            new Location("lofoten", "lofoten", "lofoten", "lofoten islands"),
             new Location("cairns", "cairns", "cairns", "cairns"),
-            new Location("nile", "nile river", "nile", "nile river"));
+            new Location("nile", "nile", "nile", "nile river"));
 
     /**
-     * A text of the server's with a place in it, as it is shown: the mediterranean sea is "med" everywhere (foecollab writes it
-     * the same in the compendium and the travel menu). Only for text that is drawn, never for matching.
+     * The server's names that are shown shorter, lowercase and as the server writes them: the names luna chose on 2026-11-15, the
+     * ones foecollab uses. Longest first, so "toledo bend reservoir" goes before "toledo bend".
+     */
+    private static final String[][] SHORT = both(
+            "toledo bend reservoir", "toledo", "mediterranean sea", "med", "lofoten islands", "lofoten", "cypress lake", "cypress",
+            "murray river", "murray", "danube river", "danube", "amazon river", "amazon", "kenai river", "kenai", "toledo bend", "toledo",
+            "nile river", "nile", "lake biwa", "biwa", "key west", "key", "cape cod", "cape", "oil rig", "rig");
+
+    private static String[][] both(String... pairs) {
+        String[][] out = new String[pairs.length][];
+        for (int i = 0; i < pairs.length; i += 2) {
+            out[i] = new String[] {pairs[i], pairs[i + 1]};
+            out[i + 1] = new String[] {title(pairs[i]), title(pairs[i + 1])};
+        }
+        return out;
+    }
+
+    /** "key west" as "Key West". */
+    private static String title(String s) {
+        StringBuilder out = new StringBuilder(s);
+        for (int i = 0; i < out.length(); i++) {
+            if (i == 0 || out.charAt(i - 1) == ' ') {
+                out.setCharAt(i, Character.toUpperCase(out.charAt(i)));
+            }
+        }
+        return out.toString();
+    }
+
+    /**
+     * A text of the server's with a place in it, as it is shown: every place by its short name ("kenai river" is "kenai", the
+     * mediterranean sea "med"). Only for text that is drawn, never for matching.
      */
     public static String shown(String text) {
-        return text.replace("mediterranean sea", "med").replace("Mediterranean Sea", "Med");
+        for (String[] s : SHORT) {
+            text = text.replace(s[0], s[1]);
+        }
+        return text;
     }
 
     /** The location a menu item is named after, or null. */
