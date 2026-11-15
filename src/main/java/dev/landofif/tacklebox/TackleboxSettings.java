@@ -191,6 +191,9 @@ public class TackleboxSettings {
     /** The inventory hud (hud/InventoryHud): the 27 inventory slots on the hud; the faint square behind each slot. */
     public dev.landofif.tacklebox.hud.HudSpot inventoryHud = new dev.landofif.tacklebox.hud.HudSpot(4, 200);
     public boolean inventoryHudCells = true;
+    /** The slots left hud (hud/SlotsLeft): shows once this many or fewer of the 36 inventory slots are empty. */
+    public dev.landofif.tacklebox.hud.HudSpot slotsLeftHud = new dev.landofif.tacklebox.hud.HudSpot(4, 260);
+    public int slotsLeftAt = 5;
     /** When each vote of the last 24 hours came in (epoch ms), oldest first. */
     public java.util.List<Long> votes = new java.util.ArrayList<>();
     /** The now playing hud (hud/NowPlaying): what Spotify, a browser tab or any other player is playing, where it sits. */
@@ -635,6 +638,9 @@ public class TackleboxSettings {
         timersHud.fixed(360, 230);
         if (inventoryHud == null) inventoryHud = new dev.landofif.tacklebox.hud.HudSpot();
         inventoryHud.fixed(4, 200);
+        if (slotsLeftHud == null) slotsLeftHud = new dev.landofif.tacklebox.hud.HudSpot();
+        slotsLeftHud.fixed(4, 260);
+        slotsLeftAt = Math.max(0, Math.min(dev.landofif.tacklebox.hud.SlotsLeft.SLOTS, slotsLeftAt));
         if (votes == null) votes = new java.util.ArrayList<>();
         if (nowPlayingPos == null) nowPlayingPos = new HudPos(nowPlayingX, nowPlayingY);
         if (serverHudPos == null) serverHudPos = new HudPos(serverHudX, serverHudY);

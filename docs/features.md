@@ -74,6 +74,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Event hud: points, placement, missions. `eventHud`, off. `huds/event-hud.md`
 - Cryptids hud: where to fish for what during moons, rainbow, storms, fabled and the clock windows, next moon and windows, dry streaks; popups with a switch per event. `cryptidHud`, off; `cryptidPopups`, on. `huds/cryptids.md`
 - Inventory hud: the 27 inventory slots on the hud, with counts, without opening the inventory. `inventoryHud`, off; `inventoryHudCells`, on. `huds/inventory.md`
+- Slots left hud: how many of the 36 inventory slots are empty, shown at or under a number you set. `slotsLeftHud`, off; `slotsLeftAt`, 5. `huds/inventory.md`
 - Timers hud: tackle shop restock, cosmetic store reset, votes of the last 24 hours. `timersHud`, off; `timersVotes`, on. A title on every restock and reset, always on. `huds/timers.md`
 - Now playing (playerctl). `nowPlaying`, off. `huds/boosts-and-now-playing.md`
 - Server hud: sidebar-style lines with picture; includes compendium lines, frenzy schedule and community goal lines. `serverHud`, off. `huds/server-hud.md`

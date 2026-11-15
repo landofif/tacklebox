@@ -578,6 +578,13 @@ public final class SettingsPages {
         main();
         toggle("inventory hud slots", "a faint dark square behind every slot of the inventory hud, so empty slots can be told apart.",
                 () -> s.inventoryHudCells, v -> s.inventoryHudCells = v);
+        toggle("slots left hud", "how many inventory slots are still empty (hotbar and inventory, 36 in all), shown once that is at or under the number below. red at 0. move it with move huds.",
+                () -> s.slotsLeftHud.on, v -> s.slotsLeftHud.on = v);
+        main();
+        slider("slots left shows at", "the slots left hud shows once this many or fewer slots are empty. 36 shows it always, 0 only when the inventory is full.", 0, 36, 1, "",
+                () -> s.slotsLeftAt, v -> s.slotsLeftAt = (int) Math.round(v));
+        cycle("slots left align", "how the text of the slots left hud lines up inside it: left, centre or right.",
+                TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.slotsLeftHud.align, v -> s.slotsLeftHud.align = v);
         header("level progress");
         toggle("level progress hud", "two thin bars: your fishing level (from the vanilla xp bar) and the level of the location you are at. the location bar starts when you open /comp once and then follows the location xp of quest rewards and chat. move it with move huds.",
                 () -> s.levelBars, v -> s.levelBars = v);

@@ -212,6 +212,7 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.hud.CryptidHud.renderHud(context);
             dev.landofif.tacklebox.hud.TimersHud.renderHud(context);
             dev.landofif.tacklebox.hud.InventoryHud.renderHud(context);
+            dev.landofif.tacklebox.hud.SlotsLeft.renderHud(context);
             dev.landofif.tacklebox.hud.NowPlaying.renderHud(context);
             dev.landofif.tacklebox.display.BobberTimer.renderHud(context);
             dev.landofif.tacklebox.display.CatchTitle.renderHud(context);

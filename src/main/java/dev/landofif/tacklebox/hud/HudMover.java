@@ -140,6 +140,7 @@ public final class HudMover extends Screen {
         }
         spot(add, s.timersHud, dev.landofif.tacklebox.hud.TimersHud::draw);
         spot(add, s.inventoryHud, dev.landofif.tacklebox.hud.InventoryHud::draw);
+        spot(add, s.slotsLeftHud, ctx -> dev.landofif.tacklebox.hud.SlotsLeft.draw(ctx, true));
         if (s.nowPlaying) {
             add.add(new Box(ctx -> dev.landofif.tacklebox.hud.NowPlaying.draw(ctx, true), (x, y, r) -> s.nowPlayingPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.nowPlayingScale = Math.max(50, Math.min(300, s.nowPlayingScale + step * 5)), () -> {
                 s.nowPlayingScale = 100;
