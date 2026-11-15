@@ -133,7 +133,7 @@ public final class Tacklebox implements ClientModInitializer {
                     TackleboxSettings.save();
                 }
             }
-            if (!overlay && dev.landofif.tacklebox.hud.MiniEventHud.onChat(message.getString(), System.currentTimeMillis())) {
+            if (!overlay && dev.landofif.tacklebox.hud.MiniEventHud.onChat(message, System.currentTimeMillis())) {
                 return false; // the answer to the mod's own quiet /minievent
             }
             boolean show = TriggerEngine.onGameMessage(message, overlay);

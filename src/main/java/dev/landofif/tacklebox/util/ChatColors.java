@@ -15,6 +15,19 @@ public final class ChatColors {
 
     private ChatColors() {}
 
+    /** The colour of every character of the line as sent ({@code 0xFFrrggbb}), 0 where the server gave none. As long as {@code line.getString()}. */
+    public static int[] each(Text line) {
+        List<Integer> colors = new ArrayList<>();
+        line.visit((style, s) -> {
+            TextColor c = style.getColor();
+            for (int i = 0; i < s.length(); i++) {
+                colors.add(c == null ? 0 : 0xFF000000 | c.getRgb());
+            }
+            return Optional.empty();
+        }, Style.EMPTY);
+        return colors.stream().mapToInt(Integer::intValue).toArray();
+    }
+
     /**
      * The colour of the first letter of {@code words} in the line, else of their first word: the words come from the normalized
      * line, which drops server glyphs and turns » into >, so the whole of them is not always in the line as sent.

@@ -48,12 +48,16 @@ public final class MiniEvent {
     public static final class Mission {
         public final String name, mark;
         public int cur, max;
+        /** The name as the hud shows it and the mark, in the colours of the chat line; empty when it had none. */
+        final List<TextHud.Part> nameParts, markParts;
 
-        Mission(String name, int cur, int max, String mark) {
+        Mission(String name, int cur, int max, String mark, List<TextHud.Part> nameParts, List<TextHud.Part> markParts) {
             this.name = name;
             this.cur = cur;
             this.max = max;
             this.mark = mark;
+            this.nameParts = nameParts;
+            this.markParts = markParts;
         }
 
         /** A mission that starts over when it is done ("∞ x25"). */
@@ -81,6 +85,11 @@ public final class MiniEvent {
      * @return true when it is part of the answer to the mod's own quiet /minievent and is to be hidden
      */
     public static boolean onChat(String raw, long now) {
+        return onChat(raw, null, now);
+    }
+
+    /** {@link #onChat(String, long)} with the colour of every character of the message ({@code 0xFFrrggbb}, 0 for none), or null. */
+    public static boolean onChat(String raw, int[] colors, long now) {
         String s = raw.strip();
         Matcher m = HEADER.matcher(s);
         if (m.find()) {
@@ -108,7 +117,8 @@ public final class MiniEvent {
         }
         m = MISSION.matcher(raw);
         if (m.find()) {
-            Mission read = new Mission(words(m.group(1)), number(m.group(3)), number(m.group(4)), m.group(5).toLowerCase(Locale.ROOT));
+            Mission read = new Mission(words(m.group(1)), number(m.group(3)), number(m.group(4)), m.group(5).toLowerCase(Locale.ROOT),
+                    parts(raw, colors, m.start(1), m.end(1), true), parts(raw, colors, m.start(5), m.end(5), false));
             if (inAnswer) {
                 missions.add(read);
                 return hidingAnswer;
@@ -156,6 +166,44 @@ public final class MiniEvent {
             };
         }
         return ms;
+    }
+
+    /**
+     * A piece of a mission's chat line cut where the colour changes. A space or a pack glyph has the colour of the letters
+     * before it (a badge is a picture in chat and a word here). A name's pieces are its words as the hud shows them.
+     *
+     * @return empty when the piece has no colour at all
+     */
+    static List<TextHud.Part> parts(String raw, int[] colors, int from, int to, boolean name) {
+        List<TextHud.Part> out = new ArrayList<>();
+        if (colors == null || colors.length < to) {
+            return out;
+        }
+        boolean any = false;
+        int start = from, color = 0;
+        for (int i = from; i <= to; i++) {
+            char c = i < to ? raw.charAt(i) : 0;
+            boolean own = i < to && !Character.isWhitespace(c) && (c < '\uE000' || c > '\uF8FF');
+            if (i == from && own) {
+                color = colors[i];
+            }
+            if (i == to || (own && colors[i] != color)) {
+                String text = raw.substring(start, i).toLowerCase(Locale.ROOT);
+                if (name) {
+                    text = Locations.shown(words(text));
+                    text = text.isEmpty() || out.isEmpty() ? text : " " + text;
+                }
+                if (!text.isEmpty()) {
+                    out.add(new TextHud.Part(text, color));
+                    any |= color != 0;
+                }
+                if (i < to) {
+                    start = i;
+                    color = colors[i];
+                }
+            }
+        }
+        return any ? out : new ArrayList<>();
     }
 
     private static int number(String s) {
@@ -299,7 +347,13 @@ public final class MiniEvent {
             if (m.cur >= m.max && !m.repeats()) {
                 continue;
             }
-            rows.add(new TextHud.Row(Locations.shown(m.name), m.cur + "/" + m.max + " · " + m.mark, 0, m.cur >= m.max ? GREEN : 0));
+            boolean reached = m.cur >= m.max;
+            List<TextHud.Part> value = new ArrayList<>();
+            if (!reached && !m.markParts.isEmpty()) { // a reached goal stays green all over
+                value.add(new TextHud.Part(m.cur + "/" + m.max + " · ", 0));
+                value.addAll(m.markParts);
+            }
+            rows.add(new TextHud.Row(Locations.shown(m.name), m.cur + "/" + m.max + " · " + m.mark, 0, reached ? GREEN : 0, m.nameParts, value));
         }
         return rows;
     }

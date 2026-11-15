@@ -5,6 +5,7 @@ import dev.landofif.tacklebox.ui.Foe;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
 import java.util.List;
@@ -14,10 +15,20 @@ import java.util.List;
  * The timers, warnings and mini event huds draw through this.
  */
 public final class TextHud {
-    /** A row; a colour of 0 is the default (dim label, white value). */
-    public record Row(String label, String value, int labelColor, int valueColor) {
+    /** A piece of a label or value in its own colour ({@code 0xFFrrggbb}); 0 is the row's colour. */
+    public record Part(String text, int color) {}
+
+    /**
+     * A row; a colour of 0 is the default (dim label, white value). With parts, the label or value is drawn from them
+     * (they spell the same text), each in its own colour: the mini event's missions in their chat colours.
+     */
+    public record Row(String label, String value, int labelColor, int valueColor, List<Part> labelParts, List<Part> valueParts) {
         public Row(String label, String value) {
             this(label, value, 0, 0);
+        }
+
+        public Row(String label, String value, int labelColor, int valueColor) {
+            this(label, value, labelColor, valueColor, List.of(), List.of());
         }
     }
 
@@ -43,7 +54,7 @@ public final class TextHud {
         for (int i = 0; i < rows.size(); i++) {
             Row r = rows.get(i);
             int ry = y + 20 + i * 11;
-            Text l = Foe.text(r.label()), v = Foe.text(r.value());
+            Text l = text(r.label(), r.labelParts()), v = text(r.value(), r.valueParts());
             int lx = x + 8, vx = x + w - 8 - tr.getWidth(v); // left keeps the values in a column on the right
             if (align != TackleboxSettings.HudAlign.LEFT) {
                 lx = align.x(x + 8, w - 16, width(tr, r));
@@ -56,6 +67,18 @@ public final class TextHud {
     }
 
     private static int width(TextRenderer tr, Row r) {
-        return tr.getWidth(Foe.text(r.label())) + (r.value().isEmpty() ? 0 : 12 + tr.getWidth(Foe.text(r.value())));
+        return tr.getWidth(text(r.label(), r.labelParts())) + (r.value().isEmpty() ? 0 : 12 + tr.getWidth(text(r.value(), r.valueParts())));
+    }
+
+    private static Text text(String plain, List<Part> parts) {
+        if (parts.isEmpty()) {
+            return Foe.text(plain);
+        }
+        MutableText out = Text.empty();
+        for (Part p : parts) {
+            MutableText t = Foe.text(p.text());
+            out.append(p.color() != 0 ? t.withColor(p.color() & 0xFFFFFF) : t);
+        }
+        return out;
     }
 }

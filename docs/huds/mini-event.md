@@ -38,6 +38,7 @@ Daily missions reroll in 18h 13m 26s
 
 - **Hiding**: after a send, a header within 3 s starts a hidden answer; its reroll line and missions (within 2 s of the header) are hidden with it. An answer to `/minievent` you typed yourself is read too and shown as usual.
 - **Rows**: `ends in`, `daily reroll`, then each mission that is not done, and the repeating ones always: `med | 59/100 · ∞ x25` (every place is shown by its short name, `Locations.shown`, see `rules/text-and-automation.md`; the mission keeps its full name for counting). A finished one timer or daily is left out. The value is green when the goal is reached. Nothing shows with no event or after its end.
+- **Colours** (luna 2026-11-15, "wheres the coloring"; FOE+ keeps the server's styled lines too): a mission's name and its mark are drawn in the colours of its chat line. `MiniEventHud.onChat(Text)` hands `MiniEvent` the colour of every character (`ChatColors.each`), `MiniEvent.parts` cuts the name and the mark where the colour changes, and the row carries them as `TextHud.Part`s (`TextHud.Row.labelParts/valueParts`, which spell the same text as the row's label and value). A space or a pack glyph takes the colour of the letters before it, since a badge is a picture in chat and a word ("albino") here. The count stays white, a reached goal is green all over as before, and a line with no colours is drawn as before (dim name, white value). The title stays the accent.
 - **Counting between answers** (`MiniEvent.counts`): a catch adds one to every unfinished mission whose whole name fits the fish: the place (the fish's `location`), the size word, the variant, the rarity, and what is left over is the fish's name or its `group` (`Rays`, with or without the plural s). Pet missions (`Lynx Pet`) and anything else are left to the server's next answer, which replaces all counts.
 
 ## Gotchas
@@ -48,6 +49,6 @@ Daily missions reroll in 18h 13m 26s
 
 ## Tests
 
-`hud/MiniEventTest` (the logged answer, rows, times, catches per mission kind, the MISSION COMPLETE block, when to send, what is hidden, another answer), `MiniEventIntegrationTest` (the hud off reads nothing; on: the quiet answer hidden and read, a catch counted and asked after, the next answer replacing it; a save).
+`hud/MiniEventTest` (the logged answer, rows, times, catches per mission kind, the MISSION COMPLETE block, when to send, what is hidden, another answer), the colours of a name, a two coloured name, a badge and a mark), `MiniEventIntegrationTest` (the hud off reads nothing; on: the quiet answer hidden and read, a catch counted and asked after, the next answer replacing it; a styled mission through the chat hook to coloured rows; a save).
 
-Not run in game yet: the hud, that the answer is fully hidden and nothing else is, the timing of the sends, the answer with no event on, the group names, whether the server rate-limits the command.
+Not run in game yet: the colours (which ones the server really sends is not in the logs, they are plain text), the hud, that the answer is fully hidden and nothing else is, the timing of the sends, the answer with no event on, the group names, whether the server rate-limits the command.

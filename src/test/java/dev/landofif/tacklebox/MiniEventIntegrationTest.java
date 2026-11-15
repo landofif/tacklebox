@@ -86,4 +86,22 @@ class MiniEventIntegrationTest {
         assertTrue(back.miniEventHud.on);
         assertEquals(120, back.miniEventHud.scale);
     }
+
+    /** A mission as the server sends it, styled, through the hud's chat hook: the row has the chat colours (luna 2026-11-15: "wheres the coloring"). */
+    @Test
+    void theMissionRowsAreColouredAsInChat() {
+        TackleboxSettings.get().miniEventHud.on = true;
+        MiniEventHud.onChat(net.minecraft.text.Text.literal(ANSWER.get(0)), T);
+        net.minecraft.text.Text mission = net.minecraft.text.Text.literal(" - 🎣 ")
+                .append(net.minecraft.text.Text.literal("Lynx Pet").withColor(0xFF55FF))
+                .append("  \n    ┗ ")
+                .append(net.minecraft.text.Text.literal("(0/1) ").formatted(net.minecraft.util.Formatting.GRAY))
+                .append(net.minecraft.text.Text.literal("∞").formatted(net.minecraft.util.Formatting.DARK_PURPLE))
+                .append(net.minecraft.text.Text.literal(" x12").formatted(net.minecraft.util.Formatting.GRAY));
+        assertFalse(MiniEventHud.onChat(mission, T));
+        TextHud.Row row = MiniEvent.rows(T).get(1);
+        assertEquals("lynx pet", row.label());
+        assertEquals(List.of(new TextHud.Part("lynx pet", 0xFFFF55FF)), row.labelParts());
+        assertEquals(List.of(new TextHud.Part("0/1 · ", 0), new TextHud.Part("∞ ", 0xFFAA00AA), new TextHud.Part("x12", 0xFFAAAAAA)), row.valueParts());
+    }
 }

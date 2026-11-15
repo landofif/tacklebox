@@ -206,4 +206,62 @@ class MiniEventTest {
         assertFalse(MiniEvent.on(T + MiniEvent.FIRST + 300));
         assertTrue(MiniEvent.rows(T + MiniEvent.FIRST + 300).isEmpty());
     }
+
+    // ---------------------------------------------------------------- colours
+
+    private static final int PINK = 0xFFFF55FF, GREEN = 0xFF55FF55, GOLD = 0xFFFFAA00, GRAY = 0xFFAAAAAA, PURPLE = 0xFFAA00AA;
+
+    /** The colour of every character of {@code line}: {@code runs} are a text of the line and its colour in turn, the rest has none. */
+    private static int[] colors(String line, Object... runs) {
+        int[] out = new int[line.length()];
+        int from = 0;
+        for (int i = 0; i < runs.length; i += 2) {
+            int at = line.indexOf((String) runs[i], from);
+            assertTrue(at >= 0, (String) runs[i]);
+            from = at + ((String) runs[i]).length();
+            java.util.Arrays.fill(out, at, from, (Integer) runs[i + 1]);
+        }
+        return out;
+    }
+
+    private static void colored(String line, Object... runs) {
+        MiniEvent.onChat(line, colors(line, runs), T);
+    }
+
+    private static TextHud.Row row(String label) {
+        return MiniEvent.rows(T).stream().filter(r -> r.label().equals(label)).findFirst().orElseThrow();
+    }
+
+    @Test
+    void aMissionKeepsTheColoursOfItsChatLine() {
+        MiniEvent.onChat(ANSWER.get(0), T);
+        colored(" - 🎣 Lynx Pet  \n    ┗ (0/1) ∞ x12", "Lynx Pet", PINK, "(0/1)", GRAY, "∞", PURPLE, "x12", GRAY);
+        TextHud.Row row = row("lynx pet");
+        assertEquals("0/1 · ∞ x12", row.value());
+        assertEquals(List.of(new TextHud.Part("lynx pet", PINK)), row.labelParts());
+        assertEquals(List.of(new TextHud.Part("0/1 · ", 0), new TextHud.Part("∞ ", PURPLE), new TextHud.Part("x12", GRAY)), row.valueParts());
+    }
+
+    @Test
+    void aNameInTwoColoursAndABadgeInTheColourBeforeIt() {
+        MiniEvent.onChat(ANSWER.get(0), T);
+        colored(" - 🎣 Mediterranean Sea ɢɪɢᴀɴᴛɪᴄ  \n    ┗ (1/2) One Timer", "Mediterranean Sea", GREEN, "ɢɪɢᴀɴᴛɪᴄ", GOLD);
+        assertEquals(List.of(new TextHud.Part("med", GREEN), new TextHud.Part(" gigantic", GOLD)), row("med gigantic").labelParts());
+        assertEquals(List.of(), row("med gigantic").valueParts()); // the mark has no colour of its own
+        colored(" - 🎣 Mediterranean Sea \uF041  \n    ┗ (0/1) One Timer", "Mediterranean Sea", GREEN, "\uF041", 0xFFFFFFFF);
+        assertEquals(List.of(new TextHud.Part("med albino", GREEN)), row("med albino").labelParts());
+    }
+
+    @Test
+    void noColoursAndAReachedGoalAreDrawnAsBefore() {
+        answer(T);
+        assertEquals(new TextHud.Row("lynx pet", "0/1 · ∞ x10"), row("lynx pet"));
+        MiniEvent.reset();
+        MiniEvent.onChat(ANSWER.get(0), T);
+        colored(" - 🎣 Mediterranean Sea  \n    ┗ (100/100) ∞ x25", "Mediterranean Sea", GREEN, "∞", PURPLE);
+        TextHud.Row done = row("med");
+        assertEquals(MiniEvent.GREEN, done.valueColor());
+        assertEquals(List.of(), done.valueParts()); // all green, as a reached goal always was
+        assertEquals(List.of(new TextHud.Part("med", GREEN)), done.labelParts());
+    }
 }

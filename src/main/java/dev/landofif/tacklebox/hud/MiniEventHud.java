@@ -27,6 +27,12 @@ public final class MiniEventHud {
         return TackleboxSettings.get().miniEventHud.on && MiniEvent.onChat(raw, now);
     }
 
+    /** The same with the message's colours, which the missions' rows keep. */
+    public static boolean onChat(net.minecraft.text.Text message, long now) {
+        return TackleboxSettings.get().miniEventHud.on
+                && MiniEvent.onChat(message.getString(), dev.landofif.tacklebox.util.ChatColors.each(message), now);
+    }
+
     public static void tick(MinecraftClient client) {
         if (client.player == null || !active()) {
             MiniEvent.reset();
