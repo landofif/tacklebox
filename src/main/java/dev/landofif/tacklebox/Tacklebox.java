@@ -126,6 +126,9 @@ public final class Tacklebox implements ClientModInitializer {
                 if (dev.landofif.tacklebox.hud.TimersHud.onChat(dev.landofif.tacklebox.trigger.Matcher.normalize(message.getString()), System.currentTimeMillis())) {
                     TackleboxSettings.save();
                 }
+                if (dev.landofif.tacklebox.hud.GearWarning.onChat(dev.landofif.tacklebox.trigger.Matcher.normalize(message.getString()))) {
+                    TackleboxSettings.save();
+                }
                 if (dev.landofif.tacklebox.chat.DryStreakChat.onChat(dev.landofif.tacklebox.trigger.Matcher.normalize(message.getString()), System.currentTimeMillis())) {
                     TackleboxSettings.save();
                 }
@@ -194,6 +197,7 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.display.ChummerRing.reset();
             dev.landofif.tacklebox.input.FishKey.reset();
             dev.landofif.tacklebox.chat.DryStreaks.reset();
+            dev.landofif.tacklebox.hud.GearCheck.reset();
         });
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
             dev.landofif.tacklebox.chat.ChatRestore.stopping(client);
@@ -215,6 +219,7 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.hud.EventHud.renderHud(context);
             dev.landofif.tacklebox.hud.CryptidHud.renderHud(context);
             dev.landofif.tacklebox.hud.TimersHud.renderHud(context);
+            dev.landofif.tacklebox.hud.GearWarning.renderHud(context);
             dev.landofif.tacklebox.hud.InventoryHud.renderHud(context);
             dev.landofif.tacklebox.hud.SlotsLeft.renderHud(context);
             dev.landofif.tacklebox.hud.NowPlaying.renderHud(context);
@@ -260,6 +265,7 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.hud.CryptidHud.tick(client);
             dev.landofif.tacklebox.hud.TimersHud.tick(client);
             dev.landofif.tacklebox.chat.DryStreakChat.tick(client);
+            dev.landofif.tacklebox.hud.GearWarning.tick(client);
             dev.landofif.tacklebox.hud.EquipmentRow.tick(client);
             dev.landofif.tacklebox.display.PetHeads.tick(client);
             dev.landofif.tacklebox.display.PetRating.tick(client);

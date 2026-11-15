@@ -201,6 +201,13 @@ public class TackleboxSettings {
     public java.util.Set<String> dryOn = new java.util.HashSet<>();
     public java.util.Map<String, String> dryText = new java.util.HashMap<>();
     public java.util.Map<String, Integer> dryCount = new java.util.HashMap<>();
+    /**
+     * The wrong pet and armor warning (hud/GearWarning): the hud, the chat line on arrival, and the equipped pet's id as the
+     * server's PETS lines last said it ("" = none or not known yet).
+     */
+    public dev.landofif.tacklebox.hud.HudSpot gearHud = new dev.landofif.tacklebox.hud.HudSpot(360, 290);
+    public boolean gearChat = true;
+    public String equippedPet = "";
     /** When each vote of the last 24 hours came in (epoch ms), oldest first. */
     public java.util.List<Long> votes = new java.util.ArrayList<>();
     /** The now playing hud (hud/NowPlaying): what Spotify, a browser tab or any other player is playing, where it sits. */
@@ -649,6 +656,9 @@ public class TackleboxSettings {
         slotsLeftHud.fixed(4, 260);
         slotsLeftAt = Math.max(0, Math.min(dev.landofif.tacklebox.hud.SlotsLeft.SLOTS, slotsLeftAt));
         if (votes == null) votes = new java.util.ArrayList<>();
+        if (gearHud == null) gearHud = new dev.landofif.tacklebox.hud.HudSpot();
+        gearHud.fixed(360, 290);
+        if (equippedPet == null) equippedPet = "";
         if (dryOn == null) dryOn = new java.util.HashSet<>();
         if (dryText == null) dryText = new java.util.HashMap<>();
         if (dryCount == null) dryCount = new java.util.HashMap<>();

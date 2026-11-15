@@ -585,6 +585,14 @@ public final class SettingsPages {
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.timersHud.align, v -> s.timersHud.align = v);
         toggle("timers votes", "the votes line: how many of the 7 vote sites you voted on in the last 24 hours, counted from the vote reward lines in chat.",
                 () -> s.timersVotes, v -> s.timersVotes = v);
+        header("wrong gear");
+        toggle("wrong gear warning", "a red warning on the hud while your equipped pet is not the pet of the place you are at, or your armor is for another climate. it names the right pet and says if it is in your inventory. nothing at the cypress lake spawn. the pet is learned from the chat line when you equip it. move it with move huds.",
+                () -> s.gearHud.on, v -> s.gearHud.on = v);
+        main();
+        toggle("wrong gear chat line", "one chat line a moment after you arrive somewhere with the wrong pet or armor. only you see it.",
+                () -> s.gearChat, v -> s.gearChat = v);
+        cycle("wrong gear align", "how the text of the wrong gear warning lines up inside it: left, centre or right.",
+                TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.gearHud.align, v -> s.gearHud.align = v);
         header("inventory");
         toggle("inventory hud", "your inventory on the hud without opening it: the 27 slots above the hotbar as three rows of nine, with the item counts. display only. hidden while a chest or the inventory is open. move and resize it with move huds.",
                 () -> s.inventoryHud.on, v -> s.inventoryHud.on = v);
