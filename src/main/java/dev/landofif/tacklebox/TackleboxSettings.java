@@ -208,6 +208,8 @@ public class TackleboxSettings {
     public dev.landofif.tacklebox.hud.HudSpot gearHud = new dev.landofif.tacklebox.hud.HudSpot(360, 290);
     public boolean gearChat = true;
     public String equippedPet = "";
+    /** The mini event hud (hud/MiniEventHud). While on it sends /minievent quietly every 10 minutes and after catches. */
+    public dev.landofif.tacklebox.hud.HudSpot miniEventHud = new dev.landofif.tacklebox.hud.HudSpot(360, 330);
     /** When each vote of the last 24 hours came in (epoch ms), oldest first. */
     public java.util.List<Long> votes = new java.util.ArrayList<>();
     /** The now playing hud (hud/NowPlaying): what Spotify, a browser tab or any other player is playing, where it sits. */
@@ -659,6 +661,8 @@ public class TackleboxSettings {
         if (gearHud == null) gearHud = new dev.landofif.tacklebox.hud.HudSpot();
         gearHud.fixed(360, 290);
         if (equippedPet == null) equippedPet = "";
+        if (miniEventHud == null) miniEventHud = new dev.landofif.tacklebox.hud.HudSpot();
+        miniEventHud.fixed(360, 330);
         if (dryOn == null) dryOn = new java.util.HashSet<>();
         if (dryText == null) dryText = new java.util.HashMap<>();
         if (dryCount == null) dryCount = new java.util.HashMap<>();

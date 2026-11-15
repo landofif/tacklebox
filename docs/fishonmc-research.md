@@ -155,6 +155,8 @@ Hook via Fabric `ClientReceiveMessageEvents.ALLOW_GAME` (observe/suppress) and `
 - More prefixes seen: `REACTIONS`, `BOOSTER`, `VOTE`, `TIP` (`You tipped <name>! + 500xp | $500`), `LOCATION` (`Lake Biwa gained 4.17K xp`), `TP`, `PURCHASE!`, `CHUMMER` (`<name> activated a <glyph> Chummer. (+75 Bite Speed)`), `CONTESTS` (`0.2lb → 0.43lb (+0.24lb)`), `NOTIFICATION`, `TRAILS`, `HATS`, `ROD PARTS`, `ARTISAN`, `MANUFACTURER`, `PAY`, `TRADE`, `TPA`, `AUCTION HOUSE`, `<LOCATION> MINI EVENT` (message starts with a newline), and FOECollab's own `FOE » You went <n> fish dry before catching a ...`.
 - Gameplay logs to grep for more: `/home/luna/.local/share/PrismLauncher/instances/fishonmc-dev/minecraft/logs/` (luna offered them, 2026-10-03).
 
+**Mini event** (luna's logs 2026-11): the `/minievent` answer, mission lines and `MISSION COMPLETE` blocks are written down in `huds/mini-event.md`.
+
 **Other**
 - `SELL » You just earned $38.48K from selling your fish!` (money earned per sell; good stat)
 - `SELL » You just earned $824.69 from selling pets!` (pet store, an npc). Worked out from 12 of luna's sells (2026-10-16): payout = base × 2^((rating − 50) / 10), base $1,250 for common and $2,500 for rare (the payout of a 50% pet), exact to the cent. Rating is the pet's rating percent from its lore. Not known: the bases of uncommon, epic and legendary, and whether pet level changes it (all samples may have been level 0). See `display/pet-profit.md`.

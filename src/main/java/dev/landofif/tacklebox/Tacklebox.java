@@ -133,6 +133,9 @@ public final class Tacklebox implements ClientModInitializer {
                     TackleboxSettings.save();
                 }
             }
+            if (!overlay && dev.landofif.tacklebox.hud.MiniEventHud.onChat(message.getString(), System.currentTimeMillis())) {
+                return false; // the answer to the mod's own quiet /minievent
+            }
             boolean show = TriggerEngine.onGameMessage(message, overlay);
             return show && (overlay || ChatTweaks.allow(message));
         });
@@ -198,6 +201,7 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.input.FishKey.reset();
             dev.landofif.tacklebox.chat.DryStreaks.reset();
             dev.landofif.tacklebox.hud.GearCheck.reset();
+            dev.landofif.tacklebox.hud.MiniEvent.reset();
         });
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
             dev.landofif.tacklebox.chat.ChatRestore.stopping(client);
@@ -220,6 +224,7 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.hud.CryptidHud.renderHud(context);
             dev.landofif.tacklebox.hud.TimersHud.renderHud(context);
             dev.landofif.tacklebox.hud.GearWarning.renderHud(context);
+            dev.landofif.tacklebox.hud.MiniEventHud.renderHud(context);
             dev.landofif.tacklebox.hud.InventoryHud.renderHud(context);
             dev.landofif.tacklebox.hud.SlotsLeft.renderHud(context);
             dev.landofif.tacklebox.hud.NowPlaying.renderHud(context);
@@ -266,6 +271,7 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.hud.TimersHud.tick(client);
             dev.landofif.tacklebox.chat.DryStreakChat.tick(client);
             dev.landofif.tacklebox.hud.GearWarning.tick(client);
+            dev.landofif.tacklebox.hud.MiniEventHud.tick(client);
             dev.landofif.tacklebox.hud.EquipmentRow.tick(client);
             dev.landofif.tacklebox.display.PetHeads.tick(client);
             dev.landofif.tacklebox.display.PetRating.tick(client);

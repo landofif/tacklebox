@@ -72,6 +72,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Level progress bars. `levelBars`, off. `huds/level-bars.md`
 - Active boosts: boosters, chummers, weather, moon, frenzy, fabled. `boostsHud`, off. `huds/boosts-and-now-playing.md`
 - Event hud: points, placement, missions. `eventHud`, off. `huds/event-hud.md`
+- Mini event hud: when the mini event ends, the daily reroll and your missions with progress. While on it sends `/minievent` quietly every 10 minutes and after catches and hides the answer. `miniEventHud`, off. `huds/mini-event.md`
 - Cryptids hud: where to fish for what during moons, rainbow, storms, fabled and the clock windows, next moon and windows, dry streaks; popups with a switch per event. `cryptidHud`, off; `cryptidPopups`, on. `huds/cryptids.md`
 - Inventory hud: the 27 inventory slots on the hud, with counts, without opening the inventory. `inventoryHud`, off; `inventoryHudCells`, on. `huds/inventory.md`
 - Slots left hud: how many of the 36 inventory slots are empty, shown at or under a number you set. `slotsLeftHud`, off; `slotsLeftAt`, 5. `huds/inventory.md`

@@ -559,6 +559,12 @@ public final class SettingsPages {
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.eventAlign, v -> s.eventAlign = v);
         toggle("event missions", "lists the missions that are not done yet and the repeatable ones on the event hud, coloured like the menu, with the points earned and the points one catch gives. read from the mission book in /event and then follow the chat.",
                 () -> s.eventMissions, v -> s.eventMissions = v);
+        header("mini event");
+        toggle("mini event hud", "the running mini event: when it ends, when the daily missions reroll, and your missions with their progress. while this is on the mod sends /minievent by itself every 10 minutes and a few seconds after a catch and hides the answer, and counts your catches in between. off sends nothing. move it with move huds.",
+                () -> s.miniEventHud.on, v -> s.miniEventHud.on = v);
+        main();
+        cycle("mini event align", "how the text of the mini event hud lines up inside it: left, centre or right.",
+                TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.miniEventHud.align, v -> s.miniEventHud.align = v);
         header("cryptids");
         toggle("cryptids hud", "what can be caught where right now (moons, rainbow, storms, fabled, and the cryptids of the in-game clock) with the odds and the drops, then when the next moon and clock window come. read from chat and the clock in the top bar. move it with move huds.",
                 () -> s.cryptidHud, v -> s.cryptidHud = v);

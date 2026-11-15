@@ -10,6 +10,7 @@ Read the doc that matches your task. Do not read them all.
 | Level progress bars, hud scaling in the mover | `level-bars.md` |
 | Bobber timer, bite notification | `bobber-timer.md` |
 | Event hud (`/event` points, thresholds, placement) | `event-hud.md` |
+| Mini event hud (`/minievent` sent quietly, the answer's format, local counting) | `mini-event.md` |
 | Cryptids hud and popups, moon prediction, clock windows, dry streaks | `cryptids.md` |
 | Inventory hud (the 27 inventory slots on the hud), slots left hud | `inventory.md` |
 | Timers hud (tackle shop restock, cosmetic store reset, votes) and the reset titles; `TextHud` and `HudSpot`, the shared pieces of the newer text huds | `timers.md` |

@@ -102,17 +102,20 @@ public final class CatchWatch {
         Fish f = check(inventory(mc), mc.player.getUuid(), now);
         if (f != null) {
             onCatch(f, now);
-            String name = f.fish().replace('_', ' ');
+            String name = f.fish().replace('_', ' '), rarity = "", group = "";
             for (ItemStack stack : mc.player.getInventory().getMainStacks()) { // the catch title wants the item: its name, weight and length
                 NbtComponent c = stack.isEmpty() ? null : stack.get(DataComponentTypes.CUSTOM_DATA);
                 Fish same = c == null ? null : read(c.copyNbt(), mc.player.getUuid());
                 if (same != null && same.id().equals(f.id())) {
                     CatchTitle.onFish(c.copyNbt(), stack.getName().getString(), now);
                     name = CatchTitle.read(c.copyNbt(), stack.getName().getString()).name();
+                    rarity = c.copyNbt().getString("rarity").orElse("");
+                    group = c.copyNbt().getString("group").orElse("");
                     break;
                 }
             }
             dev.landofif.tacklebox.chat.DryStreakChat.onCatch(name, f.variant(), f.size(), now);
+            dev.landofif.tacklebox.hud.MiniEventHud.onCatch(new dev.landofif.tacklebox.hud.MiniEvent.Fish(f.location(), f.variant(), f.size(), rarity, group, name), now);
         }
     }
 
