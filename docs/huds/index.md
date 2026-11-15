@@ -11,6 +11,7 @@ Read the doc that matches your task. Do not read them all.
 | Bobber timer, bite notification | `bobber-timer.md` |
 | Event hud (`/event` points, thresholds, placement) | `event-hud.md` |
 | Cryptids hud and popups, moon prediction, clock windows, dry streaks | `cryptids.md` |
+| Timers hud (tackle shop restock, cosmetic store reset, votes) and the reset titles; `TextHud` and `HudSpot`, the shared pieces of the newer text huds | `timers.md` |
 | Catch title (fish picture, rarity badge and name, size with weight and length; hides the server's catch title) | `catch-title.md` |
 | The hud mover (`/tacklebox move`), what can be moved | `mover.md` |
 | Where huds and chat boxes sit, window size changes (F11, split screen) | `positions.md` |

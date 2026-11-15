@@ -138,6 +138,7 @@ public final class HudMover extends Screen {
                 s.cryptidPos = new HudPos(360, 150);
             }));
         }
+        spot(add, s.timersHud, dev.landofif.tacklebox.hud.TimersHud::draw);
         if (s.nowPlaying) {
             add.add(new Box(ctx -> dev.landofif.tacklebox.hud.NowPlaying.draw(ctx, true), (x, y, r) -> s.nowPlayingPos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> s.nowPlayingScale = Math.max(50, Math.min(300, s.nowPlayingScale + step * 5)), () -> {
                 s.nowPlayingScale = 100;
@@ -286,6 +287,13 @@ public final class HudMover extends Screen {
 
     private interface Resize {
         void by(int step, boolean shift);
+    }
+
+    /** The box of a hud that keeps its place in a {@link HudSpot}, when it is on. */
+    private static void spot(List<ClickableWidget> add, HudSpot spot, Function<DrawContext, int[]> draw) {
+        if (spot.on) {
+            add.add(new Box(draw, (x, y, r) -> spot.pos.moveTo(sw(), sh(), x, y, r[2], r[3]), (step, shift) -> spot.resize(step), spot::reset));
+        }
     }
 
     /** One draggable hud: it draws itself, reports where it is, and is outlined while hovered or held. */

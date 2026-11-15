@@ -73,6 +73,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Active boosts: boosters, chummers, weather, moon, frenzy, fabled. `boostsHud`, off. `huds/boosts-and-now-playing.md`
 - Event hud: points, placement, missions. `eventHud`, off. `huds/event-hud.md`
 - Cryptids hud: where to fish for what during moons, rainbow, storms, fabled and the clock windows, next moon and windows, dry streaks; popups with a switch per event. `cryptidHud`, off; `cryptidPopups`, on. `huds/cryptids.md`
+- Timers hud: tackle shop restock, cosmetic store reset, votes of the last 24 hours. `timersHud`, off; `timersVotes`, on. A title on every restock and reset, always on. `huds/timers.md`
 - Now playing (playerctl). `nowPlaying`, off. `huds/boosts-and-now-playing.md`
 - Server hud: sidebar-style lines with picture; includes compendium lines, frenzy schedule and community goal lines. `serverHud`, off. `huds/server-hud.md`
 - Sends /communityevent once per game start, 5 s after joining. Always on. `huds/server-hud.md`

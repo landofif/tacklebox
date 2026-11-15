@@ -564,6 +564,14 @@ public final class SettingsPages {
                         else s.cryptidOff.add(k[0]);
                     });
         }
+        header("timers");
+        toggle("timers hud", "countdowns to the next tackle shop restock (every 4 hours) and the cosmetic store reset (midnight utc), and your votes of the last 24 hours. a title shows on every restock and reset whether this hud is on or not. move it with move huds.",
+                () -> s.timersHud.on, v -> s.timersHud.on = v);
+        main();
+        cycle("timers align", "how the text of the timers hud lines up inside it: left, centre or right.",
+                TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.timersHud.align, v -> s.timersHud.align = v);
+        toggle("timers votes", "the votes line: how many of the 7 vote sites you voted on in the last 24 hours, counted from the vote reward lines in chat.",
+                () -> s.timersVotes, v -> s.timersVotes = v);
         header("level progress");
         toggle("level progress hud", "two thin bars: your fishing level (from the vanilla xp bar) and the level of the location you are at. the location bar starts when you open /comp once and then follows the location xp of quest rewards and chat. move it with move huds.",
                 () -> s.levelBars, v -> s.levelBars = v);
