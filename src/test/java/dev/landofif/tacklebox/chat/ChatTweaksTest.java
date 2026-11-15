@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** Hide rules on the lines a mod adds to the chat itself (ChatHudMixin asks {@link ChatTweaks#allowAdded}). */
 class ChatTweaksTest {
-    /** luna's rule and foecollab's line of 2026-11-15, which stayed in chat. */
+    /** luna's rule and foecollab's line of 2026-11-15, which stayed in chat (the line is always hidden now, rule or not). */
     private static final String RULE = "» You went * fish dry before catching a *";
     private static final String FOE_LINE = "FOE » You went 629 fish dry before catching a Pet";
 
@@ -36,8 +36,9 @@ class ChatTweaksTest {
 
     @Test
     void aModsOwnLineIsHidden() {
-        ChatFilter rule = TackleboxSettings.get().chatFilters.get(0);
-        assertFalse(ChatTweaks.allowAdded(FOE_LINE));
+        ChatFilter rule = new ChatFilter("» bait *", Trigger.MatchMode.SIMPLE);
+        TackleboxSettings.get().chatFilters.add(rule);
+        assertFalse(ChatTweaks.allowAdded("FOE » Bait sorted"));
         assertEquals(1, ChatTweaks.hidden(rule));
     }
 
@@ -50,6 +51,17 @@ class ChatTweaksTest {
     @Test
     void aRuleSwitchedOffHidesNothing() {
         TackleboxSettings.get().chatFilters.get(0).enabled = false;
-        assertTrue(ChatTweaks.allowAdded(FOE_LINE));
+        assertTrue(ChatTweaks.allowAdded("bob » You went 3 fish dry before catching a cold"));
+    }
+
+    @Test
+    void foecollabsDryStreaksAreHiddenWithNoRule() {
+        TackleboxSettings.get().chatFilters.clear();
+        assertFalse(ChatTweaks.allowAdded(FOE_LINE));
+        assertFalse(ChatTweaks.allowAdded("FOE » You went 1,204 fish dry before catching an Infusion Capsule"));
+        assertFalse(ChatTweaks.allowAdded(FOE_LINE + "\nFOE » You went 75 fish dry before catching a Shard"));
+        assertTrue(ChatTweaks.allowAdded("FOE » Bait sorted"));
+        assertTrue(ChatTweaks.allowAdded("[66] bob » FOE » You went 629 fish dry before catching a Pet"));
+        assertTrue(ChatTweaks.allowAdded(""));
     }
 }

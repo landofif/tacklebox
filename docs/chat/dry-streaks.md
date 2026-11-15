@@ -2,7 +2,7 @@
 
 When a rare drop finally lands, a chat line says how many catches it took (luna, 2026-11-15). Only you see the line. Every kind is off by default (`dryOn`); the counting always runs, so a kind switched on later has real numbers.
 
-Credit: the idea comes from FOE+ (`itshaxr/FOE-Plus`, `RareCatchHandler` and its chat lines), which builds on FOE-R (DannyPX) and FOECollab (Kimberlyow). No code was copied. FOECollab has its own dry streak lines; switch those off there if both are installed.
+Credit: the idea comes from FOE+ (`itshaxr/FOE-Plus`, `RareCatchHandler` and its chat lines), which builds on FOE-R (DannyPX) and FOECollab (Kimberlyow). No code was copied. FOECollab has its own dry streak lines (`FOE » You went 629 fish dry before catching a Pet`); tacklebox always hides them (luna, 2026-11-15: "just make the mod disable all foe dry streak message"), with no switch: `ChatTweaks.isFoeDryStreak`, asked where a line enters the chat hud (see `chat.md`), also for foecollab's several lines joined into one message. Foecollab's own setting is not touched. Test `ChatTweaksTest`; not run in game yet.
 
 ## Key files
 

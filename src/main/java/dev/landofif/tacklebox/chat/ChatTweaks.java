@@ -27,6 +27,8 @@ public final class ChatTweaks {
                     + "|read up on the /rules and utilize /report when needed\\."
                     + "|type /discord to join our discord!");
 
+    private static final java.util.regex.Pattern FOE_DRY = java.util.regex.Pattern.compile("FOE » You went [\\d,.]+ fish dry before catching .+");
+
     private ChatTweaks() {}
 
     /** @return false to hide the message */
@@ -47,7 +49,12 @@ public final class ChatTweaks {
      * @return false to hide the line
      */
     public static boolean allowAdded(String line) {
-        return hiddenBy(line, TriggerEngine.isOnFishOnMc(), true) == null;
+        return !isFoeDryStreak(line) && hiddenBy(line, TriggerEngine.isOnFishOnMc(), true) == null;
+    }
+
+    /** Foecollab's dry streak message, one line or several joined by line breaks. Always hidden (luna, 2026-11-15): tacklebox has its own. */
+    static boolean isFoeDryStreak(String message) {
+        return message.lines().allMatch(l -> FOE_DRY.matcher(l.strip()).matches()) && !message.isBlank();
     }
 
     /** Nothing to read: only spaces, and the server's invisible spacing glyphs (U+EEE0 to U+EEEF) or zero width characters. */

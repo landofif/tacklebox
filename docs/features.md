@@ -113,7 +113,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - 2000 lines of chat history instead of 100. Always on. **(no doc)**, `mixin/ChatHudMixin`
 - No `!` before player levels. Always on. `chat/chat.md`
 - Move and resize vanilla chat in the hud mover. `huds/positions.md`
-- Dry streak chat messages: when a pet, shard, infusion capsule, lightning bottle, variant or gigantic fish lands, a line says how many catches it took; a switch and an editable text per kind. `dryOn`, all off. `chat/dry-streaks.md`
+- Dry streak chat messages: when a pet, shard, infusion capsule, lightning bottle, variant or gigantic fish lands, a line says how many catches it took; a switch and an editable text per kind. `dryOn`, all off. Foecollab's own dry streak lines are always hidden. `chat/dry-streaks.md`
 
 ## Keys and commands
 
