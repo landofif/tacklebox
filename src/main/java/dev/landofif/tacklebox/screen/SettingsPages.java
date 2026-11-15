@@ -572,6 +572,12 @@ public final class SettingsPages {
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.timersHud.align, v -> s.timersHud.align = v);
         toggle("timers votes", "the votes line: how many of the 7 vote sites you voted on in the last 24 hours, counted from the vote reward lines in chat.",
                 () -> s.timersVotes, v -> s.timersVotes = v);
+        header("inventory");
+        toggle("inventory hud", "your inventory on the hud without opening it: the 27 slots above the hotbar as three rows of nine, with the item counts. display only. hidden while a chest or the inventory is open. move and resize it with move huds.",
+                () -> s.inventoryHud.on, v -> s.inventoryHud.on = v);
+        main();
+        toggle("inventory hud slots", "a faint dark square behind every slot of the inventory hud, so empty slots can be told apart.",
+                () -> s.inventoryHudCells, v -> s.inventoryHudCells = v);
         header("level progress");
         toggle("level progress hud", "two thin bars: your fishing level (from the vanilla xp bar) and the level of the location you are at. the location bar starts when you open /comp once and then follows the location xp of quest rewards and chat. move it with move huds.",
                 () -> s.levelBars, v -> s.levelBars = v);

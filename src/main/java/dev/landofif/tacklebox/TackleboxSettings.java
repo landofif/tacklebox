@@ -188,6 +188,9 @@ public class TackleboxSettings {
     /** The timers hud (hud/TimersHud): tackle shop restock, cosmetic store reset and votes. The reset titles show whether it is on or not. */
     public dev.landofif.tacklebox.hud.HudSpot timersHud = new dev.landofif.tacklebox.hud.HudSpot(360, 230);
     public boolean timersVotes = true;
+    /** The inventory hud (hud/InventoryHud): the 27 inventory slots on the hud; the faint square behind each slot. */
+    public dev.landofif.tacklebox.hud.HudSpot inventoryHud = new dev.landofif.tacklebox.hud.HudSpot(4, 200);
+    public boolean inventoryHudCells = true;
     /** When each vote of the last 24 hours came in (epoch ms), oldest first. */
     public java.util.List<Long> votes = new java.util.ArrayList<>();
     /** The now playing hud (hud/NowPlaying): what Spotify, a browser tab or any other player is playing, where it sits. */
@@ -630,6 +633,8 @@ public class TackleboxSettings {
         if (moonRiseAt <= 0) moonRiseAt = dev.landofif.tacklebox.hud.Cryptids.SEEN_RISE;
         if (timersHud == null) timersHud = new dev.landofif.tacklebox.hud.HudSpot();
         timersHud.fixed(360, 230);
+        if (inventoryHud == null) inventoryHud = new dev.landofif.tacklebox.hud.HudSpot();
+        inventoryHud.fixed(4, 200);
         if (votes == null) votes = new java.util.ArrayList<>();
         if (nowPlayingPos == null) nowPlayingPos = new HudPos(nowPlayingX, nowPlayingY);
         if (serverHudPos == null) serverHudPos = new HudPos(serverHudX, serverHudY);
