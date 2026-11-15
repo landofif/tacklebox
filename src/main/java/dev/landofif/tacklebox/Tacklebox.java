@@ -126,6 +126,9 @@ public final class Tacklebox implements ClientModInitializer {
                 if (dev.landofif.tacklebox.hud.TimersHud.onChat(dev.landofif.tacklebox.trigger.Matcher.normalize(message.getString()), System.currentTimeMillis())) {
                     TackleboxSettings.save();
                 }
+                if (dev.landofif.tacklebox.chat.DryStreakChat.onChat(dev.landofif.tacklebox.trigger.Matcher.normalize(message.getString()), System.currentTimeMillis())) {
+                    TackleboxSettings.save();
+                }
             }
             boolean show = TriggerEngine.onGameMessage(message, overlay);
             return show && (overlay || ChatTweaks.allow(message));
@@ -190,6 +193,7 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.hud.BoostsHud.reset();
             dev.landofif.tacklebox.display.ChummerRing.reset();
             dev.landofif.tacklebox.input.FishKey.reset();
+            dev.landofif.tacklebox.chat.DryStreaks.reset();
         });
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
             dev.landofif.tacklebox.chat.ChatRestore.stopping(client);
@@ -255,6 +259,7 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.display.RodIdle.tick(client);
             dev.landofif.tacklebox.hud.CryptidHud.tick(client);
             dev.landofif.tacklebox.hud.TimersHud.tick(client);
+            dev.landofif.tacklebox.chat.DryStreakChat.tick(client);
             dev.landofif.tacklebox.hud.EquipmentRow.tick(client);
             dev.landofif.tacklebox.display.PetHeads.tick(client);
             dev.landofif.tacklebox.display.PetRating.tick(client);

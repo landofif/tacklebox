@@ -7,7 +7,7 @@ Read the index for your area first. Do not read every doc.
 | Feature list | Every tacklebox feature in one line, its setting and doc | `features.md` |
 | Rules | Full text of the text and no-automation rules | `rules/index.md` |
 | UI | Foecollab look, screens, settings screen, hotbar | `ui/index.md` |
-| Chat | Filters, chat boxes, scrolling, copy, stacking | `chat/index.md` |
+| Chat | Filters, chat boxes, scrolling, copy, stacking, dry streak messages | `chat/index.md` |
 | FOECollab | Optional foecollab extras, hooks, lure sorting, pet memory | `foecollab/index.md` |
 | Huds | Server hud, boosts, now playing, quests left, bobber timer, catch title, chummer range ring | `huds/index.md` |
 | Menus | Fishonmc menu, vaults, power, compendium, bait picker, presets | `menus/index.md` |

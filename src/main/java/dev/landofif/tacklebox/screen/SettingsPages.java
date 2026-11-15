@@ -284,6 +284,7 @@ public final class SettingsPages {
         p.page("world");
         p.chat();
         p.drops();
+        p.dryStreaks();
         p.world();
         p.page("screens");
         p.screens();
@@ -319,6 +320,18 @@ public final class SettingsPages {
             dropToggle(r, "totem pop", s.dropPopOff);
             dropToggle(r, "sound", s.dropSoundOff);
         }
+    }
+
+    private void dryStreaks() {
+        header("dry streaks");
+        for (dev.landofif.tacklebox.chat.DryStreaks.Kind k : dev.landofif.tacklebox.chat.DryStreaks.KINDS) {
+            toggle("dry streak: " + k.label(), "a chat line when you get " + k.desc() + ", saying how many catches it took. only you see it.",
+                    () -> s.dryOn.contains(k.key()), v -> {
+                        if (v) s.dryOn.add(k.key());
+                        else s.dryOn.remove(k.key());
+                    });
+        }
+        link("dry streak texts", "what each dry streak line says, with %item% and %streak%.", DryStreakScreen::new);
     }
 
     private void dropToggle(dev.landofif.tacklebox.trigger.RareDrops.Row r, String part, java.util.Set<String> off) {

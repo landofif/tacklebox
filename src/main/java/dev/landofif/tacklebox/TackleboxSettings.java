@@ -194,6 +194,13 @@ public class TackleboxSettings {
     /** The slots left hud (hud/SlotsLeft): shows once this many or fewer of the 36 inventory slots are empty. */
     public dev.landofif.tacklebox.hud.HudSpot slotsLeftHud = new dev.landofif.tacklebox.hud.HudSpot(4, 260);
     public int slotsLeftAt = 5;
+    /**
+     * Dry streak chat messages (chat/DryStreaks): the kinds switched on, the edited text per kind (none = the default), and the
+     * catches counted since each kind's last drop ("pet", "shard", "variant:albino", ...).
+     */
+    public java.util.Set<String> dryOn = new java.util.HashSet<>();
+    public java.util.Map<String, String> dryText = new java.util.HashMap<>();
+    public java.util.Map<String, Integer> dryCount = new java.util.HashMap<>();
     /** When each vote of the last 24 hours came in (epoch ms), oldest first. */
     public java.util.List<Long> votes = new java.util.ArrayList<>();
     /** The now playing hud (hud/NowPlaying): what Spotify, a browser tab or any other player is playing, where it sits. */
@@ -642,6 +649,9 @@ public class TackleboxSettings {
         slotsLeftHud.fixed(4, 260);
         slotsLeftAt = Math.max(0, Math.min(dev.landofif.tacklebox.hud.SlotsLeft.SLOTS, slotsLeftAt));
         if (votes == null) votes = new java.util.ArrayList<>();
+        if (dryOn == null) dryOn = new java.util.HashSet<>();
+        if (dryText == null) dryText = new java.util.HashMap<>();
+        if (dryCount == null) dryCount = new java.util.HashMap<>();
         if (nowPlayingPos == null) nowPlayingPos = new HudPos(nowPlayingX, nowPlayingY);
         if (serverHudPos == null) serverHudPos = new HudPos(serverHudX, serverHudY);
         if (chatPos == null) chatPos = new HudPos(chatX, 0);
