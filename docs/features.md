@@ -16,6 +16,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Simple menus: chests and inventory as bare items, optional background colour and picture. `flatMenus`, off. `ui/look-and-settings.md`
 - Fishonmc menu as one dark panel with tabs and rows with bars (/travel, /stats, /crew, /event, quests; /menu and the instance list stay the chest). `fishMenu`, off. `menus/fish-menu-and-presets.md`
 - Travel in the same panel: place tiles in the server's order with the level big and a bar, climate and bait notes on hover, frenzy tile green, fabled tile red. The collections overview (closest to the next level first) and level pages are tiles too. `fishMenu`, off. `menus/fish-menu-and-presets.md`
+- Travel map: `/tt`, `/travel` and `/turbotravel` as a world map drawn in code, a pin per place with the server's picture, left click travels, right click shows its species, wheel zoom, drag pan, a button to the tile menu. `travelMap`, off. `menus/travel-map.md`
 - /quests marks: after clicking a quest, its difficulty and tier buttons get a green slot, to start the same quest again. Always on. `menus/quests.md`
 - /travel chest marks: a place in a frenzy gets a green slot, the fabled event's place a red one. Always on. `menus/fish-menu-and-presets.md`
 - Presets wardrobe: armour sets on player models, rod parts as big items, click or number key to equip. `presetsMenu`, off. `menus/fish-menu-and-presets.md`

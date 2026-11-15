@@ -438,6 +438,8 @@ public final class SettingsPages {
                 () -> s.fishMenu, v -> s.fishMenu = v);
         slider("menu size", "how much of the screen the fishonmc menu fills.", 40, 100, 1, "%",
                 () -> s.menuSize, v -> s.menuSize = (int) Math.round(v));
+        toggle("travel map", "/tt, /travel and /turbotravel open as a world map: every place sits where it is in the world, left click travels, right click shows its species, the wheel zooms and a drag moves the map. a button on it shows the tile menu instead. off gives the tiles or the chest back.",
+                () -> s.travelMap, v -> s.travelMap = v);
         header("presets");
         toggle("presets screen", "/presets as a wardrobe of cards with player models. off gives the chest back.",
                 () -> s.presetsMenu, v -> s.presetsMenu = v);

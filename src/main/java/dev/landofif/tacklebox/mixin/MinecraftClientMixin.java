@@ -31,6 +31,11 @@ abstract class MinecraftClientMixin {
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     private void tacklebox$screens(@Nullable Screen screen, CallbackInfo ci) {
+        if (FishMenu.wantsMap(screen)) {
+            ci.cancel();
+            setScreen(new dev.landofif.tacklebox.screen.TravelMapScreen((GenericContainerScreen) screen));
+            return;
+        }
         if (FishMenu.wants(screen)) {
             ci.cancel();
             GenericContainerScreen chest = (GenericContainerScreen) screen;

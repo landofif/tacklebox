@@ -10,7 +10,7 @@ Read the index for your area first. Do not read every doc.
 | Chat | Filters, chat boxes, scrolling, copy, stacking, dry streak messages | `chat/index.md` |
 | FOECollab | Optional foecollab extras, hooks, lure sorting, pet memory | `foecollab/index.md` |
 | Huds | Server hud, boosts, now playing, quests left, mini event, bobber timer, catch title, wrong pet and armor warning, chummer range ring | `huds/index.md` |
-| Menus | Fishonmc menu, vaults, power, compendium, bait picker, presets | `menus/index.md` |
+| Menus | Fishonmc menu, travel map, vaults, power, compendium, bait picker, presets | `menus/index.md` |
 | Keys | Fish key (one key for fishing), bait sort key, key commands | `keys/index.md` |
 | Display | World tweaks ported from fishutils, chat triggers, totem pop, screenshot preview | `display/index.md` |
 | Dev | Build, CI, dev run, F8 gui dump, rename, logo | `dev/index.md` |

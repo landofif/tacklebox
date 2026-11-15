@@ -29,7 +29,9 @@ public final class FishMenu {
 
     /** Menus that are only buttons, named by their art glyph (see util/Glyphs). The others (sell, vault, shops, pets, armor) need your inventory. */
     private static final Set<String> BUTTON_MENUS = Set.of("stats", "crew", "presets", "event");
-    private static final Set<String> COMMANDS = Set.of("travel", "turbotravel", "stats", "crew", "presets", "event");
+    private static final Set<String> COMMANDS = Set.of("travel", "turbotravel", "tt", "stats", "crew", "presets", "event");
+    /** The commands that open the travel menu; /tt is the server's short form of /turbotravel. */
+    private static final Set<String> TRAVEL = Set.of("travel", "turbotravel", "tt");
     /** The instance list ("Instance 4 (14/75)"), which shares the crew menu's title. */
     private static final Pattern INSTANCE = Pattern.compile("instance \\d+\\b.*");
     private static final Pattern LEVEL = Pattern.compile("(?:level|lvl)\\D{0,8}(\\d+)");
@@ -39,6 +41,7 @@ public final class FishMenu {
     /** Set when the player asked for the chest gui, so the next screen is not swapped. */
     public static boolean bypass;
     private static long commandAt;
+    private static long travelAt;
 
     private FishMenu() {}
 
@@ -49,7 +52,30 @@ public final class FishMenu {
             if (COMMANDS.contains(name)) {
                 commandAt = Util.getMeasuringTimeMs();
             }
+            travelAt = isTravelCommand(command) ? Util.getMeasuringTimeMs() : 0;
         });
+    }
+
+    /** A typed command (no slash) that opens the travel menu. */
+    public static boolean isTravelCommand(String command) {
+        return TRAVEL.contains(command.trim().split("\\s+")[0].toLowerCase(Locale.ROOT));
+    }
+
+    /**
+     * The travel menu the player just asked for by command, when the travel map is on (screen/TravelMapScreen). Asked before
+     * {@link #wants}; "tile menu" on the map opens the tiles itself.
+     */
+    public static boolean wantsMap(Screen screen) {
+        if (!(screen instanceof GenericContainerScreen) || bypass || Util.getMeasuringTimeMs() - travelAt >= 4000) {
+            return false;
+        }
+        TackleboxSettings s = TackleboxSettings.get();
+        if (s == null || !s.travelMap || !dev.landofif.tacklebox.trigger.TriggerEngine.isOnFishOnMc()) {
+            return false;
+        }
+        travelAt = 0;
+        commandAt = 0;
+        return true;
     }
 
     public static boolean isPresets(Screen screen) {
@@ -78,7 +104,8 @@ public final class FishMenu {
         boolean typed = Util.getMeasuringTimeMs() - commandAt < 4000;
         commandAt = 0;
         // a button inside one of our menus (quests, then difficulty, then tier) stays in our screen too
-        boolean chained = MinecraftClient.getInstance().currentScreen instanceof FishMenuScreen;
+        Screen open = MinecraftClient.getInstance().currentScreen;
+        boolean chained = open instanceof FishMenuScreen || open instanceof dev.landofif.tacklebox.screen.TravelMapScreen;
         String title = Glyphs.plain(screen.getTitle()).toLowerCase(Locale.ROOT);
         boolean needsInventory = title.contains("merchant") || title.contains("vault") || title.contains("shop")
                 || title.contains("pet menu") || title.contains("armor")
