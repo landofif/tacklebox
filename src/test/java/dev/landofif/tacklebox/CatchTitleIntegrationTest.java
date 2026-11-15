@@ -58,7 +58,7 @@ class CatchTitleIntegrationTest {
     @Test
     void aCatchShowsItsPictureAndTwoLines() {
         TackleboxSettings s = TackleboxSettings.get();
-        Tile tile = SettingsPages.build().stream().filter(p -> p.name().equals("huds")).findFirst().orElseThrow()
+        Tile tile = SettingsPages.build().stream().filter(p -> p.name().equals("fishing")).findFirst().orElseThrow()
                 .tiles().stream().filter(t -> t.title().equals("catch title")).findFirst().orElseThrow();
         assertEquals("catch title", tile.main().name);
         assertFalse(s.catchTitle, "off until switched on");

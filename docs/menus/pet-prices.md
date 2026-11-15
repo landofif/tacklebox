@@ -1,6 +1,6 @@
 # Pet prices screen
 
-What pets sell for between players, by rating and rarity (luna, 2026-11-15). `/tacklebox prices`, or settings > screens > "pet prices". Not the pet store's payout: that is `display/pet-profit.md`.
+What pets sell for between players, by rating and rarity (luna, 2026-11-15). `/tacklebox prices`, or settings > tools > "pet prices". Not the pet store's payout: that is `display/pet-profit.md`.
 
 Credit: the prices are the FishOnMC community's pet price sheet, a Google Sheet (`docs.google.com/spreadsheets/d/1mmOt9-hvCfT3flCekELM7F3FcOrbygwKGOrNyLwA2dk`); its author is not named on it. The screen shows the credit and the address under the table. The screen and the once a day download are FOE+'s idea (`itshaxr/FOE-Plus`, `PetPriceSheetHandler`), which builds on FOE-R (DannyPX) and FOECollab (Kimberlyow). No code was copied.
 

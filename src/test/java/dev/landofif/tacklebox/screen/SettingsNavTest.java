@@ -6,61 +6,54 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SettingsNavTest {
     @Test
-    void columnsFollowWidth() {
-        assertEquals(1, SettingsNav.cols(300));
-        assertEquals(2, SettingsNav.cols(400));
-        assertEquals(3, SettingsNav.cols(600));
-        assertEquals(4, SettingsNav.cols(900));
+    void aNewPageShowsItsFirstGroup() {
+        SettingsNav nav = new SettingsNav(8);
+        assertEquals(0, nav.group());
+        assertTrue(nav.page(3));
+        assertEquals(3, nav.page);
+        assertEquals(0, nav.group());
     }
 
     @Test
-    void gridFillsRowsLeftToRight() {
-        int[] tx = new int[9], ty = new int[9], tw = new int[9];
-        int h = SettingsNav.grid(9, 900, 6, 40, tx, ty, tw);
-        assertEquals((900 - 3 * 6) / 4, tw[0]);
-        assertEquals(0, tx[0]);
-        assertEquals(tw[0] + 6, tx[1]);
-        assertEquals(0, ty[3]);
-        assertEquals(46, ty[4]);
-        assertEquals(0, tx[4]);
-        assertEquals(92, ty[8]);
-        assertEquals(3 * 40 + 2 * 6, h);
-        for (int i = 0; i < 9; i++) {
-            assertTrue(tx[i] + tw[i] <= 900, "tile " + i + " runs past the edge");
+    void everyPageRemembersItsGroup() {
+        SettingsNav nav = new SettingsNav(8);
+        nav.group(4);
+        nav.page(2);
+        nav.group(1);
+        nav.page(0);
+        assertEquals(4, nav.group());
+        nav.page(2);
+        assertEquals(1, nav.group());
+    }
+
+    @Test
+    void pagesOutsideTheListAreRefused() {
+        SettingsNav nav = new SettingsNav(8);
+        assertFalse(nav.page(-1));
+        assertFalse(nav.page(8));
+        assertFalse(nav.page(0), "the page already shown");
+        assertEquals(0, nav.page);
+    }
+
+    @Test
+    void columnsAtGuiScaleTwo() {
+        int[] c = SettingsNav.columns(960, 6);
+        assertArrayEquals(new int[]{100, 120, 190, 438}, c);
+    }
+
+    @Test
+    void columnsFillTheScreenAndStayOnIt() {
+        for (int width : new int[]{320, 480, 519, 520, 640, 960, 1920}) {
+            int[] c = SettingsNav.columns(width, 6);
+            assertTrue(c[0] >= 10, "left edge at " + width);
+            assertTrue(c[0] + c[1] + c[2] + c[3] + 12 <= width - 10, "right edge at " + width);
+            assertTrue(c[3] >= 120, "room for a setting at " + width + ": " + c[3]);
         }
     }
 
     @Test
-    void narrowGridIsOneColumn() {
-        int[] tx = new int[3], ty = new int[3], tw = new int[3];
-        assertEquals(3 * 40 + 2 * 6, SettingsNav.grid(3, 300, 6, 40, tx, ty, tw));
-        assertEquals(300, tw[0]);
-        assertEquals(0, tx[2]);
-        assertEquals(92, ty[2]);
-    }
-
-    @Test
-    void emptyGridTakesNoRoom() {
-        assertEquals(0, SettingsNav.grid(0, 900, 6, 40, new int[0], new int[0], new int[0]));
-    }
-
-    @Test
-    void escClosesTheTileBeforeTheScreen() {
-        SettingsNav nav = new SettingsNav();
-        assertFalse(nav.back(), "on the grid esc closes the screen");
-        nav.open(2);
-        assertTrue(nav.opened());
-        assertTrue(nav.back());
-        assertFalse(nav.opened());
-        assertFalse(nav.back());
-    }
-
-    @Test
-    void pageChangeLandsOnTheGrid() {
-        SettingsNav nav = new SettingsNav();
-        nav.open(1);
-        nav.page(3);
-        assertEquals(3, nav.page);
-        assertFalse(nav.opened());
+    void narrowScreensShowPagesAsIcons() {
+        assertEquals(28, SettingsNav.columns(480, 6)[1]);
+        assertEquals(120, SettingsNav.columns(640, 6)[1]);
     }
 }

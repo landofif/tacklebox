@@ -6,96 +6,82 @@ import dev.landofif.tacklebox.screen.SettingsPages.Row;
 import dev.landofif.tacklebox.screen.SettingsPages.Tile;
 import dev.landofif.tacklebox.ui.Foe;
 import dev.landofif.tacklebox.ui.Hypr;
-import dev.landofif.tacklebox.ui.Hypr.Bezier;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.input.KeyInput;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
- * /tacklebox: the mods own settings, dressed like a hyprland desktop. A bar on top with a pill per page (a workspace), the
- * sections of the page as rounded tiles with gaps; the tile under the mouse is the focused one and gets the animated
- * gradient border. A page shows its tiles small, in a grid, with their name and on/off switch; clicking one opens it alone with
- * all its rows, and esc or its back label returns to the grid. Search shows the matching rows open. Everything moves on hyprland's curves: tiles pop in one after another, a page change slides and
- * fades, the pill glides, toggles and sliders ease, and closing pops out again.
+ * /tacklebox: the mods own settings as three columns. The pages at the left (an item and a name each), the groups of the
+ * picked page in the middle with their on/off switch, and the settings of the picked group at the right. The tools page
+ * lists its links in the middle. Search shows the matching settings of every page at the right. Nothing slides or pops:
+ * the screen and the right column fade in over {@link #FADE_MS}.
  */
 public class SettingsScreen extends Screen {
-    private static final int OUT = 10, GAP = 6, BAR_Y = 6, BAR_H = 20, PAD = 8, TITLE_H = 20, ROW_H = 22, TILE_R = 4, GRID_H = 40, OPEN_W = 420;
-    private static final int POP_MS = 420, STAGGER_MS = 45, SWITCH_MS = 450, CLOSE_MS = 220, SLIDE = 36;
+    private static final int OUT = 10, GAP = 6, PAD = 8, HEAD_H = 28, ROW_H = 22, LIST_H = 24, R = 4, MAX_H = 420, FADE_MS = 200;
 
-    /** The tiles being shown (a page's grid, one opened tile, or search results) with their layout and scroll. */
-    private static final class View {
-        final List<Tile> tiles;
-        final boolean search, grid;
-        final int dir;
-        final long born;
-        final int[] tx, ty, tw, th;
-        final float[] focus;
-        int focusIdx, contentH, ox, oy;
-        float scroll, target;
-
-        View(List<Tile> tiles, boolean search, boolean grid, int dir, long born) {
-            this.tiles = tiles;
-            this.search = search;
-            this.grid = grid;
-            this.dir = dir;
-            this.born = born;
-            int n = tiles.size();
-            tx = new int[n];
-            ty = new int[n];
-            tw = new int[n];
-            th = new int[n];
-            focus = new float[n];
-        }
-    }
+    /** What the right column shows under one heading: a group, or the matches of a group in a search. */
+    private record Section(String heading, List<Row> rows) {}
 
     private final Screen parent;
     private final List<Page> pages = SettingsPages.build();
+    private final SettingsNav nav = new SettingsNav(pages.size());
+    private final Map<String, ItemStack> icons = new HashMap<>();
     private final long openedAt = Util.getMeasuringTimeMs();
-    private long last = openedAt, closeAt = -1, tipSince;
-    private float dt;
-    private final SettingsNav nav = new SettingsNav();
-    private View cur, prev;
-    private long switchedAt;
-    private float pillX = -1, pillW;
+    private long last = openedAt, closeAt = -1, detailAt = openedAt, tipSince;
+    private float dt, scroll, scrollTarget;
+    private int groupScroll, contentH;
     private String query = "";
+    private List<Section> found = List.of();
     private TextFieldWidget search;
     private Row dragging, tipRow;
-    private int[] pillBox = new int[0];
-    private int closeX;
+    /** The columns: left edge, then the widths of pages, groups and settings; and the top and height of all three. */
+    private int[] col = new int[4];
+    private int top, panelH;
 
     public SettingsScreen(Screen parent) {
         super(Foe.text("tacklebox"));
         this.parent = parent;
-        cur = pageView(0, openedAt);
     }
 
-    private int contentW() {
-        return Math.min(width - 2 * OUT, 900);
+    private boolean narrow() {
+        return width < SettingsNav.NARROW;
     }
 
-    private int contentTop() {
-        return BAR_Y + BAR_H + OUT;
+    private int groupsX() {
+        return col[0] + col[1] + GAP;
     }
 
-    private int contentBottom() {
-        return height - OUT;
+    private int detailX() {
+        return groupsX() + col[2] + GAP;
+    }
+
+    private Page page() {
+        return pages.get(nav.page);
     }
 
     @Override
     protected void init() {
-        int sw = Math.max(70, Math.min(120, width / 5));
-        closeX = width - OUT - 4 - 14;
-        search = new TextFieldWidget(textRenderer, closeX - 8 - sw + 8, BAR_Y + 6, sw - 16, 10, Text.empty());
+        col = SettingsNav.columns(width, GAP);
+        panelH = Math.min(height - 2 * OUT, MAX_H);
+        top = (height - panelH) / 2;
+        // the search sits over the pages; when those are icons only, in the heading of the groups
+        int sx = narrow() ? groupsX() + 6 : col[0] + 6, sw = (narrow() ? col[2] : col[1]) - 12;
+        search = new TextFieldWidget(textRenderer, sx + 7, top + 9, sw - 14, 10, Text.empty());
         search.setDrawsBackground(false);
         search.setMaxLength(40);
         search.setEditableColor(Hypr.TEXT);
@@ -111,7 +97,7 @@ public class SettingsScreen extends Screen {
         TackleboxSettings.save();
     }
 
-    /** Closes with the pop out animation; the screen goes away in {@link #tick}. */
+    /** Closes with a fade; the screen goes away in {@link #tick}. */
     @Override
     public void close() {
         if (closeAt < 0) {
@@ -121,49 +107,43 @@ public class SettingsScreen extends Screen {
 
     @Override
     public void tick() {
-        if (closeAt >= 0 && Util.getMeasuringTimeMs() - closeAt >= CLOSE_MS) {
+        if (closeAt >= 0 && Util.getMeasuringTimeMs() - closeAt >= FADE_MS) {
             client.setScreen(parent);
         }
     }
 
     // ---- state changes
 
-    private View pageView(int dir, long now) {
-        return new View(pages.get(nav.page).tiles(), false, true, dir, now);
+    /** The right column shows something else: start at its top and fade it in. */
+    private void changed() {
+        detailAt = Util.getMeasuringTimeMs();
+        scroll = scrollTarget = 0;
+        dragging = null;
     }
 
     private void go(int to) {
-        if (to < 0 || to >= pages.size() || closeAt >= 0 || (to == nav.page && cur.grid)) {
-            return;
+        if (closeAt < 0 && nav.page(to)) {
+            groupScroll = 0;
+            clearSearch();
+            changed();
         }
-        long now = Util.getMeasuringTimeMs();
-        int dir = to == nav.page ? -1 : Integer.compare(to, nav.page);
-        nav.page(to);
-        query = "";
-        search.setText("");
-        swap(pageView(dir, now), now);
     }
 
-    private void open(int tile) {
-        long now = Util.getMeasuringTimeMs();
-        nav.open(tile);
-        swap(new View(List.of(cur.tiles.get(tile)), false, false, 1, now), now);
-    }
-
-    private boolean back() {
-        if (closeAt >= 0 || !nav.back()) {
-            return false;
+    private void pick(int group) {
+        boolean wasSearch = !query.isEmpty();
+        clearSearch();
+        if (wasSearch || group != nav.group()) {
+            nav.group(group);
+            changed();
         }
-        long now = Util.getMeasuringTimeMs();
-        swap(pageView(-1, now), now);
-        return true;
     }
 
-    private void swap(View next, long now) {
-        prev = cur;
-        cur = next;
-        switchedAt = now;
-        dragging = null;
+    private void clearSearch() {
+        if (!query.isEmpty()) {
+            query = "";
+            found = List.of();
+            search.setText("");
+        }
     }
 
     private void onQuery(String text) {
@@ -171,31 +151,60 @@ public class SettingsScreen extends Screen {
         if (q.equals(query)) {
             return;
         }
+        boolean wasSearch = !query.isEmpty();
         query = q;
-        long now = Util.getMeasuringTimeMs();
-        nav.back();
-        if (q.isEmpty()) {
-            swap(pageView(0, now), now);
-            return;
-        }
-        List<Tile> found = new ArrayList<>();
-        for (Page p : pages) {
-            for (Tile t : p.tiles()) {
-                List<Row> rows = t.rows().stream().filter(r -> r.name.contains(q) || r.desc.toLowerCase(Locale.ROOT).contains(q)).toList();
-                if (!rows.isEmpty()) {
-                    found.add(new Tile(p.name() + " · " + t.title(), Foe.bold(p.name() + " · " + t.title()), rows));
+        List<Section> hits = new ArrayList<>();
+        if (!q.isEmpty()) {
+            for (Page p : pages) {
+                for (Tile t : p.tiles()) {
+                    List<Row> rows = t.rows().stream().filter(r -> r.name.contains(q) || r.desc.toLowerCase(Locale.ROOT).contains(q)).toList();
+                    if (!rows.isEmpty()) {
+                        hits.add(new Section(Foe.smallCaps(p.name() + " › " + t.title()), rows));
+                    }
                 }
             }
         }
-        View next = new View(found, true, false, 0, cur.search ? cur.born : now);
-        if (cur.search) {
-            cur = next; // typing more letters updates the tiles in place
+        found = hits;
+        if (wasSearch && !q.isEmpty()) {
+            scroll = scrollTarget = 0; // typing more letters updates the list in place
         } else {
-            swap(next, now);
+            changed();
         }
     }
 
+    /** The headings and rows of the right column. */
+    private List<Section> sections() {
+        if (!query.isEmpty()) {
+            return found;
+        }
+        if (page().links()) {
+            return List.of();
+        }
+        return List.of(new Section(null, page().tiles().get(nav.group()).rows()));
+    }
+
+    /** The rows of the middle column: the links of the tools page, or one row per group. */
+    private int listSize() {
+        return page().links() ? page().tiles().get(0).rows().size() : page().tiles().size();
+    }
+
+    private int maxGroupScroll() {
+        return Math.max(0, listSize() * LIST_H + 4 - (panelH - HEAD_H));
+    }
+
+    private int listTop() {
+        return top + HEAD_H - groupScroll;
+    }
+
+    private int pagesTop() {
+        return top + (narrow() ? 6 : HEAD_H);
+    }
+
     // ---- input
+
+    private static boolean in(double mx, double my, int x, int y, int w, int h) {
+        return mx >= x && mx < x + w && my >= y && my < y + h;
+    }
 
     @Override
     public boolean mouseClicked(Click click, boolean doubled) {
@@ -203,40 +212,34 @@ public class SettingsScreen extends Screen {
             return true;
         }
         double mx = click.x(), my = click.y();
-        if (my >= BAR_Y && my < BAR_Y + BAR_H) {
-            if (mx >= closeX && mx < closeX + 14) {
-                close();
-                return true;
-            }
-            for (int i = 0; i + 1 < pillBox.length; i += 2) {
-                if (mx >= pillBox[i] && mx < pillBox[i + 1]) {
-                    go(i / 2);
-                    return true;
-                }
-            }
-        } else if (my >= contentTop() && my < contentBottom()) {
-            if (cur.grid) {
-                for (int i = 0; i < cur.tiles.size(); i++) {
-                    int x = cur.ox + cur.tx[i], y = cur.oy + cur.ty[i], w = cur.tw[i];
-                    if (mx >= x && mx < x + w && my >= y && my < y + GRID_H) {
-                        Row main = cur.tiles.get(i).main();
-                        if (main != null && mx >= switchX(main, x, w) - 4) {
-                            main.click(mx, click.button());
-                        } else {
-                            open(i);
-                        }
-                        return true;
+        if (in(mx, my, detailX() + col[3] - 22, top + 4, 20, 20)) {
+            close();
+            return true;
+        }
+        if (in(mx, my, col[0], pagesTop(), col[1], pages.size() * LIST_H)) {
+            go((int) (my - pagesTop()) / LIST_H);
+            return true;
+        }
+        if (in(mx, my, groupsX(), top + HEAD_H, col[2], panelH - HEAD_H)) {
+            int i = (int) Math.floor((my - listTop()) / LIST_H);
+            if (i >= 0 && i < listSize()) {
+                if (page().links()) {
+                    page().tiles().get(0).rows().get(i).click(mx, click.button());
+                } else {
+                    Row main = page().tiles().get(i).main();
+                    if (main != null && mx >= groupsX() + col[2] - PAD - main.width(textRenderer) - 4) {
+                        main.click(mx, click.button());
+                    } else {
+                        pick(i);
                     }
                 }
-                return true;
             }
-            if (!cur.search && mx >= cur.ox + cur.tx[0] && mx < cur.ox + cur.tx[0] + cur.tw[0] && my >= cur.oy && my < cur.oy + TITLE_H) {
-                back(); // the title row of an opened tile is its back label
-                return true;
-            }
-            for (Tile t : cur.tiles) {
-                for (Row r : t.rows()) {
-                    if (mx >= r.x && mx < r.x + r.w && my >= r.y && my < r.y + ROW_H) {
+            return true;
+        }
+        if (in(mx, my, detailX(), top + HEAD_H, col[3], panelH - HEAD_H)) {
+            for (Section s : sections()) {
+                for (Row r : s.rows()) {
+                    if (in(mx, my, r.x, r.y, r.w, ROW_H)) {
                         r.click(mx, click.button());
                         if (r.drags()) {
                             dragging = r;
@@ -245,6 +248,7 @@ public class SettingsScreen extends Screen {
                     }
                 }
             }
+            return true;
         }
         return super.mouseClicked(click, doubled);
     }
@@ -266,10 +270,12 @@ public class SettingsScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mx, double my, double horizontal, double vertical) {
-        if (my >= BAR_Y && my < BAR_Y + BAR_H) {
-            go(nav.page - (int) Math.signum(vertical)); // scrolling the bar changes workspace, like waybar
+        if (mx < groupsX()) {
+            go(nav.page - (int) Math.signum(vertical)); // scrolling the pages walks through them
+        } else if (mx < detailX()) {
+            groupScroll = Math.max(0, Math.min(maxGroupScroll(), groupScroll - (int) Math.signum(vertical) * LIST_H));
         } else {
-            cur.target = Math.max(0, Math.min(Math.max(0, cur.contentH - (contentBottom() - contentTop())), cur.target - (float) vertical * 30));
+            scrollTarget -= (float) vertical * 30; // clamped when drawn
         }
         return true;
     }
@@ -278,10 +284,7 @@ public class SettingsScreen extends Screen {
     public boolean keyPressed(KeyInput input) {
         int n = input.key() - GLFW.GLFW_KEY_1;
         if ((input.modifiers() & GLFW.GLFW_MOD_ALT) != 0 && n >= 0 && n < pages.size()) {
-            go(n); // alt + number, like super + number
-            return true;
-        }
-        if (input.key() == GLFW.GLFW_KEY_ESCAPE && back()) {
+            go(n);
             return true;
         }
         return super.keyPressed(input);
@@ -294,259 +297,173 @@ public class SettingsScreen extends Screen {
         long now = Util.getMeasuringTimeMs();
         dt = Math.min(0.1f, (now - last) / 1000f);
         last = now;
+        float fade = Hypr.clamp01((now - openedAt) / (float) FADE_MS) * (closeAt < 0 ? 1 : 1 - Hypr.clamp01((now - closeAt) / (float) FADE_MS));
+        boolean live = closeAt < 0;
+        Row tip = null;
 
-        float closeP = closeAt < 0 ? 0 : Hypr.clamp01((now - closeAt) / (float) CLOSE_MS);
-        float barP = Bezier.OUT_QUINT.at((now - openedAt) / 450f);
-        float fade = barP * (1 - closeP);
-        drawBar(ctx, mouseX, mouseY, fade, now, barP, closeP);
-
-        int top = contentTop(), bottom = contentBottom();
-        ctx.enableScissor(0, top - 2, width, bottom);
-        float sw = Hypr.clamp01((now - switchedAt) / (float) SWITCH_MS);
-        float slide = Bezier.OUT_QUINT.at(sw);
-        if (prev != null) {
-            if (sw >= 1) {
-                prev = null;
-            } else {
-                drawView(ctx, prev, Math.round(-cur.dir * slide * SLIDE), 1 - Math.min(1, slide * 1.8f), false, mouseX, mouseY, now, closeP);
-            }
+        drawPages(ctx, mouseX, mouseY, fade, live);
+        Row t1 = drawGroups(ctx, mouseX, mouseY, fade, live);
+        Row t2 = drawDetail(ctx, mouseX, mouseY, fade * Hypr.clamp01((now - detailAt) / (float) FADE_MS), fade, live);
+        tip = t1 != null ? t1 : t2;
+        if (tip != tipRow) {
+            tipRow = tip;
+            tipSince = now;
         }
-        drawView(ctx, cur, Math.round(cur.dir * (1 - slide) * SLIDE), 1, true, mouseX, mouseY, now, closeP);
-        ctx.disableScissor();
-        drawScrollbar(ctx, fade);
         drawTip(ctx, mouseX, mouseY, now, fade);
     }
 
-    private void drawBar(DrawContext ctx, int mouseX, int mouseY, float fade, long now, float barP, float closeP) {
-        int lift = Math.round((1 - barP) * -BAR_H) - Math.round(closeP * BAR_H / 2f);
-        int bx = OUT, bw = width - 2 * OUT, by = BAR_Y + lift;
-        Hypr.rrect(ctx, bx, by, bw, BAR_H, 5, Hypr.alpha(Hypr.BAR, fade));
+    /** A vanilla item as an icon; items cannot fade, so they only show once the screen is mostly there. */
+    private void icon(DrawContext ctx, String id, int x, int y, float fade) {
+        if (id == null || fade < 0.6f) {
+            return;
+        }
+        ctx.drawItem(icons.computeIfAbsent(id, k -> new ItemStack(Registries.ITEM.get(Identifier.ofVanilla(k)))), x, y);
+    }
 
-        pillBox = new int[pages.size() * 2];
-        int x = bx + 5, py = by + 3;
-        for (int i = 0; i < pages.size(); i++) {
-            String num = String.valueOf(i + 1), name = Foe.smallCaps(pages.get(i).name());
-            int w = textRenderer.getWidth(num) + 4 + textRenderer.getWidth(name) + 14;
-            pillBox[i * 2] = x;
-            pillBox[i * 2 + 1] = x + w;
-            if (i == nav.page) {
-                pillX = pillX < 0 ? x : Hypr.approach(pillX, x, dt, 16); // the active pill glides to its place
-                pillW = pillW <= 0 ? w : Hypr.approach(pillW, w, dt, 16);
+    private void drawPages(DrawContext ctx, int mouseX, int mouseY, float fade, boolean live) {
+        int x = col[0], w = col[1];
+        Hypr.rrect(ctx, x, top, w, panelH, 5, Hypr.alpha(Hypr.BAR, fade));
+        if (!narrow()) {
+            drawSearch(ctx, mouseX, mouseY, fade);
+        }
+        int y = pagesTop();
+        for (int i = 0; i < pages.size(); i++, y += LIST_H) {
+            boolean on = i == nav.page, hot = live && in(mouseX, mouseY, x, y, w, LIST_H);
+            if (on) {
+                Hypr.rrect(ctx, x + 4, y + 1, w - 8, LIST_H - 2, narrow() ? R : (LIST_H - 2) / 2, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), x + 4, w - 8, fade), 8);
+            } else if (hot) {
+                Hypr.rrect(ctx, x + 4, y + 1, w - 8, LIST_H - 2, narrow() ? R : (LIST_H - 2) / 2, Hypr.alpha(Hypr.SURFACE, fade));
             }
-            x += w + 2;
-        }
-        if (pillX >= 0) {
-            Hypr.rrect(ctx, Math.round(pillX), py, Math.round(pillW), 14, 7,
-                    Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), Math.round(pillX), Math.round(pillW), fade), 8);
-        }
-        for (int i = 0; i < pages.size(); i++) {
-            int x0 = pillBox[i * 2], w = pillBox[i * 2 + 1] - x0;
-            boolean hot = mouseX >= x0 && mouseX < x0 + w && mouseY >= BAR_Y && mouseY < BAR_Y + BAR_H;
-            boolean on = i == nav.page;
-            if (hot && !on) {
-                Hypr.rrect(ctx, x0, py, w, 14, 7, Hypr.alpha(Hypr.SURFACE, fade));
+            icon(ctx, pages.get(i).icon(), narrow() ? x + (w - 16) / 2 : x + 10, y + 4, fade);
+            if (!narrow()) {
+                ctx.drawText(textRenderer, Foe.smallCaps(pages.get(i).name()), x + 32, y + 8, Hypr.alpha(on ? Hypr.CRUST : hot ? Hypr.TEXT : Hypr.SUB, fade), !on);
             }
-            int num = on ? Hypr.CRUST : Hypr.MUTED, label = on ? Hypr.CRUST : hot ? Hypr.TEXT : Hypr.SUB;
-            String n = String.valueOf(i + 1);
-            ctx.drawText(textRenderer, n, x0 + 7, py + 3, Hypr.alpha(num, fade), false);
-            ctx.drawText(textRenderer, Foe.smallCaps(pages.get(i).name()), x0 + 7 + textRenderer.getWidth(n) + 4, py + 3, Hypr.alpha(label, fade), false);
         }
+    }
 
-        // the focused tile's name in the middle, like the window title in waybar, if there is room for it
-        String title = cur.tiles.isEmpty() ? "" : Foe.smallCaps(cur.tiles.get(Math.min(cur.focusIdx, cur.tiles.size() - 1)).title());
-        if (!title.isEmpty() && !cur.grid && !cur.search) {
-            title = Foe.smallCaps(pages.get(nav.page).name()) + " › " + title;
-        }
-        int free0 = x + 8, free1 = search.getX() - 12;
-        int tw = textRenderer.getWidth(title);
-        if (!title.isEmpty() && tw < free1 - free0) {
-            ctx.drawText(textRenderer, title, (free0 + free1 - tw) / 2, by + 6, Hypr.alpha(Hypr.MUTED, fade), false);
-        }
-
-        // the search pill and the red close dot
-        int sx = search.getX() - 8, sw = search.getWidth() + 16;
-        Hypr.rrect(ctx, sx, py, sw, 14, 7, Hypr.alpha(search.isFocused() ? Hypr.OVERLAY : Hypr.SURFACE, fade));
-        search.setY(by + 5);
+    private void drawSearch(DrawContext ctx, int mouseX, int mouseY, float fade) {
+        Hypr.rrect(ctx, search.getX() - 7, top + 6, search.getWidth() + 14, 16, 8, Hypr.alpha(search.isFocused() ? Hypr.OVERLAY : Hypr.SURFACE, fade));
         search.setAlpha(fade);
-        search.render(ctx, mouseX, mouseY, 0);
-        boolean hotClose = mouseX >= closeX && mouseX < closeX + 14 && mouseY >= BAR_Y && mouseY < BAR_Y + BAR_H;
-        Hypr.rrect(ctx, closeX, py, 14, 14, 7, Hypr.alpha(hotClose ? Hypr.RED : Hypr.mix(Hypr.RED, Hypr.SURFACE, 0.55f), fade));
     }
 
-    /** Lays the tiles out in columns, each into the shortest one (a masonry grid, like a tiling layout). */
-    private void layout(View v) {
-        int cw = contentW();
-        if (v.grid) {
-            v.contentH = SettingsNav.grid(v.tiles.size(), cw, GAP, GRID_H, v.tx, v.ty, v.tw);
-            java.util.Arrays.fill(v.th, GRID_H);
-            return;
-        }
-        if (!v.search) { // one opened tile, in the middle
-            v.tw[0] = Math.min(cw, OPEN_W);
-            v.tx[0] = (cw - v.tw[0]) / 2;
-            v.ty[0] = 0;
-            v.th[0] = TITLE_H + v.tiles.get(0).rows().size() * ROW_H + 4;
-            v.contentH = v.th[0];
-            return;
-        }
-        int cols = cw >= 780 ? 3 : cw >= 500 ? 2 : 1;
-        int colW = (cw - GAP * (cols - 1)) / cols;
-        int[] colH = new int[cols];
-        for (int i = 0; i < v.tiles.size(); i++) {
-            int c = 0;
-            for (int k = 1; k < cols; k++) {
-                if (colH[k] < colH[c]) {
-                    c = k;
-                }
-            }
-            v.tx[i] = c * (colW + GAP);
-            v.ty[i] = colH[c];
-            v.tw[i] = colW;
-            v.th[i] = TITLE_H + v.tiles.get(i).rows().size() * ROW_H + 4;
-            colH[c] += v.th[i] + GAP;
-        }
-        int max = 0;
-        for (int h : colH) {
-            max = Math.max(max, h);
-        }
-        v.contentH = Math.max(0, max - GAP);
-    }
-
-    private void drawView(DrawContext ctx, View v, int xOff, float aMul, boolean live, int mouseX, int mouseY, long now, float closeP) {
-        layout(v);
-        int top = contentTop(), bottom = contentBottom();
-        v.target = Math.max(0, Math.min(Math.max(0, v.contentH - (bottom - top)), v.target));
-        v.scroll = Hypr.approach(v.scroll, v.target, dt, 18);
-        int ox = (width - contentW()) / 2 + xOff, oy = top - Math.round(v.scroll);
-        v.ox = ox;
-        v.oy = oy;
-        boolean inClip = mouseY >= top && mouseY < bottom;
-        if (live && v.tiles.isEmpty()) {
-            String none = Foe.smallCaps("nothing found");
-            ctx.drawText(textRenderer, none, (width - textRenderer.getWidth(none)) / 2, top + 20, Hypr.alpha(Hypr.MUTED, aMul * (1 - closeP)), false);
-        }
-        for (int i = 0; i < v.tiles.size(); i++) {
-            float p = (now - v.born - (long) i * STAGGER_MS) / (float) POP_MS;
-            float scale = (0.88f + 0.12f * Bezier.OVERSHOOT.at(p)) * (1 - 0.13f * closeP);
-            float fade = Bezier.OUT_QUINT.at(p) * aMul * (1 - closeP);
-            int x = ox + v.tx[i], y = oy + v.ty[i], w = v.tw[i], h = v.th[i];
-            if (fade < 0.02f || y + h < top - 20 || y > bottom + 20) {
-                continue;
-            }
-            if (live && inClip && mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + h) {
-                v.focusIdx = i; // focus follows the mouse and stays on the last tile when it leaves
-            }
-            var m = ctx.getMatrices();
-            m.pushMatrix();
-            m.translate(x + w / 2f, y + h / 2f);
-            m.scale(scale, scale);
-            m.translate(-x - w / 2f, -y - h / 2f);
-            drawTile(ctx, v, i, x, y, w, h, fade, live, mouseX, mouseY, inClip, now);
-            m.popMatrix();
-        }
-    }
-
-    private void drawTile(DrawContext ctx, View v, int i, int x, int y, int w, int h, float fade, boolean live, int mouseX, int mouseY, boolean inClip, long now) {
-        Tile tile = v.tiles.get(i);
-        v.focus[i] = Hypr.approach(v.focus[i], live && v.focusIdx == i ? 1 : 0, dt, 14);
-        float f = v.focus[i];
-        if (f > 0.03f) { // a soft shadow under the focused tile
-            Hypr.rrect(ctx, x - 2, y - 1, w + 4, h + 5, TILE_R + 2, Hypr.alpha(0x000000, 0.16f * f * fade));
-            Hypr.rrect(ctx, x - 1, y, w + 2, h + 2, TILE_R + 1, Hypr.alpha(0x000000, 0.16f * f * fade));
-        }
-        Hypr.rrect(ctx, x, y, w, h, TILE_R, Hypr.alpha(Hypr.BASE, fade));
-        if (f > 0.02f) { // the border turns slowly, like hyprland's borderangle loop
-            double angle = Math.toRadians(45) + (now % 10000) / 10000.0 * Math.PI * 2;
-            Hypr.Paint grad = Hypr.angled(Hypr.acc1(), Hypr.acc2(), x, y, w, h, angle, 1);
-            Hypr.ring(ctx, x, y, w, h, TILE_R, 1, (px, py) -> Hypr.alpha(Hypr.mix(Hypr.INACTIVE, grad.at(px, py), f), fade), 12);
+    /** The groups of the page with their switch, or the links of the tools page. Returns the switch or link under the mouse. */
+    private Row drawGroups(DrawContext ctx, int mouseX, int mouseY, float fade, boolean live) {
+        int x = groupsX(), w = col[2];
+        Hypr.rrect(ctx, x, top, w, panelH, R, Hypr.alpha(Hypr.BASE, fade));
+        if (narrow()) {
+            drawSearch(ctx, mouseX, mouseY, fade);
         } else {
-            Hypr.ring(ctx, x, y, w, h, TILE_R, 1, Hypr.alpha(Hypr.INACTIVE, fade));
+            ctx.drawTextWithShadow(textRenderer, Foe.bold(page().name()), x + PAD + 2, top + 10, Hypr.alpha(Hypr.TEXT, fade));
         }
+        Row tip = null;
+        boolean links = page().links();
+        List<Tile> tiles = page().tiles();
+        groupScroll = Math.min(groupScroll, maxGroupScroll());
+        ctx.enableScissor(x, top + HEAD_H, x + w, top + panelH - 2);
+        boolean inside = live && in(mouseX, mouseY, x, top + HEAD_H, w, panelH - HEAD_H);
+        int y = listTop();
+        for (int i = 0; i < listSize(); i++, y += LIST_H) {
+            boolean hot = inside && mouseY >= y && mouseY < y + LIST_H;
+            boolean on = !links && query.isEmpty() && i == nav.group();
+            if (on || hot) {
+                Hypr.rrect(ctx, x + 4, y + 1, w - 8, LIST_H - 2, R, Hypr.alpha(Hypr.OVERLAY, (on ? 0.55f : 0.3f) * fade));
+            }
+            if (on) {
+                Hypr.ring(ctx, x + 4, y + 1, w - 8, LIST_H - 2, R, 1, Hypr.horizontal(Hypr.acc1(), Hypr.acc2(), x + 4, w - 8, fade), 8);
+            }
+            Row link = links ? tiles.get(0).rows().get(i) : null;
+            Row main = links ? null : tiles.get(i).main();
+            icon(ctx, links ? link.icon : tiles.get(i).icon(), x + 10, y + 4, fade);
+            int room = w - 32 - PAD - (main == null ? 0 : main.width(textRenderer) + 6);
+            String name = fit(links ? link.label : Foe.smallCaps(tiles.get(i).title()), room);
+            ctx.drawTextWithShadow(textRenderer, name, x + 32, y + 8, Hypr.alpha(on || hot ? Hypr.TEXT : Hypr.SUB, fade));
+            if (main != null) {
+                int sx = x + w - PAD - main.width(textRenderer);
+                boolean hotSwitch = hot && mouseX >= sx - 4;
+                main.draw(ctx, textRenderer, sx, y + (LIST_H - Row.H) / 2, fade, hotSwitch, dt);
+                if (hotSwitch) {
+                    tip = main;
+                }
+            } else if (hot && links) {
+                tip = link;
+            }
+        }
+        ctx.disableScissor();
+        return tip;
+    }
+
+    private String fit(String s, int room) {
+        return textRenderer.getWidth(s) <= room ? s : textRenderer.trimToWidth(s, Math.max(0, room - textRenderer.getWidth("…"))) + "…";
+    }
+
+    /** The settings of the picked group, or what the search found. Returns the row under the mouse. */
+    private Row drawDetail(DrawContext ctx, int mouseX, int mouseY, float fade, float frame, boolean live) {
+        int x = detailX(), w = col[3];
+        Hypr.rrect(ctx, x, top, w, panelH, R, Hypr.alpha(Hypr.BASE, frame));
+        boolean hotClose = live && in(mouseX, mouseY, x + w - 22, top + 4, 20, 20);
+        Hypr.rrect(ctx, x + w - 16, top + 10, 8, 8, 4, Hypr.alpha(hotClose ? Hypr.RED : Hypr.mix(Hypr.RED, Hypr.SURFACE, 0.4f), frame));
+
+        boolean searching = !query.isEmpty();
+        Tile tile = page().tiles().get(page().links() ? 0 : nav.group());
         int hx = x + PAD;
-        if (!v.grid && !v.search) {
-            boolean hotBack = live && inClip && mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + TITLE_H;
-            String back = "‹ " + Foe.smallCaps(pages.get(nav.page).name());
-            ctx.drawTextWithShadow(textRenderer, back, hx, y + 7, Hypr.alpha(hotBack ? Hypr.acc1() : Hypr.MUTED, fade));
-            hx += textRenderer.getWidth(back) + 8;
+        if (!searching) {
+            icon(ctx, tile.icon(), hx, top + 6, fade);
+            hx += 22;
         }
-        ctx.drawTextWithShadow(textRenderer, tile.heading(), hx, y + 7, Hypr.alpha(Hypr.mix(Hypr.SUB, Hypr.acc2(), f), fade));
-        if (v.grid) {
-            drawGridTile(ctx, tile, x, y, w, h, fade, live && inClip, mouseX, mouseY, now);
-            return;
-        }
+        ctx.drawTextWithShadow(textRenderer, searching ? Foe.bold("search") : tile.heading(), hx, top + 10, Hypr.alpha(Hypr.TEXT, fade));
 
-        int ry = y + TITLE_H;
-        int clipTop = contentTop() - ROW_H, clipBottom = contentBottom();
-        for (Row r : tile.rows()) {
-            if (ry < clipTop || ry > clipBottom) { // rows scrolled out of view cost nothing
-                if (live) {
+        List<Section> sections = sections();
+        int view = panelH - HEAD_H - 4;
+        scrollTarget = Math.max(0, Math.min(Math.max(0, contentH - view), scrollTarget));
+        scroll = Hypr.approach(scroll, scrollTarget, dt, 18);
+        String note = searching && sections.isEmpty() ? "nothing found" : !searching && page().links() ? "pick a screen in the list" : null;
+        if (note != null) {
+            ctx.drawText(textRenderer, Foe.smallCaps(note), x + PAD, top + HEAD_H + 6, Hypr.alpha(Hypr.MUTED, fade), false);
+        }
+        Row tip = null;
+        int clipTop = top + HEAD_H, clipBottom = top + panelH - 4;
+        boolean inside = live && dragging == null && in(mouseX, mouseY, x, clipTop, w, clipBottom - clipTop);
+        ctx.enableScissor(x, clipTop, x + w, clipBottom);
+        int y = clipTop - Math.round(scroll);
+        for (Section s : sections) {
+            if (s.heading() != null) {
+                ctx.drawText(textRenderer, s.heading(), x + PAD, y + 8, Hypr.alpha(Hypr.MUTED, fade), false);
+                y += 20;
+            }
+            for (Row r : s.rows()) {
+                if (y + ROW_H < clipTop || y > clipBottom) { // rows scrolled out of view cost nothing and cannot be clicked
                     r.y = -9999;
+                    y += ROW_H;
+                    continue;
                 }
-                ry += ROW_H;
-                continue;
-            }
-            boolean hover = live && inClip && dragging == null && mouseX >= x && mouseX < x + w && mouseY >= ry && mouseY < ry + ROW_H;
-            if (live) {
+                boolean hover = inside && mouseY >= y && mouseY < y + ROW_H;
                 r.x = x;
-                r.y = ry;
+                r.y = y;
                 r.w = w;
-                if (hover && r != tipRow) {
-                    tipRow = r;
-                    tipSince = now;
-                } else if (!hover && r == tipRow) {
-                    tipRow = null;
+                if (hover) {
+                    tip = r;
                 }
+                r.hot = Hypr.approach(r.hot, hover || r == dragging ? 1 : 0, dt, 20);
+                if (r.hot > 0.02f) {
+                    Hypr.rrect(ctx, x + 3, y + 1, w - 6, ROW_H - 2, 3, Hypr.alpha(Hypr.OVERLAY, 0.4f * r.hot * fade));
+                }
+                int cw = r.width(textRenderer);
+                ctx.drawTextWithShadow(textRenderer, fit(r.label, w - 2 * PAD - cw - 8), x + PAD, y + 7, Hypr.alpha(Hypr.mix(Hypr.SUB, Hypr.TEXT, r.hot), fade));
+                r.draw(ctx, textRenderer, x + w - PAD - cw, y + (ROW_H - Row.H) / 2, fade, hover || r == dragging, dt);
+                y += ROW_H;
             }
-            r.hot = Hypr.approach(r.hot, hover || r == dragging ? 1 : 0, dt, 20);
-            if (r.hot > 0.02f) {
-                Hypr.rrect(ctx, x + 3, ry + 1, w - 6, ROW_H - 2, 3, Hypr.alpha(Hypr.OVERLAY, 0.4f * r.hot * fade));
-            }
-            int cw = r.width(textRenderer);
-            int room = w - 2 * PAD - cw - 8;
-            String label = r.label;
-            if (textRenderer.getWidth(label) > room) {
-                label = textRenderer.trimToWidth(label, room - textRenderer.getWidth("…")) + "…";
-            }
-            ctx.drawTextWithShadow(textRenderer, label, x + PAD, ry + 7, Hypr.alpha(Hypr.mix(Hypr.SUB, Hypr.TEXT, r.hot), fade));
-            r.draw(ctx, textRenderer, x + w - PAD - cw, ry + (ROW_H - Row.H) / 2, fade, hover || r == dragging, dt);
-            ry += ROW_H;
         }
+        ctx.disableScissor();
+        contentH = y + Math.round(scroll) - clipTop;
+        if (contentH > view) {
+            int thumb = Math.max(16, view * view / contentH);
+            int ty = clipTop + Math.round((view - thumb) * (scroll / (contentH - view)));
+            Hypr.rrect(ctx, x + w - 4, ty, 2, thumb, 1, Hypr.alpha(Hypr.acc1(), 0.7f * fade));
+        }
+        return tip;
     }
 
-    private int switchX(Row main, int x, int w) {
-        return x + w - PAD - main.width(textRenderer);
-    }
-
-    /** A tile in a page's grid: its name, how many settings it holds and its on/off switch, if it has one. */
-    private void drawGridTile(DrawContext ctx, Tile tile, int x, int y, int w, int h, float fade, boolean live, int mouseX, int mouseY, long now) {
-        int n = tile.rows().size();
-        ctx.drawText(textRenderer, Foe.smallCaps(n == 1 ? "1 setting" : n + " settings"), x + PAD, y + 23, Hypr.alpha(Hypr.MUTED, fade), false);
-        Row main = tile.main();
-        if (main == null) {
-            return;
-        }
-        int sx = switchX(main, x, w);
-        boolean hover = live && mouseX >= sx - 4 && mouseX < x + w && mouseY >= y && mouseY < y + h;
-        if (hover && main != tipRow) {
-            tipRow = main;
-            tipSince = now;
-        } else if (!hover && main == tipRow) {
-            tipRow = null;
-        }
-        main.draw(ctx, textRenderer, sx, y + (h - Row.H) / 2, fade, hover, dt);
-    }
-
-    private void drawScrollbar(DrawContext ctx, float fade) {
-        int view = contentBottom() - contentTop();
-        if (cur.contentH <= view) {
-            return;
-        }
-        int thumb = Math.max(16, view * view / cur.contentH);
-        int y = contentTop() + Math.round((view - thumb) * (cur.scroll / (cur.contentH - view)));
-        Hypr.rrect(ctx, width - 5, y, 2, thumb, 1, Hypr.alpha(Hypr.acc1(), 0.7f * fade));
-    }
-
-    /** What a setting does, as a small popup that fades in after the mouse rests on a row (like a notification). */
+    /** What a setting does, as a small popup that fades in after the mouse rests on it. */
     private void drawTip(DrawContext ctx, int mouseX, int mouseY, long now, float fade) {
         if (tipRow == null || tipRow.desc.isEmpty() || dragging != null || closeAt >= 0) {
             return;

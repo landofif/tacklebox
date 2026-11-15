@@ -8,7 +8,7 @@ Credit: the idea comes from FOE+ (`itshaxr/FOE-Plus`, `RareCatchHandler` and its
 
 - `chat/DryStreaks`: pure (the tests run it). The kinds, the drop line patterns, the counting, the texts and their placeholders.
 - `chat/DryStreakChat`: feeds it the catches (`CatchWatch.tick`), the chat (`Tacklebox` chat hook) and the moon and storm (`CryptidHud.state`), and prints the lines on the next tick so they come after the server's own line.
-- `screen/DryStreakScreen`: per kind a switch, its text and a "default" button. Settings > world > "dry streaks": a switch per kind and "dry streak texts" opens the screen.
+- `screen/DryStreakScreen`: per kind a switch, its text and a "default" button. Settings > chat > "dry streaks": a switch per kind and "dry streak texts" opens the screen.
 - Saved: `dryOn` (kinds switched on), `dryText` (edited texts only), `dryCount` (catches since the last drop).
 
 ## How it works

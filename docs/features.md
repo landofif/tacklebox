@@ -4,7 +4,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 
 ## Screens and look
 
-- Settings screen: pages of click-to-open tiles, search, alt+number page switch, hover help. `/tacklebox` (alias `/dofi`), right shift, Mod Menu. `ui/look-and-settings.md`
+- Settings screen: three columns (eight pages with icons, the groups of the page with their switch, the settings of the picked group), search, alt+number page switch, hover help. `/tacklebox` (alias `/dofi`), right shift, Mod Menu. `ui/look-and-settings.md`
 - Accent gradient: two colours for focused tiles, hovered buttons, toggles, hotbar and menu fills. `accent1`, `accent2`. `ui/look-and-settings.md`
 - Flat buttons and rounded text fields everywhere. `flatButtons`, off. `ui/look-and-settings.md`
 - No toast popups: every toast (recipes, advancements, hints) is blocked. Always on. **(no doc)**, `mixin/ToastManagerMixin`
@@ -60,7 +60,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 ## Triggers
 
 - Chat triggers: a matching chat line shows an animated title and plays sounds, can hide the line. `/triggers`. `display/triggers.md`
-- Rare drops (2026-11-01): your own pet drops and rare catches are built in (not triggers), with a title, totem pop and sound switch per kind of drop in settings > world > rare drops. Pet titles (fished and quest reward pets, 2026-11-13) show the pet's rating under the name ("amazing 93.4%"). `display/triggers.md`
+- Rare drops (2026-11-01): your own pet drops and rare catches are built in (not triggers), with a title, totem pop and sound switch per kind of drop in settings > fishing > rare drops. Pet titles (fished and quest reward pets, 2026-11-13) show the pet's rating under the name ("amazing 93.4%"). `display/triggers.md`
 - Trigger presets (quest completed, pet max level, fabled, storm and more). `+ new trigger`. `display/triggers.md`
 - Totem pop: a trigger can pop an item (pet head, shard head, the real item). Trigger totem tab. `display/world-and-totem.md`
 - Trigger share codes: copy and import a trigger as a short code. **(no doc)**, `trigger/TriggerStore`
@@ -88,7 +88,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Bite notification replacing the server's BITE! title. `biteOn`, on. `huds/bobber-timer.md`
 - Catch title: on a catch the fish's picture, its rarity badge and name, and its size with weight and length, in place of the server's catch title; every part has a switch. `catchTitle`, off. `huds/catch-title.md`
 - Focus the game window on a bite (Hyprland). `biteFocus`, off. `huds/bobber-timer.md`
-- Hotbar look, spacing, size, offhand box, gliding selection. Settings > huds > hotbar. `ui/look-and-settings.md`
+- Hotbar look, spacing, size, offhand box, gliding selection. Settings > look > hotbar. `ui/look-and-settings.md`
 - Own armour and rod parts row above the hotbar. `equipHud`, off. `ui/look-and-settings.md`
 - Huds, hotbar, chat and chat boxes in tacklebox's own hud mover. `/tacklebox move`. `huds/mover.md`, `huds/positions.md`
 - Hide hud parts behind chat, chat boxes and the player list. `hideBehindChat`, off. `chat/chat.md`

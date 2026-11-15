@@ -1,48 +1,44 @@
 package dev.landofif.tacklebox.screen;
 
 /**
- * Where {@link SettingsScreen} is: a page, and on it either the grid of tiles or one tile opened. Esc and back close the
- * tile first, a page change always lands on the grid.
+ * Where {@link SettingsScreen} is: a page and the group picked on it. Every page remembers its group, so coming back to a
+ * page shows what was open there; a page seen for the first time shows its first group.
  */
 final class SettingsNav {
-    int page, open = -1;
+    /** Screens narrower than this show the pages as icons only. */
+    static final int NARROW = 520;
+    int page;
+    private final int[] group;
 
-    boolean opened() {
-        return open >= 0;
+    SettingsNav(int pages) {
+        group = new int[pages];
     }
 
-    void open(int tile) {
-        open = tile;
+    int group() {
+        return group[page];
     }
 
-    /** Back to the grid; false when it was there already (esc then closes the screen). */
-    boolean back() {
-        if (open < 0) {
+    void group(int g) {
+        group[page] = g;
+    }
+
+    /** False when {@code to} is not a page or is the page already shown. */
+    boolean page(int to) {
+        if (to < 0 || to >= group.length || to == page) {
             return false;
         }
-        open = -1;
+        page = to;
         return true;
     }
 
-    void page(int to) {
-        page = to;
-        open = -1;
-    }
-
-    static int cols(int width) {
-        return width >= 760 ? 4 : width >= 540 ? 3 : width >= 340 ? 2 : 1;
-    }
-
-    /** Lays {@code n} tiles of height {@code h} out in rows across {@code width}; returns the height they take. */
-    static int grid(int n, int width, int gap, int h, int[] tx, int[] ty, int[] tw) {
-        int cols = cols(width);
-        int colW = (width - gap * (cols - 1)) / cols;
-        for (int i = 0; i < n; i++) {
-            tx[i] = (i % cols) * (colW + gap);
-            ty[i] = (i / cols) * (h + gap);
-            tw[i] = colW;
-        }
-        int rows = (n + cols - 1) / cols;
-        return Math.max(0, rows * (h + gap) - gap);
+    /**
+     * The three columns for a screen {@code width} wide, centred with {@code gap} between them: the left edge, then the
+     * widths of the pages, the groups and the settings.
+     */
+    static int[] columns(int width, int gap) {
+        int total = Math.min(width - 20, 760);
+        int side = width >= NARROW ? 120 : 28;
+        int groups = total >= 640 ? 190 : total >= 420 ? 150 : 110;
+        return new int[]{(width - total) / 2, side, groups, total - side - groups - 2 * gap};
     }
 }
