@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  * Chat filters: lines that match an enabled hide rule never reach the chat box. Runs for server
- * messages and player chat. Only what you see changes; nothing is sent.
+ * messages, player chat and the lines mods add to the chat themselves. Only what you see changes; nothing is sent.
  */
 public final class ChatTweaks {
     private static final Map<String, Matcher> MATCHERS = new HashMap<>();
@@ -39,6 +39,15 @@ public final class ChatTweaks {
             return false;
         }
         return hiddenBy(message.getString(), TriggerEngine.isOnFishOnMc(), true) == null;
+    }
+
+    /**
+     * A line on its way into the chat hud, from the server or from a mod. Lines a mod writes itself (foecollab's dry
+     * streaks) never pass {@link #allow}, so the hide rules are asked here too.
+     * @return false to hide the line
+     */
+    public static boolean allowAdded(String line) {
+        return hiddenBy(line, TriggerEngine.isOnFishOnMc(), true) == null;
     }
 
     /** Nothing to read: only spaces, and the server's invisible spacing glyphs (U+EEE0 to U+EEEF) or zero width characters. */

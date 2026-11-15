@@ -180,7 +180,7 @@ abstract class ChatScreenMixin extends Screen {
             client.setScreen(new ChatFilterScreen(null, rule));
         } else {
             client.keyboard.setClipboard(plain);
-            client.player.sendMessage(Foe.text("tacklebox » ").withColor(Foe.TITLE & 0xFFFFFF).append(Foe.text("message copied").withColor(Foe.DIM & 0xFFFFFF)), false);
+            client.player.sendMessage(Text.literal("tacklebox » ").withColor(Foe.TITLE & 0xFFFFFF).append(Text.literal("message copied").withColor(Foe.DIM & 0xFFFFFF)), false);
         }
         cir.setReturnValue(true);
     }

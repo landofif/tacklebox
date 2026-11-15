@@ -71,6 +71,10 @@ abstract class ChatHudMixin {
             at = @At("HEAD"), cancellable = true)
     private void tacklebox$chatBoxes(Text message, @Nullable MessageSignatureData signature, @Nullable MessageIndicator indicator, CallbackInfo ci) {
         TackleboxSettings st = TackleboxSettings.get();
+        if (!rewriting && !stacking && !dev.landofif.tacklebox.chat.ChatTweaks.allowAdded(message.getString())) {
+            ci.cancel(); // a hide rule: also for lines a mod adds itself, which the receive events never see
+            return;
+        }
         if (!rewriting) {
             Text out = ChatTimes.rewrite(message, st == null ? 0 : st.chatTimeMode, System.currentTimeMillis());
             if (st != null) {
