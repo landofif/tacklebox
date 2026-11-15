@@ -150,6 +150,20 @@ public final class FishKey {
         return blockUse;
     }
 
+    /**
+     * Holding the use button with a rod (luna 2026-11-13): the game clicks again every 4 ticks while it is held, which
+     * reeled the line back in right after the cast. That repeat is dropped (MinecraftClientMixin), so only a new press
+     * clicks. Whatever the fish key is bound to, or unbound.
+     */
+    public static boolean dropHeldUse(boolean rod, boolean fishOnMc) {
+        return rod && fishOnMc;
+    }
+
+    public static boolean dropHeldUse(MinecraftClient client) {
+        ClientPlayerEntity p = client.player;
+        return p != null && dropHeldUse(p.getMainHandStack().isOf(Items.FISHING_ROD) || p.getOffHandStack().isOf(Items.FISHING_ROD), TriggerEngine.isOnFishOnMc());
+    }
+
     /** The key is held in the minigame: KeyboardInputMixin adds sneak to the player's input. */
     public static boolean sneaking() {
         return sneak;

@@ -43,6 +43,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Hide xp popups (action bar line and holograms). `hideXpPopups`, off. `display/world-and-totem.md`
 - Flat leaves. `flatLeaves`, off. `display/world-and-totem.md`
 - Black sky and fog. `blackSky`, off. `display/world-and-totem.md`
+- Hide the outline of the block you are looking at. `hideBlockOutline`, off. `display/world-and-totem.md`
 - Hide far server displays for fps. `hideFarDisplays`, `farDisplayRange`, off. `display/world-and-totem.md`
 - Hide other players near you or your bobber while your line is out, crew and friends stay. `hideNearPlayers`, `nearPlayersRange`, off. `display/world-and-totem.md`
 - Only my fish: hide the fish particles swimming to other players' bobbers. `ownFishOnly`, off. `display/world-and-totem.md`
@@ -57,7 +58,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 ## Triggers
 
 - Chat triggers: a matching chat line shows an animated title and plays sounds, can hide the line. `/triggers`. `display/triggers.md`
-- Rare drops (2026-11-01): your own pet drops and rare catches are built in (not triggers), with a title, totem pop and sound switch per kind of drop in settings > world > rare drops. `display/triggers.md`
+- Rare drops (2026-11-01): your own pet drops and rare catches are built in (not triggers), with a title, totem pop and sound switch per kind of drop in settings > world > rare drops. Pet titles (fished and quest reward pets, 2026-11-13) show the pet's rating under the name ("amazing 93.4%"). `display/triggers.md`
 - Trigger presets (quest completed, pet max level, fabled, storm and more). `+ new trigger`. `display/triggers.md`
 - Totem pop: a trigger can pop an item (pet head, shard head, the real item). Trigger totem tab. `display/world-and-totem.md`
 - Trigger share codes: copy and import a trigger as a short code. **(no doc)**, `trigger/TriggerStore`
@@ -110,6 +111,7 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 
 - Key commands: a key or mouse button sends a command once per press. `/tacklebox keys`. **(no doc)**, `input/KeyCommands`, one line in `rules/text-and-automation.md`
 - Fish key: one key for fishing as a rebind. A press is a right click with the rod (cast, reel in, start the minigame), held in the minigame it is sneak. Key, unbound. `keys/fish-key.md`
+- Holding the use button with a rod does not reel back in: it takes a new press. Always on, on FishOnMC. `keys/fish-key.md`
 - Bait sort key: sorts the bait and lures in your inventory common to legendary, as one group. Key, unbound. `menus/bait-sort.md`
 - Command aliases, like `/sb 5` for `/sellall bait 5`. `aliases`. `chat/command-aliases.md`
 

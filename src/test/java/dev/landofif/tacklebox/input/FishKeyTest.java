@@ -21,6 +21,13 @@ class FishKeyTest {
     }
 
     @Test
+    void theGamesHeldUseIsOnlyDroppedWithARodOnFishOnMc() {
+        assertTrue(FishKey.dropHeldUse(true, true));
+        assertFalse(FishKey.dropHeldUse(false, true)); // food, blocks and the rest keep the game's repeat
+        assertFalse(FishKey.dropHeldUse(true, false)); // other servers and singleplayer stay vanilla
+    }
+
+    @Test
     void aPressIsOneRightClick() {
         assertTrue(FishKey.step(1, true, true, false, false));
         assertFalse(FishKey.sneaking());

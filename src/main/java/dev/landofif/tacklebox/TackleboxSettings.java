@@ -322,6 +322,8 @@ public class TackleboxSettings {
     public int farDisplayRange = 24;
     /** Draw the sky flat black with no sun, moon, stars or rain, and the fog black too. Only what you see, the server clock is untouched (mixin/SkyRenderingMixin). */
     public boolean blackSky = false;
+    /** Don't draw the outline around the block you are looking at (mixin/GameRendererMixin). */
+    public boolean hideBlockOutline = false;
     /** While your line is out, hide other players within this many blocks (2 to 12) of you or your bobber, and their nametags; crew and friends stay (display/NearbyPlayers). */
     public boolean hideNearPlayers = false;
     public int nearPlayersRange = 4;

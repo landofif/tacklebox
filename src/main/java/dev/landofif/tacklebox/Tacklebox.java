@@ -250,6 +250,7 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.hud.CryptidHud.tick(client);
             dev.landofif.tacklebox.hud.EquipmentRow.tick(client);
             dev.landofif.tacklebox.display.PetHeads.tick(client);
+            dev.landofif.tacklebox.display.PetRating.tick(client);
             dev.landofif.tacklebox.display.TotemPop.tick(client);
             dev.landofif.tacklebox.display.ChummerRing.tick(client);
             dev.landofif.tacklebox.input.KeyCommands.tick(client);

@@ -200,6 +200,9 @@ public final class TriggerEngine {
                 merge.add(result, trigger.title.chatColors ? colors : null);
                 MERGING.put(trigger.id, merge);
                 merge.title = fire(trigger, merge.joined(), merge.joinedColors());
+                if (RareDrops.isPet(trigger)) {
+                    dev.landofif.tacklebox.display.PetRating.await(merge.title, result.values().get("pet"));
+                }
             }
             if (trigger.hideMessage) {
                 show = false;

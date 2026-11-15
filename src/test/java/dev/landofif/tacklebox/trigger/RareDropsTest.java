@@ -1,6 +1,7 @@
 package dev.landofif.tacklebox.trigger;
 
 import dev.landofif.tacklebox.TackleboxSettings;
+import dev.landofif.tacklebox.display.PetRating;
 import dev.landofif.tacklebox.display.SoundQueue;
 import dev.landofif.tacklebox.display.TitleOverlay;
 import dev.landofif.tacklebox.display.TotemPop;
@@ -27,6 +28,8 @@ class RareDropsTest {
     @BeforeEach
     void setUp() {
         TriggerEngine.clock = () -> now[0];
+        PetRating.clock = () -> now[0];
+        PetRating.reset();
         TriggerEngine.playSound = s -> sounds++;
         TriggerEngine.assumeFishOnMc = true;
         TriggerEngine.forgetFires();
@@ -38,6 +41,8 @@ class RareDropsTest {
     @AfterEach
     void tearDown() {
         TriggerEngine.clock = System::currentTimeMillis;
+        PetRating.clock = System::currentTimeMillis;
+        PetRating.reset();
         TriggerEngine.playSound = SoundQueue::play;
         TriggerEngine.assumeFishOnMc = false;
         reset();
@@ -85,6 +90,9 @@ class RareDropsTest {
         assertNull(row("! [366] meowfih » RARE CATCH! You pulled 1x Prospecting Amulet"), "other players' drops never show");
         assertNull(row("! [366] meowfih » PET DROP! You pulled a Capybara Pet"));
         assertEquals(RareDrops.ROWS.size(), 7);
+        assertEquals(RareDrops.PET, row(" +  Lynx Pet"), "a quest's pet reward is a pet drop too");
+        assertNull(row(" + 2x Mediterranean Shard (x3)"));
+        assertNull(row(" - 🎣 Lynx Pet  \n    ┗ (0/1) ∞ x5\n"));
     }
 
     @Test
@@ -205,5 +213,47 @@ class RareDropsTest {
         oldPet.enabled = true; // luna switches it back on herself: not touched again
         assertFalse(RareDrops.migrate());
         assertTrue(oldPet.enabled);
+    }
+
+    private static String subtitle() {
+        return TitleOverlay.shown().get(0).subtitle().getString();
+    }
+
+    /** The whole way: the chat line shows the title, the pet turns up in the inventory a moment later, the title gets its rating. */
+    @Test
+    void petDropTitleGetsTheRatingOfThePetThatArrives() {
+        PetRating.scan(List.of(new PetRating.Item("old", "capybara", 12.5)));
+        chat("PET DROP! You pulled a [COMMON] Capybara Pet");
+        assertEquals(List.of("+ capybara pet"), titles());
+        assertEquals("", subtitle(), "the capybara that was there already is not the drop");
+        now[0] += 100;
+        PetRating.scan(List.of(new PetRating.Item("old", "capybara", 12.5), new PetRating.Item("new", "capybara", 93.4)));
+        assertEquals(List.of("+ capybara pet"), titles());
+        assertEquals("amazing 93.4%", subtitle());
+        assertEquals("a:fc54fc", TriggerColorsTest.chars(TitleOverlay.shown().get(0).subtitle()).get(0), "in the rating's colour");
+    }
+
+    @Test
+    void questPetShowsLikeAPetDropWithItsRating() {
+        chat(" + $5.4K (x3)");
+        chat(" + 2x Mediterranean Shard (x3)");
+        assertEquals(List.of(), titles());
+        PetRating.scan(List.of());
+        chat(" +  Lynx Pet");
+        assertEquals(List.of("+ lynx pet"), titles());
+        assertEquals(1, sounds);
+        PetRating.scan(List.of(new PetRating.Item("a", "lynx", 53.25)));
+        assertEquals("good 53.3%", subtitle());
+    }
+
+    @Test
+    void questPetFollowsThePetRowsSwitches() {
+        TackleboxSettings s = TackleboxSettings.get();
+        s.dropTitleOff.add(RareDrops.PET);
+        s.dropSoundOff.add(RareDrops.PET);
+        chat(" +  Lynx Pet");
+        assertEquals(List.of(), titles());
+        assertEquals(0, sounds);
+        PetRating.scan(List.of(new PetRating.Item("a", "lynx", 53.25))); // no title: nothing to add to, nothing breaks
     }
 }

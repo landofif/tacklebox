@@ -148,6 +148,47 @@ class FishKeyIntegrationTest {
     }
 
     /**
+     * The game's use key as MinecraftClient.handleInputEvents runs it: a press is a click, and while the button stays
+     * down it clicks again whenever the 4 tick cooldown is over. Returns the clicks made over the given button states.
+     */
+    private static int gameClicks(boolean[] downs, boolean rod, boolean fishOnMc) {
+        int clicks = 0, cooldown = 0;
+        boolean was = false;
+        for (boolean down : downs) {
+            if (cooldown > 0) {
+                cooldown--;
+            }
+            if (down && !was) { // the press
+                clicks++;
+                cooldown = 4;
+            }
+            if (down && cooldown == 0 && !FishKey.dropHeldUse(rod, fishOnMc)) { // the repeat while held
+                clicks++;
+                cooldown = 4;
+            }
+            was = down;
+        }
+        return clicks;
+    }
+
+    /**
+     * Holding the button with a rod (luna 2026-11-13: it uncast the bobber): the game's repeat reeled the line back in
+     * four ticks after the cast. Only the press clicks now, and it takes a release and a new press to reel in.
+     */
+    @Test
+    void holdingTheButtonDoesNotReelBackIn() {
+        boolean[] held = new boolean[40];
+        java.util.Arrays.fill(held, true);
+        assertEquals(10, gameClicks(held, false, true)); // the game's own repeat, as with any other item
+        assertEquals(1, gameClicks(held, true, true)); // with a rod: the cast and nothing more
+
+        boolean[] again = new boolean[40];
+        java.util.Arrays.fill(again, 0, 20, true);
+        java.util.Arrays.fill(again, 21, 40, true); // let go for one tick, pressed again
+        assertEquals(2, gameClicks(again, true, true)); // cast, reel in
+    }
+
+    /**
      * The fish key on right mouse: the game makes the right clicks itself (one per press here, as its use key does), the
      * mod never adds one, and in the minigame the game's click is dropped while the button is sneak.
      */

@@ -57,6 +57,14 @@ abstract class MinecraftClientMixin {
         return original.call(window, ChestScale.guiScale(ChestScale.isChest(currentScreen), TackleboxSettings.get().chestScale, guiScale), unicode);
     }
 
+    /** The second doItemUse call in handleInputEvents is the repeat while the use key is held; the first is the press. */
+    @WrapOperation(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;doItemUse()V", ordinal = 1))
+    private void tacklebox$heldUse(MinecraftClient client, Operation<Void> original) {
+        if (!dev.landofif.tacklebox.input.FishKey.dropHeldUse(client)) { // holding the button with a rod does not reel back in
+            original.call(client);
+        }
+    }
+
     @Inject(method = "doItemUse", at = @At("HEAD"), cancellable = true)
     private void tacklebox$use(CallbackInfo ci) {
         if (dev.landofif.tacklebox.input.FishKey.blockUse()) { // the fish key on right mouse is sneak in the minigame

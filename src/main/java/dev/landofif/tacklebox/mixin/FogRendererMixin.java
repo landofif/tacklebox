@@ -9,7 +9,7 @@ import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-/** The black sky setting: the fog in the air and under water is black too (vanilla draws no sky under water, only the fog colour). Lava and powder snow keep their colour. */
+/** The black sky setting: the fog in the air is black too. Under water, lava and powder snow keep vanilla's colour (the water fog is the biome's fixed dark blue, same at any hour, so it already reads as night). */
 @Mixin(FogRenderer.class)
 abstract class FogRendererMixin {
     @ModifyReturnValue(method = "getFogColor", at = @At("RETURN"))
@@ -19,6 +19,6 @@ abstract class FogRendererMixin {
     }
 
     private static boolean blackFor(CameraSubmersionType type) {
-        return type == CameraSubmersionType.ATMOSPHERIC || type == CameraSubmersionType.WATER;
+        return type == CameraSubmersionType.ATMOSPHERIC;
     }
 }

@@ -664,6 +664,8 @@ public final class SettingsPages {
                 });
         toggle("black sky", "makes the sky flat black, always midnight to your eyes: no sun, moon, stars, sunsets or rain. the server's real time and weather are untouched.",
                 () -> s.blackSky, v -> s.blackSky = v);
+        toggle("hide block outline", "hides the outline around the block you are looking at.",
+                () -> s.hideBlockOutline, v -> s.hideBlockOutline = v);
         link("particles", "switch off particle types, like rain splashes. lists every particle seen since the game started. a switched off type is hidden for everyone, your own too.", ParticleScreen::new);
         header("crowds");
         toggle("hide nearby players", "while your line is out, players near you or your bobber are not drawn, nor their nametags. crewmates and friends from foecollab stay. only on your screen.",

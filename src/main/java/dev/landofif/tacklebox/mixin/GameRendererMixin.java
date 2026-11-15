@@ -3,6 +3,7 @@ package dev.landofif.tacklebox.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import dev.landofif.tacklebox.TackleboxSettings;
 import dev.landofif.tacklebox.menu.ChestScale;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -11,6 +12,8 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.RenderTickCounter;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * The hud keeps the games gui scale while a server chest is open at its own (menu/ChestScale). Fabric draws hud
@@ -26,5 +29,11 @@ abstract class GameRendererMixin {
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderDeferredSubtitles()V"))
     private void tacklebox$lastHudScale(InGameHud hud, Operation<Void> original, @Local DrawContext context) {
         ChestScale.drawHud(MinecraftClient.getInstance(), context, () -> original.call(hud));
+    }
+
+    /** The "hide block outline" setting: no outline around the block you are looking at. */
+    @Inject(method = "shouldRenderBlockOutline", at = @At("HEAD"), cancellable = true)
+    private void tacklebox$hideBlockOutline(CallbackInfoReturnable<Boolean> cir) {
+        if (TackleboxSettings.get().hideBlockOutline) cir.setReturnValue(false);
     }
 }

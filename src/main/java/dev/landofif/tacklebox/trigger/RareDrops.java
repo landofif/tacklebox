@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Your own rare drops (pet drop, rare catch lines) as two built-in triggers that are not in /triggers. Which part of each drop
+ * Your own rare drops (pet drop, rare catch and quest pet lines) as built-in triggers that are not in /triggers. Which part of each drop
  * shows (title, totem pop, sound) is a setting per kind of drop ({@code dropTitleOff}, {@code dropPopOff}, {@code dropSoundOff}),
  * so the engine fires a copy of the built-in with those parts switched off.
  */
@@ -19,7 +19,7 @@ public final class RareDrops {
             AMULET = "amulet", BIGFOOT = "bigfoot", OTHER = "other";
 
     public static final List<Row> ROWS = List.of(
-            new Row(PET, "pet drop", "a pet drop."),
+            new Row(PET, "pet drop", "a pet drop, fished up or from a quest."),
             new Row(SHARD, "shards", "a shard of any climate."),
             new Row(BOTTLE, "lightning in a bottle", "a lightning in a bottle."),
             new Row(CAPSULE, "infusion capsule", "an infusion capsule."),
@@ -29,6 +29,9 @@ public final class RareDrops {
 
     private static final Trigger PET_DROP = builtIn(TriggerPresets.petDrop(), "builtin:pet-drop");
     private static final Trigger RARE_CATCH = builtIn(TriggerPresets.rareCatch(), "builtin:rare-catch");
+    /** A quest's pet reward, the line " + <rarity glyph> Lynx Pet" under the quest's other rewards. Shows like a pet drop, with the pet row's switches. */
+    static final String QUEST_PET_PATTERN = "^\\+ (?:\\[?(?<rarity>common|rare|epic|legendary|mythic|mythical)]? )?(?<pet>.+?) pet(?: \\(x\\d+\\))?$";
+    private static final Trigger QUEST_PET = builtIn(questPet(), "builtin:quest-pet");
 
     private RareDrops() {}
 
@@ -37,18 +40,29 @@ public final class RareDrops {
         return t;
     }
 
+    private static Trigger questPet() {
+        Trigger t = TriggerPresets.petDrop();
+        t.pattern = QUEST_PET_PATTERN;
+        return t;
+    }
+
     /** The built-in triggers while "rare drops" is on. */
     public static List<Trigger> triggers() {
-        return TackleboxSettings.get().rareDrops ? List.of(PET_DROP, RARE_CATCH) : List.of();
+        return TackleboxSettings.get().rareDrops ? List.of(PET_DROP, RARE_CATCH, QUEST_PET) : List.of();
     }
 
     public static boolean isBuiltIn(Trigger t) {
-        return t == PET_DROP || t == RARE_CATCH;
+        return t == PET_DROP || t == RARE_CATCH || t == QUEST_PET;
+    }
+
+    /** A pet drop or quest pet (the built-in or its copy from {@link #apply}): its title gets the pet's rating, see display/PetRating. */
+    public static boolean isPet(Trigger t) {
+        return PET_DROP.id.equals(t.id) || QUEST_PET.id.equals(t.id);
     }
 
     /** The kind of drop a line was: the pet drop trigger is a pet, a rare catch is told apart by its item. */
     public static String row(Trigger builtIn, Matcher.Result r) {
-        if (builtIn == PET_DROP) {
+        if (builtIn == PET_DROP || builtIn == QUEST_PET) {
             return PET;
         }
         String item = r.values().getOrDefault("item", "").toLowerCase(Locale.ROOT);
