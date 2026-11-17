@@ -8,7 +8,10 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +91,28 @@ public final class CatchTitle {
             case "frozen" -> "";
             default -> "";
         };
+    }
+
+    private static final List<String> RARITIES = List.of("common", "rare", "epic", "legendary", "mythical", "special");
+
+    /** The rarity whose badge a text holds (the server's catch subtitle, research section 2), "" when it has none. */
+    public static String rarityOf(String text) {
+        for (String r : RARITIES) {
+            if (text.contains(rarityBadge(r))) {
+                return r;
+            }
+        }
+        return "";
+    }
+
+    /** "fabled" or "trophy" when a text holds that variant's badge, else "normal": all a big catch needs from a subtitle. */
+    public static String variantOf(String text) {
+        for (String v : List.of("fabled", "trophy")) {
+            if (text.contains(variantBadge(v))) {
+                return v;
+            }
+        }
+        return "normal";
     }
 
     /** The server's colour of a size word, the text colour for one we do not know. */
@@ -292,6 +317,10 @@ public final class CatchTitle {
         } else if (w1 > 0) {
             line(ctx, tr, l1, -w1 / 2, (int) rows[1], alpha, s.catchShadow);
         }
+        long shine = sample ? -1 : BigCatch.shineStart(shownAt);
+        if (shine >= 0 && w1 > 0) {
+            shine(ctx, tr, v.fallback() != null ? v.fallback().asOrderedText() : ordered(l1), -w1 / 2, (int) rows[1], w1, a[0], now - shine);
+        }
         if (w2 > 0) {
             line(ctx, tr, l2, -w2 / 2, (int) rows[2], alpha, s.catchShadow);
         }
@@ -312,6 +341,33 @@ public final class CatchTitle {
             ctx.drawText(tr, Text.literal(seg.text()), x, y, alpha | seg.rgb(), shadow && !seg.art());
             x += tr.getWidth(seg.text());
         }
+    }
+
+    private static OrderedText ordered(List<Seg> line) {
+        MutableText out = Text.empty();
+        for (Seg seg : line) {
+            out.append(seg.text());
+        }
+        return out.asOrderedText();
+    }
+
+    /**
+     * A big catch's light band ({@link BigCatch#shine}) over line 1, {@code t} ms after it started: each letter drawn once more
+     * in the band's colour, as strong as the band is on it. Badges and other pack pictures are left alone.
+     */
+    private static void shine(DrawContext ctx, TextRenderer tr, OrderedText line, int x, int y, int width, float alpha, long t) {
+        int rgb = BigCatch.shineColor();
+        int[] left = {x};
+        line.accept((index, style, cp) -> {
+            Text letter = Text.literal(Character.toString(cp)).setStyle(style.withColor((TextColor) null));
+            int w = tr.getWidth(letter);
+            int a = Math.round(BigCatch.shine((left[0] + w / 2f - x) / width, t) * alpha * 255);
+            if (a > 4 && !Glyphs.isArt(cp) && !Character.isWhitespace(cp)) {
+                ctx.drawText(tr, letter, left[0], y, a << 24 | rgb, false);
+            }
+            left[0] += w;
+            return true;
+        });
     }
 
     /**

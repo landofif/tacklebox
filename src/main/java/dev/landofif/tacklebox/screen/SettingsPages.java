@@ -634,6 +634,22 @@ public final class SettingsPages {
         main();
         color("line colour", "the colour of your fishing line.",
                 () -> s.lineColor, v -> s.lineColor = v);
+        header("water", "prismarine_crystals");
+        toggle("water rings", "thin rings on the water at your own bobber: quicker ones while a fish swims in, a small wake behind the fish and one ring where you caught it. they grow a little and fade. only your own bobber and fish.",
+                () -> s.waterFx, v -> s.waterFx = v);
+        main();
+        toggle("bite rings", "rings at your bobber while a fish swims to it, coming quicker as it gets close, and a bigger one on the bite. they follow the same fish particles as the bite countdown.",
+                () -> s.waterBiteRings, v -> s.waterBiteRings = v);
+        toggle("fish wake", "small fainter rings behind the fish as it swims to your bobber.",
+                () -> s.waterWake, v -> s.waterWake = v);
+        toggle("catch ring", "one ring where your bobber was when you catch a fish, in its rarity colour. commons get a faint white one.",
+                () -> s.waterCatchRing, v -> s.waterCatchRing = v);
+        toggle("catch sparkles", "a few slow dust sparkles in the rarity colour where you caught a legendary fish or better. switching off the dust particle hides them too.",
+                () -> s.waterSparkles, v -> s.waterSparkles = v);
+        slider("water ring opacity", "how strong the rings are when they start.", 5, 100, 5, "%",
+                () -> s.waterOpacity, v -> s.waterOpacity = (int) Math.round(v));
+        color("water ring colour", "the colour of the bite rings and the wake. the catch ring takes the fish's rarity colour.",
+                () -> s.waterColor, v -> s.waterColor = v);
         header("catch title", "tropical_fish");
         toggle("catch title", "when you catch a fish: its picture, under it the rarity badge and the name, under that the size with weight and length. the lines come from the fish in your inventory, so with a full inventory only the server's own line shows. move it with move huds.",
                 () -> s.catchTitle, v -> s.catchTitle = v);
@@ -668,6 +684,26 @@ public final class SettingsPages {
                 TackleboxSettings.BiteAnim.values(), k -> k.label, () -> s.catchAnim, v -> s.catchAnim = v);
         slider("catch title size", "how big the whole catch title is. scrolling it in move huds does the same.", 50, 400, 10, "%",
                 () -> s.catchScale, v -> s.catchScale = (int) Math.round(v));
+        header("big catches", "nether_star");
+        toggle("big catch moment", "when you catch a fabled, trophy, mythical or gigantic fish: a soft glow in its colour at the edges of the screen, one light sweep over the catch title's name and a sound. nothing moves or flashes.",
+                () -> s.bigCatch, v -> s.bigCatch = v);
+        main();
+        toggle("fabled catches", "fabled fish get the moment. a fish that is several kinds gets the first one that is on: fabled, trophy, mythical, gigantic.",
+                () -> s.bigFabled, v -> s.bigFabled = v);
+        toggle("trophy catches", "trophy fish get the moment.",
+                () -> s.bigTrophy, v -> s.bigTrophy = v);
+        toggle("mythical catches", "mythical fish get the moment.",
+                () -> s.bigMythical, v -> s.bigMythical = v);
+        toggle("gigantic catches", "gigantic fish get the moment. with a full inventory the size is not known, so they get none.",
+                () -> s.bigGigantic, v -> s.bigGigantic = v);
+        toggle("edge glow", "a soft glow in the fish's colour that fades in and out at the edges of the screen.",
+                () -> s.bigGlow, v -> s.bigGlow = v);
+        slider("edge glow strength", "how strong the edge glow gets at its peak.", 5, 100, 5, "%",
+                () -> s.bigGlowOpacity, v -> s.bigGlowOpacity = (int) Math.round(v));
+        toggle("title shine", "one light band sweeps across the name on the catch title. needs the catch title on.",
+                () -> s.bigShine, v -> s.bigShine = v);
+        toggle("big catch sound", "a sound for each kind: a deep one for fabled, a bell chord for trophy, level up for mythical, an amethyst chime for gigantic.",
+                () -> s.bigSound, v -> s.bigSound = v);
         header("rare drops", "prismarine_shard");
         toggle("rare drops", "your own pet drops and rare catches (shards, lightning in a bottle, infusion capsules, prospecting amulets, bigfoot items) show a title, pop their item in the totem animation and play a sound. these are built in, not triggers. other players drops never show.",
                 () -> s.rareDrops, v -> s.rareDrops = v);

@@ -471,6 +471,29 @@ public class TackleboxSettings {
     /** Hide the server's own catch title and subtitle while the catch title is on. */
     public boolean catchHideTitle = true;
 
+    // ---- water rings (display/WaterRings): at your own bobber while a fish swims in, behind the fish, where you caught it ----
+    public boolean waterFx = false;
+    public boolean waterBiteRings = true;
+    public boolean waterWake = true;
+    public boolean waterCatchRing = true;
+    public boolean waterSparkles = true;
+    /** Percent; how strong a ring is when it starts. */
+    public int waterOpacity = 60;
+    /** RGB of the bite rings and the wake; the catch ring takes the fish's rarity colour. */
+    public int waterColor = 0xD8F0FF;
+
+    // ---- big catch moment (display/BigCatch): fabled, trophy, mythical and gigantic fish ----
+    public boolean bigCatch = false;
+    public boolean bigFabled = true;
+    public boolean bigTrophy = true;
+    public boolean bigMythical = true;
+    public boolean bigGigantic = true;
+    public boolean bigGlow = true;
+    public boolean bigShine = true;
+    public boolean bigSound = true;
+    /** Percent; how strong the edge glow gets at its peak. */
+    public int bigGlowOpacity = 35;
+
     // ---- viewmodel (held item) ----
     public boolean viewmodel = false;
     public double vmScale = 1.0;
@@ -607,6 +630,9 @@ public class TackleboxSettings {
         catchX = Math.max(0, Math.min(100, catchX));
         catchY = Math.max(0, Math.min(100, catchY));
         catchColor &= 0xFFFFFF;
+        waterOpacity = Math.max(5, Math.min(100, waterOpacity));
+        waterColor &= 0xFFFFFF;
+        bigGlowOpacity = Math.max(5, Math.min(100, bigGlowOpacity));
         if (swingStyle == null) swingStyle = SwingStyle.NORMAL;
         if (equipPlace == null) equipPlace = EquipPlace.ABOVE;
         if (rarityShape == null) rarityShape = RarityShape.CIRCLE;

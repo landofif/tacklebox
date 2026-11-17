@@ -108,6 +108,7 @@ public final class Tacklebox implements ClientModInitializer {
         dev.landofif.tacklebox.hud.NowPlaying.start();
         dev.landofif.tacklebox.display.FlatLeaves.register();
         dev.landofif.tacklebox.display.ChummerRing.register();
+        dev.landofif.tacklebox.display.WaterRingRenderer.register();
         dev.landofif.tacklebox.display.ScreenshotPreview.register();
 
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
@@ -198,6 +199,7 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.hud.ServerHud.reset();
             dev.landofif.tacklebox.hud.BoostsHud.reset();
             dev.landofif.tacklebox.display.ChummerRing.reset();
+            dev.landofif.tacklebox.display.WaterRings.reset();
             dev.landofif.tacklebox.input.FishKey.reset();
             dev.landofif.tacklebox.chat.DryStreaks.reset();
             dev.landofif.tacklebox.hud.GearCheck.reset();
@@ -231,6 +233,13 @@ public final class Tacklebox implements ClientModInitializer {
             dev.landofif.tacklebox.display.BobberTimer.renderHud(context);
             dev.landofif.tacklebox.display.CatchTitle.renderHud(context);
         });
+        // the big catch edge glow: over the vanilla overlays (vignette, pumpkin), under the crosshair, hotbar and titles
+        HudElementRegistry.attachElementAfter(net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements.MISC_OVERLAYS,
+                Identifier.of(MOD_ID, "big_catch_glow"), (context, tickCounter) -> {
+                    if (!MinecraftClient.getInstance().options.hudHidden) {
+                        dev.landofif.tacklebox.display.BigCatch.renderHud(context);
+                    }
+                });
         HudElementRegistry.attachElementAfter(net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements.CHAT,
                 Identifier.of(MOD_ID, "chat_boxes"), (context, tickCounter) -> {
                     if (!dev.landofif.tacklebox.hud.HudMover.isMover(MinecraftClient.getInstance().currentScreen)) { // it draws the boxes itself
@@ -266,6 +275,7 @@ public final class Tacklebox implements ClientModInitializer {
             ServerInfo.tick(client);
             XpEstimate.tick(client);
             dev.landofif.tacklebox.display.BobberTimer.tick(client);
+            dev.landofif.tacklebox.display.WaterRingRenderer.tick(client); // after the bobber timer, which resets the countdown
             dev.landofif.tacklebox.display.RodIdle.tick(client);
             dev.landofif.tacklebox.hud.CryptidHud.tick(client);
             dev.landofif.tacklebox.hud.TimersHud.tick(client);

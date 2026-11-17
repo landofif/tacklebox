@@ -29,9 +29,17 @@ public final class CatchWatch {
     public record Fish(UUID id, String fish, String variant, String size, String location) {}
 
     static final long WINDOW = 3000;
+    /** No fish item this long after the title (full inventory): the catch effects go by the server's subtitle, like the catch title. */
+    static final long FALLBACK_MS = CatchTitle.FALLBACK_MS;
+    /** A subtitle this close to the catch title, before or after it, is that catch's. */
+    static final long SUBTITLE_MS = CatchTitle.SUBTITLE_MS;
 
     private static Set<UUID> before;
     private static long until;
+    /** The last catch title, whether its catch effects ran, and the last subtitle with a rarity badge. */
+    private static long titleAt, subtitleAt;
+    private static boolean effectsDone;
+    private static String subtitle = "";
 
     private CatchWatch() {}
 
@@ -66,6 +74,42 @@ public final class CatchWatch {
             }
         }
         until = now + WINDOW;
+        titleAt = now;
+        effectsDone = false;
+        BigCatch.clear();
+    }
+
+    /** The server's subtitle: one with a rarity badge is kept for a catch whose fish never reaches the inventory. */
+    public static void onSubtitle(String text, long now) {
+        if (text != null && !CatchTitle.rarityOf(text).isEmpty()) {
+            subtitle = text;
+            subtitleAt = now;
+        }
+    }
+
+    /** What a catch of yours shows on the water and the screen, once per catch title: the catch ring and the big catch moment. */
+    static void effects(String rarity, String variant, String size, long now) {
+        effectsDone = true;
+        WaterRings.Spot spot = WaterRings.onCatch(rarity, now);
+        if (spot != null) {
+            WaterRingRenderer.sparkles(spot, rarity, WaterRings.sparkles(rarity));
+        }
+        BigCatch.onCatch(rarity, variant, size, now);
+    }
+
+    /**
+     * No fish item {@link #FALLBACK_MS} after the title (full inventory): the effects go by the subtitle's badges, so rarity,
+     * mythical, fabled and trophy are known but gigantic is not. Gives up once no subtitle came within {@link #SUBTITLE_MS}.
+     */
+    static void fallback(long now) {
+        if (effectsDone || titleAt == 0 || now - titleAt < FALLBACK_MS) {
+            return;
+        }
+        if (subtitleAt != 0 && Math.abs(subtitleAt - titleAt) <= SUBTITLE_MS) {
+            effects(CatchTitle.rarityOf(subtitle), CatchTitle.variantOf(subtitle), "", now);
+        } else if (now - titleAt > SUBTITLE_MS) {
+            effectsDone = true;
+        }
     }
 
     /** The new fish of yours, once, while a catch title is fresh; null otherwise. */
@@ -100,7 +144,9 @@ public final class CatchWatch {
         }
         long now = System.currentTimeMillis();
         Fish f = check(inventory(mc), mc.player.getUuid(), now);
-        if (f != null) {
+        if (f == null) {
+            fallback(now);
+        } else {
             onCatch(f, now);
             String name = f.fish().replace('_', ' '), rarity = "", group = "";
             for (ItemStack stack : mc.player.getInventory().getMainStacks()) { // the catch title wants the item: its name, weight and length
@@ -111,6 +157,9 @@ public final class CatchWatch {
                     name = CatchTitle.read(c.copyNbt(), stack.getName().getString()).name();
                     rarity = c.copyNbt().getString("rarity").orElse("");
                     group = c.copyNbt().getString("group").orElse("");
+                    if (!effectsDone) {
+                        effects(rarity, f.variant(), f.size(), now);
+                    }
                     break;
                 }
             }

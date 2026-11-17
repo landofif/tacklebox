@@ -69,6 +69,7 @@ abstract class InGameHudOverlayMixin {
 
     @Inject(method = "setSubtitle", at = @At("TAIL"))
     private void tacklebox$catchSubtitle(Text shown, CallbackInfo ci) {
+        dev.landofif.tacklebox.display.CatchWatch.onSubtitle(shown == null ? null : shown.getString(), System.currentTimeMillis());
         if (dev.landofif.tacklebox.display.CatchTitle.onSubtitle(shown, System.currentTimeMillis())) {
             this.subtitle = null;
         }

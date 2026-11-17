@@ -37,7 +37,7 @@ class SettingsTilesIntegrationTest {
         assertEquals(List.of("quests left", "level progress", "active boosts", "event", "mini event", "cryptids", "timers", "wrong gear",
                 "server hud", "now playing"), groups(pages, "huds"));
         assertEquals(List.of("equipment", "inventory hud", "slots left"), groups(pages, "inventory"));
-        assertEquals(List.of("bobber", "skin", "line", "catch title", "rare drops", "chummer"), groups(pages, "fishing"));
+        assertEquals(List.of("bobber", "skin", "line", "water", "catch title", "big catches", "rare drops", "chummer"), groups(pages, "fishing"));
         assertEquals(List.of("chat", "dry streaks"), groups(pages, "chat"));
         assertEquals(List.of("nametags", "clutter", "crowds", "lag", "screenshots"), groups(pages, "world"));
     }
@@ -118,6 +118,8 @@ class SettingsTilesIntegrationTest {
         assertEquals("inventory hud", tile(pages, "inventory", "inventory hud").main().name);
         assertEquals("slots left hud", tile(pages, "inventory", "slots left").main().name);
         assertEquals("catch title", tile(pages, "fishing", "catch title").main().name);
+        assertEquals("water rings", tile(pages, "fishing", "water").main().name);
+        assertEquals("big catch moment", tile(pages, "fishing", "big catches").main().name);
         assertNull(tile(pages, "look", "hotbar").main(), "the hotbar has no on/off");
     }
 }

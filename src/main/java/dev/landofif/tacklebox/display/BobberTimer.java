@@ -59,15 +59,17 @@ public final class BobberTimer {
     }
 
     /**
-     * Every particle packet. Feeds the bite countdown with the fish's approach particles of your own bobber:
-     * the bobber whose line to the particle is most perpendicular to its sideways speed is the one that sent it
-     * ({@link OwnFish}). Returns true to drop the particle: "only my fish" is on and it swims to someone else's bobber.
+     * Every particle packet. Feeds the bite countdown and the water rings' wake ({@link WaterRings}) with the fish's approach
+     * particles of your own bobber: the bobber whose line to the particle is most perpendicular to its sideways speed is the
+     * one that sent it ({@link OwnFish}). Returns true to drop the particle: "only my fish" is on and it swims to someone
+     * else's bobber.
      */
     public static boolean onParticle(ParticleS2CPacket packet) {
         MinecraftClient client = MinecraftClient.getInstance();
         TackleboxSettings s = TackleboxSettings.get();
         boolean countdown = s.timerStyle == TackleboxSettings.TimerStyle.COUNTDOWN;
-        if ((!countdown && !s.ownFishOnly) || !client.isOnThread() || client.world == null) {
+        boolean water = WaterRings.wantsApproach(s); // the bite rings follow the countdown too
+        if ((!countdown && !water && !s.ownFishOnly) || !client.isOnThread() || client.world == null) {
             return false; // the handler also runs on the network thread first
         }
         if (packet.getCount() != 0 || packet.getParameters().getType() != ParticleTypes.FISHING) {
@@ -82,9 +84,13 @@ public final class BobberTimer {
         double px = packet.getX(), pz = packet.getZ();
         FishingBobberEntity mine = own(client);
         FishingBobberEntity owner = OwnFish.owner(px, pz, packet.getOffsetX(), packet.getOffsetZ(), bobbers, Entity::getX, Entity::getZ);
-        if (countdown && owner != null && owner == mine) {
+        if ((countdown || water) && owner != null && owner == mine) {
+            long now = System.currentTimeMillis();
             double dx = px - mine.getX(), dz = pz - mine.getZ();
-            BiteCountdown.onApproach(Math.sqrt(dx * dx + dz * dz), System.currentTimeMillis());
+            BiteCountdown.onApproach(Math.sqrt(dx * dx + dz * dz), now);
+            if (water) {
+                WaterRings.onWake(px, WaterRingRenderer.waterTop(client.world, px, packet.getY(), pz), pz, now);
+            }
         }
         return OwnFish.drops(s.ownFishOnly, owner, mine);
     }
@@ -95,13 +101,14 @@ public final class BobberTimer {
         if (title == null || !"BITE!".equals(title.getString())) {
             return false;
         }
-        BiteCountdown.onBite(System.currentTimeMillis());
+        long now = System.currentTimeMillis();
+        BiteCountdown.onBite(now);
+        WaterRings.onBite(now);
         if (!s.biteOn) {
             return false;
         }
         MinecraftClient client = MinecraftClient.getInstance();
         FishingBobberEntity hook = own(client);
-        long now = System.currentTimeMillis();
         if (hook != null && hook.getId() != reeledId && now - lastBiteTitle > BITE_GAP_MS) {
             biteAt = now;
         }

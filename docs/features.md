@@ -51,6 +51,8 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 - Only my fish: hide the fish particles swimming to other players' bobbers. `ownFishOnly`, off. `display/world-and-totem.md`
 - Particle switches: switch off any particle type seen this session (rain splashes and more). World page > particles, `hiddenParticles`. `display/world-and-totem.md`
 - Chummer range ring. `chummerRing`, `chummerRingColor`, off. `huds/chummer-range.md`
+- Water rings at your own bobber: quicker rings while a fish swims in and a bigger one on the bite, a wake of small rings behind the fish, one ring in the rarity colour where you caught it (commons faint white) and dust sparkles for legendary and up. `waterFx`, off; a switch per part, `waterOpacity` (60%), `waterColor`. `display/catch-effects.md`
+- Big catch moment for fabled, trophy, mythical and gigantic fish: an edge glow in the fish's colour that fades in and out, one light sweep over the catch title's name, a sound per kind. `bigCatch`, off; a switch per kind and part, `bigGlowOpacity` (35%). `display/catch-effects.md`
 - Screenshot preview: F2 copies to the clipboard and slides in at the top right. `screenshotPreview`, off. `display/screenshots.md`
 - Word swaps: replace any phrase wherever the game draws text. `/tacklebox words` (list empty by default). **(no doc)**, `display/WordSwap`
 - Held item viewmodel: size, position, rotation, no equip dip. `/tacklebox viewmodel`, off. **(no doc)**, `screen/ViewmodelScreen`

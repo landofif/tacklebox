@@ -12,7 +12,7 @@ Read the index for your area first. Do not read every doc.
 | Huds | Server hud, boosts, now playing, quests left, mini event, bobber timer, catch title, wrong pet and armor warning, chummer range ring | `huds/index.md` |
 | Menus | Fishonmc menu, travel map, pet prices, vaults, power, compendium, bait picker, presets | `menus/index.md` |
 | Keys | Fish key (one key for fishing), bait sort key, key commands | `keys/index.md` |
-| Display | World tweaks ported from fishutils, chat triggers, totem pop, screenshot preview | `display/index.md` |
+| Display | World tweaks ported from fishutils, chat triggers, totem pop, screenshot preview, water rings and the big catch moment | `display/index.md` |
 | Dev | Build, CI, dev run, F8 gui dump, rename, logo | `dev/index.md` |
 | Credits | FOE+ (itshaxr), FOE-R (DannyPX), FOECollab (Kimberlyow), the pet price sheet: who each idea and table came from | `credits.md` |
 | Server knowledge | Chat lines, glyph codepoints, item NBT, scoreboard, menus | `fishonmc-research.md` (one file, read the section you need) |
