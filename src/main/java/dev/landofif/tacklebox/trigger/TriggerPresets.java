@@ -58,7 +58,7 @@ public final class TriggerPresets {
         Trigger t = preset("pet drop");
         t.mode = Trigger.MatchMode.REGEX;
         t.pattern = PET_DROP;
-        t.title.title = "&l+ {pet.lower} pet";
+        t.title.title = "&l+ {pet} Pet"; // the server's capitals: "+ Capybara Pet"; display/PetRating adds the rating at the end
         t.title.titleColor = "#fd95f6";
         t.title.animation = Trigger.Animation.SHAKE;
         t.totem.enabled = true;
@@ -97,7 +97,7 @@ public final class TriggerPresets {
         Trigger t = preset("rare catch");
         t.mode = Trigger.MatchMode.REGEX;
         t.pattern = RARE_CATCH;
-        t.title.title = "&l+ {item.lower}";
+        t.title.title = "&l+ {item}"; // the server's capitals: "+ Lightning in a Bottle"
         t.title.titleColor = "#ffaa00";
         t.title.animation = Trigger.Animation.POP;
         t.totem.enabled = true;

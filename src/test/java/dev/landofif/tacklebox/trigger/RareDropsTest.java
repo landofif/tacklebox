@@ -98,7 +98,7 @@ class RareDropsTest {
     @Test
     void everythingOnByDefault() {
         chat("RARE CATCH! You pulled a 1x Subtropical Shard");
-        assertEquals(List.of("+ subtropical shard"), titles());
+        assertEquals(List.of("+ Subtropical Shard"), titles());
         assertEquals("Subtropical Shard", TotemPop.last());
         assertEquals(1, sounds, "one sound request, the queue repeats it");
     }
@@ -110,18 +110,18 @@ class RareDropsTest {
         assertEquals("", shown.subtitle().getString());
         List<String> chars = TriggerColorsTest.chars(shown.title());
         assertEquals("+:ffaa00:b", chars.get(0));
-        assertEquals("s:55ff55:b", chars.get(2));
+        assertEquals("S:55ff55:b", chars.get(2));
     }
 
     @Test
     void countShowsOnlyWhenMoreThanOne() {
         chat("RARE CATCH! You pulled a 3x Arctic Shard");
-        assertEquals(List.of("+3 arctic shard"), titles());
+        assertEquals(List.of("+3 Arctic Shard"), titles());
         assertEquals("Arctic Shard", TotemPop.last());
         TitleOverlay.clear();
         now[0] += 60_000;
         chat("RARE CATCH! You pulled a 1x Arctic Shard");
-        assertEquals(List.of("+ arctic shard"), titles());
+        assertEquals(List.of("+ Arctic Shard"), titles());
     }
 
     private static List<String> titles() {
@@ -142,7 +142,7 @@ class RareDropsTest {
         TackleboxSettings.get().dropPopOff.add(RareDrops.PET);
         String before = TotemPop.last();
         chat("PET DROP! You pulled a [COMMON] Capybara Pet");
-        assertEquals(List.of("+ capybara pet"), titles());
+        assertEquals(List.of("+ Capybara Pet"), titles());
         assertEquals(before, TotemPop.last(), "no pop for the pet");
     }
 
@@ -150,7 +150,7 @@ class RareDropsTest {
     void soundOffIsSilent() {
         TackleboxSettings.get().dropSoundOff.add(RareDrops.BOTTLE);
         chat("RARE CATCH! You pulled 1x Lightning in a Bottle");
-        assertEquals(List.of("+ lightning in a bottle"), titles());
+        assertEquals(List.of("+ Lightning in a Bottle"), titles());
         assertEquals(0, sounds);
     }
 
@@ -158,7 +158,7 @@ class RareDropsTest {
     void oneKindOffLeavesTheOthers() {
         TackleboxSettings.get().dropTitleOff.add(RareDrops.SHARD);
         chat("RARE CATCH! You pulled 1x Lightning in a Bottle");
-        assertEquals(List.of("+ lightning in a bottle"), titles());
+        assertEquals(List.of("+ Lightning in a Bottle"), titles());
     }
 
     @Test
@@ -219,18 +219,20 @@ class RareDropsTest {
         return TitleOverlay.shown().get(0).subtitle().getString();
     }
 
-    /** The whole way: the chat line shows the title, the pet turns up in the inventory a moment later, the title gets its rating. */
+    /** The whole way: the chat line shows the title, the pet turns up in the inventory a moment later, its percent goes at the end of the title. */
     @Test
     void petDropTitleGetsTheRatingOfThePetThatArrives() {
         PetRating.scan(List.of(new PetRating.Item("old", "capybara", 12.5)));
         chat("PET DROP! You pulled a [COMMON] Capybara Pet");
-        assertEquals(List.of("+ capybara pet"), titles());
-        assertEquals("", subtitle(), "the capybara that was there already is not the drop");
+        assertEquals(List.of("+ Capybara Pet"), titles(), "the capybara that was there already is not the drop");
         now[0] += 100;
         PetRating.scan(List.of(new PetRating.Item("old", "capybara", 12.5), new PetRating.Item("new", "capybara", 93.4)));
-        assertEquals(List.of("+ capybara pet"), titles());
-        assertEquals("amazing 93.4%", subtitle());
-        assertEquals("a:fc54fc", TriggerColorsTest.chars(TitleOverlay.shown().get(0).subtitle()).get(0), "in the rating's colour");
+        assertEquals(List.of("+ Capybara Pet 93.4%"), titles(), "the percent, not the rating's word");
+        assertEquals("", subtitle(), "no subtitle");
+        List<String> chars = TriggerColorsTest.chars(TitleOverlay.shown().get(0).title());
+        assertEquals("+:fd95f6:b", chars.get(0), "the title keeps its own colour");
+        assertEquals("9:fc54fc:b", chars.get(chars.size() - 5), "the percent in the rating's colour, bold like the title");
+        assertEquals("%:fc54fc:b", chars.get(chars.size() - 1));
     }
 
     @Test
@@ -240,10 +242,10 @@ class RareDropsTest {
         assertEquals(List.of(), titles());
         PetRating.scan(List.of());
         chat(" +  Lynx Pet");
-        assertEquals(List.of("+ lynx pet"), titles());
+        assertEquals(List.of("+ Lynx Pet"), titles());
         assertEquals(1, sounds);
         PetRating.scan(List.of(new PetRating.Item("a", "lynx", 53.25)));
-        assertEquals("good 53.3%", subtitle());
+        assertEquals(List.of("+ Lynx Pet 53.3%"), titles());
     }
 
     @Test

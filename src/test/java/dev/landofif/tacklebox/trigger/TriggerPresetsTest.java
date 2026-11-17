@@ -47,7 +47,7 @@ class TriggerPresetsTest {
             assertEquals(l[1], v.get("n"), l[0]);
             assertEquals(l[2], v.get("item"), l[0]);
             assertEquals(l[2], TriggerEngine.fill(t.totem.item, v));
-            assertEquals("&l+ " + l[2].toLowerCase(), TriggerEngine.fill(t.title.title, v));
+            assertEquals("&l+ " + l[2], TriggerEngine.fill(t.title.title, v), "the server's capitals");
             assertEquals("", t.title.subtitle);
         }
     }
@@ -82,7 +82,7 @@ class TriggerPresetsTest {
             assertNotNull(v, l[0]);
             assertEquals(l[1], v.get("pet"), l[0]);
             assertEquals("pet:" + l[1], TriggerEngine.fill(t.totem.item, v));
-            assertEquals("&l+ " + l[1].toLowerCase() + " pet", TriggerEngine.fill(t.title.title, v));
+            assertEquals("&l+ " + l[1] + " Pet", TriggerEngine.fill(t.title.title, v), "the server's capitals");
             assertEquals("", t.title.subtitle);
         }
     }

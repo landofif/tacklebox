@@ -90,7 +90,7 @@ public final class RareDrops {
         t.sound.enabled = sound;
         String n = r.values().get("n");
         if (n != null && !n.equals("1")) {
-            t.title.title = "&l+" + n + " {item.lower}"; // "+3 arctic shard"; one is just "+ arctic shard"
+            t.title.title = "&l+" + n + " {item}"; // "+3 Arctic Shard"; one is just "+ Arctic Shard"
         }
         return t;
     }

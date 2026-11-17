@@ -30,15 +30,15 @@ class PetRatingTest {
     }
 
     private static TitleOverlay.Shown title(String pet) {
-        return TitleOverlay.show("builtin:pet-drop", new Trigger.TitleSettings(), "+ " + pet + " pet", "");
+        return TitleOverlay.show("builtin:pet-drop", new Trigger.TitleSettings(), "+ " + pet + " Pet", "");
     }
 
     private static PetRating.Item pet(String id, String kind, double rating) {
         return new PetRating.Item(id, kind, rating);
     }
 
-    private static String sub(TitleOverlay.Shown shown) {
-        return shown.subtitle().getString();
+    private static String text(TitleOverlay.Shown shown) {
+        return shown.title().getString();
     }
 
     @Test
@@ -58,23 +58,25 @@ class PetRatingTest {
     }
 
     @Test
-    void lineIsTheWordAndOneDecimalInTheWordsColour() {
-        assertEquals("&#fc54fcamazing 93.4%", PetRating.line(93.4));
-        assertEquals("&#54fc54good 53.0%", PetRating.line(53));
-        assertEquals("&#a800a8perfect 100.0%", PetRating.line(100));
+    void percentHasOneDecimalInTheRatingsColourAndIsBold() {
+        assertEquals("&#fc54fc&l 93.4%", PetRating.percent(93.4));
+        assertEquals("&#54fc54&l 53.0%", PetRating.percent(53));
+        assertEquals("&#a800a8&l 100.0%", PetRating.percent(100));
     }
 
     @Test
     void petThatArrivesAfterTheLine() {
         PetRating.scan(List.of());
-        TitleOverlay.Shown shown = title("lynx");
+        TitleOverlay.Shown shown = title("Lynx");
         PetRating.await(shown, "Lynx");
         PetRating.scan(List.of());
-        assertEquals("", sub(shown));
+        assertEquals("+ Lynx Pet", text(shown));
         now[0] += 400;
         PetRating.scan(List.of(pet("a", "lynx", 71.5)));
-        assertEquals("great 71.5%", sub(shown));
-        assertEquals("+ lynx pet", shown.title().getString(), "the title stays");
+        assertEquals("+ Lynx Pet 71.5%", text(shown));
+        assertEquals("", shown.subtitle().getString(), "no subtitle");
+        PetRating.scan(List.of(pet("a", "lynx", 71.5)));
+        assertEquals("+ Lynx Pet 71.5%", text(shown), "added once");
     }
 
     @Test
@@ -83,56 +85,56 @@ class PetRatingTest {
         now[0] += 50;
         PetRating.scan(List.of(pet("a", "lynx", 71.5)));
         now[0] += 50;
-        TitleOverlay.Shown shown = title("lynx");
+        TitleOverlay.Shown shown = title("Lynx");
         PetRating.await(shown, "Lynx");
         PetRating.scan(List.of(pet("a", "lynx", 71.5)));
-        assertEquals("great 71.5%", sub(shown));
+        assertEquals("+ Lynx Pet 71.5%", text(shown));
     }
 
     @Test
     void petsThatWereThereAlreadyAndOtherKindsAreNotTheDrop() {
         PetRating.scan(List.of(pet("old", "lynx", 10))); // the first look: here since before
         now[0] += 50;
-        TitleOverlay.Shown shown = title("lynx");
+        TitleOverlay.Shown shown = title("Lynx");
         PetRating.await(shown, "Lynx");
         PetRating.scan(List.of(pet("old", "lynx", 10), pet("fox", "fox", 99)));
-        assertEquals("", sub(shown));
+        assertEquals("+ Lynx Pet", text(shown));
         PetRating.scan(List.of(pet("old", "lynx", 10), pet("fox", "fox", 99), pet("new", "lynx", 45)));
-        assertEquals("average 45.0%", sub(shown));
+        assertEquals("+ Lynx Pet 45.0%", text(shown));
     }
 
     @Test
     void twoWordNamesMatchTheItemsKind() {
         PetRating.scan(List.of());
-        TitleOverlay.Shown shown = title("marsh rabbit");
+        TitleOverlay.Shown shown = title("Marsh Rabbit");
         PetRating.await(shown, "Marsh Rabbit");
         PetRating.scan(List.of(pet("a", "marshrabbit", 88)));
-        assertEquals("excellent 88.0%", sub(shown));
+        assertEquals("+ Marsh Rabbit Pet 88.0%", text(shown));
     }
 
     @Test
     void twoDropsGetTheirOwnPets() {
         PetRating.scan(List.of());
-        TitleOverlay.Shown first = title("lynx");
+        TitleOverlay.Shown first = title("Lynx");
         PetRating.await(first, "Lynx");
         PetRating.scan(List.of(pet("a", "lynx", 25)));
         now[0] += 1000;
-        TitleOverlay.Shown second = title("lynx");
+        TitleOverlay.Shown second = title("Lynx");
         PetRating.await(second, "Lynx");
         PetRating.scan(List.of(pet("a", "lynx", 25)));
-        assertEquals("", sub(second), "the first drop's pet is not used twice");
+        assertEquals("+ Lynx Pet", text(second), "the first drop's pet is not used twice");
         PetRating.scan(List.of(pet("a", "lynx", 25), pet("b", "lynx", 95)));
-        assertEquals("bad 25.0%", sub(first));
-        assertEquals("amazing 95.0%", sub(second));
+        assertEquals("+ Lynx Pet 25.0%", text(first));
+        assertEquals("+ Lynx Pet 95.0%", text(second));
     }
 
     @Test
     void stopsWaitingAfterTheWindow() {
         PetRating.scan(List.of());
-        TitleOverlay.Shown shown = title("lynx");
+        TitleOverlay.Shown shown = title("Lynx");
         PetRating.await(shown, "Lynx");
         now[0] += PetRating.WINDOW_MS + 1;
         PetRating.scan(List.of(pet("a", "lynx", 71.5)));
-        assertEquals("", sub(shown), "a full inventory: no pet came, a later lynx is not this drop");
+        assertEquals("+ Lynx Pet", text(shown), "a full inventory: no pet came, a later lynx is not this drop");
     }
 }

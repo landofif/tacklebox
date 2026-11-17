@@ -102,9 +102,9 @@ public final class TitleOverlay {
         shown.subtitle = parseSubtitle(shown.settings, subtitle);
     }
 
-    /** A new subtitle for a title already on screen (a pet drop's rating, see PetRating). */
-    public static void subtitle(Shown shown, String subtitle) {
-        shown.subtitle = parseSubtitle(shown.settings, subtitle);
+    /** More text at the end of a title already on screen (a pet drop's rating, see PetRating). */
+    public static void append(Shown shown, String more) {
+        shown.title = shown.title.plus(parseTitle(shown.settings, more));
     }
 
     /** Shows a title alone right away (the editor's preview). */

@@ -15,8 +15,8 @@ import java.util.OptionalDouble;
 import java.util.function.LongSupplier;
 
 /**
- * The rating of a pet you just got, as the second line of its drop title ("amazing 93.4%"). The chat line has no stats, so
- * the title waits for a pet of that kind to turn up new in the inventory and reads the rating from the item.
+ * The rating of a pet you just got, at the end of its drop title in the rating's colour ("+ Capybara Pet 93.4%"). The chat line
+ * has no stats, so the title waits for a pet of that kind to turn up new in the inventory and reads the rating from the item.
  */
 public final class PetRating {
     /** How long a title waits for its pet, and how long before the chat line a pet may have arrived. */
@@ -73,9 +73,9 @@ public final class PetRating {
         };
     }
 
-    /** The subtitle: "amazing 93.4%" in the rating's colour. */
-    static String line(double percent) {
-        return String.format(Locale.ROOT, "&#%06x%s %.1f%%", color(percent), word(percent), percent);
+    /** What goes at the end of the title: " 93.4%" in the rating's colour, bold like the rest of the title. */
+    static String percent(double rating) {
+        return String.format(Locale.ROOT, "&#%06x&l %.1f%%", color(rating), rating);
     }
 
     /** "Sea Turtle" and "seaturtle" are the same pet. */
@@ -138,7 +138,7 @@ public final class PetRating {
                 return false;
             }
             KNOWN.get(found.id()).used = true;
-            TitleOverlay.subtitle(w.title(), line(found.rating()));
+            TitleOverlay.append(w.title(), percent(found.rating()));
             return true;
         });
     }

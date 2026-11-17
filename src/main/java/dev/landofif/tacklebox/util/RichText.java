@@ -43,6 +43,13 @@ public final class RichText {
         return length == 0;
     }
 
+    /** This text with {@code more} after it. */
+    public RichText plus(RichText more) {
+        List<Segment> all = new ArrayList<>(segments);
+        all.addAll(more.segments);
+        return new RichText(all);
+    }
+
     /** The full text. */
     public MutableText toText() {
         return toText(Integer.MAX_VALUE);
