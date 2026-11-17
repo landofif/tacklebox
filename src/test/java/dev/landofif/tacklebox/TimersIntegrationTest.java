@@ -1,6 +1,7 @@
 package dev.landofif.tacklebox;
 
 import dev.landofif.tacklebox.hud.HudSpot;
+import dev.landofif.tacklebox.hud.TextHud;
 import dev.landofif.tacklebox.hud.Timers;
 import dev.landofif.tacklebox.hud.TimersHud;
 import dev.landofif.tacklebox.trigger.Matcher;
@@ -28,6 +29,23 @@ class TimersIntegrationTest {
 
         TackleboxSettings back = new Gson().fromJson(new Gson().toJson(TackleboxSettings.get()), TackleboxSettings.class);
         assertEquals(2, back.votes.size());
+    }
+
+    @Test
+    void lunasSevenVotesGoBackToZeroAtMidnightUtc() {
+        // luna's saved votes of 2026-11-17, 15:42 to 15:45 UTC
+        TackleboxSettings.get().votes.addAll(java.util.List.of(1794930175600L, 1794930180741L, 1794930277397L, 1794930294086L,
+                1794930308578L, 1794930319659L, 1794930325802L));
+        long midnight = java.time.Instant.parse("2026-11-18T00:00:00Z").toEpochMilli();
+        assertEquals(new TextHud.Row("votes", "7/7"), votesRow(midnight - 1000));
+        assertEquals(new TextHud.Row("votes", "0/7"), votesRow(midnight));
+        assertTrue(TimersHud.onChat(Matcher.normalize("VOTE » You received a  Standard Bait Package"), midnight + 60_000));
+        assertEquals(1, TackleboxSettings.get().votes.size(), "yesterday's votes are dropped from the save");
+        assertEquals(new TextHud.Row("votes", "1/7"), votesRow(midnight + 61_000));
+    }
+
+    private static TextHud.Row votesRow(long now) {
+        return Timers.rows(now, TackleboxSettings.get().votes, true, ms -> "").get(2);
     }
 
     @Test

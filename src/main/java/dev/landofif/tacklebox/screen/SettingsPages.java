@@ -465,6 +465,7 @@ public final class SettingsPages {
         toggle("quests left hud", "quests until your next level and the next level of your location. it learns from /menu, /quests and the compendium. move it with move huds.",
                 () -> s.questsHud, v -> s.questsHud = v);
         main();
+        toggle("quests left heading", "the quests left title above the hud.", () -> s.questsHeading, v -> s.questsHeading = v);
         cycle("quests left align", "how the text of the quests left hud lines up inside it: left, centre or right.",
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.questsAlign, v -> s.questsAlign = v);
         header("level progress", "experience_bottle");
@@ -495,12 +496,14 @@ public final class SettingsPages {
         toggle("active boosts hud", "what is on right now: player boosters with a countdown, the chummer, and the weather events and moon. read from chat lines only. the server hud shows the events and moon too, switch its weather and moon lines off if you only want them here. move it with move huds.",
                 () -> s.boostsHud, v -> s.boostsHud = v);
         main();
+        toggle("active boosts heading", "the active title above the boosts.", () -> s.boostsHeading, v -> s.boostsHeading = v);
         cycle("active boosts align", "how the text of the active boosts hud lines up inside it: left, centre or right.",
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.boostsAlign, v -> s.boostsAlign = v);
         header("event", "nether_star");
         toggle("event hud", "the points, the next threshold with its rewards, your placement and your missions of the running event. the points and thresholds are read from /event when you open it and then follow the chat. move it with move huds.",
                 () -> s.eventHud, v -> s.eventHud = v);
         main();
+        toggle("event heading", "the event's name above the hud.", () -> s.eventHeading, v -> s.eventHeading = v);
         cycle("event align", "how the text of the event hud lines up inside it: left, centre or right.",
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.eventAlign, v -> s.eventAlign = v);
         toggle("event missions", "lists the missions that are not done yet and the repeatable ones on the event hud, coloured like the menu, with the points earned and the points one catch gives. read from the mission book in /event and then follow the chat.",
@@ -509,12 +512,14 @@ public final class SettingsPages {
         toggle("mini event hud", "the running mini event: when it ends, when the daily missions reroll, and your missions with their progress. while this is on the mod sends /minievent by itself every 10 minutes and a few seconds after a catch and hides the answer, and counts your catches in between. off sends nothing. move it with move huds.",
                 () -> s.miniEventHud.on, v -> s.miniEventHud.on = v);
         main();
+        toggle("mini event heading", "the mini event's name above the hud.", () -> s.miniEventHud.heading, v -> s.miniEventHud.heading = v);
         cycle("mini event align", "how the text of the mini event hud lines up inside it: left, centre or right.",
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.miniEventHud.align, v -> s.miniEventHud.align = v);
         header("cryptids", "ender_eye");
         toggle("cryptids hud", "what can be caught where right now (moons, rainbow, storms, fabled, and the cryptids of the in-game clock) with the odds and the drops, then when the next moon and clock window come. read from chat and the clock in the top bar. move it with move huds.",
                 () -> s.cryptidHud, v -> s.cryptidHud = v);
         main();
+        toggle("cryptids heading", "the cryptids title above the hud.", () -> s.cryptidHeading, v -> s.cryptidHeading = v);
         cycle("cryptids align", "how the text of the cryptids hud lines up inside it: left, centre or right.",
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.cryptidAlign, v -> s.cryptidAlign = v);
         toggle("cryptids popups", "a title when one of the events below starts, saying where to go and what for. these are not triggers, nothing needs adding in /triggers.",
@@ -530,17 +535,19 @@ public final class SettingsPages {
                     });
         }
         header("timers", "clock");
-        toggle("timers hud", "countdowns to the next tackle shop restock (every 4 hours) and the cosmetic store reset (midnight utc), and your votes of the last 24 hours. a title shows on every restock and reset whether this hud is on or not. move it with move huds.",
+        toggle("timers hud", "countdowns to the next tackle shop restock (every 4 hours) and the cosmetic store reset (midnight utc), and your votes of today (back to 0 at midnight utc). a title shows on every restock and reset whether this hud is on or not. move it with move huds.",
                 () -> s.timersHud.on, v -> s.timersHud.on = v);
         main();
+        toggle("timers heading", "the timers title above the hud.", () -> s.timersHud.heading, v -> s.timersHud.heading = v);
         cycle("timers align", "how the text of the timers hud lines up inside it: left, centre or right.",
                 TackleboxSettings.HudAlign.values(), k -> k.label, () -> s.timersHud.align, v -> s.timersHud.align = v);
-        toggle("timers votes", "the votes line: how many of the 7 vote sites you voted on in the last 24 hours, counted from the vote reward lines in chat.",
+        toggle("timers votes", "the votes line: how many of the 7 vote sites you voted on today, counted from the vote reward lines in chat. it goes back to 0 at midnight utc.",
                 () -> s.timersVotes, v -> s.timersVotes = v);
         header("wrong gear", "barrier");
         toggle("wrong gear warning", "a red warning on the hud while your equipped pet is not the pet of the place you are at, or your armor is for another climate. it names the right pet and says if it is in your inventory. nothing at the cypress lake spawn. the pet is learned from the chat line when you equip it. move it with move huds.",
                 () -> s.gearHud.on, v -> s.gearHud.on = v);
         main();
+        toggle("wrong gear heading", "the warning title above the hud.", () -> s.gearHud.heading, v -> s.gearHud.heading = v);
         toggle("wrong gear chat line", "one chat line a moment after you arrive somewhere with the wrong pet or armor. only you see it.",
                 () -> s.gearChat, v -> s.gearChat = v);
         cycle("wrong gear align", "how the text of the wrong gear warning lines up inside it: left, centre or right.",
@@ -599,6 +606,7 @@ public final class SettingsPages {
         toggle("slots left hud", "how many inventory slots are still empty (hotbar and inventory, 36 in all), shown once that is at or under the number below. red at 0. move it with move huds.",
                 () -> s.slotsLeftHud.on, v -> s.slotsLeftHud.on = v);
         main();
+        toggle("slots left heading", "the inventory title above the hud.", () -> s.slotsLeftHud.heading, v -> s.slotsLeftHud.heading = v);
         slider("slots left shows at", "the slots left hud shows once this many or fewer slots are empty. 36 shows it always, 0 only when the inventory is full.", 0, 36, 1, "",
                 () -> s.slotsLeftAt, v -> s.slotsLeftAt = (int) Math.round(v));
         cycle("slots left align", "how the text of the slots left hud lines up inside it: left, centre or right.",

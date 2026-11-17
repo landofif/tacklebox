@@ -72,13 +72,14 @@ One line per tacklebox feature: what it does, the setting, and its topic doc. **
 
 - Quests left until the next fishing and location level. `questsHud`, off. `huds/quests-left.md`
 - Level progress bars. `levelBars`, off. `huds/level-bars.md`
+- Hud headings (the title above each hud): a switch per hud, all off by default. `huds/level-bars.md` (Headings)
 - Active boosts: boosters, chummers, weather, moon, frenzy, fabled. `boostsHud`, off. `huds/boosts-and-now-playing.md`
 - Event hud: points, placement, missions. `eventHud`, off. `huds/event-hud.md`
 - Mini event hud: when the mini event ends, the daily reroll and your missions with progress. While on it sends `/minievent` quietly every 10 minutes and after catches and hides the answer. `miniEventHud`, off. `huds/mini-event.md`
 - Cryptids hud: where to fish for what during moons, rainbow, storms, fabled and the clock windows, next moon and windows, dry streaks; popups with a switch per event. `cryptidHud`, off; `cryptidPopups`, on. `huds/cryptids.md`
 - Inventory hud: the 27 inventory slots on the hud, with counts, without opening the inventory. `inventoryHud`, off; `inventoryHudCells`, on. `huds/inventory.md`
 - Slots left hud: how many of the 36 inventory slots are empty, shown at or under a number you set. `slotsLeftHud`, off; `slotsLeftAt`, 5. `huds/inventory.md`
-- Timers hud: tackle shop restock, cosmetic store reset, votes of the last 24 hours. `timersHud`, off; `timersVotes`, on. A title on every restock and reset, always on. `huds/timers.md`
+- Timers hud: tackle shop restock, cosmetic store reset, today's votes (back to 0 at midnight UTC). `timersHud`, off; `timersVotes`, on. A title on every restock and reset, always on. `huds/timers.md`
 - Wrong pet and armor warning: a red hud line while your equipped pet is not the place's own pet or your armor is for another climate, naming the right pet and whether it is in your inventory, and one chat line on arrival. `gearHud`, off; `gearChat`, on. `huds/gear-warning.md`
 - Now playing (playerctl). `nowPlaying`, off. `huds/boosts-and-now-playing.md`
 - Server hud: sidebar-style lines with picture; includes compendium lines, frenzy schedule and community goal lines. `serverHud`, off. `huds/server-hud.md`

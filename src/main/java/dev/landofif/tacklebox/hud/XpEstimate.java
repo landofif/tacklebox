@@ -163,8 +163,8 @@ public final class XpEstimate {
             }
             Locations.Location loc = Locations.byName(Glyphs.plain(stack.getName()));
             FishMenu.Info info = loc == null ? null : FishMenu.info(stack);
-            if (info != null && info.level() >= 0 && info.progress() >= 0) {
-                LOCATION.put(loc.id(), new double[]{info.level(), info.progress() * need(info.level() + 1)});
+            if (info != null) {
+                read(loc.id(), info);
             }
             LoreComponent lore = stack.get(DataComponentTypes.LORE);
             if (lore == null) {
@@ -208,6 +208,17 @@ public final class XpEstimate {
         s.questXp = questXp;
         s.questLxp = questLxp;
         s.profile = profile;
+    }
+
+    /**
+     * A place's level and the xp into it, as its compendium tooltip shows them. At level 20, the top, the count runs past its max
+     * ({@code (14.42M/2.32M)}) and its first number is kept as written: the xp past the max (the progress stops at 1).
+     */
+    public static void read(String id, FishMenu.Info info) {
+        if (info.level() >= 0 && info.progress() >= 0) {
+            boolean top = info.level() >= Power.MAX_LEVEL && info.xp() >= 0;
+            LOCATION.put(id, new double[]{info.level(), top ? info.xp() : info.progress() * need(info.level() + 1)});
+        }
     }
 
     /** 3350 as "3.35K", for the xp shown next to the location bar. */
@@ -256,9 +267,11 @@ public final class XpEstimate {
     /** {level, xp left to the next one} of a location from the menus plus the xp since, or null while it is unknown. */
     public static double[] toNext(String id) {
         double[] at = LOCATION.get(id);
-        if (at == null) {
-            return null;
-        }
+        return at == null ? null : toNext(at);
+    }
+
+    /** {@link #toNext(String)} of a saved {level, xp into it}. */
+    public static double[] toNext(double[] at) {
         int level = (int) at[0] + levelsGained(at);
         double into = at[1];
         for (int n = (int) at[0] + 1; n <= level; n++) {
@@ -280,6 +293,9 @@ public final class XpEstimate {
             return null;
         }
         int level = (int) at[0] + levelsGained(at);
+        if (level >= Power.MAX_LEVEL) {
+            return null; // the top: no next level to count quests to
+        }
         double into = at[1];
         for (int n = (int) at[0] + 1; n <= level; n++) {
             into -= need(n);
@@ -309,17 +325,22 @@ public final class XpEstimate {
                 {"to level " + (p.experienceLevel + 1), level == null ? "-" : level},
                 {"to " + (ServerInfo.locationName.isEmpty() ? "location" : Locations.shown(ServerInfo.locationName)) + " level "
                         + (where == null ? "?" : String.valueOf(Integer.parseInt(where) + 1)), loc == null ? "-" : loc}};
+        if (where != null && Integer.parseInt(where) >= Power.MAX_LEVEL) {
+            rows = java.util.Arrays.copyOf(rows, 1); // the top location level: no next one to count quests to
+        }
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
         int w = 0;
         for (String[] r : rows) {
             w = Math.max(w, tr.getWidth(Foe.text(r[0])) + 12 + tr.getWidth(Foe.text(r[1])));
         }
         w += 16;
-        int h = 25 + rows.length * 11;
         var s = TackleboxSettings.get();
-        Foe.title(ctx, s.questsX, s.questsY, w, s.questsAlign, Foe.text("quests left")); // no box behind it
+        int top = s.questsHeading ? 20 : 4, h = top + 5 + rows.length * 11;
+        if (s.questsHeading) {
+            Foe.title(ctx, s.questsX, s.questsY, w, s.questsAlign, Foe.text("quests left")); // no box behind it
+        }
         for (int i = 0; i < rows.length; i++) {
-            int y = s.questsY + 20 + i * 11;
+            int y = s.questsY + top + i * 11;
             Text l = Foe.text(rows[i][0]), v = Foe.text(rows[i][1]);
             int lx = s.questsX + 8, vx = s.questsX + w - 8 - tr.getWidth(v); // left keeps the values in a column on the right
             if (s.questsAlign != TackleboxSettings.HudAlign.LEFT) {
@@ -338,11 +359,11 @@ public final class XpEstimate {
         }
     }
 
-    /** Levels passed by xp that arrived after the menu was last read. */
+    /** Levels passed by xp that arrived after the menu was last read; none past level 20, the top (more xp there is past the max). */
     private static int levelsGained(double[] at) {
         int n = 0;
         double into = at[1];
-        while (into >= need((int) at[0] + n + 1)) {
+        while ((int) at[0] + n < Power.MAX_LEVEL && into >= need((int) at[0] + n + 1)) {
             into -= need((int) at[0] + ++n);
         }
         return n;

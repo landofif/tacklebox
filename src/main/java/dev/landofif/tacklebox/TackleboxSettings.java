@@ -129,6 +129,8 @@ public class TackleboxSettings {
     public HudPos questsPos, levelBarsPos, boostsPos, nowPlayingPos, serverHudPos, eventPos, cryptidPos;
     /** The quests left hud: whether it shows. */
     public boolean questsHud;
+    /** The "quests left" title above the hud; off by default, like every hud heading (luna, 2026-11-17: "remove those titles by default"). */
+    public boolean questsHeading;
     public int questsX = 4;
     public int questsScale = 100;
     public int questsY = 70;
@@ -139,7 +141,7 @@ public class TackleboxSettings {
     public int levelBarsScale = 100;
     public int levelBarsY = 40;
     /** What the level progress hud shows: heading, the fishing line, the location line, the bar itself, the percent, the location xp, and the bar width. */
-    public boolean levelBarsHeading = true;
+    public boolean levelBarsHeading = false; // off by default, like every hud heading (luna, 2026-11-17: "remove those titles by default")
     public boolean levelBarsFishing = true;
     public boolean levelBarsLocation = true;
     public boolean levelBarsBar = true;
@@ -151,12 +153,16 @@ public class TackleboxSettings {
     public HudAlign levelBarsAlign = HudAlign.LEFT;
     /** The active boosts hud (hud/BoostsHud): boosters, chummer, weather events and moon, where it sits. */
     public boolean boostsHud;
+    /** The "active" title above the hud; off by default, like every hud heading (luna, 2026-11-17: "remove those titles by default"). */
+    public boolean boostsHeading;
     public int boostsX = 182;
     public int boostsScale = 100;
     public int boostsY = 70;
     public HudAlign boostsAlign = HudAlign.LEFT;
     /** The event hud (hud/EventHud): points, next threshold and its rewards, placement, read from /event. */
     public boolean eventHud;
+    /** The event's name above the hud; off by default, like every hud heading (luna, 2026-11-17: "remove those titles by default"). */
+    public boolean eventHeading;
     /** Whether the event hud lists the missions you have progressed, and the finished ones too. */
     public boolean eventMissions = true;
     /** What it read from /event and chat (saved so it survives a restart). */
@@ -174,6 +180,8 @@ public class TackleboxSettings {
     public boolean dropsMigrated;
     /** The cryptids hud (hud/CryptidHud): what can be caught where now and what comes next; the popups when an event starts. */
     public boolean cryptidHud;
+    /** The "cryptids" title above the hud; off by default, like every hud heading (luna, 2026-11-17: "remove those titles by default"). */
+    public boolean cryptidHeading;
     public boolean cryptidPopups = true;
     /** The kinds of event switched off, from {@code Cryptids.KINDS}: hidden from the hud and the popups. */
     public java.util.Set<String> cryptidOff = new java.util.HashSet<>();
@@ -222,7 +230,7 @@ public class TackleboxSettings {
     public int nowPlayingScale = 100;
     public int nowPlayingY = 4;
     /** What the now playing hud shows besides the title: its heading, the album art, the artist, a progress bar and the time. */
-    public boolean nowPlayingHeading = true;
+    public boolean nowPlayingHeading = false; // off by default, like every hud heading (luna, 2026-11-17: "remove those titles by default")
     public boolean nowPlayingArt = true;
     public boolean nowPlayingArtist = true;
     public boolean nowPlayingBar = true;

@@ -11,7 +11,8 @@ import net.minecraft.text.Text;
 import java.util.List;
 
 /**
- * A hud of text rows in the look of the event hud: a title in the accent, then label and value rows with a shadow and no box.
+ * A hud of text rows in the look of the event hud: a title in the accent (when the hud's heading is on), then label and value rows
+ * with a shadow and no box.
  * The timers, warnings and mini event huds draw through this.
  */
 public final class TextHud {
@@ -40,20 +41,24 @@ public final class TextHud {
             return null;
         }
         return spot.pos.draw(ctx, ctx.getScaledWindowWidth(), ctx.getScaledWindowHeight(),
-                (x, y) -> Foe.scaled(ctx, x, y, spot.scale, c -> drawAt100(c, x, y, spot.align, title, rows)));
+                (x, y) -> Foe.scaled(ctx, x, y, spot.scale, c -> drawAt100(c, x, y, spot.align, spot.heading ? title : null, rows)));
     }
 
+    /** {@code title} is null while the hud's heading is off: the rows move up. */
     private static int[] drawAt100(DrawContext ctx, int x, int y, TackleboxSettings.HudAlign align, String title, List<Row> rows) {
         TextRenderer tr = MinecraftClient.getInstance().textRenderer;
-        int w = tr.getWidth(Foe.text(title));
+        int w = title == null ? 0 : tr.getWidth(Foe.text(title));
         for (Row r : rows) {
             w = Math.max(w, width(tr, r));
         }
         w += 16;
-        Foe.title(ctx, x, y, w, align, Foe.text(title));
+        int top = title == null ? 4 : 20;
+        if (title != null) {
+            Foe.title(ctx, x, y, w, align, Foe.text(title));
+        }
         for (int i = 0; i < rows.size(); i++) {
             Row r = rows.get(i);
-            int ry = y + 20 + i * 11;
+            int ry = y + top + i * 11;
             Text l = text(r.label(), r.labelParts()), v = text(r.value(), r.valueParts());
             int lx = x + 8, vx = x + w - 8 - tr.getWidth(v); // left keeps the values in a column on the right
             if (align != TackleboxSettings.HudAlign.LEFT) {
@@ -63,7 +68,7 @@ public final class TextHud {
             ctx.drawTextWithShadow(tr, l, lx, ry, r.labelColor() != 0 ? r.labelColor() : Foe.DIM);
             ctx.drawTextWithShadow(tr, v, vx, ry, r.valueColor() != 0 ? r.valueColor() : Foe.TEXT);
         }
-        return new int[]{x, y, w, 25 + rows.size() * 11};
+        return new int[]{x, y, w, top + 5 + rows.size() * 11};
     }
 
     private static int width(TextRenderer tr, Row r) {

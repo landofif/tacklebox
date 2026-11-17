@@ -214,11 +214,13 @@ public final class BoostsHud {
             w = Math.max(w, tr.getWidth(text(r.label())) + (r.value().text().isEmpty() ? 0 : 12 + tr.getWidth(text(List.of(r.value())))));
         }
         w += 16;
-        int h = 25 + rows.size() * 11;
         TackleboxSettings s = TackleboxSettings.get();
-        Foe.title(ctx, s.boostsX, s.boostsY, w, s.boostsAlign, Foe.text("active"));
+        int top = s.boostsHeading ? 20 : 4, h = top + 5 + rows.size() * 11;
+        if (s.boostsHeading) {
+            Foe.title(ctx, s.boostsX, s.boostsY, w, s.boostsAlign, Foe.text("active"));
+        }
         for (int i = 0; i < rows.size(); i++) {
-            int y = s.boostsY + 20 + i * 11;
+            int y = s.boostsY + top + i * 11;
             Text l = text(rows.get(i).label()), v = text(List.of(rows.get(i).value()));
             int lx = s.boostsX + 8, vx = s.boostsX + w - 8 - tr.getWidth(v); // left keeps the values in a column on the right
             if (s.boostsAlign != TackleboxSettings.HudAlign.LEFT) {

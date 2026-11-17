@@ -45,6 +45,7 @@ public final class LevelBars {
         double[] fraction = new double[2];
         String[] extra = {"", ""};
         int[] number = new int[2]; // colour of the level inside the brackets, 0 = same as the label
+        boolean[] maxed = new boolean[2]; // the top location level: no percent
         int rows = 0;
         if (s.levelBarsFishing) {
             label[rows] = "level [" + p.experienceLevel + "]";
@@ -61,7 +62,8 @@ public final class LevelBars {
             boolean max = level >= Power.MAX_LEVEL;
             label[rows] = loc.name() + " [" + level + "]";
             number[rows] = LOCATION_LEVEL;
-            extra[rows] = !s.levelBarsXp ? "" : max ? "max" : XpEstimate.abbrevXp(next - at[1], s.levelBarsDecimals) + "/" + XpEstimate.abbrevXp(next, s.levelBarsDecimals) + "lxp";
+            extra[rows] = s.levelBarsXp ? locationXp(at, s.levelBarsDecimals) : "";
+            maxed[rows] = max;
             fraction[rows++] = max ? 1 : (next - at[1]) / next;
         } else if (s.levelBarsLocation && preview) {
             label[rows++] = "open /comp";
@@ -95,13 +97,23 @@ public final class LevelBars {
                 }
             }
             int px = bx + barSpan;
-            if (s.levelBarsPercent) {
+            if (s.levelBarsPercent && !maxed[i]) {
                 String pct = (int) (f * 100) + "%"; // cut, so 99.9% never reads as done
                 ctx.drawTextWithShadow(tr, pct, px + pctW - 6 - tr.getWidth(pct), y, Foe.TEXT);
             }
             ctx.drawTextWithShadow(tr, extra[i], px + pctW, y, Foe.DIM);
         }
         return new int[]{s.levelBarsX, s.levelBarsY, boxW, top - s.levelBarsY + rows * 12 + 2};
+    }
+
+    /**
+     * The location xp of {@link XpEstimate#toNext}: into the level and what it takes ({@code 3.35K/4.20Klxp}), at level 20, the top,
+     * only the xp past the max ({@code 14.4M}, luna: "biwa [20] 14.4m").
+     */
+    public static String locationXp(double[] at, boolean decimals) {
+        double next = XpEstimate.need((int) at[0] + 1), into = next - at[1];
+        return at[0] >= Power.MAX_LEVEL ? XpEstimate.abbrevXp(into, decimals)
+                : XpEstimate.abbrevXp(into, decimals) + "/" + XpEstimate.abbrevXp(next, decimals) + "lxp";
     }
 
     /** The label in dim text; the number inside the brackets gets its own colour when there is one. */

@@ -123,11 +123,13 @@ public final class CryptidHud {
             w = Math.max(w, indent(r) + tr.getWidth(Foe.text(r.label())) + (r.value().isEmpty() ? 0 : 12 + tr.getWidth(Foe.text(r.value()))));
         }
         w += 16;
-        int h = 25 + rows.size() * 11;
-        Foe.title(ctx, s.cryptidX, s.cryptidY, w, s.cryptidAlign, Foe.text("cryptids"));
+        int top = s.cryptidHeading ? 20 : 4, h = top + 5 + rows.size() * 11;
+        if (s.cryptidHeading) {
+            Foe.title(ctx, s.cryptidX, s.cryptidY, w, s.cryptidAlign, Foe.text("cryptids"));
+        }
         for (int i = 0; i < rows.size(); i++) {
             Cryptids.Row r = rows.get(i);
-            int y = s.cryptidY + 20 + i * 11;
+            int y = s.cryptidY + top + i * 11;
             Text l = Foe.text(r.label()), v = Foe.text(r.value());
             int lx = s.cryptidX + 8 + indent(r), vx = s.cryptidX + w - 8 - tr.getWidth(v); // left keeps the values in a column on the right
             if (s.cryptidAlign != TackleboxSettings.HudAlign.LEFT) {

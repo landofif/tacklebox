@@ -13,7 +13,8 @@ import java.util.regex.Pattern;
  * Tackle shop: restocks every 4 hours at 23, 3, 7, 11, 15 and 19 UTC. All 52 {@code TACKLE SHOP » » Tackle items restocked!} lines
  * in luna's logs (2026-10-07 to 11-14) are on that grid, through both the EU and the US clock change, so it is a fixed UTC grid
  * and needs no saved anchor. Cosmetic store: resets at midnight UTC (from FOE+, no chat line for it, not seen in game yet).
- * Votes: every {@code VOTE » You received ...} line is one vote and counts for 24 hours; 7 sites (from FOE+).
+ * Votes: every {@code VOTE » You received ...} line is one vote and counts until midnight UTC, when the votes reset (luna, 2026-11-17);
+ * 7 sites (from FOE+).
  */
 public final class Timers {
     public static final long TACKLE_PERIOD = 4L * 60 * 60 * 1000;
@@ -51,17 +52,20 @@ public final class Timers {
         return DAY - Math.floorMod(now, DAY);
     }
 
-    /** Adds a vote and drops the ones older than a day; at most {@link #VOTE_SITES} are kept. */
+    /** Adds a vote and drops the ones from before the last midnight UTC; at most {@link #VOTE_SITES} are kept. */
     public static void addVote(List<Long> votes, long now) {
-        votes.removeIf(t -> t == null || now - t >= DAY);
+        long midnight = now - Math.floorMod(now, DAY);
+        votes.removeIf(t -> t == null || t < midnight);
         votes.add(now);
         while (votes.size() > VOTE_SITES) {
             votes.remove(0);
         }
     }
 
+    /** Today's votes: they reset at midnight UTC. */
     public static int votes(List<Long> votes, long now) {
-        return (int) Math.min(VOTE_SITES, votes.stream().filter(t -> t != null && now - t < DAY).count());
+        long midnight = now - Math.floorMod(now, DAY);
+        return (int) Math.min(VOTE_SITES, votes.stream().filter(t -> t != null && t >= midnight).count());
     }
 
     /** The title for a restock line. */

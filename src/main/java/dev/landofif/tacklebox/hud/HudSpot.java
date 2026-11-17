@@ -8,6 +8,8 @@ public final class HudSpot {
     public HudPos pos;
     public int scale = 100;
     public TackleboxSettings.HudAlign align = TackleboxSettings.HudAlign.LEFT;
+    /** The hud's title above its rows; off by default, like every hud heading (luna, 2026-11-17: "remove those titles by default"). */
+    public boolean heading;
     /** The spot it was put at when new; right click in the mover puts it back there. */
     public transient int homeX, homeY;
 

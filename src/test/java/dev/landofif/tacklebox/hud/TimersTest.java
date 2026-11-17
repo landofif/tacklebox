@@ -55,19 +55,18 @@ class TimersTest {
     }
 
     @Test
-    void votesCountForADay() {
+    void votesResetAtMidnightUtc() {
         List<Long> votes = new ArrayList<>();
-        long t = at("2026-11-15T10:00:00Z");
-        Timers.addVote(votes, t);
-        Timers.addVote(votes, t + 60_000);
-        assertEquals(2, Timers.votes(votes, t + 120_000));
-        assertEquals(1, Timers.votes(votes, t + Timers.DAY + 1000), "the first one ran out");
-        Timers.addVote(votes, t + Timers.DAY + 2000);
-        assertEquals(2, votes.size(), "old ones are dropped when one is added");
+        Timers.addVote(votes, at("2026-11-17T15:42:55Z"));
+        Timers.addVote(votes, at("2026-11-17T15:45:25Z"));
+        assertEquals(2, Timers.votes(votes, at("2026-11-17T23:59:59Z")));
+        assertEquals(0, Timers.votes(votes, at("2026-11-18T00:00:00Z")), "a new day starts at 0, not 24 hours after each vote");
+        Timers.addVote(votes, at("2026-11-18T00:01:00Z"));
+        assertEquals(1, votes.size(), "yesterday's are dropped when one is added");
         for (int i = 0; i < 10; i++) {
-            Timers.addVote(votes, t + Timers.DAY + 3000 + i);
+            Timers.addVote(votes, at("2026-11-18T08:00:00Z") + i);
         }
-        assertEquals(Timers.VOTE_SITES, Timers.votes(votes, t + Timers.DAY + 4000));
+        assertEquals(Timers.VOTE_SITES, Timers.votes(votes, at("2026-11-18T09:00:00Z")));
     }
 
     @Test

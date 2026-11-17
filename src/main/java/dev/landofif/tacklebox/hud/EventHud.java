@@ -454,10 +454,12 @@ public final class EventHud {
             w = Math.max(w, tr.getWidth(Foe.text(r[0])) + (r[1].isEmpty() ? 0 : 12 + tr.getWidth(Foe.text(r[1]))));
         }
         w += 16;
-        int h = 25 + rows.size() * 11;
-        Foe.title(ctx, s.eventX, s.eventY, w, s.eventAlign, Foe.text(state.title.isEmpty() ? "event" : state.title));
+        int top = s.eventHeading ? 20 : 4, h = top + 5 + rows.size() * 11;
+        if (s.eventHeading) {
+            Foe.title(ctx, s.eventX, s.eventY, w, s.eventAlign, Foe.text(state.title.isEmpty() ? "event" : state.title));
+        }
         for (int i = 0; i < rows.size(); i++) {
-            int y = s.eventY + 20 + i * 11;
+            int y = s.eventY + top + i * 11;
             Text l = Foe.text(rows.get(i)[0]), v = Foe.text(rows.get(i)[1]);
             int lx = s.eventX + 8, vx = s.eventX + w - 8 - tr.getWidth(v); // left keeps the values in a column on the right
             if (s.eventAlign != TackleboxSettings.HudAlign.LEFT) {

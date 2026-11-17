@@ -25,7 +25,16 @@ import java.util.regex.Pattern;
  */
 public final class FishMenu {
     /** Level and progress to the next level read off a travel item (-1 when the tooltip had none). */
-    public record Info(int level, float progress) {}
+    /**
+     * A place's level and progress from its tooltip. {@code xp} is the first number of its {@code (a/b)} count as written, or -1
+     * without one: the progress stops at 1, but at level 20 the count runs past its max ({@code (14.42M/2.32M)}) and that number is
+     * the xp past it.
+     */
+    public record Info(int level, float progress, double xp) {
+        public Info(int level, float progress) {
+            this(level, progress, -1);
+        }
+    }
 
     /** Menus that are only buttons, named by their art glyph (see util/Glyphs). The others (sell, vault, shops, pets, armor) need your inventory. */
     private static final Set<String> BUTTON_MENUS = Set.of("stats", "crew", "presets", "event");
@@ -177,18 +186,25 @@ public final class FishMenu {
                 text.append('\n').append(Glyphs.plain(line));
             }
         }
-        String all = text.toString().toLowerCase(Locale.ROOT);
+        return info(text.toString());
+    }
+
+    /** {@link #info(ItemStack)} of an item's name and lore lines, joined by line breaks. */
+    public static Info info(String text) {
+        String all = text.toLowerCase(Locale.ROOT);
         Matcher level = LEVEL.matcher(all);
         Matcher percent = PERCENT.matcher(all);
         Matcher fraction = FRACTION.matcher(all);
         float progress = -1;
+        double xp = -1;
         if (percent.find()) {
             progress = Float.parseFloat(percent.group(1).replace(',', '.')) / 100f;
         } else if (fraction.find()) {
+            xp = number(fraction.group(1), fraction.group(2));
             double max = number(fraction.group(3), fraction.group(4));
-            progress = max > 0 ? (float) (number(fraction.group(1), fraction.group(2)) / max) : -1;
+            progress = max > 0 ? (float) (xp / max) : -1;
         }
-        return new Info(level.find() ? Integer.parseInt(level.group(1)) : -1, Math.min(1f, progress));
+        return new Info(level.find() ? Integer.parseInt(level.group(1)) : -1, Math.min(1f, progress), xp);
     }
 
     private static double number(String digits, String suffix) {
