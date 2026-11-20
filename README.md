@@ -2,92 +2,120 @@
 
 client side fabric mod for **fishonmc** (minecraft 1.21.11).
 
-needs: fabric api and [foecollab](https://github.com/Kimberlyow/FOECollab) (with its own requirements, cloth config and mod menu). tacklebox is an addon for foecollab: it leaves the trackers and the look to foecollab, draws its own screens and huds with foecollabs boxes and the normal game font, puts its huds in foecollabs hud mover, and its settings next to foecollabs in one settings screen.
+needs: [fabric api](https://modrinth.com/mod/fabric-api). [mod menu](https://modrinth.com/mod/modmenu) is optional.
+
+works with or without [foecollab](https://github.com/Kimberlyow/FOECollab) (and next to foe-r). tacklebox reads catches and game data itself; when foecollab is installed it adds a few small tweaks to it (see [foecollab tweaks](#foecollab-tweaks)). things foecollab already does, tacklebox leaves out.
+
+almost everything is off by default. turn on what you want in the settings.
 
 ## getting around
 
-- `/tacklebox` opens the settings screen, with chat triggers, chat and key commands in its list on the left
-- `/tacklebox triggers`, `/tacklebox huds`, `/tacklebox chat`, `/tacklebox move` jump straight to one part
-- right shift opens `/tacklebox` too
-- `/tacklebox debug item` prints the held items data, f8 in any screen dumps it to a file
+- `/tacklebox` (or `/dofi`, or right shift) opens the settings: pages on the left, their groups in the middle, the settings of a group on the right, a search over everything, hover for help
+- `/tacklebox move` moves every hud, the hotbar, chat and the chat boxes. drag to move, right click to put back
+- `/tacklebox triggers`, `chat`, `keys`, `bobber`, `viewmodel`, `words` jump straight to one part
 - with mod menu: mods → tacklebox → configure
+
+## screens
+
+- **bait picker** (`/tacklebox bait`): the fastest quest and best bait for a place
+- **power** (`/tacklebox power`): your power by source, the cheapest next level, all places in a table
+- **pet prices** (`/tacklebox prices`): what pets sell for between players by rating and rarity, from the community's pet price sheet
+- **travel map**: `/tt`, `/travel` and `/turbotravel` as a world map. left click a place to travel, right click for its species
+- **fishonmc menu**: travel, stats, crew, event and quests as one dark panel with place tiles and bars
+- **vault overview**: all seven `/pv` vaults on one screen, with search
+- **presets wardrobe**: your armour sets on player models, click to equip
+
+## menus and items
+
+- **simple menus**: chests and your inventory as bare items, no boxes
+- **/travel and /quests marks**: frenzy place green, fabled place red; after a quest, its difficulty and tier get a green slot to start it again
+- **page wheel**: the mouse wheel turns pages in the compendium, auction house, vaults and presets
+- **chest scale**: its own gui scale for server menus
+- **short tooltips** for fish and pets, **pet profit marks** in the auction house, **rarity circles** behind items, and **tooltip scroll** for tooltips taller than the screen
+
+## huds
+
+all huds move in `/tacklebox move`, and each has an optional title.
+
+- **bobber timer**: on the hud or over the bobber, with a bite countdown and its own bite title
+- **catch title**: the fish's picture, rarity, name, weight and length in place of the server's catch title
+- **quests left** until your next fishing and place level, and **level bars**
+- **active boosts**: boosters, chummers, weather, moon, frenzy, fabled
+- **event** and **mini event**: points, placement and missions. the mini event hud quietly sends `/minievent` every 10 minutes and hides the answer
+- **cryptids**: where to fish for what during moons, rainbows, storms and fabled, with popups
+- **inventory** (your 27 slots on screen) and **slots left** (shows when your inventory is almost full)
+- **timers**: tackle shop restock, cosmetic store reset, today's votes
+- **wrong gear warning**: when your pet or armor doesn't fit the place you're at, and which one does
+- **server hud**: sidebar-style lines, compendium, frenzy schedule, community goal
+- **equipment row** above the hotbar, and a **hotbar** with its own look, size and spacing
+
+## fishing and catches
+
+- **rare drops**: a title, totem pop and sound for your own pet drops and rare catches. pet titles end with the pet's rating ("+ capybara pet 93.4%")
+- **water rings** at your bobber while a fish swims in, a bigger one on the bite, and one in the rarity colour where you caught it
+- **big catch moment**: an edge glow, a light sweep and a sound for fabled, trophy, mythical and gigantic fish
+- **dry streaks**: a chat line saying how many catches a pet, shard, capsule or gigantic took
+- **rod not cast** alarm, **chummer range** ring, and **bite focus** (hyprland) to bring the game to the front on a bite
 
 ## chat triggers
 
-show your own on-screen title and play a sound when a chat message appears.
+`/tacklebox triggers` shows your own title, pops a totem and plays a sound when a chat line matches.
 
-1. **+ new trigger**: start blank or from a fishonmc preset (quest completed, pet drop, rare catch, fabled event, storm, moon, fish sold).
-2. **when**: type the chat text to react to.
-   - `*` matches anything
-   - `{name}` grabs that part so you can show it in the title, for example `quests > quest #{n} has been completed!`
-   - `>` also matches `»`, and fishonmc icon glyphs and extra spaces are ignored
-   - paste a real chat line into **test with** to see right away if it fires and what `{n}` becomes
-3. **title**: text, subtitle, colours, size, height, timing and animation (fade, pop, slide, typewriter, shake).
-   - colours: `&a`, `&l` (bold), `&o`, `&#ff8800`
-   - placeholders: your `{name}` captures, `{player}`, `{count}` (times fired this session), `{message}`
-4. **sound**: click through popular sounds or type any sound id (server pack sounds work too), volume, pitch, repeats.
-5. **▶ preview** any time, then **save**.
-
-switch triggers on and off with the dot, reorder with the arrows, **share** copies a code others can **import**, and a cooldown stops repeated lines from spamming.
+- start blank or from a fishonmc preset (quest completed, pet max level, fabled, storm, moon, new in compendium and more)
+- `*` matches anything and `{name}` grabs a part to show in the title, like `quests > quest #{n} has been completed!`. paste a real line into **test with** to check it
+- titles take colours (`&a`, `&l`, `&#ff8800`), animations, and any sound id
+- **share** copies a trigger as a code others can **import**
 
 ## chat
 
-`/tacklebox chat`, or chat in the screens list of the settings.
+`/tacklebox chat`.
 
-- **hide rules**: lines that match never show up in chat. type part of the line (`*` matches anything), the whole line, or a regex, and pick fishonmc only or every server. paste a line into **test with** to check which rule hides it
-- **move chat**: drag the chat box anywhere in foecollabs hud mover. right click it there to put it back
-- **copy**: with chat open, right click a message to copy it. shift + right click a message to make a hide rule for it
-- **chat boxes**: separate chat panels, each with its own place on screen. two come set up: **dms** (`✉ from …` and `✉ to …` lines) and **crew** (`[crew chat] …` lines). their lines leave the main chat (or stay there too with **also in chat**). each box has rules like the hide rules, a name in its top border, and can fade out a while after its last line. with chat open you can scroll a box, hover and click its text like normal chat, and right click a line to copy it. move them in the move screen: drag a box, scroll on it for more or fewer lines, shift + scroll for its width. **+ box** makes a new one for anything else
+- **hide rules**: lines that match never show up. shift + right click a line to make one
+- **chat boxes**: dms and crew chat (or any rule) in their own movable box that fades out
+- **right click** a line to copy it, **ctrl + f** to search chat
+- **stacking**: repeated lines become (xN), even with other lines in between
+- **timestamps** on hover, **highlights** for your name and chosen words
+- chat comes back after a reconnect or restart, keeps 2000 lines, and the up arrow remembers plain messages too
+- type `here` and press tab for your place and instance
+- a key to peek at chat without opening it, smooth scrolling and a scroll bar
 
-## hotkey
+## keys
 
-right shift opens `/tacklebox` from anywhere in game. change it in options → controls → tacklebox.
+- **key commands**: a key or mouse button sends a command
+- **fish key**: one key for fishing as a rebind. a press is one right click with the rod
+- **bait sort key**: sorts your bait and lures common to legendary
+- **command aliases**, like `/sb 5` for `/sellall bait 5`
 
-## custom huds
+## world and bobber
 
-custom huds are foecollabs: `/tacklebox huds` (or the custom huds button) opens foecollabs own editor. **move huds** (`/tacklebox move`) is foecollabs hud mover, with the tacklebox huds in it too: the quests left hud, the chat and the chat boxes. drag one to move it, right click to put it back.
+these only change what you see.
 
-## bobber and world tweaks
-
-these change only what you see. bobber options are under settings → bobber, the rest under settings → world.
-
-- **still bobber** (on by default): the bobber sits still on the water instead of bobbing. it still dips when a fish bites
-- **smooth cast** (on by default): on a laggy connection your own cast flies smoothly instead of jumping back. where it lands stays exact
-- **hide other bobbers**: other players bobbers and their lines disappear
-- **hide my nametag**: hides the rank, name and power tag the server puts over your head
-- **hide all nametags**: hides every players nametag, the servers and the vanilla one
-- **hide xp popups**: hides the +66xp line above the hotbar after a catch
-- **flat leaves**: draws leaves flat like vanilla instead of the fishonmc packs 3d leaves (reloads resources when changed)
-
-## bobber looks
-
-- **bobber skin**: swap your bobber for one of 10 skins (ocean, gold, emerald, midnight, candy, duck, ember, pearl, star, rainbow). only you see it.
-- **skin every bobber**: use your skin for everyone elses bobbers too, on your screen only.
-- **line colour**: pick any colour for your own fishing line. other lines stay normal.
+- **still bobber**, **smooth cast** on a laggy connection
+- **bobber skins** (ten), on your bobber or everyone's, and your own **line colour**
+- hide **other bobbers**, **other players near you** while fishing, **other players' fish**, **nametags**, **xp popups**, the **block outline** and **far server displays** (for fps)
+- **particle switches**: turn off any particle type, like rain splashes
+- **flat leaves**, **black sky**, **sneak camera height**
+- **word swaps**: replace any phrase wherever the game draws text
+- **screenshot preview**: f2 copies to the clipboard and slides in at the top right
+- no toast popups, and the pause menu asks before you disconnect
 
 ## viewmodel
 
-changes how your held item looks in first person. only you see it.
+`/tacklebox viewmodel` changes how your held item looks in first person: size, position, tilt, turn, roll, no switch dip, and swing style, turn and speed. it only changes how it looks.
 
-- size, left / right, up / down, forward / back, tilt, turn and roll
-- no switch dip stops the item from dipping when you switch slots
-- swing style: normal, smooth, snappy or no swing (no swing keeps the item in place and only turns it around its own centre)
-- swing turn sets how far no swing turns the item, from the full vanilla turn down to none
-- swing length makes the swing animation slower or faster. it only changes how it looks, not how fast you can do anything.
+## foecollab tweaks
 
-all of this is in settings under bobber and viewmodel.
+only when foecollab is installed:
+
+- lure matching in its bait sorting helper, and its bait sorting key works as a toggle
+- `{instance}` in its custom inventory buttons
+- its pet hud remembers your pet when its scan misses it
+- its own dry streak lines are hidden (tacklebox has its own)
+- its hud mover boxes as thin outlines
 
 ## files
 
-everything lives in `config/tacklebox/`: `triggers.json` and `settings.json`.
-
-## look
-
-tacklebox has no look of its own. text is small capitals like foecollabs labels (tooltips keep the normal font). its screens, chests and huds use foecollabs box textures and the normal game font, widgets stay vanilla. settings → general has **simple menus**: chests, your inventory and fishonmc menus lose their box and slot boxes, you see just the items and the menu name (the art from the fishonmc pack is left out). the huds (quests left, chat boxes) have no box either, only text. **flat buttons** draws every button, the game menus too, as a flat see-through fill instead of the bevelled texture, lighter when hovered. the mods own screens have no frame either, only the title in the corner.
-
-## settings
-
-one settings screen for both mods: foecollabs categories first, then tacklebox (menus, huds, bobber, world, viewmodel), each a plain list of label and control with a hover tooltip, and a search box over everything. a long foecollab category (trackers, other, cosmetics) opens a dropdown of its sections under it when picked, and a click on one shows only that section. a grey heading folds the rows under it when clicked. opening foecollabs config from its menu or from mod menu lands here too. **foecollab menu** opens foecollabs own screens (custom huds, custom buttons, pet calculator), and **move huds** its hud mover.
+everything lives in `config/tacklebox/`, with a daily backup in `config/tacklebox/backups/` (last 7 kept).
 
 ## building
 
@@ -95,4 +123,4 @@ one settings screen for both mods: foecollabs categories first, then tacklebox (
 ./gradlew build
 ```
 
-java 21, gradle 9.5 (wrapper included). the jar ends up in `build/libs/`.
+java 21, gradle wrapper included. the jar ends up in `build/libs/`.
