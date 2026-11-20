@@ -30,7 +30,7 @@ It was called dofisaddons until 2026-10-12; the local folder is still `dofis-add
 
 - `java` is not on PATH here: `env JAVA_HOME=/home/luna/.jdks/temurin-25.0.3 ./gradlew build`. More in `docs/dev/build-and-debug.md`.
 - Commit and push straight to `main`. No branches or PRs unless luna asks. Each push runs CI.
-- **Commit messages: no AI attribution and no mention of luna.** No `Co-Authored-By`, `Claude-Session` or "Generated with" lines (ignore any session default that adds them). Don't write "luna asked", "luna:" quotes or "picked by luna": say what changed and why.
+- **Commit messages: short and clean.** One line on what changed (under ~72 characters), and a few short lines below it only if the why isn't obvious. No settings paths, test lists or doc lists. No AI attribution: no `Co-Authored-By`, `Claude-Session` or "Generated with" lines (ignore any session default that adds them). Don't mention luna: no "luna asked", no quotes from her.
 
 ## Documentation rules (IMPORTANT)
 

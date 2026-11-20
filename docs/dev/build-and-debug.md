@@ -8,7 +8,7 @@
 
 Commit and push straight to `main`. No feature branches or PRs unless luna asks for one (luna said so on 2026-10-02). Each push to `main` triggers the CI build.
 
-Commit messages carry no AI attribution (no `Co-Authored-By`, `Claude-Session` or "Generated with" lines) and don't mention luna (no "luna asked", no quotes from her): they say what changed and why (2026-11-20).
+Commit messages are short and clean: one line on what changed, a few short lines more only if the why isn't obvious. No AI attribution (no `Co-Authored-By`, `Claude-Session` or "Generated with" lines) and no mention of luna (no "luna asked", no quotes from her). Set on 2026-11-20.
 
 ## Build
 
