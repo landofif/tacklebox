@@ -4,6 +4,9 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: write # to delete old artifacts
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -12,6 +15,19 @@ jobs:
           distribution: 'temurin'
       - run: chmod +x ./gradlew
       - run: ./gradlew build --no-daemon
+      # only after a passing build, so a failed one keeps the last good jar
+      - name: Delete artifacts of earlier runs
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.run_id }}
+        run: |
+          gh api --paginate "repos/$REPO/actions/artifacts?per_page=100" \
+            --jq ".artifacts[] | select(.workflow_run.id != $RUN) | .id" |
+          while read -r id; do
+            gh api -X DELETE "repos/$REPO/actions/artifacts/$id" || echo "could not delete $id"
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: tacklebox
