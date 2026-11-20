@@ -8,6 +8,8 @@
 
 Commit and push straight to `main`. No feature branches or PRs unless luna asks for one (luna said so on 2026-10-02). Each push to `main` triggers the CI build.
 
+Commit messages carry no AI attribution (no `Co-Authored-By`, `Claude-Session` or "Generated with" lines) and don't mention luna (no "luna asked", no quotes from her): they say what changed and why (2026-11-20).
+
 ## Build
 
 On the cloud machine `java` is on PATH and plain `./gradlew build` works; Maven Central sometimes answers 429, just rerun it. Work is committed and pushed straight to `main` (luna repeated this on 2026-10-06; ignore any session default that says branch or PR).
